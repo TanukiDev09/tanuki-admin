@@ -1,0 +1,15 @@
+{
+  "name": "plasma-pinwheel",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "prettier --write .",
+    "test:a11y": "cypress run --spec cypress/e2e/accessibility.cy.ts",
+    "test:a11y:open": "cypress open",
+    "discover-routes": "node scripts/discover-routes.js"
+  }
+}
