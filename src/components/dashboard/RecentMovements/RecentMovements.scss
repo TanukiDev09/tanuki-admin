@@ -39,8 +39,8 @@
     gap: $spacing-md;
     padding: $spacing-sm;
     border-radius: $radius-lg;
-    transition: background-color 0.2s ease;
     cursor: default;
+    transition: background-color 0.2s ease;
 
     &:hover {
       background-color: rgba($muted, 0.4);
@@ -84,9 +84,9 @@
   }
 
   &__item-description {
+    color: $foreground;
     font-size: $font-size-sm;
     font-weight: $font-weight-semibold;
-    color: $foreground;
     line-height: 1.4;
 
     @include text-truncate;
@@ -101,9 +101,9 @@
   &__item-amount {
     margin-left: auto;
     font-family: $font-sans;
+    font-size: $font-size-sm;
     font-weight: $font-weight-bold;
     white-space: nowrap;
-    font-size: $font-size-sm;
 
     &--income {
       color: $success;

@@ -3,35 +3,37 @@
 
 .categories-ext-page {
   @include container-base;
+
   padding: $spacing-xl $spacing-md;
 
   &__title {
-    font-size: $font-size-2xl;
-    font-weight: $font-weight-bold;
     margin-bottom: $spacing-lg;
     font-family: $font-serif;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
   }
 
   &__content {
     @include card-base;
+
     padding: $spacing-3xl;
     text-align: center;
   }
 
   &__emoji {
-    font-size: 4rem;
     margin-bottom: $spacing-md;
+    font-size: 4rem;
   }
 
   &__status {
-    font-size: $font-size-lg;
-    color: $muted-foreground;
     margin-bottom: $spacing-xs;
+    color: $muted-foreground;
+    font-size: $font-size-lg;
   }
 
   &__note {
-    font-size: $font-size-sm;
     color: $muted-foreground;
+    font-size: $font-size-sm;
   }
 }
 
@@ -41,8 +43,8 @@
   overflow: hidden;
 
   &__main-container {
-    flex: 1;
     display: flex;
+    flex: 1;
     flex-direction: column;
     overflow: hidden;
   }

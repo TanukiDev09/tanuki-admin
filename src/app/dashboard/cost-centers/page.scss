@@ -25,15 +25,15 @@
   }
 
   &__title {
+    color: $foreground;
     font-size: 2rem;
     font-weight: $font-weight-bold;
-    color: $foreground;
     letter-spacing: -0.02em;
   }
 
   &__subtitle {
-    font-size: $font-size-base;
     color: $muted-foreground;
+    font-size: $font-size-base;
   }
 
   &__icon {

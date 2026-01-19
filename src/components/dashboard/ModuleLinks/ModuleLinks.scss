@@ -13,22 +13,23 @@
 
 .module-card {
   @include card-base;
-  padding: $spacing-lg;
+
   display: flex;
   flex-direction: column;
   gap: $spacing-sm;
+  padding: $spacing-lg;
+  background: rgba($card, 0.6);
+  text-decoration: none;
+  border: 1px solid rgba($border, 0.4);
   cursor: pointer;
   transition: all 0.2s ease;
-  border: 1px solid rgba($border, 0.4);
-  background: rgba($card, 0.6);
   backdrop-filter: blur(10px);
-  text-decoration: none;
 
   &:hover {
+    background: rgba($card, 0.8);
+    border-color: rgba($primary, 0.3);
     transform: translateY(-4px);
     box-shadow: $shadow-lg;
-    border-color: rgba($primary, 0.3);
-    background: rgba($card, 0.8);
 
     .module-card__icon {
       transform: scale(1.1);
@@ -44,13 +45,13 @@
   }
 
   &__icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 48px;
     height: 48px;
-    border-radius: 12px;
     background: linear-gradient(135deg, rgba($primary, 0.05) 0%, rgba($background, 0.5) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    border-radius: 12px;
     flex-shrink: 0;
   }
 
@@ -62,17 +63,17 @@
   }
 
   &__title {
+    color: $foreground;
     font-size: $font-size-lg;
     font-weight: $font-weight-semibold;
-    color: $foreground;
     line-height: 1.2;
   }
 
   &__description {
-    font-size: $font-size-sm;
-    color: $muted-foreground;
-    line-height: $line-height-normal;
     display: -webkit-box;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    line-height: $line-height-normal;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;

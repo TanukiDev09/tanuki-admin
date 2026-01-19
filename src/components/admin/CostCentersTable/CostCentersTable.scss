@@ -3,34 +3,35 @@
 
 .cost-centers-table {
   @include card-base;
+
   padding: 0;
   overflow: hidden;
 
   &__loading,
   &__empty {
     padding: $spacing-xl;
-    text-align: center;
+    background: $card;
     color: $muted-foreground;
     font-size: $font-size-sm;
-    background: $card;
-    border-radius: $radius-lg;
+    text-align: center;
     border: 1px solid rgba($border, 0.4);
+    border-radius: $radius-lg;
   }
 
   &__code {
+    color: $primary;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     font-weight: $font-weight-medium;
-    color: $primary;
   }
 
   &__name {
-    font-weight: $font-weight-medium;
     color: $foreground;
+    font-weight: $font-weight-medium;
   }
 
   &__actions-head {
-    text-align: right;
     width: 120px;
+    text-align: right;
   }
 
   &__actions-cell {

@@ -3,8 +3,8 @@
 
 .permissions-page {
   width: 100%;
-  margin: 0 auto;
   max-width: $breakpoint-xl;
+  margin: 0 auto;
   padding: $spacing-md;
 
   @include lg {
@@ -13,30 +13,30 @@
 
   // Permission Denied State
   &__access-denied {
-    min-height: 100vh;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    min-height: 100vh;
   }
 
   &__denied-content {
-    text-align: center;
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
+    text-align: center;
   }
 
   &__denied-icon {
     width: 4rem;
     height: 4rem;
-    color: $danger;
     margin: 0 auto;
+    color: $danger;
   }
 
   &__denied-title {
+    color: $foreground;
     font-size: $font-size-2xl;
     font-weight: $font-weight-bold;
-    color: $foreground;
   }
 
   &__denied-text {
@@ -45,25 +45,26 @@
 
   // Header
   &__header {
-    margin-bottom: $spacing-xl;
     display: flex;
     align-items: center;
     gap: $spacing-md;
+    margin-bottom: $spacing-xl;
     margin-bottom: $spacing-sm;
   }
 
   &__icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 3rem;
     height: 3rem;
-    border-radius: $radius-xl;
     background: linear-gradient(
       to bottom right,
       #a855f7,
       #9333ea
     ); // purple-500 to purple-600
-    display: flex;
-    align-items: center;
-    justify-content: center;
+
+    border-radius: $radius-xl;
     box-shadow: 0 10px 15px -3px rgba(#a855f7, 0.3);
     flex-shrink: 0;
   }
@@ -71,13 +72,13 @@
   &__header-icon {
     width: 1.5rem;
     height: 1.5rem;
-    color: #ffffff;
+    color: #fff;
   }
 
   &__title {
+    color: $foreground;
     font-size: $font-size-3xl;
     font-weight: $font-weight-bold;
-    color: $foreground;
   }
 
   &__subtitle {
@@ -86,10 +87,10 @@
 
   // Layout
   &__header {
-    margin-bottom: $spacing-xl;
     display: flex;
     align-items: center;
     gap: $spacing-md;
+    margin-bottom: $spacing-xl;
     margin-bottom: $spacing-2xl; // Increased spacing
   }
 
@@ -134,16 +135,17 @@
   // Cards
   &__card {
     @include card-base;
+
+    padding: $spacing-xl;
     border: 1px solid rgba($border, 0.5);
     border-radius: $radius-xl;
-    padding: $spacing-xl;
   }
 
   &__card-title {
+    margin-bottom: $spacing-md;
+    color: $foreground;
     font-size: $font-size-lg;
     font-weight: $font-weight-semibold;
-    color: $foreground;
-    margin-bottom: $spacing-md;
   }
 
   &__user-header {
@@ -151,8 +153,8 @@
   }
 
   &__user-info {
-    font-size: $font-size-sm;
     color: $muted-foreground;
+    font-size: $font-size-sm;
   }
 
   // Empty/Loading States
@@ -164,10 +166,10 @@
   }
 
   &__skeleton-line {
+    width: 33%;
     height: 2rem;
     background-color: $muted;
     border-radius: $radius-sm;
-    width: 33%;
   }
 
   &__skeleton-block {
@@ -178,28 +180,29 @@
 
   &__empty-state {
     @include card-base;
-    border: 1px solid rgba($border, 0.5);
-    border-radius: $radius-xl;
-    padding: 3rem;
-    text-align: center;
+
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    padding: 3rem;
+    text-align: center;
+    border: 1px solid rgba($border, 0.5);
+    border-radius: $radius-xl;
   }
 
   &__empty-icon {
     width: 4rem;
     height: 4rem;
-    color: rgba($muted-foreground, 0.3);
     margin-bottom: $spacing-md;
+    color: rgba($muted-foreground, 0.3);
   }
 
   &__empty-title {
+    margin-bottom: $spacing-xs;
+    color: $foreground;
     font-size: $font-size-lg;
     font-weight: $font-weight-medium;
-    color: $foreground;
-    margin-bottom: $spacing-xs;
   }
 
   &__empty-text {
@@ -212,6 +215,7 @@
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }

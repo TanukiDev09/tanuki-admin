@@ -26,7 +26,6 @@ import ImageUploader from '../ImageUploader/ImageUploader';
 import CostCenterSelect from '../CostCenterSelect/CostCenterSelect';
 import CollectionSelect from '../CollectionSelect/CollectionSelect';
 import MonthYearSelect from '../MonthYearSelect/MonthYearSelect';
-import { formatCurrency, formatNumber } from '@/lib/utils';
 import './CreateBookModal.scss';
 
 interface CreateBookModalProps {

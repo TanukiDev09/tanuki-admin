@@ -65,8 +65,8 @@
     cursor: pointer;
 
     &:hover {
-      text-decoration: underline;
       color: $primary;
+      text-decoration: underline;
     }
   }
 

@@ -114,7 +114,7 @@ export default function CostCentersPage() {
       <CostCentersTable
         costCenters={filteredCostCenters}
         loading={loading}
-        onEdit={(cc) => toast({ title: "Próximamente", description: "La edición estará disponible pronto." })}
+        onEdit={() => toast({ title: "Próximamente", description: "La edición estará disponible pronto." })}
         onDelete={handleDelete}
       />
     </div>

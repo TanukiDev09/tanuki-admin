@@ -76,9 +76,9 @@
     }
 
     &-title {
+      color: $muted-foreground;
       font-size: $font-size-sm;
       font-weight: $font-weight-semibold;
-      color: $muted-foreground;
       text-transform: uppercase;
       letter-spacing: 0.05em;
     }
@@ -105,8 +105,8 @@
   
   &__input-preview {
     margin-top: 2px;
-    font-size: $font-size-xs;
     color: $primary;
+    font-size: $font-size-xs;
     font-weight: $font-weight-medium;
   }
 

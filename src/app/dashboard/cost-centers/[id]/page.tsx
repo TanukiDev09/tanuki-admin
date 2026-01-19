@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, Clock, TrendingUp, TrendingDown, DollarSign, ArrowUpRight, ArrowDownRight, Scale, Activity } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, TrendingDown, ArrowUpRight, ArrowDownRight, Scale, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import { CostCenter } from '@/types/cost-center';
+import { Movement } from '@/types/movement';
+import { FinancialSummary } from '@/types/financial-summary';
 import { useToast } from '@/components/ui/Toast';
 import { RunwayCard } from '@/components/dashboard/RunwayCard';
 import dynamic from 'next/dynamic';
@@ -18,18 +20,13 @@ const IncomeExpenseChart = dynamic(() => import('@/components/dashboard/IncomeEx
   loading: () => <div className="h-[300px] w-full bg-muted/10 animate-pulse rounded-lg" />
 });
 
-const CategoryPieChart = dynamic(() => import('@/components/dashboard/CategoryPieChart').then(mod => mod.CategoryPieChart), {
-  ssr: false,
-  loading: () => <div className="h-[300px] w-full bg-muted/10 animate-pulse rounded-lg" />
-});
-
 export default function CostCenterDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
   const [costCenter, setCostCenter] = useState<CostCenter | null>(null);
-  const [financialData, setFinancialData] = useState<any>(null); // Using any for summary structure speed
-  const [movements, setMovements] = useState<any[]>([]);
+  const [financialData, setFinancialData] = useState<FinancialSummary | null>(null);
+  const [movements, setMovements] = useState<Movement[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -206,7 +203,7 @@ export default function CostCenterDetailPage() {
           {/* 2. INDICADORES DE SOSTENIBILIDAD */}
           <h3 className="cost-center-detail__section-title subsection" style={{ marginTop: '2rem' }}>Indicadores de Sostenibilidad</h3>
           <div className="cost-center-detail__indicators-grid">
-            <RunwayCard runway={financialData.metrics?.runway || 0} />
+            <RunwayCard runway={financialData.health?.runway || 0} />
 
             {/* Burn Rate Card */}
             <Card className="runway-card"> {/* Reuse card style base */}
@@ -216,7 +213,7 @@ export default function CostCenterDetailPage() {
               </CardHeader>
               <CardContent className="runway-card__content">
                 <div className="text-3xl font-bold text-foreground">
-                  {formatCurrency(financialData.metrics?.averageExpense || 0)}
+                  {formatCurrency(financialData.health?.avgMonthlyExpense || 0)}
                   <span className="text-sm font-normal text-muted-foreground ml-1">/mes</span>
                 </div>
                 <p className="text-sm text-muted-foreground mt-2">
@@ -234,14 +231,14 @@ export default function CostCenterDetailPage() {
               <CardContent className="runway-card__content flex items-center justify-between">
                 <div>
                   <div className="text-3xl font-bold text-foreground">
-                    {financialData.metrics?.healthScore || 100}
+                    {financialData.health?.healthScore || 100}
                     <span className="text-sm font-normal text-muted-foreground">/100</span>
                   </div>
                   <p className="text-sm text-emerald-600 font-medium mt-2">Excelente</p>
                 </div>
                 {/* Simple circular placeholder */}
                 <div className="h-16 w-16 rounded-full border-4 border-emerald-500 flex items-center justify-center text-emerald-700 font-bold">
-                  {financialData.metrics?.healthScore || 100}
+                  {financialData.health?.healthScore || 100}
                 </div>
               </CardContent>
             </Card>

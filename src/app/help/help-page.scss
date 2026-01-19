@@ -3,19 +3,20 @@
 
 .help-page {
   @include container-base;
-  padding: $spacing-xl $spacing-md;
+
   max-width: 800px;
   margin: 0 auto;
+  padding: $spacing-xl $spacing-md;
 
   &__header {
     margin-bottom: $spacing-xl;
   }
 
   &__title {
-    font-size: $font-size-2xl;
-    font-weight: $font-weight-bold;
     margin-bottom: $spacing-xs;
     font-family: $font-serif;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
   }
 
   &__subtitle {
@@ -30,15 +31,16 @@
 
   &__term-card {
     @include card-base;
+
     padding: $spacing-lg;
   }
 
   &__term-title {
-    font-size: $font-size-xl;
-    font-weight: $font-weight-semibold;
     margin-bottom: $spacing-xs;
     color: $primary;
     font-family: $font-serif;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
   }
 
   &__term-definition {
@@ -48,22 +50,23 @@
 
   &__support-card {
     @include card-base;
-    padding: $spacing-lg;
+
     margin-top: $spacing-2xl;
+    padding: $spacing-lg;
     background-color: rgba($info, 0.05);
     border-color: rgba($info, 0.2);
   }
 
   &__support-title {
-    font-size: $font-size-lg;
-    font-weight: $font-weight-semibold;
     margin-bottom: $spacing-xs;
     color: $info;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
   }
 
   &__support-text {
-    font-size: $font-size-sm;
     color: $muted-foreground;
+    font-size: $font-size-sm;
   }
 }
 
@@ -73,8 +76,8 @@
   overflow: hidden;
 
   &__main-container {
-    flex: 1;
     display: flex;
+    flex: 1;
     flex-direction: column;
     overflow: hidden;
   }

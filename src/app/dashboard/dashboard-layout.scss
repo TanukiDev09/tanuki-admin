@@ -15,9 +15,9 @@
 
   &__main {
     flex: 1;
-    overflow-y: auto;
-    background-color: $background;
     padding: $spacing-md;
+    background-color: $background;
+    overflow-y: auto;
 
     @include lg {
       padding: $spacing-xl;

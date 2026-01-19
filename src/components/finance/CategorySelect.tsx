@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Plus, Check } from 'lucide-react';
 import {
   Select,
@@ -52,7 +52,7 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
     }
   }, [fixedType]);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -74,11 +74,11 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [type]);
 
   useEffect(() => {
     fetchCategories();
-  }, [type]);
+  }, [fetchCategories]);
 
   const handleCreateNew = async (e: React.SyntheticEvent) => {
     e.preventDefault();
