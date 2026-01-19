@@ -61,8 +61,8 @@ interface SelectedItem {
 interface InventoryMovementModalProps {
   isOpen: boolean;
   onClose: () => void;
-  warehouseId: string;
-  warehouseType: string;
+  warehouseId?: string;
+  warehouseType?: string;
   onSuccess: () => void;
 }
 
@@ -103,8 +103,31 @@ export function InventoryMovementModal({
       setSearchTerm('');
       setSearchResults([]);
       fetchWarehouses();
+
+      // Reset active warehouse states based on props
+      if (warehouseId) setActiveWarehouseId(warehouseId);
+      if (warehouseType) setActiveWarehouseType(warehouseType);
+      if (!warehouseId) {
+        setActiveWarehouseId('');
+        setActiveWarehouseType('');
+      }
     }
-  }, [isOpen]);
+  }, [isOpen, warehouseId, warehouseType]);
+
+  const [activeWarehouseId, setActiveWarehouseId] = useState<string>(warehouseId || '');
+  const [activeWarehouseType, setActiveWarehouseType] = useState<string>(warehouseType || '');
+
+  const handleActiveWarehouseChange = (wid: string) => {
+    const w = warehouses.find(w => w._id === wid);
+    if (w) {
+      setActiveWarehouseId(wid);
+      setActiveWarehouseType(w.type);
+      // Reset type and items when warehouse changes
+      setType('');
+      setSubType('');
+      setItems([]);
+    }
+  };
 
   const fetchWarehouses = async () => {
     try {
@@ -126,12 +149,12 @@ export function InventoryMovementModal({
 
   const getSourceWarehouseId = () => {
     if (type === 'INGRESO') return null;
-    if (type === 'REMISION' || type === 'DEVOLUCION' || type === 'LIQUIDACION') return warehouseId;
-    return warehouseId;
+    if (type === 'REMISION' || type === 'DEVOLUCION' || type === 'LIQUIDACION') return activeWarehouseId;
+    return activeWarehouseId;
   };
 
   const getDestWarehouseId = () => {
-    if (type === 'INGRESO') return warehouseId;
+    if (type === 'INGRESO') return activeWarehouseId;
     if (type === 'REMISION') return targetWarehouseId;
     if (type === 'DEVOLUCION') {
       const editorial = warehouses.find(w => w.type === 'editorial');
@@ -236,21 +259,41 @@ export function InventoryMovementModal({
 
   const renderStep1 = () => (
     <div className="inventory-movement-modal__step">
+      {!warehouseId && (
+        <div className="inventory-movement-modal__field">
+          <Label>Bodega</Label>
+          <Select value={activeWarehouseId} onValueChange={handleActiveWarehouseChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar bodega..." />
+            </SelectTrigger>
+            <SelectContent>
+              {warehouses.map(w => (
+                <SelectItem key={w._id} value={w._id}>{w.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       <div className="inventory-movement-modal__field">
         <Label>Tipo de Movimiento</Label>
-        <Select value={type} onValueChange={(v) => handleTypeChange(v as MovementType)}>
+        <Select
+          value={type}
+          onValueChange={(v) => handleTypeChange(v as MovementType)}
+          disabled={!activeWarehouseId}
+        >
           <SelectTrigger>
-            <SelectValue placeholder="Seleccionar..." />
+            <SelectValue placeholder={!activeWarehouseId ? "Primero seleccione una bodega" : "Seleccionar..."} />
           </SelectTrigger>
           <SelectContent>
-            {(warehouseType === 'editorial' || warehouseType === 'general') && (
+            {(activeWarehouseType === 'editorial' || activeWarehouseType === 'general') && (
               <>
                 <SelectItem value="INGRESO">Ingreso (Compras / Ajuste)</SelectItem>
                 <SelectItem value="REMISION">Remisión (A Punto de Venta)</SelectItem>
               </>
             )}
             <SelectItem value="LIQUIDACION">Liquidación (Venta)</SelectItem>
-            {warehouseType === 'pos' && (
+            {activeWarehouseType === 'pos' && (
               <SelectItem value="DEVOLUCION">Devolución (A Editorial)</SelectItem>
             )}
           </SelectContent>
