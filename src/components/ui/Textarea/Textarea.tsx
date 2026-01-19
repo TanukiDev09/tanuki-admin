@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import './Textarea.scss';
 
 export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>;
@@ -14,6 +14,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     );
   }
 );
-Textarea.displayName = "Textarea";
+Textarea.displayName = 'Textarea';
 
 export { Textarea };

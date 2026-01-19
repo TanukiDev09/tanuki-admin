@@ -37,18 +37,24 @@ export function InventoryStats({ stats, isLoading }: StatsProps) {
     <div className="inventory-stats">
       <Card className="inventory-stats__card">
         <CardHeader className="inventory-stats__header">
-          <CardTitle className="inventory-stats__title">Unidades Totales</CardTitle>
+          <CardTitle className="inventory-stats__title">
+            Unidades Totales
+          </CardTitle>
           <Package className="inventory-stats__icon" />
         </CardHeader>
         <CardContent>
-          <div className="inventory-stats__value">{formatNumber(stats.totalUnits)}</div>
+          <div className="inventory-stats__value">
+            {formatNumber(stats.totalUnits)}
+          </div>
           <p className="inventory-stats__description">En todas las bodegas</p>
         </CardContent>
       </Card>
 
       <Card className="inventory-stats__card">
         <CardHeader className="inventory-stats__header">
-          <CardTitle className="inventory-stats__title">Valor del Inventario</CardTitle>
+          <CardTitle className="inventory-stats__title">
+            Valor del Inventario
+          </CardTitle>
           <DollarSign className="inventory-stats__icon" />
         </CardHeader>
         <CardContent>
@@ -65,8 +71,12 @@ export function InventoryStats({ stats, isLoading }: StatsProps) {
           <AlertTriangle className="inventory-stats__icon inventory-stats__icon--warning" />
         </CardHeader>
         <CardContent>
-          <div className="inventory-stats__value inventory-stats__value--warning">{formatNumber(stats.lowStockCount)}</div>
-          <p className="inventory-stats__description">Items por debajo del mínimo</p>
+          <div className="inventory-stats__value inventory-stats__value--warning">
+            {formatNumber(stats.lowStockCount)}
+          </div>
+          <p className="inventory-stats__description">
+            Items por debajo del mínimo
+          </p>
         </CardContent>
       </Card>
 
@@ -76,7 +86,9 @@ export function InventoryStats({ stats, isLoading }: StatsProps) {
           <XCircle className="inventory-stats__icon inventory-stats__icon--danger" />
         </CardHeader>
         <CardContent>
-          <div className="inventory-stats__value inventory-stats__value--danger">{formatNumber(stats.outOfStockCount)}</div>
+          <div className="inventory-stats__value inventory-stats__value--danger">
+            {formatNumber(stats.outOfStockCount)}
+          </div>
           <p className="inventory-stats__description">Items agotados</p>
         </CardContent>
       </Card>

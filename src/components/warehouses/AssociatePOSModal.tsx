@@ -69,15 +69,18 @@ export function AssociatePOSModal({
     setLoading(true);
 
     try {
-      const response = await fetch(`/api/warehouses/${warehouseId}/associate-pos`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          pointOfSaleId: selectedPOSId === 'none' ? null : selectedPOSId,
-        }),
-      });
+      const response = await fetch(
+        `/api/warehouses/${warehouseId}/associate-pos`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            pointOfSaleId: selectedPOSId === 'none' ? null : selectedPOSId,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -87,15 +90,19 @@ export function AssociatePOSModal({
 
       toast({
         title: 'Éxito',
-        description: selectedPOSId === 'none'
-          ? 'Punto de venta desasociado correctamente'
-          : 'Punto de venta asociado correctamente',
+        description:
+          selectedPOSId === 'none'
+            ? 'Punto de venta desasociado correctamente'
+            : 'Punto de venta asociado correctamente',
       });
 
       router.refresh();
       onClose();
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('No se pudo asociar el punto de venta');
+      const error =
+        err instanceof Error
+          ? err
+          : new Error('No se pudo asociar el punto de venta');
       toast({
         title: 'Error',
         description: error.message,
@@ -116,11 +123,11 @@ export function AssociatePOSModal({
           </DialogDescription>
         </DialogHeader>
 
-
-
         <div className="associate-pos-modal__content">
           <div className="associate-pos-modal__field-group">
-            <Label htmlFor="pos" className="associate-pos-modal__label">Punto de Venta</Label>
+            <Label htmlFor="pos" className="associate-pos-modal__label">
+              Punto de Venta
+            </Label>
             <Select
               value={selectedPOSId}
               onValueChange={setSelectedPOSId}

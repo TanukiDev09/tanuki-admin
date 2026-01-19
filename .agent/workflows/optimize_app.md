@@ -3,24 +3,29 @@ description: Optimize Load Times and API Calls for the Entire Application
 ---
 
 # Objective
+
 Improve the performance of the Tanuki Admin application by reducing page load times, minimizing unnecessary API calls, and implementing best‑practice caching and lazy‑loading strategies.
 
 # Prerequisites
+
 - Node.js (v20+)
 - The project is a Next.js (app router) application located at `d:\Dev\Web\tanuki-admin`.
 - Ensure the development server is running (`npm run dev`).
 
 # Steps
+
 1. **Audit Existing API Calls**
    - Search the codebase for direct `fetch`/`axios` calls.
    - Identify duplicated requests, calls inside loops, and calls that fetch large payloads.
    - Document findings in `docs/performance-audit.md`.
 
 2. **Introduce a Centralized API Client**
+
    ```bash
    // turbo
    npx -y create-next-app@latest ./tmp_api_client
    ```
+
    - Create `src/lib/api.ts` that wraps `fetch` with default headers, error handling, and built‑in caching using **React Query** (or **SWR**).
    - Replace all direct fetch/axios calls with `api.get/post/...`.
 
@@ -38,9 +43,14 @@ Improve the performance of the Tanuki Admin application by reducing page load ti
 
 6. **Lazy‑Load Heavy Components**
    - Convert large UI components (modals, charts) to dynamic imports:
+
    ```tsx
-   const AddBookModal = dynamic(() => import('@/components/inventory/AddBookToInventoryModal'), { ssr: false });
+   const AddBookModal = dynamic(
+     () => import('@/components/inventory/AddBookToInventoryModal'),
+     { ssr: false }
+   );
    ```
+
    - Add a loading skeleton for better UX.
 
 7. **Code‑Split Routes**
@@ -54,14 +64,22 @@ Improve the performance of the Tanuki Admin application by reducing page load ti
 
 9. **Enable HTTP Compression**
    - In `next.config.js` add:
+
    ```js
    const nextConfig = {
      compress: true,
      async headers() {
-       return [{
-         source: '/:path*',
-         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
-       }];
+       return [
+         {
+           source: '/:path*',
+           headers: [
+             {
+               key: 'Cache-Control',
+               value: 'public, max-age=31536000, immutable',
+             },
+           ],
+         },
+       ];
      },
    };
    module.exports = nextConfig;
@@ -81,6 +99,7 @@ Improve the performance of the Tanuki Admin application by reducing page load ti
     - Use `next-telemetry` to send runtime metrics to an internal dashboard.
 
 # Post‑Implementation Checklist
+
 - [ ] All direct fetch/axios calls replaced.
 - [ ] React Query provider configured.
 - [ ] Heavy components are lazy‑loaded.
@@ -90,6 +109,7 @@ Improve the performance of the Tanuki Admin application by reducing page load ti
 - [ ] Documentation updated.
 
 # References
+
 - [React Query Docs](https://tanstack.com/query/v4/docs/overview)
 - [Next.js Image Component](https://nextjs.org/docs/app/api-reference/components/image)
 - [Lighthouse CI](https://github.com/GoogleChrome/lighthouse-ci)

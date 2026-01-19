@@ -30,14 +30,12 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop/Sidebar Navigation */}
-      <aside
-        className={`sidebar ${isCollapsed ? 'sidebar--collapsed' : ''}`}
-      >
+      <aside className={`sidebar ${isCollapsed ? 'sidebar--collapsed' : ''}`}>
         {/* Toggle Button */}
         <button
           className="sidebar__toggle"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          aria-label={isCollapsed ? "Expandir menú" : "Colapsar menú"}
+          aria-label={isCollapsed ? 'Expandir menú' : 'Colapsar menú'}
         >
           {isCollapsed ? (
             <ChevronRight className="sidebar__toggle-icon" />
@@ -84,15 +82,17 @@ export function Sidebar() {
           aria-label="Navegación principal"
           className="sidebar__nav"
         >
-          <NavLinks currentPath={pathname} variant="vertical" collapsed={isCollapsed} />
+          <NavLinks
+            currentPath={pathname}
+            variant="vertical"
+            collapsed={isCollapsed}
+          />
         </nav>
 
         {/* Footer Info */}
         {!isCollapsed && (
           <div className="sidebar__footer">
-            <p className="sidebar__footer-text">
-              Tanuki Libros © 2024
-            </p>
+            <p className="sidebar__footer-text">Tanuki Libros © 2024</p>
           </div>
         )}
       </aside>

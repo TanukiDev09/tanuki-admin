@@ -48,12 +48,16 @@ const StockComparison = ({ current, result }: StockComparisonProps) => (
   <div className="inventory-adjust-modal__comparison">
     <div className="inventory-adjust-modal__comparison-column">
       <p className="inventory-adjust-modal__comparison-label">Actual</p>
-      <p className="inventory-adjust-modal__comparison-value">{formatNumber(current)}</p>
+      <p className="inventory-adjust-modal__comparison-value">
+        {formatNumber(current)}
+      </p>
     </div>
     <ArrowRight className="inventory-adjust-modal__comparison-arrow" />
     <div className="inventory-adjust-modal__comparison-column inventory-adjust-modal__comparison-column--right">
       <p className="inventory-adjust-modal__comparison-label">Resultante</p>
-      <p className={`inventory-adjust-modal__comparison-value ${result < 0 ? 'inventory-adjust-modal__comparison-value--negative' : 'inventory-adjust-modal__comparison-value--positive'}`}>
+      <p
+        className={`inventory-adjust-modal__comparison-value ${result < 0 ? 'inventory-adjust-modal__comparison-value--negative' : 'inventory-adjust-modal__comparison-value--positive'}`}
+      >
         {formatNumber(result)}
       </p>
     </div>
@@ -79,7 +83,7 @@ const AdjustmentInput = ({ label, value, onChange }: AdjustmentInputProps) => (
         className="inventory-adjust-modal__input"
       />
       <div className="inventory-adjust-modal__quick-actions">
-        {[1, 10, 50].map(val => (
+        {[1, 10, 50].map((val) => (
           <Button
             key={val}
             variant="outline"
@@ -165,7 +169,10 @@ export function InventoryAdjustModal({
     setLoading(true);
     try {
       await performUpdateRequest(getFinalAdjustment());
-      toast({ title: 'Éxito', description: 'Inventario ajustado correctamente' });
+      toast({
+        title: 'Éxito',
+        description: 'Inventario ajustado correctamente',
+      });
       onSuccess();
       router.refresh();
       onClose();
@@ -181,8 +188,18 @@ export function InventoryAdjustModal({
   };
 
   const labels = {
-    title: mode === 'add' ? 'Aumentar Stock' : mode === 'remove' ? 'Disminuir Stock' : 'Ajustar Stock',
-    input: mode === 'add' ? 'Cantidad a sumar' : mode === 'remove' ? 'Cantidad a restar' : 'Nueva cantidad'
+    title:
+      mode === 'add'
+        ? 'Aumentar Stock'
+        : mode === 'remove'
+          ? 'Disminuir Stock'
+          : 'Ajustar Stock',
+    input:
+      mode === 'add'
+        ? 'Cantidad a sumar'
+        : mode === 'remove'
+          ? 'Cantidad a restar'
+          : 'Nueva cantidad',
   };
 
   return (
@@ -220,7 +237,11 @@ export function InventoryAdjustModal({
           <Button
             onClick={handleSubmit}
             disabled={loading || (mode === 'remove' && calculatedResult < 0)}
-            className={mode === 'remove' ? 'inventory-adjust-modal__btn-confirm--remove' : ''}
+            className={
+              mode === 'remove'
+                ? 'inventory-adjust-modal__btn-confirm--remove'
+                : ''
+            }
           >
             {loading ? 'Procesando...' : 'Confirmar Ajuste'}
           </Button>

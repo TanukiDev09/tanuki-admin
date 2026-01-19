@@ -11,7 +11,6 @@ import {
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/Button';
 import {
-
   Command,
   CommandEmpty,
   CommandGroup,
@@ -99,7 +98,7 @@ export function CreatorSelect({
 
     const count = value.length;
     if (count === 1) {
-      const creator = creators.find(c => c._id === value[0]);
+      const creator = creators.find((c) => c._id === value[0]);
       return creator ? creator.name : 'Cargando...';
     }
     return `${count} seleccionados`;
@@ -115,7 +114,9 @@ export function CreatorSelect({
             aria-expanded={open}
             className="creator-select__trigger"
           >
-            <span className="creator-select__trigger-text">{getSelectedLabels()}</span>
+            <span className="creator-select__trigger-text">
+              {getSelectedLabels()}
+            </span>
             <ChevronsUpDown className="creator-select__icon-muted" />
           </Button>
         </PopoverTrigger>
@@ -151,7 +152,9 @@ export function CreatorSelect({
                     <Check
                       className={cn(
                         'creator-select__icon-check',
-                        value.includes(creator._id) ? 'creator-select__icon-check--selected' : 'creator-select__icon-check--unselected'
+                        value.includes(creator._id)
+                          ? 'creator-select__icon-check--selected'
+                          : 'creator-select__icon-check--unselected'
                       )}
                     />
                     <div className="creator-select__item-col">

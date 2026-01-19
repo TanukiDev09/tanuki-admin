@@ -99,17 +99,17 @@
   // I will target the Grid gap specifically in a second easier chunk if needed, or do it here if contiguous.
   // The header section is lines 47-53. The grid is lines 88-91. They are not contiguous.
   // I will make TWO replace calls or use multi_replace.
-  
+
   // Re-reading the `replace_file_content` rule 5: "If you are making multiple edits across a single file, use the multi_replace_file_content tool instead."
   // I should use multi_replace.
-  
+
   // Wait, I am the AI, I can't change the tool call inside the thought process.
   // I will use `replace_file_content` for just the Grid Gap first as it's more critical for "cramped" feel.
   // Actually, I can use multi_replace. Let me switch to multi_replace for permissions.scss.
-  
+
   // ABORTING single replace. Will use multi_replace below.
   // For this step, I will just do the GAP change which is lines 88-91.
-  
+
   &__grid {
     display: grid;
     grid-template-columns: 1fr;

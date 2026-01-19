@@ -21,9 +21,7 @@ export async function verifyPassword(
   hashedPassword: string
 ): Promise<boolean> {
   try {
-    console.log('[Auth Lib] Verifying password...');
     const match = await bcrypt.compare(password, hashedPassword);
-    console.log('[Auth Lib] Password match result:', match);
     return match;
   } catch (error) {
     console.error('[Auth Lib] Error comparing passwords:', error);

@@ -34,7 +34,9 @@ export default function LoginPage() {
   if (user) {
     return (
       <main className="login-page login-page--redirecting">
-        <h1 className="login-page__redirect-text">Redirigiendo al dashboard...</h1>
+        <h1 className="login-page__redirect-text">
+          Redirigiendo al dashboard...
+        </h1>
       </main>
     );
   }

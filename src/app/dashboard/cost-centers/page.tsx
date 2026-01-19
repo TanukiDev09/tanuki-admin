@@ -14,7 +14,10 @@ import './page.scss';
 export default function CostCentersPage() {
   const { toast } = useToast();
   const { hasPermission } = usePermission();
-  const canCreate = hasPermission(ModuleName.COST_CENTERS, PermissionAction.CREATE);
+  const canCreate = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.CREATE
+  );
 
   const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,7 +56,9 @@ export default function CostCentersPage() {
   }, [fetchCostCenters]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar este centro de costo?')) {
+    if (
+      !confirm('¿Estás seguro de que deseas eliminar este centro de costo?')
+    ) {
       return;
     }
 
@@ -95,7 +100,15 @@ export default function CostCentersPage() {
           </p>
         </div>
         {canCreate && (
-          <Button onClick={() => toast({ title: "Próximamente", description: "La creación desde esta vista está en construcción. Usa el selector en movimientos." })}>
+          <Button
+            onClick={() =>
+              toast({
+                title: 'Próximamente',
+                description:
+                  'La creación desde esta vista está en construcción. Usa el selector en movimientos.',
+              })
+            }
+          >
             <Plus className="cost-centers-page__icon" />
             Nuevo Centro
           </Button>
@@ -114,7 +127,12 @@ export default function CostCentersPage() {
       <CostCentersTable
         costCenters={filteredCostCenters}
         loading={loading}
-        onEdit={() => toast({ title: "Próximamente", description: "La edición estará disponible pronto." })}
+        onEdit={() =>
+          toast({
+            title: 'Próximamente',
+            description: 'La edición estará disponible pronto.',
+          })
+        }
         onDelete={handleDelete}
       />
     </div>

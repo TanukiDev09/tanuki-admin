@@ -19,9 +19,7 @@ export default function AyudaLayout({
         <Sidebar />
         <div className="help-layout__main-container">
           <AppHeader />
-          <main className="help-layout__content">
-            {children}
-          </main>
+          <main className="help-layout__content">{children}</main>
         </div>
       </div>
     </AuthGuard>

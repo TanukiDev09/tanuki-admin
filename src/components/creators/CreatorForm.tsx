@@ -93,8 +93,9 @@ export function CreatorForm({
 
       toast({
         title: 'Éxito',
-        description: `Creador ${creatorToEdit ? 'actualizado' : 'creado'
-          } correctamente`,
+        description: `Creador ${
+          creatorToEdit ? 'actualizado' : 'creado'
+        } correctamente`,
       });
 
       onSuccess();
@@ -121,7 +122,10 @@ export function CreatorForm({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="creator-form__form">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="creator-form__form"
+          >
             <FormField
               control={form.control}
               name="name"

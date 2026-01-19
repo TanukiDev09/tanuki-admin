@@ -32,7 +32,6 @@ if (!cached) {
 
 async function dbConnect() {
   if (cached.conn) {
-    console.log('[MongoDB] Using cached connection to:', cached.conn.connection.db?.databaseName);
     return cached.conn;
   }
 
@@ -41,19 +40,7 @@ async function dbConnect() {
       bufferCommands: false,
     };
 
-    const sanitizedUri = MONGODB_URI!.replace(/:([^@]+)@/, ':****@');
-    console.log('[MongoDB] Attempting connection to:', sanitizedUri);
-
     cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
-      console.log('[MongoDB] Connection established to database:', mongoose.connection.db?.databaseName);
-      
-      // List collections for deep debugging
-      mongoose.connection.db?.listCollections().toArray().then(cols => {
-        console.log('[MongoDB] Available collections:', cols.map(c => c.name).join(', '));
-      }).catch(err => {
-        console.error('[MongoDB] Error listing collections:', err);
-      });
-
       return mongoose;
     });
   }

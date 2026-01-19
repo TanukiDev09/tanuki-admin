@@ -33,10 +33,14 @@ interface LeanPointOfSale {
   discountPercentage?: number;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { id } = await params;
   await dbConnect();
-  const pos = await PointOfSale.findById(id).select('name').lean() as LeanPointOfSale | null;
+  const pos = (await PointOfSale.findById(id)
+    .select('name')
+    .lean()) as LeanPointOfSale | null;
 
   if (!pos) {
     return { title: 'Punto de Venta no encontrado' };
@@ -49,7 +53,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 async function getPointOfSale(id: string) {
   await dbConnect();
-  const doc = await PointOfSale.findById(id).lean() as LeanPointOfSale | null;
+  const doc = (await PointOfSale.findById(id).lean()) as LeanPointOfSale | null;
 
   if (!doc) return null;
 
@@ -91,7 +95,9 @@ export default async function PointOfSaleDetailPage({ params }: PageProps) {
         <TabsList>
           <TabsTrigger value="info">Información</TabsTrigger>
           <TabsTrigger value="stock">Inventario</TabsTrigger>
-          <TabsTrigger value="sales" disabled>Ventas (Próximamente)</TabsTrigger>
+          <TabsTrigger value="sales" disabled>
+            Ventas (Próximamente)
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="info" className="space-y-4">
           <div className="pos-detail__grid">

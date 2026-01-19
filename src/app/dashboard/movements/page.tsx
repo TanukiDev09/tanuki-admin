@@ -75,7 +75,11 @@ export default function MovementsPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar este movimiento? Esta acción no se puede deshacer.')) {
+    if (
+      !window.confirm(
+        '¿Estás seguro de que quieres eliminar este movimiento? Esta acción no se puede deshacer.'
+      )
+    ) {
       return;
     }
 
@@ -180,13 +184,18 @@ export default function MovementsPage() {
                 <TableHead>Categoría</TableHead>
                 <TableHead>Monto</TableHead>
                 <TableHead>Estado</TableHead>
-                <TableHead className="movements-list__th-right">Acciones</TableHead>
+                <TableHead className="movements-list__th-right">
+                  Acciones
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="movements-list__loading-row">
+                  <TableCell
+                    colSpan={7}
+                    className="movements-list__loading-row"
+                  >
                     Cargando...
                   </TableCell>
                 </TableRow>
@@ -200,37 +209,61 @@ export default function MovementsPage() {
                 movements.map((movement) => (
                   <TableRow key={movement._id}>
                     <TableCell>
-                      {new Date(movement.date).toLocaleDateString('es-CO', { timeZone: 'UTC' })}
+                      {new Date(movement.date).toLocaleDateString('es-CO', {
+                        timeZone: 'UTC',
+                      })}
                     </TableCell>
                     <TableCell className="movements-list__description-link">
-                      <a href={`/dashboard/movements/${movement._id}`} className="movements-list__link">
+                      <a
+                        href={`/dashboard/movements/${movement._id}`}
+                        className="movements-list__link"
+                      >
                         {movement.description}
                       </a>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={movement.type === 'INCOME' ? 'default' : 'destructive'}>
+                      <Badge
+                        variant={
+                          movement.type === 'INCOME' ? 'default' : 'destructive'
+                        }
+                      >
                         {movement.type === 'INCOME' ? 'Ingreso' : 'Egreso'}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      {movement.category
-                        ? (typeof movement.category === 'string' ? movement.category : movement.category.name)
-                        : <span className="movements-list__no-category">Sin categoría</span>}
+                      {movement.category ? (
+                        typeof movement.category === 'string' ? (
+                          movement.category
+                        ) : (
+                          movement.category.name
+                        )
+                      ) : (
+                        <span className="movements-list__no-category">
+                          Sin categoría
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>
-                      <span className={`movements-list__amount ${movement.type === 'INCOME' ? 'movements-list__amount--income' : 'movements-list__amount--expense'}`}>
-                        {movement.type === 'INCOME' ? '+' : '-'}{formatCurrency(movement.amount)}
+                      <span
+                        className={`movements-list__amount ${movement.type === 'INCOME' ? 'movements-list__amount--income' : 'movements-list__amount--expense'}`}
+                      >
+                        {movement.type === 'INCOME' ? '+' : '-'}
+                        {formatCurrency(movement.amount)}
                       </span>
                     </TableCell>
                     <TableCell>
-                      {movement.status && <Badge variant="outline">{movement.status}</Badge>}
+                      {movement.status && (
+                        <Badge variant="outline">{movement.status}</Badge>
+                      )}
                     </TableCell>
                     <TableCell className="movements-list__actions-cell">
                       <div className="movements-list__actions">
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => router.push(`/dashboard/movements/${movement._id}`)}
+                          onClick={() =>
+                            router.push(`/dashboard/movements/${movement._id}`)
+                          }
                           title="Ver detalle"
                         >
                           <Eye className="movements-list__icon-sm" />
@@ -239,7 +272,11 @@ export default function MovementsPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => router.push(`/dashboard/movements/${movement._id}/editar`)}
+                            onClick={() =>
+                              router.push(
+                                `/dashboard/movements/${movement._id}/editar`
+                              )
+                            }
                             title="Editar"
                           >
                             <Pencil className="movements-list__icon-sm" />
@@ -257,7 +294,6 @@ export default function MovementsPage() {
                             <Trash2 className="movements-list__icon-sm" />
                           </Button>
                         )}
-
                       </div>
                     </TableCell>
                   </TableRow>
@@ -267,7 +303,6 @@ export default function MovementsPage() {
           </Table>
         </div>
       </div>
-
     </div>
   );
 }

@@ -50,10 +50,14 @@ export default function CreateMovementPage() {
   }, [canCreate, router, toast]);
 
   if (!canCreate) {
-    return <div className="movement-form__loading">Verificando permisos...</div>;
+    return (
+      <div className="movement-form__loading">Verificando permisos...</div>
+    );
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -68,14 +72,20 @@ export default function CreateMovementPage() {
 
     try {
       if (!formData.type || !formData.description || !formData.date) {
-        toast({ title: 'Error', description: 'Faltan campos requeridos (Tipo, Descripción y Fecha)', variant: 'destructive' });
+        toast({
+          title: 'Error',
+          description: 'Faltan campos requeridos (Tipo, Descripción y Fecha)',
+          variant: 'destructive',
+        });
         setLoading(false);
         return;
       }
 
       const payload = {
         ...formData,
-        fiscalYear: formData.date ? new Date(formData.date).getFullYear() : new Date().getFullYear(),
+        fiscalYear: formData.date
+          ? new Date(formData.date).getFullYear()
+          : new Date().getFullYear(),
       };
 
       const res = await fetch('/api/finance/movements', {
@@ -89,9 +99,13 @@ export default function CreateMovementPage() {
         try {
           errorData = await res.json();
         } catch {
-          errorData = { error: `Server error (${res.status}): ${res.statusText}` };
+          errorData = {
+            error: `Server error (${res.status}): ${res.statusText}`,
+          };
         }
-        throw new Error(errorData.error || errorData.details || 'Error al crear');
+        throw new Error(
+          errorData.error || errorData.details || 'Error al crear'
+        );
       }
 
       toast({ title: 'Éxito', description: 'Movimiento creado correctamente' });
@@ -102,7 +116,7 @@ export default function CreateMovementPage() {
       toast({
         title: 'Error',
         description: error.message || 'No se pudo crear el movimiento',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -111,14 +125,20 @@ export default function CreateMovementPage() {
 
   return (
     <div className="movement-form">
-      <Button variant="ghost" onClick={() => router.back()} className="movement-form__back-btn">
+      <Button
+        variant="ghost"
+        onClick={() => router.back()}
+        className="movement-form__back-btn"
+      >
         <ArrowLeft className="movement-form__back-btn-icon" />
         Volver
       </Button>
 
       <div className="movement-form__header">
         <h1 className="movement-form__title">Nuevo Movimiento</h1>
-        <p className="movement-form__subtitle">Registra un nuevo ingreso o egreso.</p>
+        <p className="movement-form__subtitle">
+          Registra un nuevo ingreso o egreso.
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="movement-form__container">
@@ -168,7 +188,9 @@ export default function CreateMovementPage() {
         </div>
 
         <div className="movement-form__section">
-          <h2 className="movement-form__section-title">Detalles de la Transacción</h2>
+          <h2 className="movement-form__section-title">
+            Detalles de la Transacción
+          </h2>
           <div className="movement-form__grid movement-form__grid--3">
             <div className="movement-form__field-group">
               <Label htmlFor="amount">Monto</Label>
@@ -177,7 +199,9 @@ export default function CreateMovementPage() {
                 name="amount"
                 placeholder="0.00"
                 value={formData.amount}
-                onValueChange={(val) => setFormData(prev => ({ ...prev, amount: val }))}
+                onValueChange={(val) =>
+                  setFormData((prev) => ({ ...prev, amount: val }))
+                }
               />
             </div>
 
@@ -206,7 +230,9 @@ export default function CreateMovementPage() {
                     id="exchangeRate"
                     name="exchangeRate"
                     value={formData.exchangeRate}
-                    onValueChange={(val) => setFormData(prev => ({ ...prev, exchangeRate: val }))}
+                    onValueChange={(val) =>
+                      setFormData((prev) => ({ ...prev, exchangeRate: val }))
+                    }
                     placeholder="Ej: 4 000"
                   />
                 </>
@@ -236,15 +262,22 @@ export default function CreateMovementPage() {
                 name="quantity"
                 placeholder="0"
                 value={formData.quantity}
-                onValueChange={(val) => setFormData(prev => ({ ...prev, quantity: val }))}
+                onValueChange={(val) =>
+                  setFormData((prev) => ({ ...prev, quantity: val }))
+                }
               />
             </div>
 
             <div className="movement-form__field-group">
               <Label>Valor Unitario (Calculado)</Label>
               <div className="movement-form__calculated-value">
-                {formData.amount && formData.quantity && Number(formData.quantity) !== 0
-                  ? formatCurrency(Number(formData.amount) / Number(formData.quantity), formData.currency)
+                {formData.amount &&
+                formData.quantity &&
+                Number(formData.quantity) !== 0
+                  ? formatCurrency(
+                      Number(formData.amount) / Number(formData.quantity),
+                      formData.currency
+                    )
                   : '$ 0'}
               </div>
             </div>
@@ -252,12 +285,18 @@ export default function CreateMovementPage() {
         </div>
 
         <div className="movement-form__section">
-          <h2 className="movement-form__section-title">Clasificación y Destino</h2>
+          <h2 className="movement-form__section-title">
+            Clasificación y Destino
+          </h2>
           <div className="movement-form__grid movement-form__grid--2">
             <div className="movement-form__field-group">
               <Label htmlFor="category">Categoría</Label>
               <CategorySelect
-                value={typeof formData.category === 'string' ? formData.category : formData.category?._id}
+                value={
+                  typeof formData.category === 'string'
+                    ? formData.category
+                    : formData.category?._id
+                }
                 onChange={(val) => handleSelectChange('category', val)}
                 type={formData.type as 'INCOME' | 'EXPENSE'}
               />

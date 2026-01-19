@@ -112,11 +112,7 @@ export default function EditUserModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="edit-user-modal__form">
-          {error && (
-            <div className="edit-user-modal__error">
-              {error}
-            </div>
-          )}
+          {error && <div className="edit-user-modal__error">{error}</div>}
 
           <div className="edit-user-modal__field">
             <Label htmlFor="edit-name">Nombre completo</Label>
@@ -124,7 +120,9 @@ export default function EditUserModal({
               id="edit-name"
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               required
             />
           </div>
@@ -135,7 +133,9 @@ export default function EditUserModal({
               id="edit-email"
               type="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               required
             />
           </div>
@@ -148,7 +148,10 @@ export default function EditUserModal({
                 setFormData({ ...formData, role: value as UserRole })
               }
             >
-              <SelectTrigger id="edit-role" className="edit-user-modal__select-trigger">
+              <SelectTrigger
+                id="edit-role"
+                className="edit-user-modal__select-trigger"
+              >
                 <SelectValue placeholder="Seleccionar rol" />
               </SelectTrigger>
               <SelectContent>
@@ -185,10 +188,7 @@ export default function EditUserModal({
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-            >
+            <Button type="submit" disabled={loading}>
               {loading ? 'Guardando...' : 'Guardar Cambios'}
             </Button>
           </DialogFooter>

@@ -6,9 +6,10 @@ interface WarehouseStatusBadgeProps {
 }
 
 export function WarehouseStatusBadge({ status }: WarehouseStatusBadgeProps) {
-  const variantClass = status === 'active'
-    ? 'warehouse-status-badge--active'
-    : 'warehouse-status-badge--inactive';
+  const variantClass =
+    status === 'active'
+      ? 'warehouse-status-badge--active'
+      : 'warehouse-status-badge--inactive';
 
   return (
     <Badge className={`warehouse-status-badge ${variantClass}`}>

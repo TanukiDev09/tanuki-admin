@@ -2,100 +2,138 @@
 
 Bienvenido a la documentación completa del proyecto Tanuki Admin. Esta guía te ayudará a entender, desarrollar y mantener el sistema.
 
+---
+
 ## 📑 Índice General
 
+### ⚡ Inicio Rápido
+
+- [**Guía Rápida de Comandos**](./guia-rapida.md)
+  Comandos, rutas y utilidades para el día a día.
+
 ### 🔌 API y Backend
-- [**Guía de Integración de Permisos API**](./api/permissions-integration.md)  
+
+- [**Guía de Integración de Permisos API**](./api/permissions-integration.md)
   Cómo implementar y verificar permisos en las rutas API
 
 ### 📦 Módulos de la Aplicación
-- [**Módulo de Catálogo**](./modules/catalog.md)  
+
+- [**Módulo de Catálogo**](./modules/catalog.md)
   Gestión de libros, creadores, colecciones y editorial
-  
-- [**Módulo de Usuarios**](./modules/users.md)  
+- [**Módulo de Usuarios**](./modules/users.md)
   Administración de usuarios, roles y permisos
 
 ### 🎨 Diseño y UI
-- [**Sistema de Diseño**](./design/design-system.md)  
+
+- [**Sistema de Diseño**](./design/design-system.md)
   Guía completa del sistema de diseño, componentes y patrones
-  
-- [**Referencia Rápida del Sistema de Diseño**](./design/quick-reference.md)  
+- [**Referencia Rápida del Sistema de Diseño**](./design/quick-reference.md)
   Guía rápida para consulta de tokens, colores y estilos
+
+### 🔄 Historial y Evolución
+
+- [**Proceso de Reorganización**](./reorganization/RESUMEN_REORGANIZACION.md)
+  Detalles sobre la nueva estructura del proyecto y el plan ejecutado.
+- [**Migración SASS**](./migration/README_MIGRACION.md)
+  Guías y estándares para la migración de estilos a BEM/SCSS.
+
+---
+
+## 🎯 Documentación por Rol
+
+### Desarrollador Frontend
+
+1. [**Sistema de Diseño**](./design/design-system.md) - Bases visuales y componentes.
+2. [**Módulos**](./modules/) - Lógica de negocio y vistas.
+3. [**Guía Rápida**](./guia-rapida.md) - Comandos de desarrollo.
+
+### Desarrollador Backend
+
+1. [**Permisos API**](./api/permissions-integration.md) - Seguridad y control de acceso.
+2. [**Scripts de DB**](../scripts/README.md) - Gestión de datos y migraciones.
+3. [**Modelos**](../src/models/) - Estructura de la base de datos.
+
+### Diseñador
+
+1. [**Sistema de Diseño**](./design/design-system.md) - Guía completa de estilos.
+2. [**Referencia Rápida**](./design/quick-reference.md) - Tokens y colores.
+
+---
 
 ## 🚀 Guías de Inicio
 
 ### Para Desarrolladores Nuevos
 
 1. **Configuración Inicial**
+
    ```bash
    # Clonar el repositorio
    git clone [repository-url]
-   
+
    # Instalar dependencias
    npm install
-   
+
    # Configurar variables de entorno
    cp .env.example .env.local
-   
+
    # Iniciar base de datos
    npm run seed:permissions
-   
+
    # Iniciar servidor de desarrollo
    npm run dev
    ```
 
 2. **Entender la Estructura**
+
    - Lee el [README principal](../README.md)
-   - Revisa el [Plan de Reorganización](../PLAN_REORGANIZACION.md)
+   - Revisa el [Resumen de Reorganización](./reorganization/RESUMEN_REORGANIZACION.md)
    - Familiarízate con el [Sistema de Diseño](./design/design-system.md)
 
 3. **Primeros Pasos en Desarrollo**
+
    - Explora los componentes en `src/components/`
    - Revisa las rutas API en `src/app/api/`
    - Estudia los modelos de datos en `src/models/`
 
-### Para Diseñadores
-
-1. Revisa el [Sistema de Diseño](./design/design-system.md)
-2. Consulta la [Referencia Rápida](./design/quick-reference.md)
-3. Los componentes UI están en `src/components/ui/`
-
-### Para Administradores de Sistema
-
-1. Scripts de base de datos: `scripts/db/`
-2. Scripts de desarrollo: `scripts/dev/`
-3. Configuraciones: `config/`
+---
 
 ## 📚 Documentación por Área
 
 ### Autenticación y Permisos
+
 - Sistema de autenticación JWT
 - Control de acceso basado en roles
 - [Integración de permisos en API](./api/permissions-integration.md)
 
 ### Base de Datos
+
 - MongoDB con Mongoose
 - Modelos en `src/models/`
 - [Scripts de migración](../scripts/db/migrations/)
 - [Scripts de seed](../scripts/db/seed/)
 
 ### Frontend
+
 - Next.js 16 con App Router
 - React 19
-- Tailwind CSS 4
+- Vanilla CSS con BEM (Migración en curso)
 - [Sistema de Diseño](./design/design-system.md)
 
 ### Testing
+
 - Tests unitarios con Jest
 - Tests E2E con Cypress
 - Tests de accesibilidad
-- Scripts de testing en `scripts/testing/`
+- [Guía de Scripts](../scripts/README.md)
+
+---
 
 ## 🔧 Herramientas y Utilidades
 
 ### Scripts Útiles
 
-#### Base de Datos
+#### Comandos de Base de Datos
+
 ```bash
 # Poblar permisos
 npm run seed:permissions
@@ -107,7 +145,8 @@ npx tsx scripts/db/migrations/migrate-categories-real.ts
 npx tsx scripts/db/inspect/inspect-db.ts
 ```
 
-#### Desarrollo
+#### Comandos de Desarrollo
+
 ```bash
 # Crear usuario de prueba
 node scripts/dev/create-test-user.js
@@ -116,7 +155,8 @@ node scripts/dev/create-test-user.js
 npm run discover-routes
 ```
 
-#### Testing
+#### Comandos de Testing
+
 ```bash
 # Tests unitarios
 npm test
@@ -128,73 +168,39 @@ npm run test:e2e:open
 npm run test:a11y
 ```
 
+---
+
 ## 🎯 Convenciones de Código
 
 ### Estructura de Archivos
+
 - Componentes: PascalCase (ej: `UserProfile.tsx`)
 - Utilidades: camelCase (ej: `formatDate.ts`)
 - Constantes: UPPER_SNAKE_CASE
-- Tipos: PascalCase con sufijo Type (ej: `UserType`)
+- Tipos: PascalCase (ej: `UserType.ts`)
 
-### Imports
-```typescript
-// 1. Dependencias externas
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+### Estilos (SCSS/BEM)
 
-// 2. Componentes internos
-import { Button } from '@/components/ui/button';
+- Seguir la [Guía de Migración SASS](./migration/GUIA_MIGRACION_SASS_BEM.md)
+- Usar variables del sistema: `styles/variables.scss`
 
-// 3. Utilidades y helpers
-import { cn } from '@/lib/utils';
-
-// 4. Tipos
-import type { User } from '@/types/user';
-```
-
-### Componentes
-- Usar TypeScript estricto
-- Props tipadas con interfaces
-- Exportar componentes nombrados
-- Documentar componentes complejos
+---
 
 ## 🐛 Debugging y Troubleshooting
 
-### Problemas Comunes
+1. **Error de conexión a DB**: Verifica variables de entorno y que MongoDB esté corriendo.
+2. **Error de permisos**: Ejecuta `npm run seed:permissions` para resetear permisos base.
+3. **Estilos no se aplican**: Verifica que no haya conflictos con clases legacy.
 
-1. **Error de conexión a DB**
-   - Verifica variables de entorno
-   - Asegúrate que MongoDB esté corriendo
-   - Revisa cadena de conexión en `.env.local`
-
-2. **Error de permisos**
-   - Verifica que los permisos estén poblados: `npm run seed:permissions`
-   - Revisa la [guía de permisos](./api/permissions-integration.md)
-
-3. **Estilos no se aplican**
-   - Verifica que Tailwind esté compilando
-   - Revisa el [sistema de diseño](./design/design-system.md)
-   - Limpia caché: `rm -rf .next`
-
-## 📈 Roadmap y Mejoras Futuras
-
-Consulta el archivo [ROADMAP.md](./ROADMAP.md) para ver las características planificadas.
+---
 
 ## 🤝 Contribuir
 
-1. Lee las guías de módulos relevantes
-2. Sigue el sistema de diseño
-3. Escribe tests para nuevas funcionalidades
-4. Actualiza la documentación
-5. Ejecuta linter antes de commit
-
-## 📞 Soporte
-
-- **Issues**: [GitHub Issues]
-- **Documentación técnica**: Ver carpeta `docs/`
-- **Preguntas**: Contactar al equipo de desarrollo
+1. Sigue el sistema de diseño.
+2. Ejecuta `npm run lint` y `npm run format` antes de commit.
+3. Actualiza la documentación si añades nuevos módulos.
 
 ---
 
 **Última actualización**: Enero 2026  
-**Versión de documentación**: 1.0
+**Versión de documentación**: 1.1

@@ -27,18 +27,32 @@ interface AgreementListProps {
   onUpdate?: () => void;
 }
 
-export default function AgreementList({ bookId, requiredCreators = [], onUpdate }: AgreementListProps) {
+export default function AgreementList({
+  bookId,
+  requiredCreators = [],
+  onUpdate,
+}: AgreementListProps) {
   const [agreements, setAgreements] = useState<AgreementResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAgreement, setSelectedAgreement] = useState<AgreementResponse | null>(null);
+  const [selectedAgreement, setSelectedAgreement] =
+    useState<AgreementResponse | null>(null);
   const [preselectedCreator, setPreselectedCreator] = useState<string>('');
 
   const { toast } = useToast();
   const { hasPermission } = usePermission();
-  const canCreate = hasPermission(ModuleName.AGREEMENTS, PermissionAction.CREATE);
-  const canUpdate = hasPermission(ModuleName.AGREEMENTS, PermissionAction.UPDATE);
-  const canDelete = hasPermission(ModuleName.AGREEMENTS, PermissionAction.DELETE);
+  const canCreate = hasPermission(
+    ModuleName.AGREEMENTS,
+    PermissionAction.CREATE
+  );
+  const canUpdate = hasPermission(
+    ModuleName.AGREEMENTS,
+    PermissionAction.UPDATE
+  );
+  const canDelete = hasPermission(
+    ModuleName.AGREEMENTS,
+    PermissionAction.DELETE
+  );
 
   const fetchAgreements = useCallback(async () => {
     if (!bookId) return;
@@ -65,12 +79,13 @@ export default function AgreementList({ bookId, requiredCreators = [], onUpdate 
   }, [fetchAgreements]);
 
   // Identify creators without agreements
-  const missingAgreements = requiredCreators.filter(req => {
+  const missingAgreements = requiredCreators.filter((req) => {
     // Check if there is an active or draft agreement for this creator
-    const hasAgreement = agreements.some(a => {
-      const creatorId = typeof a.creator === 'object'
-        ? String((a.creator as { _id: unknown })._id)
-        : a.creator;
+    const hasAgreement = agreements.some((a) => {
+      const creatorId =
+        typeof a.creator === 'object'
+          ? String((a.creator as { _id: unknown })._id)
+          : a.creator;
       return creatorId === req._id && a.status !== 'terminated';
     });
     return !hasAgreement;
@@ -120,28 +135,40 @@ export default function AgreementList({ bookId, requiredCreators = [], onUpdate 
 
   const getStatusVariant = (status: string) => {
     switch (status) {
-      case 'active': return 'success';
-      case 'draft': return 'secondary';
-      case 'terminated': return 'destructive';
-      default: return 'outline';
+      case 'active':
+        return 'success';
+      case 'draft':
+        return 'secondary';
+      case 'terminated':
+        return 'destructive';
+      default:
+        return 'outline';
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'active': return 'Activo';
-      case 'draft': return 'Borrador';
-      case 'terminated': return 'Terminado';
-      default: return status;
+      case 'active':
+        return 'Activo';
+      case 'draft':
+        return 'Borrador';
+      case 'terminated':
+        return 'Terminado';
+      default:
+        return status;
     }
   };
 
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'author': return 'Autor';
-      case 'illustrator': return 'Ilustrador';
-      case 'translator': return 'Traductor';
-      default: return role;
+      case 'author':
+        return 'Autor';
+      case 'illustrator':
+        return 'Ilustrador';
+      case 'translator':
+        return 'Traductor';
+      default:
+        return role;
     }
   };
 
@@ -154,8 +181,11 @@ export default function AgreementList({ bookId, requiredCreators = [], onUpdate 
             ⚠️ Contratos Faltantes (Obligatorio)
           </h4>
           <div className="agreement-list__warning-list">
-            {missingAgreements.map(req => (
-              <div key={`${req._id}-${req.role}`} className="agreement-list__warning-item">
+            {missingAgreements.map((req) => (
+              <div
+                key={`${req._id}-${req.role}`}
+                className="agreement-list__warning-item"
+              >
                 <span>
                   Falta contrato para <strong>{req.name}</strong> ({req.role})
                 </span>
@@ -178,7 +208,11 @@ export default function AgreementList({ bookId, requiredCreators = [], onUpdate 
       <div className="agreement-list__header">
         <h3 className="agreement-list__title">Contratos y Acuerdos</h3>
         {canCreate && (
-          <Button onClick={() => handleCreate()} size="sm" className="agreement-list__new-btn">
+          <Button
+            onClick={() => handleCreate()}
+            size="sm"
+            className="agreement-list__new-btn"
+          >
             <Plus className="agreement-list__icon" />
             Nuevo Contrato
           </Button>
@@ -194,7 +228,9 @@ export default function AgreementList({ bookId, requiredCreators = [], onUpdate 
               <TableHead>Royalties (%)</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Contrato</TableHead>
-              <TableHead className="agreement-list__actions-head">Acciones</TableHead>
+              <TableHead className="agreement-list__actions-head">
+                Acciones
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -210,7 +246,9 @@ export default function AgreementList({ bookId, requiredCreators = [], onUpdate 
             ) : agreements.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={6} className="agreement-list__empty-cell">
-                  <span className="agreement-list__empty-text">No hay contratos registrados para este libro.</span>
+                  <span className="agreement-list__empty-text">
+                    No hay contratos registrados para este libro.
+                  </span>
                 </TableCell>
               </TableRow>
             ) : (
@@ -221,15 +259,18 @@ export default function AgreementList({ bookId, requiredCreators = [], onUpdate 
                       href={`/dashboard/agreements/${agreement._id}`}
                       className="agreement-list__link"
                     >
-                      {(agreement.creator as unknown as ICreator)?.name || 'Desconocido'}
+                      {(agreement.creator as unknown as ICreator)?.name ||
+                        'Desconocido'}
                     </a>
                   </TableCell>
+                  <TableCell>{getRoleLabel(agreement.role)}</TableCell>
                   <TableCell>
-                    {getRoleLabel(agreement.role)}
-                  </TableCell>
-                  <TableCell>
-                    {(agreement as { isPublicDomain?: boolean }).isPublicDomain ? (
-                      <Badge variant="outline" className="agreement-list__public-domain">
+                    {(agreement as { isPublicDomain?: boolean })
+                      .isPublicDomain ? (
+                      <Badge
+                        variant="outline"
+                        className="agreement-list__public-domain"
+                      >
                         <BookOpen className="agreement-list__icon-sm" />
                         Dominio Público
                       </Badge>
@@ -238,7 +279,17 @@ export default function AgreementList({ bookId, requiredCreators = [], onUpdate 
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={getStatusVariant(agreement.status) as "default" | "secondary" | "destructive" | "outline" | "success" | "warning"}>
+                    <Badge
+                      variant={
+                        getStatusVariant(agreement.status) as
+                          | 'default'
+                          | 'secondary'
+                          | 'destructive'
+                          | 'outline'
+                          | 'success'
+                          | 'warning'
+                      }
+                    >
                       {getStatusLabel(agreement.status)}
                     </Badge>
                   </TableCell>

@@ -7,12 +7,7 @@ import { Badge } from '@/components/ui/Badge';
 import { useToast } from '@/components/ui/Toast';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import { Movement } from '@/types/movement';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/Card"
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency, formatNumber } from '@/lib/utils';
@@ -36,7 +31,11 @@ export default function MovementDetailPage() {
         setMovement(data.data);
       } catch (error) {
         console.error(error);
-        toast({ title: 'Error', description: 'No se pudo cargar el movimiento', variant: 'destructive' });
+        toast({
+          title: 'Error',
+          description: 'No se pudo cargar el movimiento',
+          variant: 'destructive',
+        });
         router.push('/dashboard/movimientos');
       } finally {
         setLoading(false);
@@ -46,12 +45,20 @@ export default function MovementDetailPage() {
     if (params.id) fetchMovement();
   }, [params.id, router, toast]);
 
-  if (loading) return <div className="movement-detail__loading">Cargando...</div>;
-  if (!movement) return <div className="movement-detail__error">Movimiento no encontrado</div>;
+  if (loading)
+    return <div className="movement-detail__loading">Cargando...</div>;
+  if (!movement)
+    return (
+      <div className="movement-detail__error">Movimiento no encontrado</div>
+    );
 
   return (
     <div className="movement-detail">
-      <Button variant="ghost" onClick={() => router.back()} className="movement-detail__back-btn">
+      <Button
+        variant="ghost"
+        onClick={() => router.back()}
+        className="movement-detail__back-btn"
+      >
         <ArrowLeft className="movement-detail__icon" />
         Volver
       </Button>
@@ -64,7 +71,11 @@ export default function MovementDetailPage() {
           </Badge>
         </div>
         {canUpdate && (
-          <Button onClick={() => router.push(`/dashboard/movements/${movement._id}/editar`)}>
+          <Button
+            onClick={() =>
+              router.push(`/dashboard/movements/${movement._id}/editar`)
+            }
+          >
             <Pencil className="movement-detail__icon" />
             Editar
           </Button>
@@ -74,19 +85,29 @@ export default function MovementDetailPage() {
       <Card>
         <CardHeader>
           <CardTitle>{movement.description}</CardTitle>
-          <p className="movement-detail__date">{new Date(movement.date).toLocaleDateString()}</p>
+          <p className="movement-detail__date">
+            {new Date(movement.date).toLocaleDateString()}
+          </p>
         </CardHeader>
         <CardContent className="movement-detail__content">
           <div className="movement-detail__grid-2">
             <div>
               <h3 className="movement-detail__label">Tipo</h3>
-              <p className={movement.type === 'INCOME' ? 'movement-detail__value--income' : 'movement-detail__value--expense'}>
+              <p
+                className={
+                  movement.type === 'INCOME'
+                    ? 'movement-detail__value--income'
+                    : 'movement-detail__value--expense'
+                }
+              >
                 {movement.type === 'INCOME' ? 'INGRESO' : 'EGRESO'}
               </p>
             </div>
             <div>
               <h3 className="movement-detail__label">Monto</h3>
-              <p className="movement-detail__value--xl">{formatCurrency(movement.amount)}</p>
+              <p className="movement-detail__value--xl">
+                {formatCurrency(movement.amount)}
+              </p>
             </div>
           </div>
 
@@ -101,7 +122,11 @@ export default function MovementDetailPage() {
             </div>
             <div>
               <h3 className="movement-detail__label">Valor Unitario</h3>
-              <p>{movement.unitValue ? formatCurrency(Number(movement.unitValue)) : '-'}</p>
+              <p>
+                {movement.unitValue
+                  ? formatCurrency(Number(movement.unitValue))
+                  : '-'}
+              </p>
             </div>
           </div>
 
@@ -110,7 +135,9 @@ export default function MovementDetailPage() {
               <h3 className="movement-detail__label">Categoría</h3>
               <p>
                 {movement.category
-                  ? (typeof movement.category === 'string' ? movement.category : movement.category.name)
+                  ? typeof movement.category === 'string'
+                    ? movement.category
+                    : movement.category.name
                   : '-'}
               </p>
             </div>
@@ -133,7 +160,9 @@ export default function MovementDetailPage() {
 
           <div>
             <h3 className="movement-detail__label">Notas</h3>
-            <p className="movement-detail__notes">{movement.notes || 'Sin notas adicionales.'}</p>
+            <p className="movement-detail__notes">
+              {movement.notes || 'Sin notas adicionales.'}
+            </p>
           </div>
 
           {movement.invoiceRef && (

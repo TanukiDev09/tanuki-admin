@@ -9,7 +9,10 @@ interface SignedContractInfoProps {
   className?: string;
 }
 
-export function SignedContractInfo({ url, className }: SignedContractInfoProps) {
+export function SignedContractInfo({
+  url,
+  className,
+}: SignedContractInfoProps) {
   if (!url) {
     return (
       <div className={`signed-contract-info__empty ${className || ''}`}>
@@ -26,7 +29,11 @@ export function SignedContractInfo({ url, className }: SignedContractInfoProps) 
         <p className="signed-contract-info__meta">Disponible para descarga</p>
       </div>
       <Button variant="outline" size="sm" asChild>
-        <a href={`/uploads/contracts/${url}`} target="_blank" rel="noopener noreferrer">
+        <a
+          href={`/uploads/contracts/${url}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
           <Download className="signed-contract-info__action-icon" />
           Descargar / Ver
         </a>

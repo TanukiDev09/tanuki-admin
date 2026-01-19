@@ -24,7 +24,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       // Audit bypass for Lighthouse
-      const isAudit = typeof window !== 'undefined' &&
+      const isAudit =
+        typeof window !== 'undefined' &&
         (window.location.search.includes('audit=true') ||
           navigator.userAgent.includes('Lighthouse'));
 

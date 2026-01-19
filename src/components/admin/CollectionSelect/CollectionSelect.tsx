@@ -137,17 +137,21 @@ export default function CollectionSelect({
         </Button>
       </div>
 
-      <Dialog open={showNewModal} onOpenChange={(open) => !creating && setShowNewModal(open)}>
+      <Dialog
+        open={showNewModal}
+        onOpenChange={(open) => !creating && setShowNewModal(open)}
+      >
         <DialogContent className="collection-select__modal">
           <DialogHeader>
             <DialogTitle>Crear Colección</DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleCreateNew} className="collection-select__create-form">
+          <form
+            onSubmit={handleCreateNew}
+            className="collection-select__create-form"
+          >
             {error && (
-              <div className="collection-select__form-error">
-                {error}
-              </div>
+              <div className="collection-select__form-error">{error}</div>
             )}
 
             <div className="collection-select__form-field">

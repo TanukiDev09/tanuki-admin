@@ -10,7 +10,14 @@ import {
   ModuleMetadata,
 } from '@/types/permission';
 import { Button } from '@/components/ui/Button';
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/Table';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/Table';
 import './PermissionMatrix.scss';
 
 interface PermissionMatrixProps {
@@ -28,7 +35,8 @@ export function PermissionMatrixComponent({
   onSave,
   onCancel,
 }: PermissionMatrixProps) {
-  const [permissions, setPermissions] = useState<PermissionMatrix>(initialPermissions);
+  const [permissions, setPermissions] =
+    useState<PermissionMatrix>(initialPermissions);
   const [loading, setLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
 
@@ -55,7 +63,9 @@ export function PermissionMatrixComponent({
   const toggleAllActions = (module: ModuleName) => {
     setPermissions((prev) => {
       const modulePerms = prev[module] || [];
-      const allSelected = ALL_ACTIONS.every((action) => modulePerms.includes(action));
+      const allSelected = ALL_ACTIONS.every((action) =>
+        modulePerms.includes(action)
+      );
 
       setHasChanges(true);
       return {
@@ -138,84 +148,142 @@ export function PermissionMatrixComponent({
         <Table className="permission-matrix__table">
           <TableHeader>
             <TableRow>
-              <TableHead className="permission-matrix__th--module">Módulo</TableHead>
-              <TableHead className="permission-matrix__th--action">Todos</TableHead>
-              <TableHead className="permission-matrix__th--action">Crear</TableHead>
-              <TableHead className="permission-matrix__th--action">Leer</TableHead>
-              <TableHead className="permission-matrix__th--action">Editar</TableHead>
-              <TableHead className="permission-matrix__th--action">Eliminar</TableHead>
+              <TableHead className="permission-matrix__th--module">
+                Módulo
+              </TableHead>
+              <TableHead className="permission-matrix__th--action">
+                Todos
+              </TableHead>
+              <TableHead className="permission-matrix__th--action">
+                Crear
+              </TableHead>
+              <TableHead className="permission-matrix__th--action">
+                Leer
+              </TableHead>
+              <TableHead className="permission-matrix__th--action">
+                Editar
+              </TableHead>
+              <TableHead className="permission-matrix__th--action">
+                Eliminar
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {modules.map((module) => (
               <TableRow key={module.name} className="permission-matrix__row">
                 <TableCell className="permission-matrix__module-info">
-                  <div className="permission-matrix__module-label">{module.label}</div>
-                  <div className="permission-matrix__module-description">{module.description}</div>
+                  <div className="permission-matrix__module-label">
+                    {module.label}
+                  </div>
+                  <div className="permission-matrix__module-description">
+                    {module.description}
+                  </div>
                 </TableCell>
 
                 <TableCell className="permission-matrix__cell--action">
                   <button
                     type="button"
                     onClick={() => toggleAllActions(module.name)}
-                    className={`permission-matrix__check-button permission-matrix__check-button--all ${allActionsSelected(module.name) ? 'permission-matrix__check-button--active' : ''
-                      }`}
+                    className={`permission-matrix__check-button permission-matrix__check-button--all ${
+                      allActionsSelected(module.name)
+                        ? 'permission-matrix__check-button--active'
+                        : ''
+                    }`}
                     aria-pressed={allActionsSelected(module.name)}
                     title="Seleccionar todos"
                   >
-                    {allActionsSelected(module.name) && <Check className="permission-matrix__check-icon" />}
+                    {allActionsSelected(module.name) && (
+                      <Check className="permission-matrix__check-icon" />
+                    )}
                   </button>
                 </TableCell>
 
                 <TableCell className="permission-matrix__cell--action">
                   <button
                     type="button"
-                    onClick={() => togglePermission(module.name, PermissionAction.CREATE)}
-                    className={`permission-matrix__check-button permission-matrix__check-button--create ${hasAction(module.name, PermissionAction.CREATE) ? 'permission-matrix__check-button--active' : ''
-                      }`}
-                    aria-pressed={hasAction(module.name, PermissionAction.CREATE)}
+                    onClick={() =>
+                      togglePermission(module.name, PermissionAction.CREATE)
+                    }
+                    className={`permission-matrix__check-button permission-matrix__check-button--create ${
+                      hasAction(module.name, PermissionAction.CREATE)
+                        ? 'permission-matrix__check-button--active'
+                        : ''
+                    }`}
+                    aria-pressed={hasAction(
+                      module.name,
+                      PermissionAction.CREATE
+                    )}
                     title="Crear"
                   >
-                    {hasAction(module.name, PermissionAction.CREATE) && <Check className="permission-matrix__check-icon" />}
+                    {hasAction(module.name, PermissionAction.CREATE) && (
+                      <Check className="permission-matrix__check-icon" />
+                    )}
                   </button>
                 </TableCell>
 
                 <TableCell className="permission-matrix__cell--action">
                   <button
                     type="button"
-                    onClick={() => togglePermission(module.name, PermissionAction.READ)}
-                    className={`permission-matrix__check-button permission-matrix__check-button--read ${hasAction(module.name, PermissionAction.READ) ? 'permission-matrix__check-button--active' : ''
-                      }`}
+                    onClick={() =>
+                      togglePermission(module.name, PermissionAction.READ)
+                    }
+                    className={`permission-matrix__check-button permission-matrix__check-button--read ${
+                      hasAction(module.name, PermissionAction.READ)
+                        ? 'permission-matrix__check-button--active'
+                        : ''
+                    }`}
                     aria-pressed={hasAction(module.name, PermissionAction.READ)}
                     title="Leer"
                   >
-                    {hasAction(module.name, PermissionAction.READ) && <Check className="permission-matrix__check-icon" />}
+                    {hasAction(module.name, PermissionAction.READ) && (
+                      <Check className="permission-matrix__check-icon" />
+                    )}
                   </button>
                 </TableCell>
 
                 <TableCell className="permission-matrix__cell--action">
                   <button
                     type="button"
-                    onClick={() => togglePermission(module.name, PermissionAction.UPDATE)}
-                    className={`permission-matrix__check-button permission-matrix__check-button--update ${hasAction(module.name, PermissionAction.UPDATE) ? 'permission-matrix__check-button--active' : ''
-                      }`}
-                    aria-pressed={hasAction(module.name, PermissionAction.UPDATE)}
+                    onClick={() =>
+                      togglePermission(module.name, PermissionAction.UPDATE)
+                    }
+                    className={`permission-matrix__check-button permission-matrix__check-button--update ${
+                      hasAction(module.name, PermissionAction.UPDATE)
+                        ? 'permission-matrix__check-button--active'
+                        : ''
+                    }`}
+                    aria-pressed={hasAction(
+                      module.name,
+                      PermissionAction.UPDATE
+                    )}
                     title="Editar"
                   >
-                    {hasAction(module.name, PermissionAction.UPDATE) && <Check className="permission-matrix__check-icon" />}
+                    {hasAction(module.name, PermissionAction.UPDATE) && (
+                      <Check className="permission-matrix__check-icon" />
+                    )}
                   </button>
                 </TableCell>
 
                 <TableCell className="permission-matrix__cell--action">
                   <button
                     type="button"
-                    onClick={() => togglePermission(module.name, PermissionAction.DELETE)}
-                    className={`permission-matrix__check-button permission-matrix__check-button--delete ${hasAction(module.name, PermissionAction.DELETE) ? 'permission-matrix__check-button--active' : ''
-                      }`}
-                    aria-pressed={hasAction(module.name, PermissionAction.DELETE)}
+                    onClick={() =>
+                      togglePermission(module.name, PermissionAction.DELETE)
+                    }
+                    className={`permission-matrix__check-button permission-matrix__check-button--delete ${
+                      hasAction(module.name, PermissionAction.DELETE)
+                        ? 'permission-matrix__check-button--active'
+                        : ''
+                    }`}
+                    aria-pressed={hasAction(
+                      module.name,
+                      PermissionAction.DELETE
+                    )}
                     title="Eliminar"
                   >
-                    {hasAction(module.name, PermissionAction.DELETE) && <Check className="permission-matrix__check-icon" />}
+                    {hasAction(module.name, PermissionAction.DELETE) && (
+                      <Check className="permission-matrix__check-icon" />
+                    )}
                   </button>
                 </TableCell>
               </TableRow>

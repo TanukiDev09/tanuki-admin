@@ -9,7 +9,7 @@ import {
   YAxis,
   Tooltip,
   Legend,
-  CartesianGrid
+  CartesianGrid,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { formatCurrency } from '@/lib/utils'; // Assuming this utility exists
@@ -54,7 +54,13 @@ export function BookProfitabilityChart({ data }: BookProfitabilityChartProps) {
               margin={{ top: 20, right: 30, left: 40, bottom: 5 }}
               barGap={4}
             >
-              <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--color-border)" opacity={0.5} />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                horizontal={true}
+                vertical={false}
+                stroke="var(--color-border)"
+                opacity={0.5}
+              />
               <XAxis type="number" hide />
               <YAxis
                 type="category"
@@ -68,19 +74,32 @@ export function BookProfitabilityChart({ data }: BookProfitabilityChartProps) {
                   backgroundColor: 'var(--color-popover)',
                   borderColor: 'var(--color-border)',
                   color: 'var(--color-popover-foreground)',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
                 }}
-                formatter={(value: number | undefined) => value !== undefined ? formatCurrency(value) : ''}
+                formatter={(value: number | undefined) =>
+                  value !== undefined ? formatCurrency(value) : ''
+                }
                 cursor={{ fill: '#F1F5F9', opacity: 0.4 }}
               />
               <Legend iconType="circle" />
 
               {/* Income Bar - Green #16A34A */}
-              <Bar dataKey="income" name="Ingresos" fill="#16A34A" radius={[0, 4, 4, 0]} barSize={20} />
+              <Bar
+                dataKey="income"
+                name="Ingresos"
+                fill="#16A34A"
+                radius={[0, 4, 4, 0]}
+                barSize={20}
+              />
 
               {/* Expense Bar - Red #DC2626 */}
-              <Bar dataKey="expenses" name="Egresos" fill="#DC2626" radius={[0, 4, 4, 0]} barSize={20} />
-
+              <Bar
+                dataKey="expenses"
+                name="Egresos"
+                fill="#DC2626"
+                radius={[0, 4, 4, 0]}
+                barSize={20}
+              />
             </BarChart>
           </ResponsiveContainer>
         </div>

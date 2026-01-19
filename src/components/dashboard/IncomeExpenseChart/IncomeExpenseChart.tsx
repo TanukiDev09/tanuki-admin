@@ -15,7 +15,12 @@ import { formatCurrency } from '@/lib/utils';
 import './IncomeExpenseChart.scss';
 
 interface IncomeExpenseChartProps {
-  data?: Array<{ day?: string; month?: string; income: number; expenses: number }>;
+  data?: Array<{
+    day?: string;
+    month?: string;
+    income: number;
+    expenses: number;
+  }>;
   title?: string;
 }
 

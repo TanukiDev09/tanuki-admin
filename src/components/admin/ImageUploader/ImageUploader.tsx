@@ -133,8 +133,9 @@ export default function ImageUploader({
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
-          className={`image-uploader__dropzone ${isDragging ? 'image-uploader__dropzone--dragging' : ''
-            }`}
+          className={`image-uploader__dropzone ${
+            isDragging ? 'image-uploader__dropzone--dragging' : ''
+          }`}
         >
           <input
             ref={fileInputRef}
@@ -158,18 +159,14 @@ export default function ImageUploader({
                 <p className="image-uploader__text">
                   Arrastra una imagen aquí o haz clic para seleccionar
                 </p>
-                <p className="image-uploader__hint">
-                  PNG, JPG, WEBP hasta 5MB
-                </p>
+                <p className="image-uploader__hint">PNG, JPG, WEBP hasta 5MB</p>
               </div>
             </div>
           )}
         </div>
       )}
 
-      {error && (
-        <p className="image-uploader__error">{error}</p>
-      )}
+      {error && <p className="image-uploader__error">{error}</p>}
     </div>
   );
 }

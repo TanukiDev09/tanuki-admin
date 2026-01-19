@@ -8,7 +8,11 @@ interface SparklineProps {
   height?: number;
 }
 
-export function Sparkline({ data, color = 'hsl(var(--primary))', height = 40 }: SparklineProps) {
+export function Sparkline({
+  data,
+  color = 'hsl(var(--primary))',
+  height = 40,
+}: SparklineProps) {
   const chartData = data.map((value, index) => ({ value, index }));
 
   return (

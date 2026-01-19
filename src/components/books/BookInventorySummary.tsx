@@ -35,28 +35,36 @@ export default function BookInventorySummary({
   onUpdate,
 }: BookInventorySummaryProps) {
   const { hasPermission } = usePermission();
-  const canUpdateInventory = hasPermission(ModuleName.INVENTORY, PermissionAction.UPDATE);
+  const canUpdateInventory = hasPermission(
+    ModuleName.INVENTORY,
+    PermissionAction.UPDATE
+  );
 
-  const [allWarehouses, setAllWarehouses] = useState<WarehouseWithStock[]>(() => {
-    if (inventoryDetails && inventoryDetails.length > 0) {
-      return inventoryDetails
-        .map((detail) => ({
-          _id: detail.warehouseId,
-          name: detail.warehouseName,
-          code: detail.warehouseCode,
-          type: detail.warehouseType as 'main' | 'secondary' | 'point_of_sale',
-          quantity: detail.quantity,
-          hasStock: detail.quantity > 0,
-          inventoryItemId: detail.inventoryItemId,
-        }))
-        .sort((a, b) => {
-          if (a.hasStock && !b.hasStock) return -1;
-          if (!a.hasStock && b.hasStock) return 1;
-          return b.quantity - a.quantity;
-        });
+  const [allWarehouses, setAllWarehouses] = useState<WarehouseWithStock[]>(
+    () => {
+      if (inventoryDetails && inventoryDetails.length > 0) {
+        return inventoryDetails
+          .map((detail) => ({
+            _id: detail.warehouseId,
+            name: detail.warehouseName,
+            code: detail.warehouseCode,
+            type: detail.warehouseType as
+              | 'main'
+              | 'secondary'
+              | 'point_of_sale',
+            quantity: detail.quantity,
+            hasStock: detail.quantity > 0,
+            inventoryItemId: detail.inventoryItemId,
+          }))
+          .sort((a, b) => {
+            if (a.hasStock && !b.hasStock) return -1;
+            if (!a.hasStock && b.hasStock) return 1;
+            return b.quantity - a.quantity;
+          });
+      }
+      return [];
     }
-    return [];
-  });
+  );
   const [loading, setLoading] = useState(allWarehouses.length === 0);
   const [adjustModal, setAdjustModal] = useState<{
     isOpen: boolean;
@@ -70,19 +78,27 @@ export default function BookInventorySummary({
   useEffect(() => {
     const fetchAllWarehouses = async () => {
       try {
-        const response = await fetch(`/api/warehouses?limit=100&t=${new Date().getTime()}`);
+        const response = await fetch(
+          `/api/warehouses?limit=100&t=${new Date().getTime()}`
+        );
         const data = await response.json();
 
         if (data && Array.isArray(data)) {
           // Fetch inventory items for this book to get IDs
-          const inventoryResponse = await fetch(`/api/inventory?bookId=${bookId}&t=${new Date().getTime()}`);
+          const inventoryResponse = await fetch(
+            `/api/inventory?bookId=${bookId}&t=${new Date().getTime()}`
+          );
           const inventoryData = await inventoryResponse.json();
-          const fetchedInventoryItems = Array.isArray(inventoryData) ? inventoryData : [];
+          const fetchedInventoryItems = Array.isArray(inventoryData)
+            ? inventoryData
+            : [];
 
           // Create a map of existing warehouses from the API response
           const warehouseMap = new Map<string, WarehouseWithStock>();
 
-          (data as { _id: string, name: string, code: string, type: string }[]).forEach(warehouse => {
+          (
+            data as { _id: string; name: string; code: string; type: string }[]
+          ).forEach((warehouse) => {
             warehouseMap.set(warehouse._id, {
               _id: warehouse._id,
               name: warehouse.name,
@@ -90,49 +106,63 @@ export default function BookInventorySummary({
               type: warehouse.type as 'main' | 'secondary' | 'point_of_sale',
               quantity: 0,
               hasStock: false,
-              inventoryItemId: undefined
+              inventoryItemId: undefined,
             });
           });
 
           // Ensure warehouses from inventoryDetails are present (even if not returned by API)
-          inventoryDetails?.forEach(detail => {
+          inventoryDetails?.forEach((detail) => {
             if (detail.warehouseId && !warehouseMap.has(detail.warehouseId)) {
               warehouseMap.set(detail.warehouseId, {
                 _id: detail.warehouseId,
                 name: detail.warehouseName || 'Bodega Desconocida',
                 code: detail.warehouseCode || '???',
-                type: (detail.warehouseType as 'main' | 'secondary' | 'point_of_sale') || 'secondary',
+                type:
+                  (detail.warehouseType as
+                    | 'main'
+                    | 'secondary'
+                    | 'point_of_sale') || 'secondary',
                 quantity: 0,
                 hasStock: false,
-                inventoryItemId: undefined
+                inventoryItemId: undefined,
               });
             }
           });
 
           // Convert map to array and populate stock data
-          const mergedWarehouses = Array.from(warehouseMap.values()).map(warehouse => {
-            // 1. Try to find in generic inventoryDetails (from props)
-            const propInventory = inventoryDetails?.find(
-              (inv) => String(inv.warehouseId) === String(warehouse._id)
-            );
+          const mergedWarehouses = Array.from(warehouseMap.values()).map(
+            (warehouse) => {
+              // 1. Try to find in generic inventoryDetails (from props)
+              const propInventory = inventoryDetails?.find(
+                (inv) => String(inv.warehouseId) === String(warehouse._id)
+              );
 
-            // 2. Try to find in fresh inventory fetch (for specific InventoryItem ID)
-            const fetchedInventory = (fetchedInventoryItems as { warehouseId: string | { _id: string }; quantity: number; _id: string }[]).find(
-              (item) => {
-                const itemWarehouseId = typeof item.warehouseId === 'object' ? item.warehouseId._id : item.warehouseId;
+              // 2. Try to find in fresh inventory fetch (for specific InventoryItem ID)
+              const fetchedInventory = (
+                fetchedInventoryItems as {
+                  warehouseId: string | { _id: string };
+                  quantity: number;
+                  _id: string;
+                }[]
+              ).find((item) => {
+                const itemWarehouseId =
+                  typeof item.warehouseId === 'object'
+                    ? item.warehouseId._id
+                    : item.warehouseId;
                 return String(itemWarehouseId) === String(warehouse._id);
-              }
-            );
+              });
 
-            const quantity = fetchedInventory?.quantity ?? propInventory?.quantity ?? 0;
+              const quantity =
+                fetchedInventory?.quantity ?? propInventory?.quantity ?? 0;
 
-            return {
-              ...warehouse,
-              quantity,
-              hasStock: quantity > 0,
-              inventoryItemId: fetchedInventory?._id
-            };
-          });
+              return {
+                ...warehouse,
+                quantity,
+                hasStock: quantity > 0,
+                inventoryItemId: fetchedInventory?._id,
+              };
+            }
+          );
 
           // Sort: warehouses with stock first
           mergedWarehouses.sort((a, b) => {
@@ -186,7 +216,10 @@ export default function BookInventorySummary({
   };
 
   const getWarehouseTypeBadge = (type: string) => {
-    const typeMap: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' }> = {
+    const typeMap: Record<
+      string,
+      { label: string; variant: 'default' | 'secondary' | 'outline' }
+    > = {
       main: { label: 'Principal', variant: 'default' },
       secondary: { label: 'Secundaria', variant: 'secondary' },
       point_of_sale: { label: 'Punto de Venta', variant: 'outline' },
@@ -209,7 +242,9 @@ export default function BookInventorySummary({
           <div className="book-inventory-summary__total-stock">
             <div>
               <p className="book-inventory-summary__total-label">Stock Total</p>
-              <p className="book-inventory-summary__total-value">{formatNumber(totalStock)}</p>
+              <p className="book-inventory-summary__total-value">
+                {formatNumber(totalStock)}
+              </p>
             </div>
             <div>{getStockBadge()}</div>
           </div>
@@ -218,7 +253,9 @@ export default function BookInventorySummary({
           {loading ? (
             <div className="book-inventory-summary__loading">
               <Package className="book-inventory-summary__loading-icon" />
-              <p className="book-inventory-summary__loading-text">Cargando bodegas...</p>
+              <p className="book-inventory-summary__loading-text">
+                Cargando bodegas...
+              </p>
             </div>
           ) : (
             <div className="book-inventory-summary__list">
@@ -233,11 +270,18 @@ export default function BookInventorySummary({
                   >
                     <div className="book-inventory-summary__item-info">
                       <div className="book-inventory-summary__item-header">
-                        <Warehouse className={`book-inventory-summary__warehouse-icon ${warehouse.hasStock ? 'book-inventory-summary__warehouse-icon--stock' : ''}`} />
-                        <span className="book-inventory-summary__warehouse-name">{warehouse.name}</span>
+                        <Warehouse
+                          className={`book-inventory-summary__warehouse-icon ${warehouse.hasStock ? 'book-inventory-summary__warehouse-icon--stock' : ''}`}
+                        />
+                        <span className="book-inventory-summary__warehouse-name">
+                          {warehouse.name}
+                        </span>
                         {getWarehouseTypeBadge(warehouse.type)}
                         {!warehouse.hasStock && (
-                          <Badge variant="outline" className="book-inventory-summary__unavailable-badge">
+                          <Badge
+                            variant="outline"
+                            className="book-inventory-summary__unavailable-badge"
+                          >
                             No disponible
                           </Badge>
                         )}
@@ -248,10 +292,14 @@ export default function BookInventorySummary({
                     </div>
                     <div className="book-inventory-summary__item-actions">
                       <div className="book-inventory-summary__stock-display">
-                        <p className={`book-inventory-summary__stock-value ${warehouse.hasStock ? 'book-inventory-summary__stock-value--stock' : ''}`}>
+                        <p
+                          className={`book-inventory-summary__stock-value ${warehouse.hasStock ? 'book-inventory-summary__stock-value--stock' : ''}`}
+                        >
                           {formatNumber(warehouse.quantity)}
                         </p>
-                        <p className="book-inventory-summary__stock-unit">unidades</p>
+                        <p className="book-inventory-summary__stock-unit">
+                          unidades
+                        </p>
                       </div>
                       {canUpdateInventory && (
                         <Button
@@ -265,7 +313,11 @@ export default function BookInventorySummary({
                         </Button>
                       )}
                       <Link href={`/dashboard/warehouses/${warehouse._id}`}>
-                        <Button variant="ghost" size="icon" className="book-inventory-summary__action-btn">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="book-inventory-summary__action-btn"
+                        >
                           <ExternalLink className="book-inventory-summary__action-icon" />
                         </Button>
                       </Link>

@@ -18,9 +18,9 @@
     margin: 0 auto;
     padding: $spacing-lg;
     padding-bottom: 150px; // Significantly increased to fully clear mobile bottom menu
-    
+
     // Subtle background mesh/gradient effect could be added here if not in global body
-    
+
     @include lg {
       padding: $spacing-xl; // Reset padding on desktop
     }
@@ -42,7 +42,7 @@
     }
   }
 
-// ...
+  // ...
 
   // --- ACTIVITY SECTION ---
   &__section {
@@ -50,7 +50,7 @@
     flex-direction: column;
     gap: $spacing-xl; // Increased from md
   }
-  
+
   &__section-title {
     display: flex;
     align-items: center;
@@ -83,7 +83,7 @@
     border-radius: $radius-xl;
     overflow: hidden;
     box-shadow: $shadow-sm;
-    
+
     // Ensure table inside looks good
     :global(table) {
       width: 100%;
@@ -113,9 +113,9 @@
   height: 100%;
   min-height: 300px;
   background: linear-gradient(
-    90deg, 
-    rgba($muted, 0.1) 25%, 
-    rgba($muted, 0.2) 50%, 
+    90deg,
+    rgba($muted, 0.1) 25%,
+    rgba($muted, 0.2) 50%,
     rgba($muted, 0.1) 75%
   );
   background-size: 200% 100%;
@@ -124,6 +124,11 @@
 }
 
 @keyframes loading-pulse {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
 }

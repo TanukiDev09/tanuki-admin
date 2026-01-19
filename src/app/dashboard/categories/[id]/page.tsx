@@ -44,7 +44,9 @@ export default function CategoryDetailPage({
       try {
         setLoading(true);
         // Fetch category
-        const catRes = await fetch(`/api/finance/categories/${unwrappedParams.id}`);
+        const catRes = await fetch(
+          `/api/finance/categories/${unwrappedParams.id}`
+        );
         if (!catRes.ok) throw new Error('Category not found');
         const catData = await catRes.json();
         setCategory(catData.data);
@@ -73,12 +75,20 @@ export default function CategoryDetailPage({
     fetchData();
   }, [unwrappedParams.id, toast]);
 
-  if (loading) return <div className="category-detail__loading">Cargando...</div>;
-  if (!category) return <div className="category-detail__error">Categoría no encontrada</div>;
+  if (loading)
+    return <div className="category-detail__loading">Cargando...</div>;
+  if (!category)
+    return (
+      <div className="category-detail__error">Categoría no encontrada</div>
+    );
 
   return (
     <div className="category-detail">
-      <Button variant="ghost" onClick={() => router.back()} className="category-detail__back-btn">
+      <Button
+        variant="ghost"
+        onClick={() => router.back()}
+        className="category-detail__back-btn"
+      >
         <ArrowLeft className="category-detail__icon" /> Volver
       </Button>
 
@@ -86,7 +96,9 @@ export default function CategoryDetailPage({
         <div className="category-detail__title-group">
           <h1 className="category-detail__title">{category.name}</h1>
           {category.description && (
-            <p className="category-detail__description">{category.description}</p>
+            <p className="category-detail__description">
+              {category.description}
+            </p>
           )}
         </div>
         <div className="category-detail__badges">
@@ -108,7 +120,9 @@ export default function CategoryDetailPage({
       </div>
 
       <div className="category-detail__content">
-        <h2 className="category-detail__section-title">Movimientos Asociados</h2>
+        <h2 className="category-detail__section-title">
+          Movimientos Asociados
+        </h2>
         {movements.length === 0 ? (
           <p className="category-detail__empty">
             No hay movimientos registrados que coincidan con esta categoría.
@@ -132,7 +146,9 @@ export default function CategoryDetailPage({
                   <TableCell>
                     <span
                       className="category-detail__link"
-                      onClick={() => router.push(`/dashboard/movements/${mov._id}`)}
+                      onClick={() =>
+                        router.push(`/dashboard/movements/${mov._id}`)
+                      }
                     >
                       {mov.description}
                     </span>

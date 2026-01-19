@@ -2,7 +2,25 @@
 
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Home, List, Tag, HelpCircle, Settings, Users, BookOpen, PenTool, FileText, Store, Warehouse, Package, Shield, Activity, MoreHorizontal, User, LogOut } from 'lucide-react';
+import {
+  Home,
+  List,
+  Tag,
+  HelpCircle,
+  Settings,
+  Users,
+  BookOpen,
+  PenTool,
+  FileText,
+  Store,
+  Warehouse,
+  Package,
+  Shield,
+  Activity,
+  MoreHorizontal,
+  User,
+  LogOut,
+} from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
@@ -18,7 +36,11 @@ import './NavLinks.scss';
 
 export const navItems = [
   { href: '/dashboard', label: 'Inicio', icon: Home },
-  { href: '/dashboard/financial-health', label: 'Salud Financiera', icon: Activity },
+  {
+    href: '/dashboard/financial-health',
+    label: 'Salud Financiera',
+    icon: Activity,
+  },
   { href: '/dashboard/catalog', label: 'Catálogo', icon: BookOpen },
   { href: '/dashboard/creators', label: 'Creadores', icon: PenTool },
   { href: '/dashboard/points-of-sale', label: 'Puntos de Venta', icon: Store },
@@ -64,18 +86,30 @@ export function NavLinks({
   const { hasPermission } = usePermission();
 
   const canSee = (href: string) => {
-    if (href === '/dashboard' || href === '/help' || href === '/settings') return true;
-    if (href.startsWith('/dashboard/catalog')) return hasPermission(ModuleName.BOOKS, PermissionAction.READ);
-    if (href.startsWith('/dashboard/creators')) return hasPermission(ModuleName.CREATORS, PermissionAction.READ);
-    if (href.startsWith('/dashboard/points-of-sale')) return hasPermission(ModuleName.POINTS_OF_SALE, PermissionAction.READ);
-    if (href.startsWith('/dashboard/warehouses')) return hasPermission(ModuleName.WAREHOUSES, PermissionAction.READ);
-    if (href.startsWith('/dashboard/agreements')) return hasPermission(ModuleName.AGREEMENTS, PermissionAction.READ);
-    if (href.startsWith('/dashboard/movements')) return hasPermission(ModuleName.FINANCE, PermissionAction.READ);
-    if (href.startsWith('/dashboard/financial-health')) return hasPermission(ModuleName.FINANCE, PermissionAction.READ);
-    if (href.startsWith('/dashboard/inventory')) return hasPermission(ModuleName.INVENTORY, PermissionAction.READ);
-    if (href.startsWith('/dashboard/categories')) return hasPermission(ModuleName.CATEGORIES, PermissionAction.READ);
-    if (href.startsWith('/dashboard/users')) return hasPermission(ModuleName.USERS, PermissionAction.READ);
-    if (href.startsWith('/dashboard/permissions')) return hasPermission(ModuleName.PERMISSIONS, PermissionAction.READ);
+    if (href === '/dashboard' || href === '/help' || href === '/settings')
+      return true;
+    if (href.startsWith('/dashboard/catalog'))
+      return hasPermission(ModuleName.BOOKS, PermissionAction.READ);
+    if (href.startsWith('/dashboard/creators'))
+      return hasPermission(ModuleName.CREATORS, PermissionAction.READ);
+    if (href.startsWith('/dashboard/points-of-sale'))
+      return hasPermission(ModuleName.POINTS_OF_SALE, PermissionAction.READ);
+    if (href.startsWith('/dashboard/warehouses'))
+      return hasPermission(ModuleName.WAREHOUSES, PermissionAction.READ);
+    if (href.startsWith('/dashboard/agreements'))
+      return hasPermission(ModuleName.AGREEMENTS, PermissionAction.READ);
+    if (href.startsWith('/dashboard/movements'))
+      return hasPermission(ModuleName.FINANCE, PermissionAction.READ);
+    if (href.startsWith('/dashboard/financial-health'))
+      return hasPermission(ModuleName.FINANCE, PermissionAction.READ);
+    if (href.startsWith('/dashboard/inventory'))
+      return hasPermission(ModuleName.INVENTORY, PermissionAction.READ);
+    if (href.startsWith('/dashboard/categories'))
+      return hasPermission(ModuleName.CATEGORIES, PermissionAction.READ);
+    if (href.startsWith('/dashboard/users'))
+      return hasPermission(ModuleName.USERS, PermissionAction.READ);
+    if (href.startsWith('/dashboard/permissions'))
+      return hasPermission(ModuleName.PERMISSIONS, PermissionAction.READ);
     return true;
   };
 
@@ -89,16 +123,19 @@ export function NavLinks({
     return currentPath?.startsWith(href);
   };
 
-  const allNavItems = (isAdmin
-    ? [...navItems, ...adminNavItems]
-    : navItems).filter(item => canSee(item.href));
+  const allNavItems = (
+    isAdmin ? [...navItems, ...adminNavItems] : navItems
+  ).filter((item) => canSee(item.href));
 
-  const mobileNavItemsVisible = mobileNavItems.filter(item => canSee(item.href));
+  const mobileNavItemsVisible = mobileNavItems.filter((item) =>
+    canSee(item.href)
+  );
 
   // Mobile variant - bottom navigation bar
   if (variant === 'mobile') {
     const moreItems = allNavItems.filter(
-      item => !mobileNavItems.some(mobileItem => mobileItem.href === item.href)
+      (item) =>
+        !mobileNavItems.some((mobileItem) => mobileItem.href === item.href)
     );
 
     return (
@@ -126,7 +163,10 @@ export function NavLinks({
               className="nav-links__mobile-item nav-links__mobile-item--more"
               aria-label="Más opciones"
             >
-              <MoreHorizontal className="nav-links__mobile-icon" aria-hidden="true" />
+              <MoreHorizontal
+                className="nav-links__mobile-icon"
+                aria-hidden="true"
+              />
               <span className="nav-links__mobile-label">Más</span>
             </button>
           </DropdownMenuTrigger>
@@ -143,7 +183,10 @@ export function NavLinks({
                     }}
                     className={`nav-links__dropdown-item ${active ? 'nav-links__dropdown-item--active' : ''}`}
                   >
-                    <Icon className="nav-links__dropdown-icon" aria-hidden="true" />
+                    <Icon
+                      className="nav-links__dropdown-icon"
+                      aria-hidden="true"
+                    />
                     <span>{label}</span>
                   </Link>
                 </DropdownMenuItem>

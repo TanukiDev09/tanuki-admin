@@ -1,4 +1,4 @@
-import * as React from "react";
+import * as React from 'react';
 import './Input.scss';
 
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
@@ -15,6 +15,6 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     );
   }
 );
-Input.displayName = "Input";
+Input.displayName = 'Input';
 
 export { Input };

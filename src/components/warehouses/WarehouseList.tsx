@@ -52,10 +52,19 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
   const { toast } = useToast();
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const { hasPermission } = usePermission();
-  const canDelete = hasPermission(ModuleName.WAREHOUSES, PermissionAction.DELETE);
-  const canUpdate = hasPermission(ModuleName.WAREHOUSES, PermissionAction.UPDATE);
+  const canDelete = hasPermission(
+    ModuleName.WAREHOUSES,
+    PermissionAction.DELETE
+  );
+  const canUpdate = hasPermission(
+    ModuleName.WAREHOUSES,
+    PermissionAction.UPDATE
+  );
 
   const confirmDelete = async () => {
     if (!itemToDelete) return;
@@ -79,7 +88,8 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
       router.refresh();
       setItemToDelete(null);
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('No se pudo eliminar la bodega');
+      const error =
+        err instanceof Error ? err : new Error('No se pudo eliminar la bodega');
       toast({
         title: 'Error',
         description: error.message,
@@ -102,7 +112,9 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
               <TableHead>Punto de Venta</TableHead>
               <TableHead>Ciudad</TableHead>
               <TableHead>Estado</TableHead>
-              <TableHead className="warehouse-list__header-cell--right">Acciones</TableHead>
+              <TableHead className="warehouse-list__header-cell--right">
+                Acciones
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -131,12 +143,16 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
                         {warehouse.pointOfSaleId.name}
                       </Link>
                     ) : (
-                      <span className="warehouse-list__link--placeholder">Sin asociar</span>
+                      <span className="warehouse-list__link--placeholder">
+                        Sin asociar
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>
                     {warehouse.city || (
-                      <span className="warehouse-list__link--placeholder">-</span>
+                      <span className="warehouse-list__link--placeholder">
+                        -
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>
@@ -164,7 +180,12 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
                           variant="ghost"
                           size="icon"
                           className="warehouse-list__action-btn--delete"
-                          onClick={() => setItemToDelete({ id: warehouse._id, name: warehouse.name })}
+                          onClick={() =>
+                            setItemToDelete({
+                              id: warehouse._id,
+                              name: warehouse.name,
+                            })
+                          }
                           disabled={deletingId === warehouse._id}
                         >
                           <Trash2 className="warehouse-list__icon" />
@@ -179,12 +200,17 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
         </Table>
       </div>
 
-      <Dialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
+      <Dialog
+        open={!!itemToDelete}
+        onOpenChange={(open) => !open && setItemToDelete(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>¿Estás seguro?</DialogTitle>
             <DialogDescription>
-              Esta acción no se puede deshacer. Se eliminará permanentemente la bodega {itemToDelete?.name ? `&quot;${itemToDelete.name}&quot;` : ""}.
+              Esta acción no se puede deshacer. Se eliminará permanentemente la
+              bodega{' '}
+              {itemToDelete?.name ? `&quot;${itemToDelete.name}&quot;` : ''}.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

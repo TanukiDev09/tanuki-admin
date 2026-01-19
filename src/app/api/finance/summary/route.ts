@@ -214,7 +214,8 @@ async function getDailyData(
     formattedDailyData.push({
       day: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`,
       income: found && found.income ? parseFloat(found.income.toString()) : 0,
-      expenses: found && found.expense ? parseFloat(found.expense.toString()) : 0,
+      expenses:
+        found && found.expense ? parseFloat(found.expense.toString()) : 0,
     });
   }
   return formattedDailyData;
@@ -276,44 +277,48 @@ export async function GET(request: NextRequest) {
     const groupBy = searchParams.get('groupBy');
 
     if (groupBy === 'book' && searchParams.get('creatorId')) {
-        const creatorId = searchParams.get('creatorId');
-        
-        // Find books for the creator
-        const books = await Book.find({
-            $or: [
-            { authors: creatorId },
-            { translators: creatorId },
-            { illustrators: creatorId }
-            ]
-        }).select('title costCenter');
+      const creatorId = searchParams.get('creatorId');
 
-        // Calculate totals per book
-        const bookStats = await Promise.all(books.map(async (book) => {
-            if (!book.costCenter) return null;
+      // Find books for the creator
+      const books = await Book.find({
+        $or: [
+          { authors: creatorId },
+          { translators: creatorId },
+          { illustrators: creatorId },
+        ],
+      }).select('title costCenter');
 
-            // Get totals for this specific cost center
-            const stats = await getTotals({ costCenter: book.costCenter });
-            
-            // Only include if there's activity
-            if (stats.totalIncome === 0 && stats.totalExpenses === 0) return null;
+      // Calculate totals per book
+      const bookStats = await Promise.all(
+        books.map(async (book) => {
+          if (!book.costCenter) return null;
 
-            return {
-                id: book._id,
-                title: book.title,
-                income: stats.totalIncome,
-                expenses: stats.totalExpenses,
-                profit: stats.totalIncome - stats.totalExpenses
-            };
-        }));
+          // Get totals for this specific cost center
+          const stats = await getTotals({ costCenter: book.costCenter });
 
-        // Filter out nulls (books with no cost center or no activity)
-        const validStats = bookStats.filter((s): s is NonNullable<typeof s> => s !== null);
-        
-        // Sort by highest profit
-        validStats.sort((a, b) => b.profit - a.profit);
+          // Only include if there's activity
+          if (stats.totalIncome === 0 && stats.totalExpenses === 0) return null;
 
-        return NextResponse.json(validStats);
-    } 
+          return {
+            id: book._id,
+            title: book.title,
+            income: stats.totalIncome,
+            expenses: stats.totalExpenses,
+            profit: stats.totalIncome - stats.totalExpenses,
+          };
+        })
+      );
+
+      // Filter out nulls (books with no cost center or no activity)
+      const validStats = bookStats.filter(
+        (s): s is NonNullable<typeof s> => s !== null
+      );
+
+      // Sort by highest profit
+      validStats.sort((a, b) => b.profit - a.profit);
+
+      return NextResponse.json(validStats);
+    }
 
     let matchStage: Record<string, unknown> = {};
 
@@ -324,19 +329,19 @@ export async function GET(request: NextRequest) {
       matchStage = { costCenter: cc ? cc.code : costCenterParam };
     } else if (searchParams.get('creatorId')) {
       const creatorId = searchParams.get('creatorId');
-      
+
       // Find books where this creator is author, translator, or illustrator
       const books = await Book.find({
         $or: [
           { authors: creatorId },
           { translators: creatorId },
-          { illustrators: creatorId }
-        ]
+          { illustrators: creatorId },
+        ],
       }).select('costCenter');
 
       // Extract unique cost centers
       const costCenters = books
-        .map(b => b.costCenter)
+        .map((b) => b.costCenter)
         .filter((cc): cc is string => !!cc);
 
       if (costCenters.length > 0) {

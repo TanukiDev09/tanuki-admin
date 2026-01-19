@@ -25,23 +25,23 @@ src/
 
 ### Campos
 
-| Campo | Tipo | Requerido | Descripción |
-|-------|------|-----------|-------------|
-| `isbn` | String | ✓ | ISBN único (10 o 13 dígitos) |
-| `title` | String | ✓ | Título del libro (1-200 caracteres) |
-| `author` | String | ✓ | Autor principal (mínimo 2 caracteres) |
-| `coauthors` | Array\<String\> | - | Lista de coautores |
-| `publicationDate` | Date | ✓ | Fecha de publicación |
-| `genre` | String | ✓ | Género/categoría del libro |
-| `language` | String | ✓ | Idioma (default: 'es') |
-| `pages` | Number | ✓ | Número de páginas (mínimo 1) |
-| `price` | Number | ✓ | Precio de venta (no negativo) |
-| `stock` | Number | ✓ | Cantidad en inventario (default: 0) |
-| `description` | String | - | Sinopsis o descripción |
-| `coverImage` | String | - | URL de la imagen de portada |
-| `isActive` | Boolean | ✓ | Estado activo/inactivo (default: true) |
-| `createdAt` | Date | ✓ | Fecha de creación (automático) |
-| `updatedAt` | Date | ✓ | Fecha de última actualización (automático) |
+| Campo             | Tipo            | Requerido | Descripción                                |
+| ----------------- | --------------- | --------- | ------------------------------------------ |
+| `isbn`            | String          | ✓         | ISBN único (10 o 13 dígitos)               |
+| `title`           | String          | ✓         | Título del libro (1-200 caracteres)        |
+| `author`          | String          | ✓         | Autor principal (mínimo 2 caracteres)      |
+| `coauthors`       | Array\<String\> | -         | Lista de coautores                         |
+| `publicationDate` | Date            | ✓         | Fecha de publicación                       |
+| `genre`           | String          | ✓         | Género/categoría del libro                 |
+| `language`        | String          | ✓         | Idioma (default: 'es')                     |
+| `pages`           | Number          | ✓         | Número de páginas (mínimo 1)               |
+| `price`           | Number          | ✓         | Precio de venta (no negativo)              |
+| `stock`           | Number          | ✓         | Cantidad en inventario (default: 0)        |
+| `description`     | String          | -         | Sinopsis o descripción                     |
+| `coverImage`      | String          | -         | URL de la imagen de portada                |
+| `isActive`        | Boolean         | ✓         | Estado activo/inactivo (default: true)     |
+| `createdAt`       | Date            | ✓         | Fecha de creación (automático)             |
+| `updatedAt`       | Date            | ✓         | Fecha de última actualización (automático) |
 
 ### Validaciones
 
@@ -67,6 +67,7 @@ src/
 #### 1. **GET /api/books** - Listar libros
 
 **Query Parameters:**
+
 - `page` (opcional): Número de página (default: 1)
 - `limit` (opcional): Elementos por página (default: 10)
 - `genre` (opcional): Filtrar por género
@@ -74,6 +75,7 @@ src/
 - `search` (opcional): Buscar por título, autor o ISBN
 
 **Respuesta exitosa (200):**
+
 ```json
 {
   "success": true,
@@ -109,6 +111,7 @@ src/
 #### 2. **POST /api/books** - Crear libro
 
 **Request Body:**
+
 ```json
 {
   "isbn": "9781234567890",
@@ -127,6 +130,7 @@ src/
 ```
 
 **Respuesta exitosa (201):**
+
 ```json
 {
   "success": true,
@@ -147,12 +151,14 @@ src/
 ```
 
 **Errores:**
+
 - `400`: Campos requeridos faltantes o formato ISBN inválido
 - `409`: ISBN ya registrado
 
 #### 3. **GET /api/books/[id]** - Obtener libro por ID
 
 **Respuesta exitosa (200):**
+
 ```json
 {
   "success": true,
@@ -170,12 +176,14 @@ src/
 ```
 
 **Errores:**
+
 - `400`: ID inválido
 - `404`: Libro no encontrado
 
 #### 4. **PUT /api/books/[id]** - Actualizar libro
 
 **Request Body (todos los campos son opcionales):**
+
 ```json
 {
   "title": "Nuevo título",
@@ -186,6 +194,7 @@ src/
 ```
 
 **Respuesta exitosa (200):**
+
 ```json
 {
   "success": true,
@@ -201,6 +210,7 @@ src/
 ```
 
 **Errores:**
+
 - `400`: ID o datos inválidos
 - `404`: Libro no encontrado
 - `409`: ISBN ya registrado en otro libro
@@ -210,6 +220,7 @@ src/
 **Nota**: Implementa soft delete (marca como inactivo) en lugar de eliminar.
 
 **Respuesta exitosa (200):**
+
 ```json
 {
   "success": true,
@@ -223,6 +234,7 @@ src/
 ```
 
 **Errores:**
+
 - `400`: ID inválido
 - `404`: Libro no encontrado
 
@@ -231,6 +243,7 @@ src/
 ### BookManagementTable
 
 Tabla completa para gestionar libros con:
+
 - **Búsqueda**: Por título, autor o ISBN
 - **Filtros**: Todos, Activos, Inactivos
 - **Columnas**: Portada, ISBN, Título, Autor, Género, Precio, Stock, Estado, Acciones
@@ -240,6 +253,7 @@ Tabla completa para gestionar libros con:
 ### CreateBookModal
 
 Modal para crear nuevos libros:
+
 - Formulario completo con todos los campos
 - Validaciones en cliente y servidor
 - Manejo de errores con mensajes claros
@@ -249,6 +263,7 @@ Modal para crear nuevos libros:
 ### EditBookModal
 
 Modal para editar libros existentes:
+
 - Pre-carga datos del libro seleccionado
 - Permite actualización parcial de campos
 - Validaciones y manejo de errores
@@ -271,8 +286,8 @@ const response = await fetch('http://localhost:3000/api/books', {
     genre: 'Fantasía',
     pages: 662,
     price: 29.99,
-    stock: 15
-  })
+    stock: 15,
+  }),
 });
 const data = await response.json();
 
@@ -290,8 +305,8 @@ const updateResponse = await fetch(
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       price: 34.99,
-      stock: 25
-    })
+      stock: 25,
+    }),
   }
 );
 ```
@@ -406,7 +421,7 @@ interface BookResponse {
 }
 
 // Función helper
-function sanitizeBook(book: IBook): BookResponse
+function sanitizeBook(book: IBook): BookResponse;
 ```
 
 ## 🚀 Próximos Pasos (Opcionales)
@@ -437,6 +452,7 @@ function sanitizeBook(book: IBook): BookResponse
 ## 📱 Responsive Design
 
 El módulo está completamente optimizado para:
+
 - **Desktop**: Tabla completa con todas las columnas
 - **Tablet**: Ajuste automático de columnas
 - **Móvil**: Vista optimizada con información esencial

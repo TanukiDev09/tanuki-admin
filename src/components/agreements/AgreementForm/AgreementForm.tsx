@@ -21,7 +21,12 @@ import {
   SelectValue,
 } from '@/components/ui/Select';
 import { useToast } from '@/components/ui/Toast';
-import { CreateAgreementDTO, AgreementResponse, AgreementRole, AgreementStatus } from '@/types/agreement';
+import {
+  CreateAgreementDTO,
+  AgreementResponse,
+  AgreementRole,
+  AgreementStatus,
+} from '@/types/agreement';
 import { CreatorSelect } from '@/components/creators/CreatorSelect';
 import { FileText, Loader2, Upload, Info } from 'lucide-react';
 import './AgreementForm.scss';
@@ -70,16 +75,26 @@ export function AgreementForm({
   useEffect(() => {
     if (agreementToEdit) {
       form.reset({
-        book: typeof agreementToEdit.book === 'object' ? String((agreementToEdit.book as { _id: unknown })._id) : agreementToEdit.book,
-        creator: typeof agreementToEdit.creator === 'object' ? String((agreementToEdit.creator as { _id: unknown })._id) : agreementToEdit.creator,
+        book:
+          typeof agreementToEdit.book === 'object'
+            ? String((agreementToEdit.book as { _id: unknown })._id)
+            : agreementToEdit.book,
+        creator:
+          typeof agreementToEdit.creator === 'object'
+            ? String((agreementToEdit.creator as { _id: unknown })._id)
+            : agreementToEdit.creator,
         role: agreementToEdit.role,
         royaltyPercentage: agreementToEdit.royaltyPercentage,
         advancePayment: agreementToEdit.advancePayment || 0,
         status: agreementToEdit.status,
         signedContractUrl: agreementToEdit.signedContractUrl || '',
         isPublicDomain: agreementToEdit.isPublicDomain || false,
-        validFrom: agreementToEdit.validFrom ? new Date(agreementToEdit.validFrom) : undefined,
-        validUntil: agreementToEdit.validUntil ? new Date(agreementToEdit.validUntil) : undefined,
+        validFrom: agreementToEdit.validFrom
+          ? new Date(agreementToEdit.validFrom)
+          : undefined,
+        validUntil: agreementToEdit.validUntil
+          ? new Date(agreementToEdit.validUntil)
+          : undefined,
       });
     } else {
       form.reset({
@@ -188,8 +203,10 @@ export function AgreementForm({
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="agreement-form__form">
-
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="agreement-form__form"
+        >
           <div className="agreement-form__grid-2">
             <div className="agreement-form__field agreement-form__field--full">
               <Label>Creador</Label>
@@ -205,7 +222,9 @@ export function AgreementForm({
               <Label>Rol</Label>
               <Select
                 value={form.watch('role')}
-                onValueChange={(val) => form.setValue('role', val as AgreementRole)}
+                onValueChange={(val) =>
+                  form.setValue('role', val as AgreementRole)
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Seleccionar rol" />
@@ -222,7 +241,9 @@ export function AgreementForm({
               <Label>Estado</Label>
               <Select
                 value={form.watch('status')}
-                onValueChange={(val) => form.setValue('status', val as AgreementStatus)}
+                onValueChange={(val) =>
+                  form.setValue('status', val as AgreementStatus)
+                }
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Estado" />
@@ -236,7 +257,9 @@ export function AgreementForm({
             </div>
 
             <div className="agreement-form__section agreement-form__section--full">
-              <Label className="agreement-form__section-label">Tipo de Acuerdo</Label>
+              <Label className="agreement-form__section-label">
+                Tipo de Acuerdo
+              </Label>
 
               <div className="agreement-form__radio-group">
                 <div className="agreement-form__radio-option">
@@ -244,14 +267,20 @@ export function AgreementForm({
                     type="radio"
                     id="type-royalty"
                     name="paymentType"
-                    checked={!form.watch('isPublicDomain') && (form.watch('royaltyPercentage') || 0) > 0}
+                    checked={
+                      !form.watch('isPublicDomain') &&
+                      (form.watch('royaltyPercentage') || 0) > 0
+                    }
                     onChange={() => {
                       form.setValue('isPublicDomain', false);
                       form.setValue('royaltyPercentage', 5);
                     }}
                     className="agreement-form__radio"
                   />
-                  <label htmlFor="type-royalty" className="agreement-form__radio-label">
+                  <label
+                    htmlFor="type-royalty"
+                    className="agreement-form__radio-label"
+                  >
                     Regalías (Standard)
                   </label>
                 </div>
@@ -261,14 +290,20 @@ export function AgreementForm({
                     type="radio"
                     id="type-cash"
                     name="paymentType"
-                    checked={!form.watch('isPublicDomain') && form.watch('royaltyPercentage') === 0}
+                    checked={
+                      !form.watch('isPublicDomain') &&
+                      form.watch('royaltyPercentage') === 0
+                    }
                     onChange={() => {
                       form.setValue('isPublicDomain', false);
                       form.setValue('royaltyPercentage', 0);
                     }}
                     className="agreement-form__radio"
                   />
-                  <label htmlFor="type-cash" className="agreement-form__radio-label">
+                  <label
+                    htmlFor="type-cash"
+                    className="agreement-form__radio-label"
+                  >
                     Pago de Contado (Sin Regalías)
                   </label>
                 </div>
@@ -286,7 +321,10 @@ export function AgreementForm({
                     }}
                     className="agreement-form__radio"
                   />
-                  <label htmlFor="type-public" className="agreement-form__radio-label">
+                  <label
+                    htmlFor="type-public"
+                    className="agreement-form__radio-label"
+                  >
                     Dominio Público (Sin Pagos)
                   </label>
                 </div>
@@ -295,24 +333,35 @@ export function AgreementForm({
 
             {/* Conditional Fields */}
             <div className="agreement-form__grid-2 agreement-form__field--full">
-              {!form.watch('isPublicDomain') && (form.watch('royaltyPercentage') || 0) > 0 && (
-                <div className="agreement-form__field">
-                  <Label>% Royalties</Label>
-                  <NumericInput
-                    placeholder="0.00"
-                    value={form.watch('royaltyPercentage')}
-                    onValueChange={val => form.setValue('royaltyPercentage', val || 0)}
-                  />
-                </div>
-              )}
+              {!form.watch('isPublicDomain') &&
+                (form.watch('royaltyPercentage') || 0) > 0 && (
+                  <div className="agreement-form__field">
+                    <Label>% Royalties</Label>
+                    <NumericInput
+                      placeholder="0.00"
+                      value={form.watch('royaltyPercentage')}
+                      onValueChange={(val) =>
+                        form.setValue('royaltyPercentage', val || 0)
+                      }
+                    />
+                  </div>
+                )}
 
               {!form.watch('isPublicDomain') && (
-                <div className={`agreement-form__field ${form.watch('royaltyPercentage') === 0 ? "agreement-form__field--full" : ""}`}>
-                  <Label>{form.watch('royaltyPercentage') === 0 ? 'Monto del Pago ($)' : 'Adelanto ($)'}</Label>
+                <div
+                  className={`agreement-form__field ${form.watch('royaltyPercentage') === 0 ? 'agreement-form__field--full' : ''}`}
+                >
+                  <Label>
+                    {form.watch('royaltyPercentage') === 0
+                      ? 'Monto del Pago ($)'
+                      : 'Adelanto ($)'}
+                  </Label>
                   <NumericInput
                     placeholder="0.00"
                     value={form.watch('advancePayment')}
-                    onValueChange={val => form.setValue('advancePayment', val || 0)}
+                    onValueChange={(val) =>
+                      form.setValue('advancePayment', val || 0)
+                    }
                   />
                 </div>
               )}
@@ -321,7 +370,11 @@ export function AgreementForm({
                 <div className="agreement-form__info-box agreement-form__info-box--full">
                   <div className="agreement-form__info-content">
                     <Info className="agreement-form__info-icon" />
-                    <span>Los acuerdos de <strong>Dominio Público</strong> no generan obligaciones de pago. Se utilizan para acreditar la autoría sin compensación económica.</span>
+                    <span>
+                      Los acuerdos de <strong>Dominio Público</strong> no
+                      generan obligaciones de pago. Se utilizan para acreditar
+                      la autoría sin compensación económica.
+                    </span>
                   </div>
                 </div>
               )}
@@ -343,7 +396,9 @@ export function AgreementForm({
                 type="button"
                 variant="outline"
                 disabled={isUploading}
-                onClick={() => document.getElementById('contract-upload')?.click()}
+                onClick={() =>
+                  document.getElementById('contract-upload')?.click()
+                }
                 className="agreement-form__btn-upload"
               >
                 {isUploading ? (

@@ -62,8 +62,13 @@ export function UsersTable({
     return true;
   });
 
-  const getRoleVariant = (role: string): 'default' | 'secondary' | 'outline' | 'destructive' => {
-    const variants: Record<string, 'default' | 'secondary' | 'outline' | 'destructive'> = {
+  const getRoleVariant = (
+    role: string
+  ): 'default' | 'secondary' | 'outline' | 'destructive' => {
+    const variants: Record<
+      string,
+      'default' | 'secondary' | 'outline' | 'destructive'
+    > = {
       admin: 'default',
       user: 'secondary',
       viewer: 'outline',
@@ -117,24 +122,22 @@ export function UsersTable({
               <TableHead>Rol</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead>Último acceso</TableHead>
-              <TableHead className="users-table__cell--right">Acciones</TableHead>
+              <TableHead className="users-table__cell--right">
+                Acciones
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredUsers.map((user) => (
               <TableRow key={user._id} className="users-table__row">
                 <TableCell>
-                  <div className="users-table__user-name">
-                    {user.name}
-                  </div>
+                  <div className="users-table__user-name">{user.name}</div>
                 </TableCell>
                 <TableCell>
                   <div className="users-table__user-email">{user.email}</div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={getRoleVariant(user.role)}>
-                    {user.role}
-                  </Badge>
+                  <Badge variant={getRoleVariant(user.role)}>{user.role}</Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant={user.isActive ? 'success' : 'destructive'}>
@@ -163,7 +166,11 @@ export function UsersTable({
                         variant="ghost"
                         size="icon"
                         onClick={() => onToggleStatus(user._id, user.isActive)}
-                        className={user.isActive ? 'users-table__action-btn--warning' : 'users-table__action-btn--success'}
+                        className={
+                          user.isActive
+                            ? 'users-table__action-btn--warning'
+                            : 'users-table__action-btn--success'
+                        }
                         title={user.isActive ? 'Suspender' : 'Activar'}
                       >
                         {user.isActive ? (

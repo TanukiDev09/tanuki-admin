@@ -1,4 +1,3 @@
-
 const glossaryTerms = [
   {
     term: 'Pista Financiera',
@@ -40,16 +39,15 @@ export default function AyudaPage() {
       <header className="help-page__header">
         <h1 className="help-page__title">Glosario Financiero</h1>
         <p className="help-page__subtitle">
-          Términos financieros explicados sin jerga técnica, diseñados para emprendedores.
+          Términos financieros explicados sin jerga técnica, diseñados para
+          emprendedores.
         </p>
       </header>
 
       <div className="help-page__glossary">
         {glossaryTerms.map((item) => (
           <div key={item.term} className="help-page__term-card">
-            <h2 className="help-page__term-title">
-              {item.term}
-            </h2>
+            <h2 className="help-page__term-title">{item.term}</h2>
             <p className="help-page__term-definition">{item.definition}</p>
           </div>
         ))}
@@ -58,8 +56,8 @@ export default function AyudaPage() {
       <div className="help-page__support-card">
         <h2 className="help-page__support-title">¿Necesitas más ayuda?</h2>
         <p className="help-page__support-text">
-          Esta sección se expandirá con tutoriales, videos y guías paso a paso para ayudarte
-          a comprender mejor tus finanzas.
+          Esta sección se expandirá con tutoriales, videos y guías paso a paso
+          para ayudarte a comprender mejor tus finanzas.
         </p>
       </div>
     </div>

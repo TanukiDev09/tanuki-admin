@@ -3,6 +3,7 @@
 ## 🎨 Colors
 
 ### Semantic Status
+
 ```css
 hsl(var(--success))    /* Green: #16A34A */
 hsl(var(--danger))     /* Red: #DC2626 */
@@ -11,6 +12,7 @@ hsl(var(--warning))    /* Amber: #F59E0B */
 ```
 
 ### Chart Palette
+
 ```css
 hsl(var(--chart-1))    /* Blue */
 hsl(var(--chart-2))    /* Red */
@@ -23,6 +25,7 @@ hsl(var(--chart-8))    /* Magenta */
 ```
 
 ## 📏 Spacing
+
 ```css
 var(--spacing-xs)      /* 4px */
 var(--spacing-sm)      /* 8px */
@@ -34,6 +37,7 @@ var(--spacing-3xl)     /* 64px */
 ```
 
 ## 🔤 Typography
+
 ```css
 var(--font-size-xs)    /* 12px */
 var(--font-size-sm)    /* 14px */
@@ -46,6 +50,7 @@ var(--font-size-4xl)   /* 36px */
 ```
 
 ## 🌑 Shadows
+
 ```css
 var(--shadow-xs)       /* Minimal */
 var(--shadow-sm)       /* Small (cards) */
@@ -56,6 +61,7 @@ var(--shadow-2xl)      /* Maximum */
 ```
 
 ## 📐 Border Radius
+
 ```css
 var(--radius-xs)       /* 4px */
 var(--radius-sm)       /* 8px */
@@ -68,6 +74,7 @@ var(--radius-full)     /* Circular */
 ## 🧩 Utility Classes
 
 ### Cards
+
 ```html
 <div class="card">Standard card</div>
 <div class="stat-card-success">Green stat card</div>
@@ -76,6 +83,7 @@ var(--radius-full)     /* Circular */
 ```
 
 ### Badges
+
 ```html
 <span class="badge-success">Success</span>
 <span class="badge-danger">Danger</span>
@@ -84,6 +92,7 @@ var(--radius-full)     /* Circular */
 ```
 
 ### Icon Circles
+
 ```html
 <div class="icon-circle-success">✓</div>
 <div class="icon-circle-danger">✗</div>
@@ -92,6 +101,7 @@ var(--radius-full)     /* Circular */
 ```
 
 ### Charts
+
 ```html
 <div class="chart-container">Default height (300px)</div>
 <div class="chart-container chart-container-sm">Small (200px)</div>
@@ -101,6 +111,7 @@ var(--radius-full)     /* Circular */
 ## ⚡ Quick Examples
 
 ### Stat Card
+
 ```html
 <div class="stat-card-success">
   <div class="stat-value">$ 77.454.940</div>
@@ -109,6 +120,7 @@ var(--radius-full)     /* Circular */
 ```
 
 ### Movement Item
+
 ```html
 <div class="flex items-center gap-3">
   <div class="icon-circle-info">$</div>
@@ -121,6 +133,7 @@ var(--radius-full)     /* Circular */
 ```
 
 ### Custom Component
+
 ```css
 .my-component {
   padding: var(--spacing-lg);

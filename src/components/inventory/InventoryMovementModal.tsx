@@ -114,11 +114,15 @@ export function InventoryMovementModal({
     }
   }, [isOpen, warehouseId, warehouseType]);
 
-  const [activeWarehouseId, setActiveWarehouseId] = useState<string>(warehouseId || '');
-  const [activeWarehouseType, setActiveWarehouseType] = useState<string>(warehouseType || '');
+  const [activeWarehouseId, setActiveWarehouseId] = useState<string>(
+    warehouseId || ''
+  );
+  const [activeWarehouseType, setActiveWarehouseType] = useState<string>(
+    warehouseType || ''
+  );
 
   const handleActiveWarehouseChange = (wid: string) => {
-    const w = warehouses.find(w => w._id === wid);
+    const w = warehouses.find((w) => w._id === wid);
     if (w) {
       setActiveWarehouseId(wid);
       setActiveWarehouseType(w.type);
@@ -149,7 +153,8 @@ export function InventoryMovementModal({
 
   const getSourceWarehouseId = () => {
     if (type === 'INGRESO') return null;
-    if (type === 'REMISION' || type === 'DEVOLUCION' || type === 'LIQUIDACION') return activeWarehouseId;
+    if (type === 'REMISION' || type === 'DEVOLUCION' || type === 'LIQUIDACION')
+      return activeWarehouseId;
     return activeWarehouseId;
   };
 
@@ -157,7 +162,7 @@ export function InventoryMovementModal({
     if (type === 'INGRESO') return activeWarehouseId;
     if (type === 'REMISION') return targetWarehouseId;
     if (type === 'DEVOLUCION') {
-      const editorial = warehouses.find(w => w.type === 'editorial');
+      const editorial = warehouses.find((w) => w.type === 'editorial');
       return editorial?._id;
     }
     if (type === 'LIQUIDACION') return null;
@@ -185,7 +190,6 @@ export function InventoryMovementModal({
       } else {
         setSearchResults(data as InventoryItem[]);
       }
-
     } catch (error) {
       console.error('Search error:', error);
     } finally {
@@ -208,16 +212,18 @@ export function InventoryMovementModal({
       maxQty = 999999;
     }
 
-    if (items.find(i => i.bookId === bookId)) return;
+    if (items.find((i) => i.bookId === bookId)) return;
     setItems([...items, { bookId, title, quantity: 1, maxQuantity: maxQty }]);
   };
 
   const updateQuantity = (bookId: string, q: number) => {
-    setItems(items.map(i => i.bookId === bookId ? { ...i, quantity: q } : i));
+    setItems(
+      items.map((i) => (i.bookId === bookId ? { ...i, quantity: q } : i))
+    );
   };
 
   const removeItem = (bookId: string) => {
-    setItems(items.filter(i => i.bookId !== bookId));
+    setItems(items.filter((i) => i.bookId !== bookId));
   };
 
   const handleSubmit = async () => {
@@ -228,7 +234,7 @@ export function InventoryMovementModal({
         subType: subType || undefined,
         fromWarehouseId: getSourceWarehouseId(),
         toWarehouseId: getDestWarehouseId(),
-        items: items.map(i => ({ bookId: i.bookId, quantity: i.quantity })),
+        items: items.map((i) => ({ bookId: i.bookId, quantity: i.quantity })),
         invoiceRef: invoiceRef || undefined,
         observations: observations || undefined,
       };
@@ -236,7 +242,7 @@ export function InventoryMovementModal({
       const res = await fetch('/api/inventory/movements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -250,7 +256,7 @@ export function InventoryMovementModal({
       toast({
         title: 'Error',
         description: err.message,
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -262,13 +268,18 @@ export function InventoryMovementModal({
       {!warehouseId && (
         <div className="inventory-movement-modal__field">
           <Label>Bodega</Label>
-          <Select value={activeWarehouseId} onValueChange={handleActiveWarehouseChange}>
+          <Select
+            value={activeWarehouseId}
+            onValueChange={handleActiveWarehouseChange}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Seleccionar bodega..." />
             </SelectTrigger>
             <SelectContent>
-              {warehouses.map(w => (
-                <SelectItem key={w._id} value={w._id}>{w.name}</SelectItem>
+              {warehouses.map((w) => (
+                <SelectItem key={w._id} value={w._id}>
+                  {w.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -283,18 +294,31 @@ export function InventoryMovementModal({
           disabled={!activeWarehouseId}
         >
           <SelectTrigger>
-            <SelectValue placeholder={!activeWarehouseId ? "Primero seleccione una bodega" : "Seleccionar..."} />
+            <SelectValue
+              placeholder={
+                !activeWarehouseId
+                  ? 'Primero seleccione una bodega'
+                  : 'Seleccionar...'
+              }
+            />
           </SelectTrigger>
           <SelectContent>
-            {(activeWarehouseType === 'editorial' || activeWarehouseType === 'general') && (
+            {(activeWarehouseType === 'editorial' ||
+              activeWarehouseType === 'general') && (
               <>
-                <SelectItem value="INGRESO">Ingreso (Compras / Ajuste)</SelectItem>
-                <SelectItem value="REMISION">Remisión (A Punto de Venta)</SelectItem>
+                <SelectItem value="INGRESO">
+                  Ingreso (Compras / Ajuste)
+                </SelectItem>
+                <SelectItem value="REMISION">
+                  Remisión (A Punto de Venta)
+                </SelectItem>
               </>
             )}
             <SelectItem value="LIQUIDACION">Liquidación (Venta)</SelectItem>
             {activeWarehouseType === 'pos' && (
-              <SelectItem value="DEVOLUCION">Devolución (A Editorial)</SelectItem>
+              <SelectItem value="DEVOLUCION">
+                Devolución (A Editorial)
+              </SelectItem>
             )}
           </SelectContent>
         </Select>
@@ -303,7 +327,10 @@ export function InventoryMovementModal({
       {type === 'INGRESO' && (
         <div className="inventory-movement-modal__field">
           <Label>Motivo de Ingreso</Label>
-          <Select value={subType} onValueChange={(v) => setSubType(v as SubType)}>
+          <Select
+            value={subType}
+            onValueChange={(v) => setSubType(v as SubType)}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Seleccionar motivo..." />
             </SelectTrigger>
@@ -319,19 +346,32 @@ export function InventoryMovementModal({
       {subType === 'PURCHASE' && (
         <div className="inventory-movement-modal__field">
           <Label>Referencia de Factura</Label>
-          <Input value={invoiceRef} onChange={e => setInvoiceRef(e.target.value)} placeholder="Ej: FAC-1234" />
+          <Input
+            value={invoiceRef}
+            onChange={(e) => setInvoiceRef(e.target.value)}
+            placeholder="Ej: FAC-1234"
+          />
         </div>
       )}
 
       {type === 'REMISION' && (
         <div className="inventory-movement-modal__field">
           <Label>Bodega de Destino (Punto de Venta)</Label>
-          <Select value={targetWarehouseId} onValueChange={setTargetWarehouseId}>
-            <SelectTrigger><SelectValue placeholder="Seleccionar POS..." /></SelectTrigger>
+          <Select
+            value={targetWarehouseId}
+            onValueChange={setTargetWarehouseId}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar POS..." />
+            </SelectTrigger>
             <SelectContent>
-              {warehouses.filter(w => w.type === 'pos').map(w => (
-                <SelectItem key={w._id} value={w._id}>{w.name}</SelectItem>
-              ))}
+              {warehouses
+                .filter((w) => w.type === 'pos')
+                .map((w) => (
+                  <SelectItem key={w._id} value={w._id}>
+                    {w.name}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
         </div>
@@ -339,15 +379,24 @@ export function InventoryMovementModal({
 
       <div className="inventory-movement-modal__field">
         <Label>Observaciones</Label>
-        <Input value={observations} onChange={e => setObservations(e.target.value)} placeholder="Notas adicionales..." />
+        <Input
+          value={observations}
+          onChange={(e) => setObservations(e.target.value)}
+          placeholder="Notas adicionales..."
+        />
       </div>
 
       <div className="inventory-movement-modal__footer inventory-movement-modal__footer--end">
         <Button
-          disabled={!type || (type === 'INGRESO' && !subType) || (type === 'REMISION' && !targetWarehouseId)}
+          disabled={
+            !type ||
+            (type === 'INGRESO' && !subType) ||
+            (type === 'REMISION' && !targetWarehouseId)
+          }
           onClick={() => setStep(2)}
         >
-          Siguiente <ArrowRight className="inventory-movement-modal__arrow-icon" />
+          Siguiente{' '}
+          <ArrowRight className="inventory-movement-modal__arrow-icon" />
         </Button>
       </div>
     </div>
@@ -359,20 +408,30 @@ export function InventoryMovementModal({
         <div className="inventory-movement-modal__search">
           <Search className="inventory-movement-modal__search-icon" />
           <Input
-            placeholder={type === 'INGRESO' ? "Buscar en catálogo..." : "Buscar en inventario..."}
+            placeholder={
+              type === 'INGRESO'
+                ? 'Buscar en catálogo...'
+                : 'Buscar en inventario...'
+            }
             value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
+            onChange={(e) => setSearchTerm(e.target.value)}
             className="inventory-movement-modal__search-input"
-            onKeyDown={e => e.key === 'Enter' && searchBooks()}
+            onKeyDown={(e) => e.key === 'Enter' && searchBooks()}
           />
         </div>
         <Button onClick={searchBooks} variant="secondary" disabled={searching}>
-          {searching ? <Loader2 className="inventory-movement-modal__spinner" /> : 'Buscar'}
+          {searching ? (
+            <Loader2 className="inventory-movement-modal__spinner" />
+          ) : (
+            'Buscar'
+          )}
         </Button>
       </div>
 
       <div className="inventory-movement-modal__results">
-        {searchResults.length === 0 && <p className="inventory-movement-modal__empty">Sin resultados</p>}
+        {searchResults.length === 0 && (
+          <p className="inventory-movement-modal__empty">Sin resultados</p>
+        )}
         {searchResults.map((item) => {
           let bookId: string, title: string, quantity: number | undefined;
 
@@ -387,17 +446,26 @@ export function InventoryMovementModal({
             title = book.title;
           }
 
-          const isAdded = items.some(i => i.bookId === bookId);
+          const isAdded = items.some((i) => i.bookId === bookId);
 
           return (
             <div key={bookId} className="inventory-movement-modal__item">
               <div className="inventory-movement-modal__item-info">
-                <span className="inventory-movement-modal__item-title">{title}</span>
+                <span className="inventory-movement-modal__item-title">
+                  {title}
+                </span>
                 {type !== 'INGRESO' && (
-                  <span className="inventory-movement-modal__item-meta">Stock: {formatNumber(quantity || 0)}</span>
+                  <span className="inventory-movement-modal__item-meta">
+                    Stock: {formatNumber(quantity || 0)}
+                  </span>
                 )}
               </div>
-              <Button size="icon" variant="ghost" disabled={isAdded} onClick={() => addItem(item)}>
+              <Button
+                size="icon"
+                variant="ghost"
+                disabled={isAdded}
+                onClick={() => addItem(item)}
+              >
                 <Plus className="inventory-movement-modal__icon" />
               </Button>
             </div>
@@ -410,16 +478,26 @@ export function InventoryMovementModal({
       <div className="inventory-movement-modal__selected-section">
         <Label>Items Seleccionados ({formatNumber(items.length)})</Label>
         <div className="inventory-movement-modal__selected-list">
-          {items.map(item => (
-            <div key={item.bookId} className="inventory-movement-modal__selected-item">
-              <p className="inventory-movement-modal__selected-item-title">{item.title}</p>
+          {items.map((item) => (
+            <div
+              key={item.bookId}
+              className="inventory-movement-modal__selected-item"
+            >
+              <p className="inventory-movement-modal__selected-item-title">
+                {item.title}
+              </p>
               <NumericInput
                 className="inventory-movement-modal__selected-item-quantity"
                 value={item.quantity}
-                onValueChange={val => updateQuantity(item.bookId, val || 0)}
+                onValueChange={(val) => updateQuantity(item.bookId, val || 0)}
                 allowDecimals={false}
               />
-              <Button size="icon" variant="ghost" className="inventory-movement-modal__selected-item-remove" onClick={() => removeItem(item.bookId)}>
+              <Button
+                size="icon"
+                variant="ghost"
+                className="inventory-movement-modal__selected-item-remove"
+                onClick={() => removeItem(item.bookId)}
+              >
                 <Trash2 className="inventory-movement-modal__icon" />
               </Button>
             </div>
@@ -428,9 +506,13 @@ export function InventoryMovementModal({
       </div>
 
       <div className="inventory-movement-modal__footer">
-        <Button variant="outline" onClick={() => setStep(1)}>Atrás</Button>
+        <Button variant="outline" onClick={() => setStep(1)}>
+          Atrás
+        </Button>
         <Button disabled={items.length === 0 || loading} onClick={handleSubmit}>
-          {loading && <Loader2 className="inventory-movement-modal__spinner inventory-movement-modal__spinner--mr" />}
+          {loading && (
+            <Loader2 className="inventory-movement-modal__spinner inventory-movement-modal__spinner--mr" />
+          )}
           Confirmar Movimiento
         </Button>
       </div>
@@ -443,7 +525,9 @@ export function InventoryMovementModal({
         <DialogHeader>
           <DialogTitle>Registrar Movimiento de Inventario</DialogTitle>
           <DialogDescription>
-            {step === 1 ? 'Configure los detalles del movimiento' : 'Seleccione los libros y cantidades'}
+            {step === 1
+              ? 'Configure los detalles del movimiento'
+              : 'Seleccione los libros y cantidades'}
           </DialogDescription>
         </DialogHeader>
         {step === 1 ? renderStep1() : renderStep2()}

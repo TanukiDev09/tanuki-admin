@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint .",
     "lint:css": "stylelint \"src/**/*.scss\"",
     "format": "prettier --write .",
     "test": "jest",

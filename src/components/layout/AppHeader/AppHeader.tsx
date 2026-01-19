@@ -22,9 +22,7 @@ export function AppHeader() {
           <div className="header__logo-emoji" aria-hidden="true">
             🦝
           </div>
-          <h1 className="header__logo-title">
-            TANUKI
-          </h1>
+          <h1 className="header__logo-title">TANUKI</h1>
         </div>
 
         {/* Spacer for Desktop */}

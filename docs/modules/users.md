@@ -21,16 +21,16 @@ src/
 
 ### Campos
 
-| Campo | Tipo | Requerido | Descripción |
-|-------|------|-----------|-------------|
-| `email` | String | ✓ | Email único (lowercase, validado) |
-| `password` | String | ✓ | Contraseña hasheada con bcrypt |
-| `name` | String | ✓ | Nombre completo del usuario |
-| `role` | Enum | ✓ | Rol: `admin`, `user`, `viewer` (default: `user`) |
-| `isActive` | Boolean | ✓ | Estado del usuario (default: `true`) |
-| `lastLogin` | Date | - | Fecha del último inicio de sesión |
-| `createdAt` | Date | ✓ | Fecha de creación (automático) |
-| `updatedAt` | Date | ✓ | Fecha de última actualización (automático) |
+| Campo       | Tipo    | Requerido | Descripción                                      |
+| ----------- | ------- | --------- | ------------------------------------------------ |
+| `email`     | String  | ✓         | Email único (lowercase, validado)                |
+| `password`  | String  | ✓         | Contraseña hasheada con bcrypt                   |
+| `name`      | String  | ✓         | Nombre completo del usuario                      |
+| `role`      | Enum    | ✓         | Rol: `admin`, `user`, `viewer` (default: `user`) |
+| `isActive`  | Boolean | ✓         | Estado del usuario (default: `true`)             |
+| `lastLogin` | Date    | -         | Fecha del último inicio de sesión                |
+| `createdAt` | Date    | ✓         | Fecha de creación (automático)                   |
+| `updatedAt` | Date    | ✓         | Fecha de última actualización (automático)       |
 
 ### Validaciones
 
@@ -69,12 +69,14 @@ validateEmail(email: string): boolean
 #### 1. **GET /api/users** - Listar usuarios
 
 **Query Parameters:**
+
 - `page` (opcional): Número de página (default: 1)
 - `limit` (opcional): Elementos por página (default: 10)
 - `role` (opcional): Filtrar por rol
 - `isActive` (opcional): Filtrar por estado (`true`/`false`)
 
 **Respuesta exitosa (200):**
+
 ```json
 {
   "success": true,
@@ -101,16 +103,18 @@ validateEmail(email: string): boolean
 #### 2. **POST /api/users** - Crear usuario
 
 **Request Body:**
+
 ```json
 {
   "email": "nuevo@example.com",
   "password": "ContraseñaSegura123",
   "name": "María García",
-  "role": "user"  // opcional, default: "user"
+  "role": "user" // opcional, default: "user"
 }
 ```
 
 **Respuesta exitosa (201):**
+
 ```json
 {
   "success": true,
@@ -128,12 +132,14 @@ validateEmail(email: string): boolean
 ```
 
 **Errores:**
+
 - `400`: Campos requeridos faltantes o email inválido
 - `409`: Email ya registrado
 
 #### 3. **GET /api/users/[id]** - Obtener usuario
 
 **Respuesta exitosa (200):**
+
 ```json
 {
   "success": true,
@@ -151,12 +157,14 @@ validateEmail(email: string): boolean
 ```
 
 **Errores:**
+
 - `400`: ID inválido
 - `404`: Usuario no encontrado
 
 #### 4. **PUT /api/users/[id]** - Actualizar usuario
 
 **Request Body (todos los campos son opcionales):**
+
 ```json
 {
   "email": "nuevo-email@example.com",
@@ -168,6 +176,7 @@ validateEmail(email: string): boolean
 ```
 
 **Respuesta exitosa (200):**
+
 ```json
 {
   "success": true,
@@ -185,6 +194,7 @@ validateEmail(email: string): boolean
 ```
 
 **Errores:**
+
 - `400`: ID o email inválido
 - `404`: Usuario no encontrado
 - `409`: Email ya registrado por otro usuario
@@ -194,6 +204,7 @@ validateEmail(email: string): boolean
 **Nota**: Implementa soft delete (marca como inactivo) en lugar de eliminar.
 
 **Respuesta exitosa (200):**
+
 ```json
 {
   "success": true,
@@ -211,6 +222,7 @@ validateEmail(email: string): boolean
 ```
 
 **Errores:**
+
 - `400`: ID inválido
 - `404`: Usuario no encontrado
 
@@ -233,8 +245,8 @@ const response = await fetch('http://localhost:3000/api/users', {
   body: JSON.stringify({
     email: 'test@example.com',
     password: 'Password123',
-    name: 'Test User'
-  })
+    name: 'Test User',
+  }),
 });
 const data = await response.json();
 
@@ -243,13 +255,16 @@ const users = await fetch('http://localhost:3000/api/users?page=1&limit=10');
 const usersData = await users.json();
 
 // Actualizar usuario
-const updateResponse = await fetch('http://localhost:3000/api/users/507f1f77bcf86cd799439011', {
-  method: 'PUT',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    name: 'Nuevo Nombre'
-  })
-});
+const updateResponse = await fetch(
+  'http://localhost:3000/api/users/507f1f77bcf86cd799439011',
+  {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: 'Nuevo Nombre',
+    }),
+  }
+);
 ```
 
 ### Con cURL
@@ -329,7 +344,7 @@ interface UserResponse {
 }
 
 // Función helper
-function sanitizeUser(user: IUser): UserResponse
+function sanitizeUser(user: IUser): UserResponse;
 ```
 
 ## 🚀 Próximos Pasos (Opcionales)

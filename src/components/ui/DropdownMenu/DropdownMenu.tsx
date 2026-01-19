@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
-import { Check, ChevronRight, Circle } from "lucide-react";
-import "./DropdownMenu.scss";
+import * as React from 'react';
+import * as DropdownMenuPrimitive from '@radix-ui/react-dropdown-menu';
+import { Check, ChevronRight, Circle } from 'lucide-react';
+import './DropdownMenu.scss';
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 
@@ -25,7 +25,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
 >(({ className, inset, children, ...props }, ref) => (
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
-    className={`dropdown__sub-trigger ${inset ? "dropdown__sub-trigger--inset" : ""} ${className || ""}`}
+    className={`dropdown__sub-trigger ${inset ? 'dropdown__sub-trigger--inset' : ''} ${className || ''}`}
     {...props}
   >
     {children}
@@ -41,7 +41,7 @@ const DropdownMenuSubContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.SubContent
     ref={ref}
-    className={`dropdown__sub-content ${className || ""}`}
+    className={`dropdown__sub-content ${className || ''}`}
     {...props}
   />
 ));
@@ -56,7 +56,7 @@ const DropdownMenuContent = React.forwardRef<
     <DropdownMenuPrimitive.Content
       ref={ref}
       sideOffset={sideOffset}
-      className={`dropdown__content ${className || ""}`}
+      className={`dropdown__content ${className || ''}`}
       {...props}
     />
   </DropdownMenuPrimitive.Portal>
@@ -71,7 +71,7 @@ const DropdownMenuItem = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Item
     ref={ref}
-    className={`dropdown__item ${inset ? "dropdown__item--inset" : ""} ${className || ""}`}
+    className={`dropdown__item ${inset ? 'dropdown__item--inset' : ''} ${className || ''}`}
     {...props}
   />
 ));
@@ -83,7 +83,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
 >(({ className, children, checked, ...props }, ref) => (
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
-    className={`dropdown__checkbox-item ${className || ""}`}
+    className={`dropdown__checkbox-item ${className || ''}`}
     checked={checked}
     {...props}
   >
@@ -104,7 +104,7 @@ const DropdownMenuRadioItem = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
-    className={`dropdown__radio-item ${className || ""}`}
+    className={`dropdown__radio-item ${className || ''}`}
     {...props}
   >
     <span className="dropdown__indicator-container">
@@ -125,7 +125,7 @@ const DropdownMenuLabel = React.forwardRef<
 >(({ className, inset, ...props }, ref) => (
   <DropdownMenuPrimitive.Label
     ref={ref}
-    className={`dropdown__label ${inset ? "dropdown__label--inset" : ""} ${className || ""}`}
+    className={`dropdown__label ${inset ? 'dropdown__label--inset' : ''} ${className || ''}`}
     {...props}
   />
 ));
@@ -137,7 +137,7 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={`dropdown__separator ${className || ""}`}
+    className={`dropdown__separator ${className || ''}`}
     {...props}
   />
 ));
@@ -148,10 +148,10 @@ const DropdownMenuShortcut = ({
   ...props
 }: React.HTMLAttributes<HTMLSpanElement>) => {
   return (
-    <span className={`dropdown__shortcut ${className || ""}`} {...props} />
+    <span className={`dropdown__shortcut ${className || ''}`} {...props} />
   );
 };
-DropdownMenuShortcut.displayName = "DropdownMenuShortcut";
+DropdownMenuShortcut.displayName = 'DropdownMenuShortcut';
 
 export {
   DropdownMenu,

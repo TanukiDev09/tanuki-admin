@@ -18,7 +18,7 @@ export function BurnRateCard({
   netBurn,
   trendDirection,
   trendValue,
-  className
+  className,
 }: BurnRateCardProps) {
   const isProfitable = netBurn <= 0;
   const displayBurn = isProfitable ? grossBurn : netBurn;
@@ -26,9 +26,7 @@ export function BurnRateCard({
   return (
     <Card className={`burn-rate-card ${className || ''}`}>
       <CardHeader className="burn-rate-card__header">
-        <CardTitle className="burn-rate-card__title">
-          Gasto Mensual
-        </CardTitle>
+        <CardTitle className="burn-rate-card__title">Gasto Mensual</CardTitle>
         <Flame className="burn-rate-card__header-icon" />
       </CardHeader>
       <CardContent className="burn-rate-card__content">
@@ -39,10 +37,14 @@ export function BurnRateCard({
               <span className="burn-rate-card__unit">/mes</span>
             </div>
             <p className="burn-rate-card__description">
-              {isProfitable ? 'Operaciones (eres rentable)' : 'Quema neta de efectivo'}
+              {isProfitable
+                ? 'Operaciones (eres rentable)'
+                : 'Quema neta de efectivo'}
             </p>
             {trendValue && trendDirection && (
-              <div className={`burn-rate-card__trend burn-rate-card__trend--${trendDirection}`}>
+              <div
+                className={`burn-rate-card__trend burn-rate-card__trend--${trendDirection}`}
+              >
                 {trendDirection === 'down' ? (
                   <TrendingDown className="burn-rate-card__trend-icon" />
                 ) : (

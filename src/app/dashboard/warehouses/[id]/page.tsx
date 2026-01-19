@@ -5,17 +5,40 @@ import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Separator } from '@/components/ui/Separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/Card';
 import { WarehouseForm } from '@/components/warehouses/WarehouseForm';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import dynamic from 'next/dynamic';
 import { WarehouseTypeBadge } from '@/components/warehouses/WarehouseTypeBadge';
 import { WarehouseStatusBadge } from '@/components/warehouses/WarehouseStatusBadge';
 
-
-const AddBookToInventoryModal = dynamic(() => import('@/components/inventory/AddBookToInventoryModal').then(mod => mod.AddBookToInventoryModal), { ssr: false });
-const InventoryMovementModal = dynamic(() => import('@/components/inventory/InventoryMovementModal').then(mod => mod.InventoryMovementModal), { ssr: false });
-const InventoryAdjustModal = dynamic(() => import('@/components/inventory/InventoryAdjustModal').then(mod => mod.InventoryAdjustModal), { ssr: false });
+const AddBookToInventoryModal = dynamic(
+  () =>
+    import('@/components/inventory/AddBookToInventoryModal').then(
+      (mod) => mod.AddBookToInventoryModal
+    ),
+  { ssr: false }
+);
+const InventoryMovementModal = dynamic(
+  () =>
+    import('@/components/inventory/InventoryMovementModal').then(
+      (mod) => mod.InventoryMovementModal
+    ),
+  { ssr: false }
+);
+const InventoryAdjustModal = dynamic(
+  () =>
+    import('@/components/inventory/InventoryAdjustModal').then(
+      (mod) => mod.InventoryAdjustModal
+    ),
+  { ssr: false }
+);
 
 import { Package, MapPin, Building2, ArrowLeft, Plus } from 'lucide-react';
 import Link from 'next/link';
@@ -64,22 +87,29 @@ export default function WarehouseDetailPage() {
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 
   const { hasPermission } = usePermission();
-  const canUpdateWarehouse = hasPermission(ModuleName.WAREHOUSES, PermissionAction.UPDATE);
-  const canCreateInventory = hasPermission(ModuleName.INVENTORY, PermissionAction.CREATE);
-  const canUpdateInventory = hasPermission(ModuleName.INVENTORY, PermissionAction.UPDATE);
+  const canUpdateWarehouse = hasPermission(
+    ModuleName.WAREHOUSES,
+    PermissionAction.UPDATE
+  );
+  const canCreateInventory = hasPermission(
+    ModuleName.INVENTORY,
+    PermissionAction.CREATE
+  );
+  const canUpdateInventory = hasPermission(
+    ModuleName.INVENTORY,
+    PermissionAction.UPDATE
+  );
 
   const handleAdjustStock = (item: InventoryItem) => {
     setSelectedItem(item);
     setAdjustModalOpen(true);
   };
 
-
-
   const fetchData = useCallback(async () => {
     try {
       const [warehouseRes, inventoryRes] = await Promise.all([
         fetch(`/api/warehouses/${id}`),
-        fetch(`/api/inventory/warehouse/${id}`)
+        fetch(`/api/inventory/warehouse/${id}`),
       ]);
 
       if (warehouseRes.ok) {
@@ -100,17 +130,25 @@ export default function WarehouseDetailPage() {
     fetchData();
   }, [fetchData]);
 
-
-
-  if (loading) return <div className="warehouse-detail__loading">Cargando...</div>;
-  if (!warehouse) return <div className="warehouse-detail__error">Bodega no encontrada</div>;
+  if (loading)
+    return <div className="warehouse-detail__loading">Cargando...</div>;
+  if (!warehouse)
+    return <div className="warehouse-detail__error">Bodega no encontrada</div>;
 
   return (
     <div className="warehouse-detail">
       <div className="warehouse-detail__header">
         <div className="warehouse-detail__header-left">
-          <Button variant="outline" size="default" className="warehouse-detail__back-btn" asChild>
-            <Link href="/dashboard/warehouses" className="warehouse-detail__back-link">
+          <Button
+            variant="outline"
+            size="default"
+            className="warehouse-detail__back-btn"
+            asChild
+          >
+            <Link
+              href="/dashboard/warehouses"
+              className="warehouse-detail__back-link"
+            >
               <ArrowLeft className="warehouse-detail__icon" />
               <span className="warehouse-detail__back-text">Volver</span>
             </Link>
@@ -126,7 +164,10 @@ export default function WarehouseDetailPage() {
         </div>
         <div className="warehouse-detail__header-actions">
           {canCreateInventory && (
-            <Button variant="outline" onClick={() => setMovementModalOpen(true)}>
+            <Button
+              variant="outline"
+              onClick={() => setMovementModalOpen(true)}
+            >
               Registrar Movimiento
             </Button>
           )}
@@ -150,16 +191,22 @@ export default function WarehouseDetailPage() {
           <div className="warehouse-detail__stats-grid">
             <Card>
               <CardHeader className="warehouse-detail__stat-header">
-                <CardTitle className="warehouse-detail__stat-title">Total Productos</CardTitle>
+                <CardTitle className="warehouse-detail__stat-title">
+                  Total Productos
+                </CardTitle>
                 <Package className="warehouse-detail__stat-icon" />
               </CardHeader>
               <CardContent>
-                <div className="warehouse-detail__stat-value">{inventory.length}</div>
+                <div className="warehouse-detail__stat-value">
+                  {inventory.length}
+                </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="warehouse-detail__stat-header">
-                <CardTitle className="warehouse-detail__stat-title">Unidades Totales</CardTitle>
+                <CardTitle className="warehouse-detail__stat-title">
+                  Unidades Totales
+                </CardTitle>
                 <Building2 className="warehouse-detail__stat-icon" />
               </CardHeader>
               <CardContent>
@@ -178,10 +225,7 @@ export default function WarehouseDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <InventoryList
-                data={inventory}
-                onAdjust={handleAdjustStock}
-              />
+              <InventoryList data={inventory} onAdjust={handleAdjustStock} />
             </CardContent>
           </Card>
         </TabsContent>
@@ -197,7 +241,7 @@ export default function WarehouseDetailPage() {
                   mode="edit"
                   initialData={{
                     ...warehouse,
-                    pointOfSaleId: warehouse.pointOfSaleId?._id
+                    pointOfSaleId: warehouse.pointOfSaleId?._id,
                   }}
                   readOnly={!canUpdateWarehouse}
                 />
@@ -207,26 +251,35 @@ export default function WarehouseDetailPage() {
             <div className="warehouse-detail__sidebar">
               <Card>
                 <CardHeader>
-                  <CardTitle className="warehouse-detail__card-title-sm">Ubicación y Contacto</CardTitle>
+                  <CardTitle className="warehouse-detail__card-title-sm">
+                    Ubicación y Contacto
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="warehouse-detail__location-content">
                   <div className="warehouse-detail__location-item">
                     <MapPin className="warehouse-detail__icon" />
                     <div>
-                      <p className="warehouse-detail__location-city">{warehouse.city || 'Sin ciudad registrada'}</p>
-                      <p className="warehouse-detail__location-address">{warehouse.address || 'Sin dirección registrada'}</p>
+                      <p className="warehouse-detail__location-city">
+                        {warehouse.city || 'Sin ciudad registrada'}
+                      </p>
+                      <p className="warehouse-detail__location-address">
+                        {warehouse.address || 'Sin dirección registrada'}
+                      </p>
                     </div>
                   </div>
                   {warehouse.pointOfSaleId && (
                     <div className="warehouse-detail__pos-section">
                       <Building2 className="warehouse-detail__icon" />
                       <div>
-                        <p className="warehouse-detail__pos-label">Punto de Venta Asociado:</p>
+                        <p className="warehouse-detail__pos-label">
+                          Punto de Venta Asociado:
+                        </p>
                         <Link
                           href={`/dashboard/points-of-sale/${warehouse.pointOfSaleId._id}`}
                           className="warehouse-detail__pos-link"
                         >
-                          {warehouse.pointOfSaleId.name} ({warehouse.pointOfSaleId.code})
+                          {warehouse.pointOfSaleId.name} (
+                          {warehouse.pointOfSaleId.code})
                         </Link>
                       </div>
                     </div>
@@ -237,10 +290,14 @@ export default function WarehouseDetailPage() {
               {warehouse.description && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="warehouse-detail__card-title-sm">Descripción</CardTitle>
+                    <CardTitle className="warehouse-detail__card-title-sm">
+                      Descripción
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="warehouse-detail__description-text">{warehouse.description}</p>
+                    <p className="warehouse-detail__description-text">
+                      {warehouse.description}
+                    </p>
                   </CardContent>
                 </Card>
               )}
@@ -254,7 +311,9 @@ export default function WarehouseDetailPage() {
         onClose={() => setAddBookModalOpen(false)}
         warehouseId={id as string}
         onSuccess={fetchData}
-        existingBookIds={inventory.map(item => item.bookId?._id).filter(Boolean)}
+        existingBookIds={inventory
+          .map((item) => item.bookId?._id)
+          .filter(Boolean)}
       />
 
       {warehouse && (

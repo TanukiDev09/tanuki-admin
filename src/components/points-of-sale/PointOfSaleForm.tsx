@@ -38,7 +38,9 @@ const formSchema = z.object({
   address: z.string().optional(),
   city: z.string().optional(),
   phones: z.array(z.string()).default([]),
-  emails: z.array(z.string().email('Email inválido').or(z.literal(''))).default([]),
+  emails: z
+    .array(z.string().email('Email inválido').or(z.literal('')))
+    .default([]),
   managers: z.array(z.string()).default([]),
   status: z.enum(['active', 'inactive']),
   type: z.enum(['physical', 'online', 'event']),
@@ -48,7 +50,10 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 interface PointOfSaleFormProps {
-  initialData?: Omit<Partial<IPointOfSale>, 'warehouseId' | 'createdAt' | 'updatedAt' | '_id'> & {
+  initialData?: Omit<
+    Partial<IPointOfSale>,
+    'warehouseId' | 'createdAt' | 'updatedAt' | '_id'
+  > & {
     _id?: string;
     warehouseId?: string | null;
     createdAt?: string;
@@ -58,10 +63,14 @@ interface PointOfSaleFormProps {
   readOnly?: boolean;
 }
 
-const normalizeArrayData = (data: Record<string, unknown> | undefined, fieldName: string, legacyField: string): string[] => {
+const normalizeArrayData = (
+  data: Record<string, unknown> | undefined,
+  fieldName: string,
+  legacyField: string
+): string[] => {
   const list = data?.[fieldName];
   if (Array.isArray(list) && list.length > 0) {
-    return list.map(item => String(item));
+    return list.map((item) => String(item));
   }
   const legacyVal = data?.[legacyField];
   if (legacyVal && typeof legacyVal === 'string') {
@@ -70,9 +79,16 @@ const normalizeArrayData = (data: Record<string, unknown> | undefined, fieldName
   return [];
 };
 
-export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly }: PointOfSaleFormProps) {
+export function PointOfSaleForm({
+  initialData,
+  onSuccess,
+  readOnly: propReadOnly,
+}: PointOfSaleFormProps) {
   const { hasPermission } = usePermission();
-  const canUpdate = hasPermission(ModuleName.POINTS_OF_SALE, PermissionAction.UPDATE);
+  const canUpdate = hasPermission(
+    ModuleName.POINTS_OF_SALE,
+    PermissionAction.UPDATE
+  );
   const readOnly = propReadOnly ?? !canUpdate;
 
   const router = useRouter();
@@ -83,14 +99,20 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
   // or empty arrays
   const defaultPhones = normalizeArrayData(initialData, 'phones', 'phone');
   const defaultEmails = normalizeArrayData(initialData, 'emails', 'email');
-  const defaultManagers = normalizeArrayData(initialData, 'managers', 'manager');
+  const defaultManagers = normalizeArrayData(
+    initialData,
+    'managers',
+    'manager'
+  );
 
   const form = useForm<FormValues>({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(formSchema) as any,
     defaultValues: {
       name: initialData?.name || '',
-      identificationType: (initialData?.identificationType as FormValues['identificationType']) || undefined,
+      identificationType:
+        (initialData?.identificationType as FormValues['identificationType']) ||
+        undefined,
       identificationNumber: initialData?.identificationNumber || '',
       address: initialData?.address || '',
       city: initialData?.city || '',
@@ -98,7 +120,8 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
       emails: defaultEmails,
       managers: defaultManagers,
       status: (initialData?.status as 'active' | 'inactive') || 'active',
-      type: (initialData?.type as 'physical' | 'online' | 'event') || 'physical',
+      type:
+        (initialData?.type as 'physical' | 'online' | 'event') || 'physical',
       discountPercentage: initialData?.discountPercentage || 0,
     },
   });
@@ -111,7 +134,9 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
 
       form.reset({
         name: initialData.name || '',
-        identificationType: (initialData.identificationType as FormValues['identificationType']) || undefined,
+        identificationType:
+          (initialData.identificationType as FormValues['identificationType']) ||
+          undefined,
         identificationNumber: initialData.identificationNumber || '',
         address: initialData.address || '',
         city: initialData.city || '',
@@ -119,27 +144,40 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
         emails: emails,
         managers: managers,
         status: (initialData.status as 'active' | 'inactive') || 'active',
-        type: (initialData.type as 'physical' | 'online' | 'event') || 'physical',
+        type:
+          (initialData.type as 'physical' | 'online' | 'event') || 'physical',
         discountPercentage: initialData.discountPercentage || 0,
       });
     }
   }, [initialData, form]);
 
-  const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
+  const {
+    fields: phoneFields,
+    append: appendPhone,
+    remove: removePhone,
+  } = useFieldArray({
     control: form.control,
-    name: "phones",
+    name: 'phones',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any);
 
-  const { fields: emailFields, append: appendEmail, remove: removeEmail } = useFieldArray({
+  const {
+    fields: emailFields,
+    append: appendEmail,
+    remove: removeEmail,
+  } = useFieldArray({
     control: form.control,
-    name: "emails",
+    name: 'emails',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any);
 
-  const { fields: managerFields, append: appendManager, remove: removeManager } = useFieldArray({
+  const {
+    fields: managerFields,
+    append: appendManager,
+    remove: removeManager,
+  } = useFieldArray({
     control: form.control,
-    name: "managers",
+    name: 'managers',
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } as any);
 
@@ -150,9 +188,9 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
       // Clean up empty array items
       const cleanData = {
         ...data,
-        phones: data.phones.filter(p => p.trim() !== ''),
-        emails: data.emails.filter(e => e.trim() !== ''),
-        managers: data.managers.filter(m => m.trim() !== ''),
+        phones: data.phones.filter((p) => p.trim() !== ''),
+        emails: data.emails.filter((e) => e.trim() !== ''),
+        managers: data.managers.filter((m) => m.trim() !== ''),
       };
 
       const url = initialData?._id
@@ -194,8 +232,6 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
     }
   };
 
-
-
   // ... (imports remain)
 
   return (
@@ -210,7 +246,11 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
               <FormItem>
                 <FormLabel>Nombre</FormLabel>
                 <FormControl>
-                  <Input placeholder="Tienda Principal" {...field} disabled={loading || readOnly} />
+                  <Input
+                    placeholder="Tienda Principal"
+                    {...field}
+                    disabled={loading || readOnly}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -255,7 +295,11 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
               <FormItem>
                 <FormLabel>Número Identificación</FormLabel>
                 <FormControl>
-                  <Input placeholder="900123456" {...field} disabled={loading || readOnly} />
+                  <Input
+                    placeholder="900123456"
+                    {...field}
+                    disabled={loading || readOnly}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -322,7 +366,11 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
               <FormItem>
                 <FormLabel>Dirección</FormLabel>
                 <FormControl>
-                  <Input placeholder="Av. Siempre Viva 123" {...field} disabled={loading || readOnly} />
+                  <Input
+                    placeholder="Av. Siempre Viva 123"
+                    {...field}
+                    disabled={loading || readOnly}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -356,7 +404,11 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
               <FormItem>
                 <FormLabel>Ciudad</FormLabel>
                 <FormControl>
-                  <Input placeholder="Bogotá" {...field} disabled={loading || readOnly} />
+                  <Input
+                    placeholder="Bogotá"
+                    {...field}
+                    disabled={loading || readOnly}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -366,7 +418,6 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
 
         {/* Arrays Section */}
         <div className="pos-form__arrays-grid">
-
           {/* Phones */}
           {/* Phones */}
           <div className="pos-form__array-column">
@@ -377,9 +428,10 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => appendPhone("")}
+                  onClick={() => appendPhone('')}
                 >
-                  <Plus className="pos-form__icon-sm pos-form__icon--mr" /> Agregar
+                  <Plus className="pos-form__icon-sm pos-form__icon--mr" />{' '}
+                  Agregar
                 </Button>
               )}
             </FormLabel>
@@ -391,7 +443,11 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
                   render={({ field }) => (
                     <FormItem className="pos-form__array-input-wrapper">
                       <FormControl>
-                        <Input placeholder="Teléfono" {...field} disabled={loading || readOnly} />
+                        <Input
+                          placeholder="Teléfono"
+                          {...field}
+                          disabled={loading || readOnly}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -422,9 +478,10 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => appendEmail("")}
+                  onClick={() => appendEmail('')}
                 >
-                  <Plus className="pos-form__icon-sm pos-form__icon--mr" /> Agregar
+                  <Plus className="pos-form__icon-sm pos-form__icon--mr" />{' '}
+                  Agregar
                 </Button>
               )}
             </FormLabel>
@@ -436,7 +493,11 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
                   render={({ field }) => (
                     <FormItem className="pos-form__array-input-wrapper">
                       <FormControl>
-                        <Input placeholder="Email" {...field} disabled={loading || readOnly} />
+                        <Input
+                          placeholder="Email"
+                          {...field}
+                          disabled={loading || readOnly}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -467,9 +528,10 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => appendManager("")}
+                  onClick={() => appendManager('')}
                 >
-                  <Plus className="pos-form__icon-sm pos-form__icon--mr" /> Agregar
+                  <Plus className="pos-form__icon-sm pos-form__icon--mr" />{' '}
+                  Agregar
                 </Button>
               )}
             </FormLabel>
@@ -481,7 +543,11 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
                   render={({ field }) => (
                     <FormItem className="pos-form__array-input-wrapper">
                       <FormControl>
-                        <Input placeholder="Nombre" {...field} disabled={loading || readOnly} />
+                        <Input
+                          placeholder="Nombre"
+                          {...field}
+                          disabled={loading || readOnly}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -502,7 +568,6 @@ export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly
               </div>
             ))}
           </div>
-
         </div>
 
         <div className="pos-form__actions">

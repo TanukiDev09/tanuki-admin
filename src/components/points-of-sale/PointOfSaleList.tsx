@@ -1,6 +1,5 @@
 'use client';
 
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePermission } from '@/hooks/usePermissions';
@@ -23,7 +22,7 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/Popover"
+} from '@/components/ui/Popover';
 import {
   Dialog,
   DialogContent,
@@ -42,9 +41,15 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string } | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
   const { hasPermission } = usePermission();
-  const canDelete = hasPermission(ModuleName.POINTS_OF_SALE, PermissionAction.DELETE);
+  const canDelete = hasPermission(
+    ModuleName.POINTS_OF_SALE,
+    PermissionAction.DELETE
+  );
 
   const confirmDelete = async () => {
     if (!itemToDelete) return;
@@ -79,15 +84,17 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
   };
 
   const renderArrayCell = (items: string[] | undefined) => {
-    if (!items || items.length === 0) return <span className="pos-list__empty-text">-</span>;
+    if (!items || items.length === 0)
+      return <span className="pos-list__empty-text">-</span>;
 
     // Legacy support for single string
     if (typeof items === 'string') return items;
 
     // Filter out empty strings
-    const validItems = items.filter(i => i && i.trim() !== '');
+    const validItems = items.filter((i) => i && i.trim() !== '');
 
-    if (validItems.length === 0) return <span className="pos-list__empty-text">-</span>;
+    if (validItems.length === 0)
+      return <span className="pos-list__empty-text">-</span>;
 
     const firstItem = validItems[0];
     const count = validItems.length;
@@ -98,7 +105,8 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
       <Popover>
         <PopoverTrigger asChild>
           <span className="pos-list__expand-trigger">
-            {firstItem} <span className="pos-list__expand-count">(+{count - 1})</span>
+            {firstItem}{' '}
+            <span className="pos-list__expand-count">(+{count - 1})</span>
           </span>
         </PopoverTrigger>
         <PopoverContent className="pos-list__popover-content">
@@ -148,10 +156,17 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
                   </TableCell>
                   <TableCell>{pos.name}</TableCell>
                   <TableCell className="pos-list__type-cell">
-                    {pos.type === 'physical' ? 'Físico' :
-                      pos.type === 'online' ? 'Online' : 'Evento'}
+                    {pos.type === 'physical'
+                      ? 'Físico'
+                      : pos.type === 'online'
+                        ? 'Online'
+                        : 'Evento'}
                   </TableCell>
-                  <TableCell>{pos.discountPercentage ? `${pos.discountPercentage}%` : '0%'}</TableCell>
+                  <TableCell>
+                    {pos.discountPercentage
+                      ? `${pos.discountPercentage}%`
+                      : '0%'}
+                  </TableCell>
                   <TableCell>{renderArrayCell(pos.managers)}</TableCell>
                   <TableCell>{renderArrayCell(pos.phones)}</TableCell>
                   <TableCell>
@@ -169,8 +184,15 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
                           variant="ghost"
                           size="icon"
                           className="pos-list__delete-btn"
-                          onClick={() => setItemToDelete({ id: pos._id as unknown as string, name: pos.name })}
-                          disabled={deletingId === (pos._id as unknown as string)}
+                          onClick={() =>
+                            setItemToDelete({
+                              id: pos._id as unknown as string,
+                              name: pos.name,
+                            })
+                          }
+                          disabled={
+                            deletingId === (pos._id as unknown as string)
+                          }
                         >
                           <Trash2 className="pos-list__icon" />
                         </Button>
@@ -184,12 +206,17 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
         </Table>
       </div>
 
-      <Dialog open={!!itemToDelete} onOpenChange={(open) => !open && setItemToDelete(null)}>
+      <Dialog
+        open={!!itemToDelete}
+        onOpenChange={(open) => !open && setItemToDelete(null)}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>¿Estás seguro?</DialogTitle>
             <DialogDescription>
-              Esta acción no se puede deshacer. Se eliminará permanentemente el punto de venta {itemToDelete?.name ? `&quot;${itemToDelete.name}&quot;` : ""}.
+              Esta acción no se puede deshacer. Se eliminará permanentemente el
+              punto de venta{' '}
+              {itemToDelete?.name ? `&quot;${itemToDelete.name}&quot;` : ''}.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

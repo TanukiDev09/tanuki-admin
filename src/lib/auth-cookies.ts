@@ -7,7 +7,6 @@ export async function setAuthCookie(token: string) {
   try {
     const cookieStore = await cookies();
 
-    console.log('[Auth Cookies] Setting token cookie, env:', process.env.NODE_ENV);
     cookieStore.set(TOKEN_NAME, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -15,7 +14,6 @@ export async function setAuthCookie(token: string) {
       path: '/',
       maxAge: ONE_DAY_MS / 1000,
     });
-    console.log('[Auth Cookies] Cookie set successfully');
   } catch (error) {
     console.error('[Auth Cookies] Error setting cookie:', error);
     throw error;

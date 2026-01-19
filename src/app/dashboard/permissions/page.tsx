@@ -40,7 +40,9 @@ export default function PermissionsPage() {
       // Fetch user permissions and modules in parallel
       const [permissionsRes, modulesRes] = await Promise.all([
         fetch(`/api/permissions/user/${user._id}`),
-        modules.length === 0 ? fetch('/api/permissions/modules') : Promise.resolve(null),
+        modules.length === 0
+          ? fetch('/api/permissions/modules')
+          : Promise.resolve(null),
       ]);
 
       const permissionsData = await permissionsRes.json();
@@ -67,20 +69,25 @@ export default function PermissionsPage() {
 
     try {
       // Convert matrix to array format for API
-      const permissionsArray = Object.entries(permissions).map(([module, actions]) => ({
-        module,
-        actions,
-      }));
+      const permissionsArray = Object.entries(permissions).map(
+        ([module, actions]) => ({
+          module,
+          actions,
+        })
+      );
 
-      const response = await fetch(`/api/permissions/user/${selectedUser._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          permissions: permissionsArray,
-        }),
-      });
+      const response = await fetch(
+        `/api/permissions/user/${selectedUser._id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            permissions: permissionsArray,
+          }),
+        }
+      );
 
       const data = await response.json();
 

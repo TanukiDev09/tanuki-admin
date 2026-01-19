@@ -15,18 +15,18 @@
   border-radius: $radius-xl;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   backdrop-filter: blur(12px);
-  box-shadow: 
+  box-shadow:
     0 4px 6px -1px rgb(0 0 0 / 2%),
     0 2px 4px -1px rgb(0 0 0 / 2%);
   overflow: hidden;
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 
+    box-shadow:
       0 12px 24px -10px rgb(0 0 0 / 8%),
       0 4px 10px -5px rgb(0 0 0 / 4%);
     border-color: rgba($primary, 0.2);
-    
+
     .stat-card__icon {
       transform: scale(1.1) rotate(5deg);
     }
@@ -36,11 +36,19 @@
 
   &--flow,
   &--success {
-    background: linear-gradient(145deg, rgba($background, 0.9) 0%, rgba($success, 0.08) 100%);
+    background: linear-gradient(
+      145deg,
+      rgba($background, 0.9) 0%,
+      rgba($success, 0.08) 100%
+    );
     border-bottom: 2px solid rgba($success, 0.3);
 
     .stat-card__icon {
-      background: linear-gradient(135deg, rgba($success, 0.2), rgba($success, 0.1));
+      background: linear-gradient(
+        135deg,
+        rgba($success, 0.2),
+        rgba($success, 0.1)
+      );
       color: color.adjust($success, $lightness: -5%);
       box-shadow: 0 4px 12px rgba($success, 0.15);
     }
@@ -52,15 +60,23 @@
 
   &--ebb,
   &--danger {
-    background: linear-gradient(145deg, rgba($background, 0.9) 0%, rgba($danger, 0.08) 100%);
+    background: linear-gradient(
+      145deg,
+      rgba($background, 0.9) 0%,
+      rgba($danger, 0.08) 100%
+    );
     border-bottom: 2px solid rgba($danger, 0.3);
 
     .stat-card__icon {
-      background: linear-gradient(135deg, rgba($danger, 0.2), rgba($danger, 0.1));
+      background: linear-gradient(
+        135deg,
+        rgba($danger, 0.2),
+        rgba($danger, 0.1)
+      );
       color: color.adjust($danger, $lightness: -5%);
       box-shadow: 0 4px 12px rgba($danger, 0.15);
     }
-    
+
     .stat-card__value {
       color: color.adjust($danger, $lightness: -10%);
     }
@@ -68,7 +84,11 @@
 
   &--balance,
   &--info {
-    background: linear-gradient(145deg, rgba($background, 0.9) 0%, rgba($info, 0.08) 100%);
+    background: linear-gradient(
+      145deg,
+      rgba($background, 0.9) 0%,
+      rgba($info, 0.08) 100%
+    );
     border-bottom: 2px solid rgba($info, 0.3);
 
     .stat-card__icon {
@@ -76,7 +96,7 @@
       color: color.adjust($info, $lightness: -5%);
       box-shadow: 0 4px 12px rgba($info, 0.15);
     }
-    
+
     .stat-card__value {
       color: color.adjust($info, $lightness: -10%);
     }
@@ -139,7 +159,7 @@
     font-weight: 800;
     line-height: 1.1;
     letter-spacing: -0.03em;
-    
+
     // Gradient text for value
     // @include text-gradient-primary; // If available, otherwise cleanup
   }
@@ -159,7 +179,7 @@
     font-size: $font-size-xs;
     font-weight: $font-weight-bold;
     border-radius: 20px;
-    
+
     &--up {
       background-color: rgba($success, 0.1);
       color: $success;
@@ -175,7 +195,7 @@
     opacity: 0.8;
     filter: drop-shadow(0 4px 6px rgb(0 0 0 / 10%));
     transition: opacity 0.2s;
-    
+
     &:hover {
       opacity: 1;
     }

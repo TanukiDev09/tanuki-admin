@@ -1,6 +1,6 @@
 /**
  * Tanuki Admin - Design System Components
- * 
+ *
  * Example components demonstrating the use of the design system.
  * These components follow the UI design from the Tanuki Admin dashboard.
  */
@@ -12,7 +12,7 @@ import type {
   IconCircleProps,
   CardProps,
   ChartContainerProps,
-  MovementItemProps
+  MovementItemProps,
 } from '@/types/design-system';
 
 // ============================================
@@ -21,19 +21,19 @@ import type {
 
 /**
  * StatCard - Display financial statistics
- * 
+ *
  * @example
- * <StatCard 
- *   variant="success" 
- *   value="$ 77.454.940" 
- *   label="Entradas Totales" 
+ * <StatCard
+ *   variant="success"
+ *   value="$ 77.454.940"
+ *   label="Entradas Totales"
  * />
  */
 export const StatCard: React.FC<StatCardProps> = ({
   variant,
   value,
   label,
-  className = ''
+  className = '',
 }) => {
   return (
     <div className={`stat-card stat-card--${variant} ${className}`}>
@@ -49,19 +49,17 @@ export const StatCard: React.FC<StatCardProps> = ({
 
 /**
  * Badge - Status indicator badge
- * 
+ *
  * @example
  * <Badge variant="success">Active</Badge>
  */
 export const Badge: React.FC<BadgeProps> = ({
   variant,
   children,
-  className = ''
+  className = '',
 }) => {
   return (
-    <span className={`badge badge--${variant} ${className}`}>
-      {children}
-    </span>
+    <span className={`badge badge--${variant} ${className}`}>{children}</span>
   );
 };
 
@@ -71,7 +69,7 @@ export const Badge: React.FC<BadgeProps> = ({
 
 /**
  * IconCircle - Circular icon container
- * 
+ *
  * @example
  * <IconCircle variant="success">
  *   <CheckIcon />
@@ -80,7 +78,7 @@ export const Badge: React.FC<BadgeProps> = ({
 export const IconCircle: React.FC<IconCircleProps> = ({
   variant,
   children,
-  className = ''
+  className = '',
 }) => {
   return (
     <div className={`icon-circle icon-circle--${variant} ${className}`}>
@@ -95,22 +93,15 @@ export const IconCircle: React.FC<IconCircleProps> = ({
 
 /**
  * Card - Standard card container
- * 
+ *
  * @example
  * <Card>
  *   <h3>Card Title</h3>
  *   <p>Card content</p>
  * </Card>
  */
-export const Card: React.FC<CardProps> = ({
-  children,
-  className = ''
-}) => {
-  return (
-    <div className={`card ${className}`}>
-      {children}
-    </div>
-  );
+export const Card: React.FC<CardProps> = ({ children, className = '' }) => {
+  return <div className={`card ${className}`}>{children}</div>;
 };
 
 // ============================================
@@ -119,7 +110,7 @@ export const Card: React.FC<CardProps> = ({
 
 /**
  * ChartContainer - Container for charts with predefined heights
- * 
+ *
  * @example
  * <ChartContainer height="md">
  *   <BarChart data={data} />
@@ -128,7 +119,7 @@ export const Card: React.FC<CardProps> = ({
 export const ChartContainer: React.FC<ChartContainerProps> = ({
   children,
   height = 'md',
-  className = ''
+  className = '',
 }) => {
   const heightClass = height !== 'md' ? `chart-container--${height}` : '';
 
@@ -145,7 +136,7 @@ import './design-system.scss';
 
 /**
  * MovementItem - Display a transaction/movement item
- * 
+ *
  * @example
  * <MovementItem
  *   icon={<DollarIcon />}
@@ -161,13 +152,11 @@ export const MovementItem: React.FC<MovementItemProps> = ({
   title,
   description,
   amount,
-  className = ''
+  className = '',
 }) => {
   return (
     <div className={`design-system-movement ${className}`}>
-      <IconCircle variant={iconVariant}>
-        {icon}
-      </IconCircle>
+      <IconCircle variant={iconVariant}>{icon}</IconCircle>
       <div className="design-system-movement__content">
         <div className="design-system-movement__title">{title}</div>
         <div className="design-system-movement__description">{description}</div>
@@ -189,7 +178,7 @@ export interface DashboardSectionProps {
 
 /**
  * DashboardSection - Section container with title
- * 
+ *
  * @example
  * <DashboardSection title="Salud del Negocio">
  *   <StatCard variant="success" value="$ 77.454.940" label="Entradas Totales" />
@@ -198,7 +187,7 @@ export interface DashboardSectionProps {
 export const DashboardSection: React.FC<DashboardSectionProps> = ({
   title,
   children,
-  className = ''
+  className = '',
 }) => {
   return (
     <div className={`design-system-section ${className}`}>
@@ -220,7 +209,7 @@ export interface StatGridProps {
 
 /**
  * StatGrid - Grid layout for stat cards
- * 
+ *
  * @example
  * <StatGrid columns={3}>
  *   <StatCard variant="success" value="$ 77.454.940" label="Entradas Totales" />
@@ -231,15 +220,11 @@ export interface StatGridProps {
 export const StatGrid: React.FC<StatGridProps> = ({
   children,
   columns = 3,
-  className = ''
+  className = '',
 }) => {
   const gridClass = `design-system-grid design-system-grid--cols-${columns}`;
 
-  return (
-    <div className={`${gridClass} ${className}`}>
-      {children}
-    </div>
-  );
+  return <div className={`${gridClass} ${className}`}>{children}</div>;
 };
 
 // ============================================

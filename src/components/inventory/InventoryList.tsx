@@ -71,20 +71,33 @@ export function InventoryList({ data, onAdjust }: InventoryListProps) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="inventory-list__head-cover">Portada</TableHead>
+              <TableHead className="inventory-list__head-cover">
+                Portada
+              </TableHead>
               <TableHead>Libro</TableHead>
               <TableHead className="inventory-list__col-isbn">ISBN</TableHead>
-              <TableHead className="inventory-list__col-price">Precio</TableHead>
+              <TableHead className="inventory-list__col-price">
+                Precio
+              </TableHead>
               <TableHead className="inventory-list__stock">Stock</TableHead>
               <TableHead className="inventory-list__status">Estado</TableHead>
-              {onAdjust && <TableHead className="inventory-list__actions">Acciones</TableHead>}
+              {onAdjust && (
+                <TableHead className="inventory-list__actions">
+                  Acciones
+                </TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={onAdjust ? 7 : 6} className="inventory-list__empty">
-                  {search ? 'No se encontraron resultados.' : 'No hay productos en esta bodega.'}
+                <TableCell
+                  colSpan={onAdjust ? 7 : 6}
+                  className="inventory-list__empty"
+                >
+                  {search
+                    ? 'No se encontraron resultados.'
+                    : 'No hay productos en esta bodega.'}
                 </TableCell>
               </TableRow>
             ) : (
@@ -92,13 +105,23 @@ export function InventoryList({ data, onAdjust }: InventoryListProps) {
                 <TableRow key={item._id}>
                   <TableCell>
                     <div className="inventory-list__cover-container">
-                      {item.bookId.coverImage && !imageError[item.bookId._id] ? (
+                      {item.bookId.coverImage &&
+                      !imageError[item.bookId._id] ? (
                         <Image
-                          src={item.bookId.coverImage.startsWith('http') ? item.bookId.coverImage : `/uploads/covers/${item.bookId.coverImage}`}
+                          src={
+                            item.bookId.coverImage.startsWith('http')
+                              ? item.bookId.coverImage
+                              : `/uploads/covers/${item.bookId.coverImage}`
+                          }
                           alt={item.bookId.title}
                           fill
                           className="inventory-list__cover-image"
-                          onError={() => setImageError(prev => ({ ...prev, [item.bookId._id]: true }))}
+                          onError={() =>
+                            setImageError((prev) => ({
+                              ...prev,
+                              [item.bookId._id]: true,
+                            }))
+                          }
                         />
                       ) : (
                         <div className="inventory-list__cover-fallback">
@@ -115,7 +138,9 @@ export function InventoryList({ data, onAdjust }: InventoryListProps) {
                       {item.bookId.title}
                     </Link>
                   </TableCell>
-                  <TableCell className="inventory-list__col-isbn">{item.bookId.isbn}</TableCell>
+                  <TableCell className="inventory-list__col-isbn">
+                    {item.bookId.isbn}
+                  </TableCell>
                   <TableCell className="inventory-list__col-price">
                     {formatCurrency(item.bookId.price)}
                   </TableCell>

@@ -35,7 +35,10 @@ const COLORS = [
 
 export function CategoryBarChart({ data }: CategoryBarChartProps) {
   const sortedData = (data || [])
-    .filter(item => item && typeof item.value === 'number' && typeof item.name === 'string')
+    .filter(
+      (item) =>
+        item && typeof item.value === 'number' && typeof item.name === 'string'
+    )
     .sort((a, b) => (b.value || 0) - (a.value || 0))
     .slice(0, 8);
 
@@ -59,7 +62,9 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
               fontSize={11}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(value: number) => `$${formatNumber((value / 1000000).toFixed(1))}M`}
+              tickFormatter={(value: number) =>
+                `$${formatNumber((value / 1000000).toFixed(1))}M`
+              }
             />
             <YAxis
               type="category"
@@ -85,7 +90,10 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
             />
             <Bar dataKey="value" radius={[0, 4, 4, 0]}>
               {sortedData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Bar>
           </BarChart>

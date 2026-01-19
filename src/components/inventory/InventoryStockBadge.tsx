@@ -7,7 +7,10 @@ interface InventoryStockBadgeProps {
   minStock?: number;
 }
 
-export function InventoryStockBadge({ quantity, minStock }: InventoryStockBadgeProps) {
+export function InventoryStockBadge({
+  quantity,
+  minStock,
+}: InventoryStockBadgeProps) {
   if (quantity === 0) {
     return <Badge variant="destructive">Sin Stock</Badge>;
   }

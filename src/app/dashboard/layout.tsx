@@ -17,9 +17,7 @@ export default function DashboardLayout({
         <Sidebar />
         <div className="dashboard-layout__container">
           <AppHeader />
-          <main className="dashboard-layout__main">
-            {children}
-          </main>
+          <main className="dashboard-layout__main">{children}</main>
         </div>
       </div>
     </AuthGuard>

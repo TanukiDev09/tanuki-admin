@@ -86,11 +86,7 @@ export default function CreateUserModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="create-user-modal__form">
-          {error && (
-            <div className="create-user-modal__error">
-              {error}
-            </div>
-          )}
+          {error && <div className="create-user-modal__error">{error}</div>}
 
           <div className="create-user-modal__field">
             <Label htmlFor="name">Nombre completo</Label>
@@ -98,7 +94,9 @@ export default function CreateUserModal({
               id="name"
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
               required
               placeholder="Juan Pérez"
             />
@@ -110,7 +108,9 @@ export default function CreateUserModal({
               id="email"
               type="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
               required
               placeholder="juan@example.com"
             />
@@ -139,7 +139,10 @@ export default function CreateUserModal({
                 setFormData({ ...formData, role: value as UserRole })
               }
             >
-              <SelectTrigger id="role" className="create-user-modal__select-trigger">
+              <SelectTrigger
+                id="role"
+                className="create-user-modal__select-trigger"
+              >
                 <SelectValue placeholder="Seleccionar rol" />
               </SelectTrigger>
               <SelectContent>
@@ -159,10 +162,7 @@ export default function CreateUserModal({
             >
               Cancelar
             </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-            >
+            <Button type="submit" disabled={loading}>
               {loading ? 'Creando...' : 'Crear Usuario'}
             </Button>
           </DialogFooter>

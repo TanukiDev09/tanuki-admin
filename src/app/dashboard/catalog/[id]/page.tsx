@@ -20,7 +20,13 @@ import { formatCurrency, formatNumber } from '@/lib/utils';
 import './book-detail.scss';
 
 // Helper to display creators
-const CreatorBadgeList = ({ creators, title }: { creators: string[] | CreatorResponse[] | undefined, title: string }) => {
+const CreatorBadgeList = ({
+  creators,
+  title,
+}: {
+  creators: string[] | CreatorResponse[] | undefined;
+  title: string;
+}) => {
   if (!creators || creators.length === 0) return null;
   return (
     <div className="book-detail__creator-group">
@@ -40,7 +46,9 @@ const CreatorBadgeList = ({ creators, title }: { creators: string[] | CreatorRes
   );
 };
 
-export default function BookDetailPage(props: { params: Promise<{ id: string }> }) {
+export default function BookDetailPage(props: {
+  params: Promise<{ id: string }>;
+}) {
   const params = use(props.params);
   const router = useRouter();
   const { toast } = useToast();
@@ -57,7 +65,7 @@ export default function BookDetailPage(props: { params: Promise<{ id: string }> 
       const res = await fetch(`/api/books/${params.id}`, {
         cache: 'no-store',
         headers: {
-          'Pragma': 'no-cache',
+          Pragma: 'no-cache',
           'Cache-Control': 'no-cache',
         },
       });
@@ -91,11 +99,7 @@ export default function BookDetailPage(props: { params: Promise<{ id: string }> 
   };
 
   if (loading) {
-    return (
-      <div className="book-detail__loading">
-        Cargando...
-      </div>
-    );
+    return <div className="book-detail__loading">Cargando...</div>;
   }
 
   if (!book) return null;
@@ -106,7 +110,11 @@ export default function BookDetailPage(props: { params: Promise<{ id: string }> 
         <div className="book-detail__container">
           {/* Header / Nav */}
           <div className="book-detail__header">
-            <Button variant="ghost" className="book-detail__back-button" onClick={() => router.back()}>
+            <Button
+              variant="ghost"
+              className="book-detail__back-button"
+              onClick={() => router.back()}
+            >
               <ArrowLeft className="book-detail__icon" />
               Volver al Catálogo
             </Button>
@@ -127,7 +135,11 @@ export default function BookDetailPage(props: { params: Promise<{ id: string }> 
               <div className="book-detail__cover-wrapper">
                 {book.coverImage ? (
                   <Image
-                    src={book.coverImage.startsWith('http') ? book.coverImage : `/uploads/covers/${book.coverImage}`}
+                    src={
+                      book.coverImage.startsWith('http')
+                        ? book.coverImage
+                        : `/uploads/covers/${book.coverImage}`
+                    }
                     alt={book.title}
                     fill
                     className="book-detail__cover-image"
@@ -143,12 +155,16 @@ export default function BookDetailPage(props: { params: Promise<{ id: string }> 
               <div className="book-detail__info-card">
                 <div className="book-detail__info-row">
                   <span className="book-detail__label">Precio</span>
-                  <span className="book-detail__value">{formatCurrency(book.price)}</span>
+                  <span className="book-detail__value">
+                    {formatCurrency(book.price)}
+                  </span>
                 </div>
                 <Separator />
                 <div className="book-detail__info-row">
                   <span className="book-detail__label">Stock</span>
-                  <span className="book-detail__value book-detail__value--medium">{formatNumber(book.stock)} unidades</span>
+                  <span className="book-detail__value book-detail__value--medium">
+                    {formatNumber(book.stock)} unidades
+                  </span>
                 </div>
                 <Separator />
                 <div className="book-detail__info-row">
@@ -165,7 +181,8 @@ export default function BookDetailPage(props: { params: Promise<{ id: string }> 
               <div className="book-detail__title-section">
                 <h1 className="book-detail__title">{book.title}</h1>
                 <div className="book-detail__isbn">
-                  ISBN: <span className="book-detail__isbn-value">{book.isbn}</span>
+                  ISBN:{' '}
+                  <span className="book-detail__isbn-value">{book.isbn}</span>
                 </div>
                 <p className="book-detail__description">
                   {book.description || 'Sin descripción disponible.'}
@@ -205,8 +222,14 @@ export default function BookDetailPage(props: { params: Promise<{ id: string }> 
                 <h2 className="book-detail__credits-title">Créditos</h2>
                 <div className="book-detail__credits-grid">
                   <CreatorBadgeList creators={book.authors} title="Autores" />
-                  <CreatorBadgeList creators={book.translators} title="Traductores" />
-                  <CreatorBadgeList creators={book.illustrators} title="Ilustradores" />
+                  <CreatorBadgeList
+                    creators={book.translators}
+                    title="Traductores"
+                  />
+                  <CreatorBadgeList
+                    creators={book.illustrators}
+                    title="Ilustradores"
+                  />
                 </div>
               </div>
             </div>
@@ -237,7 +260,9 @@ export default function BookDetailPage(props: { params: Promise<{ id: string }> 
             <Separator />
 
             <div>
-              <h2 className="book-detail__section-title">Contratos y Acuerdos</h2>
+              <h2 className="book-detail__section-title">
+                Contratos y Acuerdos
+              </h2>
               <AgreementList
                 bookId={book._id}
                 requiredCreators={[]}
