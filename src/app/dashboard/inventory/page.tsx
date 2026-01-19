@@ -5,8 +5,11 @@ import { InventoryStats } from '@/components/inventory/InventoryStats';
 import { InventoryMatrixTable } from '@/components/inventory/InventoryMatrixTable';
 import { InventoryMovementsList } from '@/components/inventory/InventoryMovementsList';
 import { Button } from '@/components/ui/Button';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Plus } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import './inventory-page.scss';
+
+const InventoryMovementModal = dynamic(() => import('@/components/inventory/InventoryMovementModal').then(mod => mod.InventoryMovementModal), { ssr: false });
 
 export default function InventoryPage() {
   const [stats, setStats] = useState({
@@ -17,6 +20,7 @@ export default function InventoryPage() {
   });
   const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [movementModalOpen, setMovementModalOpen] = useState(false);
 
   const fetchData = async () => {
     setLoading(true);
@@ -55,9 +59,14 @@ export default function InventoryPage() {
             Resumen general del estado del inventario y movimientos recientes.
           </p>
         </div>
-        <Button variant="outline" size="icon" onClick={fetchData} title="Actualizar">
-          <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-        </Button>
+        <div className="inventory-page__header-actions">
+          <Button onClick={() => setMovementModalOpen(true)} className="inventory-page__btn">
+            <Plus className="inventory-page__icon" /> Nuevo Movimiento
+          </Button>
+          <Button variant="outline" size="icon" onClick={fetchData} title="Actualizar">
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
       </div>
 
       <h2 className="sr-only">Resumen de Inventario</h2>
@@ -71,6 +80,12 @@ export default function InventoryPage() {
           <InventoryMovementsList movements={movements} isLoading={loading} />
         </div>
       </div>
+
+      <InventoryMovementModal
+        isOpen={movementModalOpen}
+        onClose={() => setMovementModalOpen(false)}
+        onSuccess={fetchData}
+      />
     </div>
   );
 }

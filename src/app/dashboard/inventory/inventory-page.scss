@@ -10,7 +10,25 @@
   &__header {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+  }
+
+  &__header-actions {
+    display: flex;
+    gap: 0.75rem;
     align-items: center;
+  }
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__icon {
+    width: 1rem;
+    height: 1rem;
   }
 
   &__title-group {
