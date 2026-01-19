@@ -153,7 +153,7 @@ export default function BookManagementTable({
                     {book.coverImage ? (
                       <div className="book-management-table__cover-wrapper">
                         <Image
-                          src={`/uploads/covers/${book.coverImage}`}
+                          src={book.coverImage.startsWith('http') ? book.coverImage : `/uploads/covers/${book.coverImage}`}
                           alt={book.title}
                           fill
                           className="book-management-table__cover-image"
