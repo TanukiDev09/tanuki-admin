@@ -1,0 +1,155 @@
+@use 'sass:color';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.agreement-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    color: $foreground;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+  }
+
+  &__table-container {
+    background-color: $card;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    overflow: hidden;
+    overflow-x: auto;
+
+    @include custom-scrollbar;
+  }
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $muted-foreground;
+  }
+
+  &__spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid rgba($primary, 0.1);
+    border-top-color: $primary;
+    border-radius: $radius-full;
+    animation: spin 1s linear infinite;
+  }
+
+  &__link {
+    color: $foreground;
+    font-weight: $font-weight-medium;
+    text-decoration: none;
+
+    &:hover {
+      color: $primary;
+      text-decoration: underline;
+    }
+  }
+
+  &__pdf-link {
+    display: flex;
+    align-items: center;
+    color: $info;
+    font-size: $font-size-sm;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__public-domain {
+    background-color: rgba($info, 0.1);
+    color: $info;
+    border-color: rgba($info, 0.2);
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-xs;
+  }
+
+  &__warning {
+    padding: $spacing-md;
+    background-color: rgba($warning, 0.1);
+    border: 1px solid rgba($warning, 0.3);
+    border-radius: $radius-md;
+
+    &-title {
+      margin-bottom: $spacing-sm;
+      color: color.adjust($warning, $lightness: -20%);
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+    }
+
+    &-list {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+    }
+
+    &-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: color.adjust($warning, $lightness: -15%);
+      font-size: $font-size-sm;
+    }
+  }
+
+  &__create-btn {
+    height: 1.75rem;
+    color: color.adjust($warning, $lightness: -20%);
+    font-size: $font-size-xs;
+    border-color: rgba($warning, 0.5);
+
+    &:hover {
+      background-color: rgba($warning, 0.2);
+    }
+  }
+
+  &__new-btn {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs; // gap-2
+  }
+
+  &__icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+  }
+
+  &__icon-sm {
+    width: 0.75rem; // w-3
+    height: 0.75rem; // h-3
+    margin-right: $spacing-xs; // mr-1
+  }
+
+  &__actions-head {
+    text-align: right;
+  }
+
+  &__empty-text,
+  &__no-contract {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,37 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.warehouse-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  width: fit-content;
+
+  // Icons inside the badge
+  // We can target the lucide icons or svg generic
+  svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  &--editorial {
+    // Purple style
+    // Assuming variables like $purple-bg or $accent exist, otherwise approximating valid vars
+    background-color: #f3e8ff; // purple-100 equivalent
+    color: #581c87; // purple-900 equivalent
+
+    &:hover {
+      background-color: #f3e8ff;
+    }
+  }
+
+  &--pos {
+    // Blue style
+    background-color: #dbeafe; // blue-100 equivalent
+    color: #1e3a8a; // blue-900 equivalent
+
+    &:hover {
+      background-color: #dbeafe;
+    }
+  }
+}

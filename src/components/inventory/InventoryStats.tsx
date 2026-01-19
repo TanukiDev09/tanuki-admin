@@ -1,7 +1,9 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Package, DollarSign, AlertTriangle, XCircle } from 'lucide-react';
+import { formatCurrency, formatNumber } from '@/lib/utils';
+import './InventoryStats.scss';
 
 interface StatsProps {
   stats: {
@@ -16,14 +18,14 @@ interface StatsProps {
 export function InventoryStats({ stats, isLoading }: StatsProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="inventory-stats">
         {[...Array(4)].map((_, i) => (
-          <Card key={i} className="animate-pulse">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <div className="h-4 w-24 bg-muted rounded"></div>
+          <Card key={i} className="inventory-stats__skeleton">
+            <CardHeader className="inventory-stats__header">
+              <div className="inventory-stats__skeleton-title"></div>
             </CardHeader>
             <CardContent>
-              <div className="h-8 w-16 bg-muted rounded"></div>
+              <div className="inventory-stats__skeleton-value"></div>
             </CardContent>
           </Card>
         ))}
@@ -32,50 +34,50 @@ export function InventoryStats({ stats, isLoading }: StatsProps) {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/20 cursor-default group">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">Unidades Totales</CardTitle>
-          <Package className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+    <div className="inventory-stats">
+      <Card className="inventory-stats__card">
+        <CardHeader className="inventory-stats__header">
+          <CardTitle className="inventory-stats__title">Unidades Totales</CardTitle>
+          <Package className="inventory-stats__icon" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{stats.totalUnits.toLocaleString()}</div>
-          <p className="text-xs text-muted-foreground">En todas las bodegas</p>
+          <div className="inventory-stats__value">{formatNumber(stats.totalUnits)}</div>
+          <p className="inventory-stats__description">En todas las bodegas</p>
         </CardContent>
       </Card>
 
-      <Card className="hover:shadow-lg transition-all duration-300 hover:border-primary/20 cursor-default group">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-primary transition-colors">Valor del Inventario</CardTitle>
-          <DollarSign className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+      <Card className="inventory-stats__card">
+        <CardHeader className="inventory-stats__header">
+          <CardTitle className="inventory-stats__title">Valor del Inventario</CardTitle>
+          <DollarSign className="inventory-stats__icon" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            ${stats.totalValue.toLocaleString()}
+          <div className="inventory-stats__value">
+            {formatCurrency(stats.totalValue)}
           </div>
-          <p className="text-xs text-muted-foreground">Costo estimado total</p>
+          <p className="inventory-stats__description">Costo estimado total</p>
         </CardContent>
       </Card>
 
-      <Card className="hover:shadow-lg transition-all duration-300 hover:border-yellow-500/20 cursor-default group">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-yellow-600 transition-colors">Stock Bajo</CardTitle>
-          <AlertTriangle className="h-4 w-4 text-yellow-500" />
+      <Card className="inventory-stats__card inventory-stats__card--warning">
+        <CardHeader className="inventory-stats__header">
+          <CardTitle className="inventory-stats__title">Stock Bajo</CardTitle>
+          <AlertTriangle className="inventory-stats__icon inventory-stats__icon--warning" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-yellow-600">{stats.lowStockCount}</div>
-          <p className="text-xs text-muted-foreground">Items por debajo del mínimo</p>
+          <div className="inventory-stats__value inventory-stats__value--warning">{formatNumber(stats.lowStockCount)}</div>
+          <p className="inventory-stats__description">Items por debajo del mínimo</p>
         </CardContent>
       </Card>
 
-      <Card className="hover:shadow-lg transition-all duration-300 hover:border-destructive/20 cursor-default group">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-destructive transition-colors">Sin Stock</CardTitle>
-          <XCircle className="h-4 w-4 text-destructive" />
+      <Card className="inventory-stats__card inventory-stats__card--danger">
+        <CardHeader className="inventory-stats__header">
+          <CardTitle className="inventory-stats__title">Sin Stock</CardTitle>
+          <XCircle className="inventory-stats__icon inventory-stats__icon--danger" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-destructive">{stats.outOfStockCount}</div>
-          <p className="text-xs text-muted-foreground">Items agotados</p>
+          <div className="inventory-stats__value inventory-stats__value--danger">{formatNumber(stats.outOfStockCount)}</div>
+          <p className="inventory-stats__description">Items agotados</p>
         </CardContent>
       </Card>
     </div>

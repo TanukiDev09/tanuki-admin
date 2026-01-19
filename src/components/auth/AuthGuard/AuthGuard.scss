@@ -1,0 +1,36 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.auth-guard {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: $background;
+
+  &__container {
+    text-align: center;
+  }
+
+  &__spinner {
+    width: 4rem;
+    height: 4rem;
+    margin: 0 auto $spacing-md;
+    border: 4px solid rgba($primary, 0.1);
+    border-radius: $radius-full;
+    animation: spin 1s linear infinite;
+    border-top-color: $primary;
+  }
+
+  &__text {
+    color: $muted-foreground;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,218 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.permissions-page {
+  width: 100%;
+  margin: 0 auto;
+  max-width: $breakpoint-xl;
+  padding: $spacing-md;
+
+  @include lg {
+    padding: $spacing-xl;
+  }
+
+  // Permission Denied State
+  &__access-denied {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__denied-content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__denied-icon {
+    width: 4rem;
+    height: 4rem;
+    color: $danger;
+    margin: 0 auto;
+  }
+
+  &__denied-title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $foreground;
+  }
+
+  &__denied-text {
+    color: $muted-foreground;
+  }
+
+  // Header
+  &__header {
+    margin-bottom: $spacing-xl;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__icon-wrapper {
+    width: 3rem;
+    height: 3rem;
+    border-radius: $radius-xl;
+    background: linear-gradient(
+      to bottom right,
+      #a855f7,
+      #9333ea
+    ); // purple-500 to purple-600
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 15px -3px rgba(#a855f7, 0.3);
+    flex-shrink: 0;
+  }
+
+  &__header-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    color: #ffffff;
+  }
+
+  &__title {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $foreground;
+  }
+
+  &__subtitle {
+    color: $muted-foreground;
+  }
+
+  // Layout
+  &__header {
+    margin-bottom: $spacing-xl;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    margin-bottom: $spacing-2xl; // Increased spacing
+  }
+
+  // ... (keeping icon wrapper styles if selected, but since we are modifying lines 47-53 mostly)
+  // Logic check: The tool replaces strictly based on Content matching.
+  // I will target the Grid gap specifically in a second easier chunk if needed, or do it here if contiguous.
+  // The header section is lines 47-53. The grid is lines 88-91. They are not contiguous.
+  // I will make TWO replace calls or use multi_replace.
+  
+  // Re-reading the `replace_file_content` rule 5: "If you are making multiple edits across a single file, use the multi_replace_file_content tool instead."
+  // I should use multi_replace.
+  
+  // Wait, I am the AI, I can't change the tool call inside the thought process.
+  // I will use `replace_file_content` for just the Grid Gap first as it's more critical for "cramped" feel.
+  // Actually, I can use multi_replace. Let me switch to multi_replace for permissions.scss.
+  
+  // ABORTING single replace. Will use multi_replace below.
+  // For this step, I will just do the GAP change which is lines 88-91.
+  
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-2xl; // Increased from lg
+
+    @include lg {
+      grid-template-columns: repeat(12, 1fr);
+    }
+  }
+
+  &__sidebar {
+    @include lg {
+      grid-column: span 4;
+    }
+  }
+
+  &__main-content {
+    @include lg {
+      grid-column: span 8;
+    }
+  }
+
+  // Cards
+  &__card {
+    @include card-base;
+    border: 1px solid rgba($border, 0.5);
+    border-radius: $radius-xl;
+    padding: $spacing-xl;
+  }
+
+  &__card-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $foreground;
+    margin-bottom: $spacing-md;
+  }
+
+  &__user-header {
+    margin-bottom: $spacing-lg;
+  }
+
+  &__user-info {
+    font-size: $font-size-sm;
+    color: $muted-foreground;
+  }
+
+  // Empty/Loading States
+  &__loading-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  &__skeleton-line {
+    height: 2rem;
+    background-color: $muted;
+    border-radius: $radius-sm;
+    width: 33%;
+  }
+
+  &__skeleton-block {
+    height: 16rem;
+    background-color: $muted;
+    border-radius: $radius-sm;
+  }
+
+  &__empty-state {
+    @include card-base;
+    border: 1px solid rgba($border, 0.5);
+    border-radius: $radius-xl;
+    padding: 3rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__empty-icon {
+    width: 4rem;
+    height: 4rem;
+    color: rgba($muted-foreground, 0.3);
+    margin-bottom: $spacing-md;
+  }
+
+  &__empty-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    color: $foreground;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__empty-text {
+    color: $muted-foreground;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}

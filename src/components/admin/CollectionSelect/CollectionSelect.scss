@@ -1,0 +1,77 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.collection-select {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  &__label {
+    margin-bottom: $spacing-xs;
+  }
+
+  &__controls {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  &__select-wrapper {
+    flex: 1;
+  }
+
+  &__create-btn {
+    flex-shrink: 0;
+  }
+
+  &__modal {
+    max-width: 425px;
+  }
+
+  &__create-form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    padding-top: $spacing-sm;
+  }
+
+  &__form-field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__form-error {
+    padding: $spacing-sm;
+    background-color: rgba($destructive, 0.1);
+    color: $destructive;
+    font-size: $font-size-sm;
+    border-radius: $radius-md;
+  }
+
+  &__spinner {
+    width: 1rem;
+    height: 1rem;
+    margin-right: $spacing-xs;
+    border: 2px solid rgba($primary-foreground, 0.3);
+    border-radius: $radius-full;
+    animation: spin 1s linear infinite;
+    border-top-color: $primary-foreground;
+  }
+
+  &__icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+  }
+
+  &__submit-btn {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

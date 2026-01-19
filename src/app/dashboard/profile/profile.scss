@@ -1,0 +1,84 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.profile-page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl; // space-y-6
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    margin-bottom: $spacing-xs;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    letter-spacing: -0.025em; // tracking-tight
+  }
+
+  &__description {
+    color: $muted-foreground;
+    font-size: $font-size-base;
+  }
+
+  &__grid {
+    display: grid;
+    gap: $spacing-xl; // gap-6
+
+    @media (min-width: $breakpoint-md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__left-column {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl; // space-y-6
+  }
+
+  &__info-card {
+    @include card-base;
+
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    padding: $spacing-xl; // p-6
+  }
+
+  &__card-title {
+    margin-bottom: $spacing-md; // mb-4
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__info-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md; // space-y-4
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__label {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+
+  &__value {
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+  }
+
+  &__role-badge {
+    text-transform: capitalize;
+    align-self: flex-start;
+  }
+}

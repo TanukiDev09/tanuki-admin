@@ -1,0 +1,96 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.inventory-adjust-modal {
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    padding: $spacing-md 0;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__comparison {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md;
+    background-color: $muted;
+    border-radius: $radius-lg;
+
+    &-column {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      gap: 2px;
+
+      &--right {
+        text-align: right;
+      }
+    }
+
+    &-label {
+      color: $muted-foreground;
+      font-size: $font-size-xs;
+    }
+
+    &-value {
+      color: $foreground;
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+
+      &--negative {
+        color: $danger;
+      }
+
+      &--positive {
+        color: $primary;
+      }
+    }
+
+    &-arrow {
+      width: $icon-xs;
+      height: $icon-xs;
+      margin: 0 $spacing-sm;
+      color: $muted-foreground;
+    }
+  }
+
+  &__input-group {
+    display: flex;
+    align-items: stretch;
+    gap: $spacing-sm;
+  }
+
+  &__input {
+    flex: 1;
+    font-size: $font-size-lg !important;
+    font-weight: $font-weight-semibold !important;
+  }
+
+  &__quick-actions {
+    display: flex;
+    gap: $spacing-xs;
+  }
+
+  &__quick-btn {
+    height: auto !important;
+    padding: $spacing-xs $spacing-sm !important;
+    font-size: $font-size-xs !important;
+  }
+
+  &__btn-confirm {
+    &--remove {
+      background-color: $danger !important;
+
+      &:hover {
+        background-color: color-mix(in srgb, $danger, black 10%) !important;
+      }
+    }
+  }
+}

@@ -2,11 +2,11 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { ArrowLeft } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/Badge';
 import { Category } from '@/types/category';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/Toast';
 import {
   Table,
   TableBody,
@@ -14,7 +14,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/Table';
+import { formatCurrency } from '@/lib/utils';
+
+interface Movement {
+  _id: string;
+  date: string;
+  description: string;
+  type: 'INCOME' | 'EXPENSE';
+  amount: number;
+}
+
+import './category-detail.scss';
 
 export default function CategoryDetailPage({
   params,
@@ -25,7 +36,7 @@ export default function CategoryDetailPage({
   const unwrappedParams = use(params);
   const { toast } = useToast();
   const [category, setCategory] = useState<Category | null>(null);
-  const [movements, setMovements] = useState<any[]>([]);
+  const [movements, setMovements] = useState<Movement[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -60,25 +71,25 @@ export default function CategoryDetailPage({
       }
     };
     fetchData();
-  }, [unwrappedParams.id]);
+  }, [unwrappedParams.id, toast]);
 
-  if (loading) return <div className="p-8">Cargando...</div>;
-  if (!category) return <div className="p-8">Categoría no encontrada</div>;
+  if (loading) return <div className="category-detail__loading">Cargando...</div>;
+  if (!category) return <div className="category-detail__error">Categoría no encontrada</div>;
 
   return (
-    <div className="p-8 space-y-8">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-4">
-        <ArrowLeft className="mr-2 h-4 w-4" /> Volver
+    <div className="category-detail">
+      <Button variant="ghost" onClick={() => router.back()} className="category-detail__back-btn">
+        <ArrowLeft className="category-detail__icon" /> Volver
       </Button>
 
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-2xl font-bold">{category.name}</h1>
+      <div className="category-detail__header">
+        <div className="category-detail__title-group">
+          <h1 className="category-detail__title">{category.name}</h1>
           {category.description && (
-            <p className="text-muted-foreground mt-2">{category.description}</p>
+            <p className="category-detail__description">{category.description}</p>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="category-detail__badges">
           <Badge
             variant={
               category.type === 'Ingreso'
@@ -96,10 +107,10 @@ export default function CategoryDetailPage({
         </div>
       </div>
 
-      <div className="border rounded-lg p-6 bg-card shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Movimientos Asociados</h2>
+      <div className="category-detail__content">
+        <h2 className="category-detail__section-title">Movimientos Asociados</h2>
         {movements.length === 0 ? (
-          <p className="text-muted-foreground">
+          <p className="category-detail__empty">
             No hay movimientos registrados que coincidan con esta categoría.
           </p>
         ) : (
@@ -120,7 +131,7 @@ export default function CategoryDetailPage({
                   </TableCell>
                   <TableCell>
                     <span
-                      className="cursor-pointer hover:underline hover:text-primary font-medium"
+                      className="category-detail__link"
                       onClick={() => router.push(`/dashboard/movements/${mov._id}`)}
                     >
                       {mov.description}
@@ -138,12 +149,12 @@ export default function CategoryDetailPage({
                   <TableCell
                     className={
                       mov.type === 'INCOME'
-                        ? 'text-green-600 font-medium'
-                        : 'text-red-600 font-medium'
+                        ? 'category-detail__amount--income'
+                        : 'category-detail__amount--expense'
                     }
                   >
-                    {mov.type === 'INCOME' ? '+' : '-'}$
-                    {mov.amount.toLocaleString()}
+                    {mov.type === 'INCOME' ? '+' : '-'}
+                    {formatCurrency(mov.amount)}
                   </TableCell>
                 </TableRow>
               ))}

@@ -11,7 +11,8 @@ import type {
   BadgeProps,
   IconCircleProps,
   CardProps,
-  ChartContainerProps
+  ChartContainerProps,
+  MovementItemProps
 } from '@/types/design-system';
 
 // ============================================
@@ -35,7 +36,7 @@ export const StatCard: React.FC<StatCardProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`stat-card-${variant} ${className}`}>
+    <div className={`stat-card stat-card--${variant} ${className}`}>
       <div className="stat-value">{value}</div>
       <div className="stat-label">{label}</div>
     </div>
@@ -58,7 +59,7 @@ export const Badge: React.FC<BadgeProps> = ({
   className = ''
 }) => {
   return (
-    <span className={`badge-${variant} ${className}`}>
+    <span className={`badge badge--${variant} ${className}`}>
       {children}
     </span>
   );
@@ -82,7 +83,7 @@ export const IconCircle: React.FC<IconCircleProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`icon-circle-${variant} ${className}`}>
+    <div className={`icon-circle icon-circle--${variant} ${className}`}>
       {children}
     </div>
   );
@@ -129,7 +130,7 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
   height = 'md',
   className = ''
 }) => {
-  const heightClass = height !== 'md' ? `chart-container-${height}` : '';
+  const heightClass = height !== 'md' ? `chart-container--${height}` : '';
 
   return (
     <div className={`chart-container ${heightClass} ${className}`}>
@@ -138,18 +139,9 @@ export const ChartContainer: React.FC<ChartContainerProps> = ({
   );
 };
 
-// ============================================
-// MOVEMENT ITEM COMPONENT
-// ============================================
+import './design-system.scss';
 
-export interface MovementItemProps {
-  icon: React.ReactNode;
-  iconVariant: 'success' | 'danger' | 'info' | 'muted';
-  title: string;
-  description: string;
-  amount: string;
-  className?: string;
-}
+// ... (imports remain)
 
 /**
  * MovementItem - Display a transaction/movement item
@@ -172,15 +164,15 @@ export const MovementItem: React.FC<MovementItemProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`flex items-center gap-3 ${className}`}>
+    <div className={`design-system-movement ${className}`}>
       <IconCircle variant={iconVariant}>
         {icon}
       </IconCircle>
-      <div className="flex-1">
-        <div className="font-semibold">{title}</div>
-        <div className="text-sm text-muted-foreground">{description}</div>
+      <div className="design-system-movement__content">
+        <div className="design-system-movement__title">{title}</div>
+        <div className="design-system-movement__description">{description}</div>
       </div>
-      <div className="font-bold">{amount}</div>
+      <div className="design-system-movement__amount">{amount}</div>
     </div>
   );
 };
@@ -209,8 +201,8 @@ export const DashboardSection: React.FC<DashboardSectionProps> = ({
   className = ''
 }) => {
   return (
-    <div className={className}>
-      <h2 className="text-2xl font-bold mb-4">{title}</h2>
+    <div className={`design-system-section ${className}`}>
+      <h2 className="design-system-section__title">{title}</h2>
       {children}
     </div>
   );
@@ -241,7 +233,7 @@ export const StatGrid: React.FC<StatGridProps> = ({
   columns = 3,
   className = ''
 }) => {
-  const gridClass = `grid grid-cols-1 md:grid-cols-${columns} gap-4`;
+  const gridClass = `design-system-grid design-system-grid--cols-${columns}`;
 
   return (
     <div className={`${gridClass} ${className}`}>
@@ -257,7 +249,7 @@ export const StatGrid: React.FC<StatGridProps> = ({
 /*
 export default function DashboardPage() {
   return (
-    <div className="p-6 space-y-6">
+    <div className="design-system-page">
       {/* Business Health Section *\/}
       <DashboardSection title="Salud del Negocio">
         <StatGrid columns={3}>
@@ -282,7 +274,7 @@ export default function DashboardPage() {
       {/* Recent Movements Section *\/}
       <DashboardSection title="Movimientos Recientes">
         <Card>
-          <div className="space-y-3">
+          <div className="design-system-list">
             <MovementItem
               icon={<span>$</span>}
               iconVariant="info"
@@ -309,16 +301,16 @@ export default function DashboardPage() {
       </DashboardSection>
 
       {/* Charts Section *\/}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="design-system-grid design-system-grid--cols-1 design-system-grid--lg-cols-2">
         <Card>
-          <h3 className="text-xl font-bold mb-4">Flujo de Caja Histórico</h3>
+          <h3 className="design-system-card-title">Flujo de Caja Histórico</h3>
           <ChartContainer height="md">
             {/* Your chart component here *\/}
           </ChartContainer>
         </Card>
         
         <Card>
-          <h3 className="text-xl font-bold mb-4">Gastos por Categoría</h3>
+          <h3 className="design-system-card-title">Gastos por Categoría</h3>
           <ChartContainer height="md">
             {/* Your chart component here *\/}
           </ChartContainer>

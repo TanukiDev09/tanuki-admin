@@ -1,0 +1,140 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.user-permissions-select {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__search-wrapper {
+    position: relative;
+  }
+
+  &__search-icon {
+    position: absolute;
+    top: 50%;
+    left: $spacing-sm;
+    z-index: 1;
+    width: 1rem;
+    height: 1rem;
+    color: $muted-foreground;
+    transform: translateY(-50%);
+  }
+
+  &__search-input {
+    padding-left: $spacing-xl;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    max-height: 500px;
+    overflow-y: auto;
+
+    @include custom-scrollbar;
+  }
+
+  &__empty {
+    padding: $spacing-xl 0;
+    color: $muted-foreground;
+    text-align: center;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    width: 100%;
+    padding: $spacing-sm;
+    background: transparent;
+    text-align: left;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    cursor: pointer;
+
+    @include transition(all);
+
+    &:hover {
+      background-color: rgba($muted, 0.3);
+      border-color: rgba($primary, 0.3);
+    }
+
+    &--active {
+      background-color: rgba($primary, 0.05);
+      border-color: $primary;
+    }
+  }
+
+  &__item-avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    background-color: rgba($primary, 0.1);
+    border-radius: $radius-full;
+    flex-shrink: 0;
+  }
+
+  &__avatar-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: rgba($primary, 0.7);
+  }
+
+  &__item-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__item-name {
+    color: $foreground;
+    font-weight: $font-weight-medium;
+
+    @include text-truncate;
+  }
+
+  &__item-email {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+
+    @include text-truncate;
+  }
+
+  &__item-role {
+    flex-shrink: 0;
+  }
+
+  &__summary {
+    padding-top: $spacing-sm;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    border-top: 1px solid $border;
+  }
+
+  // Skeletons
+  &--loading {
+    .user-permissions-select__skeleton-search {
+      height: 2.5rem;
+      background-color: $muted;
+      border-radius: $radius-md;
+
+      @include animate-pulse;
+    }
+
+    .user-permissions-select__skeleton-list {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+    }
+
+    .user-permissions-select__skeleton-item {
+      height: 4rem;
+      background-color: $muted;
+      border-radius: $radius-md;
+
+      @include animate-pulse;
+    }
+  }
+}

@@ -1,0 +1,19 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.creator-form {
+  &__dialog-content {
+    max-width: 500px;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__textarea {
+    resize: none;
+    min-height: 100px;
+  }
+}

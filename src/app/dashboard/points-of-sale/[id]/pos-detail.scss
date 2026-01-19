@@ -1,0 +1,82 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.pos-detail {
+  padding: $spacing-2xl;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__title-group {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    letter-spacing: -0.025em;
+  }
+
+  &__discount-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border: 1px solid transparent;
+    border-radius: $radius-full;
+    background-color: $secondary;
+    color: $secondary-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    transition: background-color $transition-base;
+
+    &:hover {
+      background-color: rgba($secondary, 0.8);
+    }
+  }
+
+  &__grid {
+    display: grid;
+    gap: $spacing-md;
+
+    @include md {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include lg {
+      grid-template-columns: repeat(7, 1fr);
+    }
+  }
+
+  &__main-col {
+    grid-column: span 1;
+
+    @include md {
+      grid-column: span 2;
+    }
+
+    @include lg {
+      grid-column: span 4;
+    }
+  }
+
+  &__card {
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    padding: $spacing-md;
+  }
+
+  &__section-title {
+    margin-bottom: $spacing-md;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+  }
+}

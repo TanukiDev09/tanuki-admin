@@ -1,0 +1,1 @@
+export { InventoryStockBadge } from './InventoryStockBadge';

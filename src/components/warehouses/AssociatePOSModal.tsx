@@ -9,17 +9,17 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui/Dialog';
+import { Button } from '@/components/ui/Button';
+import { Label } from '@/components/ui/Label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/Select';
+import { useToast } from '@/components/ui/Toast';
 
 interface PointOfSale {
   _id: string;
@@ -116,9 +116,11 @@ export function AssociatePOSModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="pos">Punto de Venta</Label>
+
+
+        <div className="associate-pos-modal__content">
+          <div className="associate-pos-modal__field-group">
+            <Label htmlFor="pos" className="associate-pos-modal__label">Punto de Venta</Label>
             <Select
               value={selectedPOSId}
               onValueChange={setSelectedPOSId}

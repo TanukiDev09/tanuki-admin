@@ -1,0 +1,42 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.signed-contract-info {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background-color: rgba($muted, 0.1);
+  border: 1px solid $border;
+  border-radius: $radius-md;
+
+  &__icon {
+    width: $icon-lg;
+    height: $icon-lg;
+    color: $info;
+  }
+
+  &__content {
+    flex: 1;
+  }
+
+  &__filename {
+    font-weight: $font-weight-medium;
+  }
+
+  &__meta {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__empty {
+    color: $muted-foreground;
+    font-style: italic;
+  }
+
+  &__action-icon {
+    width: $icon-xs;
+    height: $icon-xs;
+    margin-right: $spacing-xs;
+  }
+}

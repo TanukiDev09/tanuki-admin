@@ -1,0 +1,123 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.add-book-inventory-modal {
+  &__search-container {
+    display: flex;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
+  }
+
+  &__search {
+    position: relative;
+    flex: 1;
+
+    &-icon {
+      position: absolute;
+      top: 50%;
+      left: $spacing-sm;
+      width: $icon-xs;
+      height: $icon-xs;
+      color: $muted-foreground;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    &-input {
+      padding-left: $spacing-xl !important;
+    }
+  }
+
+  &__results-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    max-height: 300px;
+    padding-right: $spacing-xs;
+    overflow-y: auto;
+
+    @include custom-scrollbar;
+  }
+
+  &__book-card {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-sm;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+
+    @include transition(background-color);
+
+    &:hover {
+      background-color: rgba($muted, 0.5);
+    }
+  }
+
+  &__cover-wrapper {
+    position: relative;
+    width: 40px;
+    height: 56px;
+    background-color: $muted;
+    border-radius: $radius-xs;
+    overflow: hidden;
+    flex-shrink: 0;
+
+    @include flex-center;
+  }
+
+  &__cover-fallback {
+    color: $muted-foreground;
+    font-size: 10px;
+  }
+
+  &__book-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__book-title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    @include text-truncate;
+  }
+
+  &__book-isbn {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__action-btn {
+    flex-shrink: 0;
+  }
+
+  &__empty {
+    padding: $spacing-xl;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  &__dialog {
+    @media (width >= 640px) {
+      max-width: 500px;
+    }
+  }
+
+  &__spinner {
+    width: 1rem; // w-4
+    height: 1rem;
+    animation: spin 1s linear infinite;
+  }
+
+  &__icon {
+    width: 1rem; // w-4
+    height: 1rem;
+    margin-right: 0.25rem; // mr-1
+  }
+
+  &__cover-image {
+    object-fit: cover;
+  }
+}

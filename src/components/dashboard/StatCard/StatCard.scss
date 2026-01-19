@@ -1,0 +1,184 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+@use 'sass:color';
+
+// ============================================
+// STAT CARD COMPONENT
+// Premium UI/UX Redesign
+// ============================================
+
+.stat-card {
+  position: relative;
+  padding: $spacing-xl;
+  background: rgba($card, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: $radius-xl;
+  border: 1px solid rgba($border, 0.4);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.02),
+    0 2px 4px -1px rgba(0, 0, 0, 0.02);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 
+      0 12px 24px -10px rgba(0, 0, 0, 0.08),
+      0 4px 10px -5px rgba(0, 0, 0, 0.04);
+    border-color: rgba($primary, 0.2);
+    
+    .stat-card__icon {
+      transform: scale(1.1) rotate(5deg);
+    }
+  }
+
+  // --- VARIANTS ---
+
+  &--flow,
+  &--success {
+    background: linear-gradient(145deg, rgba($background, 0.9) 0%, rgba($success, 0.08) 100%);
+    border-bottom: 2px solid rgba($success, 0.3);
+
+    .stat-card__icon {
+      background: linear-gradient(135deg, rgba($success, 0.2), rgba($success, 0.1));
+      color: color.adjust($success, $lightness: -5%);
+      box-shadow: 0 4px 12px rgba($success, 0.15);
+    }
+
+    .stat-card__value {
+      color: color.adjust($success, $lightness: -10%);
+    }
+  }
+
+  &--ebb,
+  &--danger {
+    background: linear-gradient(145deg, rgba($background, 0.9) 0%, rgba($danger, 0.08) 100%);
+    border-bottom: 2px solid rgba($danger, 0.3);
+
+    .stat-card__icon {
+      background: linear-gradient(135deg, rgba($danger, 0.2), rgba($danger, 0.1));
+      color: color.adjust($danger, $lightness: -5%);
+      box-shadow: 0 4px 12px rgba($danger, 0.15);
+    }
+    
+    .stat-card__value {
+      color: color.adjust($danger, $lightness: -10%);
+    }
+  }
+
+  &--balance,
+  &--info {
+    background: linear-gradient(145deg, rgba($background, 0.9) 0%, rgba($info, 0.08) 100%);
+    border-bottom: 2px solid rgba($info, 0.3);
+
+    .stat-card__icon {
+      background: linear-gradient(135deg, rgba($info, 0.2), rgba($info, 0.1));
+      color: color.adjust($info, $lightness: -5%);
+      box-shadow: 0 4px 12px rgba($info, 0.15);
+    }
+    
+    .stat-card__value {
+      color: color.adjust($info, $lightness: -10%);
+    }
+  }
+
+  &--default {
+    background: $card;
+    border: 1px solid $border;
+  }
+
+  // --- ELEMENTS ---
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__title {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-right: $spacing-sm;
+  }
+
+  &__icon {
+    width: 42px;
+    height: 42px;
+    padding: 10px;
+    border-radius: 12px;
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__main {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  &__value-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xs;
+  }
+
+  &__value {
+    font-size: 2.25rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    color: $foreground;
+    
+    // Gradient text for value
+    // @include text-gradient-primary; // If available, otherwise cleanup
+  }
+
+  &__subtext {
+    font-size: $font-size-sm;
+    color: $muted-foreground;
+    font-weight: $font-weight-medium;
+    opacity: 0.8;
+  }
+
+  &__trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    
+    &--up {
+      background-color: rgba($success, 0.1);
+      color: $success;
+    }
+
+    &--down {
+      background-color: rgba($danger, 0.1);
+      color: $danger;
+    }
+  }
+
+  &__sparkline {
+    opacity: 0.8;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+    transition: opacity 0.2s;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+}

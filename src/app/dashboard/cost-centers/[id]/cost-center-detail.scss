@@ -1,0 +1,229 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.cost-center-detail {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-3xl;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  padding-bottom: calc($spacing-3xl * 1.5);
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-lg;
+  }
+
+  &__back-btn {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: $muted-foreground;
+    text-decoration: none;
+    font-size: $font-size-sm;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $foreground;
+    }
+  }
+
+  &__title-group {
+    margin-top: $spacing-md;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: $font-weight-bold;
+    color: $foreground;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__code-badge {
+    background-color: rgba($primary, 0.1);
+    color: $primary;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-full;
+    font-size: $font-size-sm;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  }
+
+  &__card {
+    @include card-base;
+    padding: $spacing-xl;
+  }
+
+  &__section {
+    margin-bottom: $spacing-xl;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__label {
+    display: block;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $muted-foreground;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__value {
+    font-size: $font-size-base;
+    color: $foreground;
+    line-height: $line-height-relaxed;
+  }
+
+  &__meta-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+    border-top: 1px solid rgba($border, 0.5);
+    padding-top: $spacing-lg;
+
+    @include sm {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  // Financial Analysis Section - Premium UX
+  &__financial-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xl;
+    margin-top: $spacing-xl;
+    padding-top: $spacing-2xl;
+    border-top: 1px solid rgba($border, 0.4);
+  }
+
+  &__section-title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $foreground;
+    margin-bottom: $spacing-lg;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    &.subsection {
+      font-size: $font-size-lg;
+      margin-bottom: $spacing-md;
+      color: $muted-foreground;
+      
+      &::before {
+        display: none;
+      }
+    }
+  }
+
+  // 1. Acumulados Históricos (Hero Cards)
+  &__hero-stats {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+
+    @include lg {
+        display: grid;
+        grid-template-columns: 1fr; // Stacked for now or customized grid
+        gap: $spacing-lg;
+    }
+  }
+
+  // 2. Indicadores de Sostenibilidad (Runway, Burn, Health)
+  &__indicators-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+
+    @include md {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    @include lg {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  // 3. Historia Financiera (Full Width Chart)
+  &__chart-section {
+    background: white;
+    border-radius: $radius-xl;
+    padding: $spacing-xl;
+    box-shadow: $shadow-sm;
+    border: 1px solid rgba($border, 0.5);
+    min-height: 400px;
+  }
+
+  &__movements-section {
+    margin-top: $spacing-3xl;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+}
+
+// Custom specialized card styles for this view
+.premium-stat-card {
+    background: white;
+    border-radius: $radius-xl;
+    padding: $spacing-xl;
+    box-shadow: $shadow-sm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid rgba($border, 0.3);
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-md;
+    }
+
+    &__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: $spacing-md;
+    }
+
+    &__label {
+        font-size: $font-size-sm;
+        font-weight: $font-weight-bold;
+        color: $muted-foreground;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    &__icon {
+        color: $muted-foreground;
+        opacity: 0.5;
+    }
+
+    &__value {
+        font-size: $font-size-4xl; // Big number
+        font-weight: 800;
+        color: $foreground;
+        margin-bottom: $spacing-xs;
+        letter-spacing: -0.02em;
+    }
+
+    &__subtext {
+        font-size: $font-size-sm;
+        color: $muted-foreground;
+    }
+
+    &--highlight {
+        background: linear-gradient(135deg, rgba($primary, 0.03) 0%, rgba($primary, 0.08) 100%);
+        border-color: rgba($primary, 0.1);
+
+        .premium-stat-card__value {
+            color: $primary;
+        }
+    }
+}

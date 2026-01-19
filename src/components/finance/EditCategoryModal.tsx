@@ -1,27 +1,28 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui/Dialog';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
+import { useToast } from '@/components/ui/Toast';
 import { Category } from '@/types/category';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Checkbox } from '@/components/ui/Checkbox';
+import './CategoryModal.scss';
 
 interface EditCategoryModalProps {
   isOpen: boolean;
@@ -98,8 +99,8 @@ export default function EditCategoryModal({
         <DialogHeader>
           <DialogTitle>Editar Categoría</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+        <form onSubmit={handleSubmit} className="category-modal__form">
+          <div className="category-modal__field-group">
             <Label htmlFor="edit-name">Nombre</Label>
             <Input
               id="edit-name"
@@ -111,7 +112,7 @@ export default function EditCategoryModal({
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className="category-modal__field-group">
             <Label htmlFor="edit-type">Tipo</Label>
             <Select
               value={formData.type}
@@ -129,7 +130,7 @@ export default function EditCategoryModal({
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
+          <div className="category-modal__field-group">
             <Label htmlFor="edit-description">Descripción</Label>
             <Textarea
               id="edit-description"
@@ -140,7 +141,7 @@ export default function EditCategoryModal({
               placeholder="Descripción opcional..."
             />
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="category-modal__checkbox-field">
             <Checkbox
               id="edit-active"
               checked={formData.isActive}

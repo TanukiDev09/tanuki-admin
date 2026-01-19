@@ -3,22 +3,30 @@
 import { useState } from 'react';
 import { UserPlus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import UserManagementTable from '@/components/admin/UserManagementTable';
+import { UsersTable } from '@/components/admin/UsersTable';
+import { Button } from '@/components/ui/Button';
 import CreateUserModal from '@/components/admin/CreateUserModal';
 import EditUserModal from '@/components/admin/EditUserModal';
 import { UserResponse } from '@/types/user';
 import { useRouter } from 'next/navigation';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
+import '../dashboard.scss';
 
 export default function UsuariosPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const { hasPermission } = usePermission();
+  const canRead = hasPermission(ModuleName.USERS, PermissionAction.READ);
+  const canCreate = hasPermission(ModuleName.USERS, PermissionAction.CREATE);
+
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<UserResponse | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // Verificar si el usuario es admin
-  if (user && user.role !== 'admin') {
+  // Verificar si el usuario tiene permiso de lectura
+  if (user && !canRead) {
     router.push('/dashboard');
     return null;
   }
@@ -79,29 +87,28 @@ export default function UsuariosPage() {
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto bg-background">
-        <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
+      <div className="dashboard-page">
+        <div className="dashboard-page__container">
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground mb-2">
+          <div className="dashboard-page__header">
+            <div className="dashboard-page__title-group">
+              <h1 className="dashboard-page__title">
                 Gestión de Usuarios
               </h1>
-              <p className="text-foreground-muted">
+              <p className="dashboard-page__subtitle">
                 Administra los usuarios del sistema
               </p>
             </div>
-            <button
-              onClick={() => setCreateModalOpen(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors"
-            >
-              <UserPlus className="w-5 h-5" />
-              <span className="hidden sm:inline">Crear Usuario</span>
-            </button>
+            {canCreate && (
+              <Button onClick={() => setCreateModalOpen(true)} className="dashboard-page__action-btn">
+                <UserPlus className="dashboard-page__icon" />
+                <span className="dashboard-page__text-hidden-sm">Crear Usuario</span>
+              </Button>
+            )}
           </div>
 
           {/* Table */}
-          <UserManagementTable
+          <UsersTable
             key={refreshKey}
             onEdit={handleEdit}
             onDelete={handleDelete}

@@ -1,0 +1,23 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// CREATEPOINTOFSALEBUTTON COMPONENT
+// Notación BEM
+// ============================================
+
+.create-point-of-sale-button {
+  // Estilos base del componente
+  
+  // --- ELEMENTOS ---
+  
+  &__element {
+    // Estilos de elementos
+  }
+  
+  // --- MODIFICADORES ---
+  
+  &--modifier {
+    // Estilos de modificadores
+  }
+}

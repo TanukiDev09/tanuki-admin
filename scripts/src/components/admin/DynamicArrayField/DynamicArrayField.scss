@@ -1,0 +1,23 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// DYNAMICARRAYFIELD COMPONENT
+// Notación BEM
+// ============================================
+
+.dynamic-array-field {
+  // Estilos base del componente
+  
+  // --- ELEMENTOS ---
+  
+  &__element {
+    // Estilos de elementos
+  }
+  
+  // --- MODIFICADORES ---
+  
+  &--modifier {
+    // Estilos de modificadores
+  }
+}

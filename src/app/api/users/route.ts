@@ -1,14 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import { CreateUserDTO, sanitizeUser } from '@/types/user';
 import { hashPassword, validateEmail } from '@/lib/auth';
+import { createDefaultPermissions } from '@/lib/permissions';
+
+interface MongooseValidationErrors {
+  errors: Record<string, { message: string }>;
+}
 
 /**
  * GET /api/users
  * Obtener todos los usuarios (con paginación)
  */
 export async function GET(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.USERS,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 
@@ -23,7 +37,7 @@ export async function GET(request: NextRequest) {
     const isActive = searchParams.get('isActive');
 
     // Construir query
-    const query: any = {};
+    const query: Record<string, unknown> = {};
     if (role) query.role = role;
     if (isActive !== null) query.isActive = isActive === 'true';
 
@@ -48,13 +62,15 @@ export async function GET(request: NextRequest) {
         pages: Math.ceil(total / limit),
       },
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error al obtener usuarios:', error);
+    const message =
+      error instanceof Error ? error.message : 'Error desconocido';
     return NextResponse.json(
       {
         success: false,
         error: 'Error al obtener los usuarios',
-        message: error.message,
+        message: message,
       },
       { status: 500 }
     );
@@ -66,6 +82,13 @@ export async function GET(request: NextRequest) {
  * Crear un nuevo usuario
  */
 export async function POST(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.USERS,
+    PermissionAction.CREATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 
@@ -103,13 +126,15 @@ export async function POST(request: NextRequest) {
     // Hashear contraseña
     const hashedPassword = await hashPassword(password);
 
-    // Crear usuario
     const user = await User.create({
       email: email.toLowerCase(),
       password: hashedPassword,
       name,
       role: role || 'user',
     });
+
+    // Crear permisos por defecto
+    await createDefaultPermissions(user._id.toString(), user.role);
 
     // Sanitizar respuesta
     const userResponse = sanitizeUser(user);
@@ -122,13 +147,14 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error al crear usuario:', error);
 
     // Manejar errores de validación de Mongoose
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(
-        (err: any) => err.message
+    if (error instanceof Error && error.name === 'ValidationError') {
+      const mongooseError = error as unknown as MongooseValidationErrors;
+      const messages = Object.values(mongooseError.errors).map(
+        (err) => err.message
       );
       return NextResponse.json(
         { success: false, error: 'Error de validación', messages },
@@ -136,11 +162,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const message =
+      error instanceof Error ? error.message : 'Error desconocido';
     return NextResponse.json(
       {
         success: false,
         error: 'Error al crear el usuario',
-        message: error.message,
+        message: message,
       },
       { status: 500 }
     );

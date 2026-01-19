@@ -1,0 +1,128 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// BADGE COMPONENT (MOBILE-FIRST)
+// Notación BEM
+// ============================================
+
+.badge {
+  // Estilos base (móvil)
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  font-family: $font-sans;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  border: 1px solid transparent;
+  border-radius: $radius-full;
+
+  @include transition(background-color, color);
+
+  &:focus {
+    outline: none;
+
+    @include focus-ring;
+  }
+
+  // --- VARIANTES ---
+
+  &--default {
+    background: $primary;
+    color: $primary-foreground;
+    border-color: transparent;
+
+    &:hover {
+      background: hsl(222deg 47% 15%); // Slightly lighter
+    }
+  }
+
+  &--secondary {
+    background: $secondary;
+    color: $secondary-foreground;
+    border-color: transparent;
+
+    &:hover {
+      background: hsl(214deg 32% 85%); // Slightly darker
+    }
+  }
+
+  &--destructive {
+    background: $destructive;
+    color: $destructive-foreground;
+    border-color: transparent;
+
+    &:hover {
+      background: hsl(0deg 84% 55%); // Slightly lighter
+    }
+  }
+
+  &--success {
+    background: $success;
+    color: $success-foreground;
+    border-color: transparent;
+
+    &:hover {
+      background: hsl(142deg 76% 40%); // Slightly lighter
+    }
+  }
+
+  &--info {
+    background: $info;
+    color: $info-foreground;
+    border-color: transparent;
+
+    &:hover {
+      background: hsl(217deg 91% 65%); // Slightly lighter
+    }
+  }
+
+  &--warning {
+    background: $warning;
+    color: $warning-foreground;
+    border-color: transparent;
+
+    &:hover {
+      background: hsl(38deg 92% 55%); // Slightly lighter
+    }
+  }
+
+  &--outline {
+    background: transparent;
+    color: $foreground;
+    border-color: $border;
+
+    &:hover {
+      background: $accent;
+    }
+  }
+
+  // --- TAMAÑOS ---
+
+  &--sm {
+    padding: 1px 8px;
+    font-size: 10px;
+  }
+
+  &--lg {
+    padding: 4px 12px;
+    font-size: $font-size-sm;
+  }
+
+  // --- ESTADOS ---
+
+  &--clickable {
+    cursor: pointer;
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  // --- RESPONSIVE (MOBILE-FIRST) ---
+
+  @include respond-to('md') {
+    // Los badges generalmente no necesitan ajustes responsive
+    // Mantener tamaño consistente en todas las pantallas
+  }
+}

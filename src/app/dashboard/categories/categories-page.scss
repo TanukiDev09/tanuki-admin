@@ -1,0 +1,42 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.categories-page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  padding: $spacing-xl;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    letter-spacing: -0.025em;
+  }
+
+  &__subtitle {
+    color: $muted-foreground;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__search {
+    width: 100%;
+    max-width: 400px;
+  }
+}

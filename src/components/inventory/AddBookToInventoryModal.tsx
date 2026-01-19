@@ -8,15 +8,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/Dialog';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { useToast } from '@/components/ui/Toast';
 import Image from 'next/image';
 import { Search, Loader2, Plus } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { debounce } from 'lodash';
-
+import './AddBookToInventoryModal.scss';
 
 interface Book {
   _id: string;
@@ -70,7 +70,6 @@ export function AddBookToInventoryModal({
     staleTime: Infinity,
   });
 
-  // Debounced refetch
   const debouncedRefetch = useMemo(
     () =>
       debounce(() => {
@@ -85,10 +84,8 @@ export function AddBookToInventoryModal({
     setSearchResults(booksData ?? []);
   }, [booksData]);
 
-  // Trigger debounced search when term changes
   useEffect(() => {
     debouncedRefetch();
-    // cancel debounce on unmount
     return () => debouncedRefetch.cancel();
   }, [searchTerm, debouncedRefetch]);
 
@@ -141,7 +138,7 @@ export function AddBookToInventoryModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="add-book-inventory-modal__dialog">
         <DialogHeader>
           <DialogTitle>Agregar Libros al Inventario</DialogTitle>
           <DialogDescription>
@@ -149,26 +146,26 @@ export function AddBookToInventoryModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+        <div className="add-book-inventory-modal">
+          <div className="add-book-inventory-modal__search-container">
+            <div className="add-book-inventory-modal__search">
+              <Search className="add-book-inventory-modal__search-icon" />
               <Input
                 placeholder="Buscar por título o ISBN..."
-                className="pl-8"
+                className="add-book-inventory-modal__search-input"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && refetchBooks()}
               />
             </div>
             <Button onClick={() => refetchBooks()} disabled={isFetchingBooks}>
-              {isFetchingBooks ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Buscar'}
+              {isFetchingBooks ? <Loader2 className="add-book-inventory-modal__spinner" /> : 'Buscar'}
             </Button>
           </div>
 
-          <div className="max-h-[300px] overflow-y-auto space-y-2 pr-1">
+          <div className="add-book-inventory-modal__results-list">
             {searchResults.length === 0 ? (
-              <p className="text-center text-sm text-muted-foreground py-8">
+              <p className="add-book-inventory-modal__empty">
                 {searchTerm ? 'No se encontraron resultados.' : 'Busca un libro para comenzar.'}
               </p>
             ) : (
@@ -177,40 +174,41 @@ export function AddBookToInventoryModal({
                 const hasImage = book.coverImage && !imageError[book._id];
 
                 return (
-                  <div key={book._id} className="flex items-center gap-3 p-2 border rounded-lg hover:bg-muted/50 transition-colors">
-                    <div className="relative w-10 h-14 bg-muted rounded overflow-hidden shrink-0">
+                  <div key={book._id} className="add-book-inventory-modal__book-card">
+                    <div className="add-book-inventory-modal__cover-wrapper">
                       {hasImage ? (
                         <Image
                           src={book.coverImage!.startsWith('http') ? book.coverImage! : `/uploads/covers/${book.coverImage}`}
                           alt={book.title}
                           fill
-                          className="object-cover"
+                          className="add-book-inventory-modal__cover-image"
                           onError={() => setImageError(prev => ({ ...prev, [book._id]: true }))}
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground">
+                        <div className="add-book-inventory-modal__cover-fallback">
                           -
                         </div>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate" title={book.title}>
+                    <div className="add-book-inventory-modal__book-info">
+                      <p className="add-book-inventory-modal__book-title" title={book.title}>
                         {book.title}
                       </p>
-                      <p className="text-xs text-muted-foreground">ISBN: {book.isbn}</p>
+                      <p className="add-book-inventory-modal__book-isbn">ISBN: {book.isbn}</p>
                     </div>
                     <Button
                       size="sm"
                       variant={isAlreadyIn ? "ghost" : "outline"}
                       disabled={isAlreadyIn || addingId === book._id}
                       onClick={() => handleAdd(book)}
+                      className="add-book-inventory-modal__action-btn"
                     >
                       {addingId === book._id ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="add-book-inventory-modal__spinner" />
                       ) : isAlreadyIn ? (
                         'Ya está'
                       ) : (
-                        <Plus className="w-4 h-4 mr-1" />
+                        <Plus className="add-book-inventory-modal__icon" />
                       )}
                       {!isAlreadyIn && addingId !== book._id && 'Agregar'}
                     </Button>

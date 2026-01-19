@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
           success: false,
           error: 'Token no proporcionado',
         },
-        { status: 401 }
+        { status: 200 }
       );
     }
 
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest) {
           success: false,
           error: 'Token inválido o expirado',
         },
-        { status: 401 }
+        { status: 200 }
       );
     }
 

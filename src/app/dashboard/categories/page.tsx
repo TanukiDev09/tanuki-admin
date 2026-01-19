@@ -1,17 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect, useCallback } from 'react';
+import { Button } from '@/components/ui/Button';
 import { Plus } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/Toast';
 import CategoriesTable from '@/components/finance/CategoriesTable';
 import CreateCategoryModal from '@/components/finance/CreateCategoryModal';
 import EditCategoryModal from '@/components/finance/EditCategoryModal';
 import { Category } from '@/types/category';
-import { Input } from '@/components/ui/input';
+import { Input } from '@/components/ui/Input';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
+import './categories-page.scss';
 
 export default function CategoriesPage() {
   const { toast } = useToast();
+  const { hasPermission } = usePermission();
+  const canCreate = hasPermission(ModuleName.CATEGORIES, PermissionAction.CREATE);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -20,7 +25,7 @@ export default function CategoriesPage() {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
-  const fetchCategories = async () => {
+  const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
       const res = await fetch('/api/finance/categories');
@@ -37,11 +42,11 @@ export default function CategoriesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [toast]);
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [fetchCategories]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('¿Estás seguro de que deseas eliminar esta categoría?')) {
@@ -77,26 +82,28 @@ export default function CategoriesPage() {
   );
 
   return (
-    <div className="p-8 space-y-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Categorías</h1>
-          <p className="text-muted-foreground">
+    <div className="categories-page">
+      <div className="categories-page__header">
+        <div className="categories-page__title-group">
+          <h1 className="categories-page__title">Categorías</h1>
+          <p className="categories-page__subtitle">
             Gestiona las categorías de ingresos y egresos.
           </p>
         </div>
-        <Button onClick={() => setCreateModalOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nueva Categoría
-        </Button>
+        {canCreate && (
+          <Button onClick={() => setCreateModalOpen(true)}>
+            <Plus className="categories-page__icon" />
+            Nueva Categoría
+          </Button>
+        )}
       </div>
 
-      <div className="flex items-center space-x-2">
+      <div className="categories-page__controls">
         <Input
           placeholder="Buscar categorías..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
+          className="categories-page__search"
         />
       </div>
 

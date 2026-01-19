@@ -48,11 +48,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        setUser(data.data);
-        // El token viene en la cookie HttpOnly, no lo exponemos al cliente
-        setToken('active');
+
+        if (data.success) {
+          setUser(data.data);
+          // El token viene en la cookie HttpOnly, no lo exponemos al cliente
+          setToken('active');
+        } else {
+          // Token válido pero respuesta indica error (ej: usuario null)
+          setUser(null);
+          setToken(null);
+        }
       } else {
-        // Token inválido o expirado
+        // Token inválido, expirado o error del servidor (401, 403, 500)
         setUser(null);
         setToken(null);
       }

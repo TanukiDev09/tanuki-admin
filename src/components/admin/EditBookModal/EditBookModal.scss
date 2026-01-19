@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.edit-book-modal {
+  display: flex;
+  flex-direction: column;
+  width: 95vw;
+  max-width: 800px;
+  max-height: 90vh;
+
+  &__tabs-container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__tabs {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__tabs-list {
+    display: flex;
+    width: 100%;
+  }
+
+  &__tabs-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: $spacing-md 0;
+
+    @include custom-scrollbar;
+
+    &[data-state='inactive'] {
+      display: none;
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    padding-right: $spacing-xs;
+  }
+
+  &__grid {
+    display: grid;
+    gap: $spacing-md;
+
+    &--2col {
+      @media (min-width: $breakpoint-md) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    &--3col {
+      @media (min-width: $breakpoint-md) {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__input-preview {
+    margin-top: 2px;
+    font-size: $font-size-xs;
+    color: hsl(var(--primary)); // Use a theme color
+    font-weight: 500;
+  }
+
+  &__hint {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__note {
+    padding: $spacing-md;
+    background-color: $muted;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+
+    strong {
+      color: $foreground;
+    }
+  }
+
+  &__error {
+    padding: $spacing-sm $spacing-md;
+    background-color: rgba($destructive, 0.1);
+    color: $destructive;
+    font-size: $font-size-sm;
+    border: 1px solid rgba($destructive, 0.3);
+    border-radius: $radius-md;
+  }
+
+  &__footer {
+    margin-top: $spacing-md;
+    padding-top: $spacing-md;
+    border-top: 1px solid $border;
+  }
+
+  &__submit-btn {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs; // gap-2
+  }
+
+  &__icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+  }
+
+  &__agreements {
+    padding-top: $spacing-sm;
+  }
+}

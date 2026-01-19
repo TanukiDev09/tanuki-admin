@@ -1,0 +1,90 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.category-detail {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  padding: $spacing-2xl;
+
+  &__loading,
+  &__error {
+    padding: $spacing-2xl;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  &__back-btn {
+    margin-bottom: $spacing-md;
+    padding-left: 0;
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__description {
+    margin-top: $spacing-xs;
+    color: $muted-foreground;
+  }
+
+  &__badges {
+    display: flex;
+    gap: $spacing-xs;
+  }
+
+  &__content {
+    @include card-base;
+
+    padding: $spacing-xl;
+  }
+
+  &__section-title {
+    margin-bottom: $spacing-md;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__empty {
+    color: $muted-foreground;
+  }
+
+  &__link {
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+      color: $primary;
+    }
+  }
+
+  &__amount {
+    font-weight: $font-weight-medium;
+
+    &--income {
+      color: $success;
+    }
+
+    &--expense {
+      color: $destructive;
+    }
+  }
+
+  &__icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: $spacing-xs;
+  }
+}

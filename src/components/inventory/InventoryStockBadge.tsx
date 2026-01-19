@@ -1,6 +1,6 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/Badge';
 
 interface InventoryStockBadgeProps {
   quantity: number;
@@ -13,8 +13,8 @@ export function InventoryStockBadge({ quantity, minStock }: InventoryStockBadgeP
   }
 
   if (minStock && quantity < minStock) {
-    return <Badge className="bg-yellow-500">Stock Bajo</Badge>;
+    return <Badge variant="warning">Stock Bajo</Badge>;
   }
 
-  return <Badge className="bg-green-500">Disponible</Badge>;
+  return <Badge variant="success">Disponible</Badge>;
 }

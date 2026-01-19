@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import {
   Form,
   FormControl,
@@ -13,18 +13,22 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/Form';
+import { Input } from '@/components/ui/Input';
+import { NumericInput } from '@/components/ui/Input/NumericInput';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/Select';
+import { useToast } from '@/components/ui/Toast';
 import { IPointOfSale } from '@/models/PointOfSale';
 import { Plus, Trash2 } from 'lucide-react';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
+import './PointOfSaleForm.scss';
 
 const formSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido'),
@@ -33,18 +37,25 @@ const formSchema = z.object({
   identificationNumber: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
-  phones: z.array(z.string()).optional(),
-  emails: z.array(z.string().email('Email inválido').or(z.literal(''))).optional(),
-  managers: z.array(z.string()).optional(),
+  phones: z.array(z.string()).default([]),
+  emails: z.array(z.string().email('Email inválido').or(z.literal(''))).default([]),
+  managers: z.array(z.string()).default([]),
   status: z.enum(['active', 'inactive']),
   type: z.enum(['physical', 'online', 'event']),
+  discountPercentage: z.coerce.number().min(0).max(100).default(0),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 interface PointOfSaleFormProps {
-  initialData?: Partial<IPointOfSale> & { _id?: string };
+  initialData?: Omit<Partial<IPointOfSale>, 'warehouseId' | 'createdAt' | 'updatedAt' | '_id'> & {
+    _id?: string;
+    warehouseId?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+  };
   onSuccess?: () => void;
+  readOnly?: boolean;
 }
 
 const normalizeArrayData = (data: Record<string, unknown> | undefined, fieldName: string, legacyField: string): string[] => {
@@ -59,7 +70,11 @@ const normalizeArrayData = (data: Record<string, unknown> | undefined, fieldName
   return [];
 };
 
-export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps) {
+export function PointOfSaleForm({ initialData, onSuccess, readOnly: propReadOnly }: PointOfSaleFormProps) {
+  const { hasPermission } = usePermission();
+  const canUpdate = hasPermission(ModuleName.POINTS_OF_SALE, PermissionAction.UPDATE);
+  const readOnly = propReadOnly ?? !canUpdate;
+
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -71,7 +86,8 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
   const defaultManagers = normalizeArrayData(initialData, 'managers', 'manager');
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(formSchema) as any,
     defaultValues: {
       name: initialData?.name || '',
       identificationType: (initialData?.identificationType as FormValues['identificationType']) || undefined,
@@ -83,6 +99,7 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
       managers: defaultManagers,
       status: (initialData?.status as 'active' | 'inactive') || 'active',
       type: (initialData?.type as 'physical' | 'online' | 'event') || 'physical',
+      discountPercentage: initialData?.discountPercentage || 0,
     },
   });
 
@@ -103,27 +120,28 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
         managers: managers,
         status: (initialData.status as 'active' | 'inactive') || 'active',
         type: (initialData.type as 'physical' | 'online' | 'event') || 'physical',
+        discountPercentage: initialData.discountPercentage || 0,
       });
     }
   }, [initialData, form]);
 
   const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
     control: form.control,
-    // @ts-expect-error - Hook form type inference issue with nested arrays in zod
     name: "phones",
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any);
 
   const { fields: emailFields, append: appendEmail, remove: removeEmail } = useFieldArray({
     control: form.control,
-    // @ts-expect-error - Hook form type inference issue with nested arrays in zod
     name: "emails",
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any);
 
   const { fields: managerFields, append: appendManager, remove: removeManager } = useFieldArray({
     control: form.control,
-    // @ts-expect-error - Hook form type inference issue with nested arrays in zod
     name: "managers",
-  });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } as any);
 
   const onSubmit = async (data: FormValues) => {
     try {
@@ -132,9 +150,9 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
       // Clean up empty array items
       const cleanData = {
         ...data,
-        phones: data.phones?.filter(p => p.trim() !== '') || [],
-        emails: data.emails?.filter(e => e.trim() !== '') || [],
-        managers: data.managers?.filter(m => m.trim() !== '') || [],
+        phones: data.phones.filter(p => p.trim() !== ''),
+        emails: data.emails.filter(e => e.trim() !== ''),
+        managers: data.managers.filter(m => m.trim() !== ''),
       };
 
       const url = initialData?._id
@@ -176,11 +194,15 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
     }
   };
 
+
+
+  // ... (imports remain)
+
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="pos-form">
         {/* Basic Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="pos-form__grid">
           <FormField
             control={form.control}
             name="name"
@@ -188,7 +210,7 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
               <FormItem>
                 <FormLabel>Nombre</FormLabel>
                 <FormControl>
-                  <Input placeholder="Tienda Principal" {...field} />
+                  <Input placeholder="Tienda Principal" {...field} disabled={loading || readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -206,6 +228,7 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  disabled={loading || readOnly}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -232,7 +255,7 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
               <FormItem>
                 <FormLabel>Número Identificación</FormLabel>
                 <FormControl>
-                  <Input placeholder="900123456" {...field} />
+                  <Input placeholder="900123456" {...field} disabled={loading || readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -248,6 +271,7 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  disabled={loading || readOnly}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -274,6 +298,7 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  disabled={loading || readOnly}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -297,7 +322,27 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
               <FormItem>
                 <FormLabel>Dirección</FormLabel>
                 <FormControl>
-                  <Input placeholder="Av. Siempre Viva 123" {...field} />
+                  <Input placeholder="Av. Siempre Viva 123" {...field} disabled={loading || readOnly} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="discountPercentage"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Porcentaje de Descuento (%)</FormLabel>
+                <FormControl>
+                  <NumericInput
+                    id="discountPercentage"
+                    placeholder="0"
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={loading || readOnly}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -311,7 +356,7 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
               <FormItem>
                 <FormLabel>Ciudad</FormLabel>
                 <FormControl>
-                  <Input placeholder="Bogotá" {...field} />
+                  <Input placeholder="Bogotá" {...field} disabled={loading || readOnly} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -320,137 +365,152 @@ export function PointOfSaleForm({ initialData, onSuccess }: PointOfSaleFormProps
         </div>
 
         {/* Arrays Section */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+        <div className="pos-form__arrays-grid">
 
           {/* Phones */}
-          <div className="space-y-2">
-            <FormLabel className="flex justify-between items-center">
+          {/* Phones */}
+          <div className="pos-form__array-column">
+            <FormLabel className="pos-form__array-header">
               Teléfonos
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendPhone("")}
-              >
-                <Plus className="h-3 w-3 mr-1" /> Agregar
-              </Button>
+              {!readOnly && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendPhone("")}
+                >
+                  <Plus className="pos-form__icon-sm pos-form__icon--mr" /> Agregar
+                </Button>
+              )}
             </FormLabel>
             {phoneFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
+              <div key={field.id} className="pos-form__array-row">
                 <FormField
                   control={form.control}
                   name={`phones.${index}`}
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem className="pos-form__array-input-wrapper">
                       <FormControl>
-                        <Input placeholder="Teléfono" {...field} />
+                        <Input placeholder="Teléfono" {...field} disabled={loading || readOnly} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="text-red-500"
-                  onClick={() => removePhone(index)}
-                  disabled={phoneFields.length === 1 && index === 0} // Keep at least one or allow empty? Let's allow empty if user removes all
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {!readOnly && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="pos-form__remove-btn"
+                    onClick={() => removePhone(index)}
+                    disabled={phoneFields.length === 1 && index === 0}
+                  >
+                    <Trash2 className="pos-form__icon-md" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>
 
           {/* Emails */}
-          <div className="space-y-2">
-            <FormLabel className="flex justify-between items-center">
+          <div className="pos-form__array-column">
+            <FormLabel className="pos-form__array-header">
               Correos
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendEmail("")}
-              >
-                <Plus className="h-3 w-3 mr-1" /> Agregar
-              </Button>
+              {!readOnly && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendEmail("")}
+                >
+                  <Plus className="pos-form__icon-sm pos-form__icon--mr" /> Agregar
+                </Button>
+              )}
             </FormLabel>
             {emailFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
+              <div key={field.id} className="pos-form__array-row">
                 <FormField
                   control={form.control}
                   name={`emails.${index}`}
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem className="pos-form__array-input-wrapper">
                       <FormControl>
-                        <Input placeholder="Email" {...field} />
+                        <Input placeholder="Email" {...field} disabled={loading || readOnly} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="text-red-500"
-                  onClick={() => removeEmail(index)}
-                  disabled={emailFields.length === 1 && index === 0}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {!readOnly && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="pos-form__remove-btn"
+                    onClick={() => removeEmail(index)}
+                    disabled={emailFields.length === 1 && index === 0}
+                  >
+                    <Trash2 className="pos-form__icon-md" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>
 
           {/* Managers */}
-          <div className="space-y-2">
-            <FormLabel className="flex justify-between items-center">
+          <div className="pos-form__array-column">
+            <FormLabel className="pos-form__array-header">
               Encargados
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendManager("")}
-              >
-                <Plus className="h-3 w-3 mr-1" /> Agregar
-              </Button>
+              {!readOnly && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => appendManager("")}
+                >
+                  <Plus className="pos-form__icon-sm pos-form__icon--mr" /> Agregar
+                </Button>
+              )}
             </FormLabel>
             {managerFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
+              <div key={field.id} className="pos-form__array-row">
                 <FormField
                   control={form.control}
                   name={`managers.${index}`}
                   render={({ field }) => (
-                    <FormItem className="flex-1">
+                    <FormItem className="pos-form__array-input-wrapper">
                       <FormControl>
-                        <Input placeholder="Nombre" {...field} />
+                        <Input placeholder="Nombre" {...field} disabled={loading || readOnly} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="text-red-500"
-                  onClick={() => removeManager(index)}
-                  disabled={managerFields.length === 1 && index === 0}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+                {!readOnly && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="pos-form__remove-btn"
+                    onClick={() => removeManager(index)}
+                    disabled={managerFields.length === 1 && index === 0}
+                  >
+                    <Trash2 className="pos-form__icon-md" />
+                  </Button>
+                )}
               </div>
             ))}
           </div>
 
         </div>
 
-        <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={loading}>
-            {loading ? 'Guardando...' : initialData ? 'Actualizar' : 'Crear'}
-          </Button>
+        <div className="pos-form__actions">
+          {!readOnly && (
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Guardando...' : initialData ? 'Actualizar' : 'Crear'}
+            </Button>
+          )}
         </div>
       </form>
     </Form>

@@ -1,0 +1,90 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.cost-center-select {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__select-wrapper {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__create-form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    margin-top: $spacing-sm;
+  }
+
+  &__form-field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__form-error {
+    padding: $spacing-sm $spacing-md;
+    background-color: rgba($destructive, 0.1);
+    color: $destructive;
+    font-size: $font-size-sm;
+    border: 1px solid rgba($destructive, 0.3);
+    border-radius: $radius-md;
+  }
+
+  &__spinner {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgb(white, 0.3);
+    border-top-color: white;
+    border-radius: $radius-full;
+    animation: spin 1s linear infinite;
+  }
+
+  &__add-item {
+    color: $primary !important;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba($primary, 0.05) !important;
+    }
+  }
+
+  &__add-content {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__add-icon {
+    width: $icon-sm;
+    height: $icon-sm;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.cost-center-select {
+  &__icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+  }
+
+  &__create-action-btn {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs; // gap-2
+  }
+}

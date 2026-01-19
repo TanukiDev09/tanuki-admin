@@ -1,0 +1,26 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+
+  &__container {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__main {
+    flex: 1;
+    overflow-y: auto;
+    background-color: $background;
+    padding: $spacing-md;
+
+    @include lg {
+      padding: $spacing-xl;
+    }
+  }
+}

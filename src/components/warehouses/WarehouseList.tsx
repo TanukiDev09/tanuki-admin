@@ -1,7 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import './WarehouseList.scss';
 import { useRouter } from 'next/navigation';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import {
   Table,
   TableBody,
@@ -9,12 +12,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/Table';
+import { Button } from '@/components/ui/Button';
 import { WarehouseStatusBadge } from './WarehouseStatusBadge';
 import { WarehouseTypeBadge } from './WarehouseTypeBadge';
 import { Trash2, Eye, Link as LinkIcon } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/Toast';
 import Link from 'next/link';
 import {
   Dialog,
@@ -23,7 +26,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui/Dialog';
 
 interface Warehouse {
   _id: string;
@@ -47,8 +50,12 @@ interface WarehouseListProps {
 export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
   const router = useRouter();
   const { toast } = useToast();
+
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string } | null>(null);
+  const { hasPermission } = usePermission();
+  const canDelete = hasPermission(ModuleName.WAREHOUSES, PermissionAction.DELETE);
+  const canUpdate = hasPermission(ModuleName.WAREHOUSES, PermissionAction.UPDATE);
 
   const confirmDelete = async () => {
     if (!itemToDelete) return;
@@ -85,7 +92,7 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="warehouse-list">
         <Table>
           <TableHeader>
             <TableRow>
@@ -95,20 +102,20 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
               <TableHead>Punto de Venta</TableHead>
               <TableHead>Ciudad</TableHead>
               <TableHead>Estado</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+              <TableHead className="warehouse-list__header-cell--right">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center h-24">
+                <TableCell colSpan={7} className="warehouse-list__empty">
                   No hay bodegas registradas.
                 </TableCell>
               </TableRow>
             ) : (
               data.map((warehouse) => (
                 <TableRow key={warehouse._id}>
-                  <TableCell className="font-medium">
+                  <TableCell className="warehouse-list__code">
                     {warehouse.code}
                   </TableCell>
                   <TableCell>{warehouse.name}</TableCell>
@@ -119,48 +126,50 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
                     {warehouse.pointOfSaleId ? (
                       <Link
                         href={`/dashboard/points-of-sale/${warehouse.pointOfSaleId._id}`}
-                        className="text-blue-600 hover:underline"
+                        className="warehouse-list__link"
                       >
                         {warehouse.pointOfSaleId.name}
                       </Link>
                     ) : (
-                      <span className="text-muted-foreground">Sin asociar</span>
+                      <span className="warehouse-list__link--placeholder">Sin asociar</span>
                     )}
                   </TableCell>
                   <TableCell>
                     {warehouse.city || (
-                      <span className="text-muted-foreground">-</span>
+                      <span className="warehouse-list__link--placeholder">-</span>
                     )}
                   </TableCell>
                   <TableCell>
                     <WarehouseStatusBadge status={warehouse.status} />
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+                  <TableCell className="warehouse-list__cell--right">
+                    <div className="warehouse-list__actions">
                       <Button variant="ghost" size="icon" asChild>
                         <Link href={`/dashboard/warehouses/${warehouse._id}`}>
-                          <Eye className="w-4 h-4" />
+                          <Eye className="warehouse-list__icon" />
                         </Link>
                       </Button>
-                      {onAssociateClick && (
+                      {onAssociateClick && canUpdate && (
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => onAssociateClick(warehouse._id)}
                           title="Asociar punto de venta"
                         >
-                          <LinkIcon className="w-4 h-4" />
+                          <LinkIcon className="warehouse-list__icon" />
                         </Button>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                        onClick={() => setItemToDelete({ id: warehouse._id, name: warehouse.name })}
-                        disabled={deletingId === warehouse._id}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {canDelete && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="warehouse-list__action-btn--delete"
+                          onClick={() => setItemToDelete({ id: warehouse._id, name: warehouse.name })}
+                          disabled={deletingId === warehouse._id}
+                        >
+                          <Trash2 className="warehouse-list__icon" />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

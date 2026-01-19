@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '@/components/ui/dialog';
+} from '@/components/ui/Dialog';
 import {
   Form,
   FormControl,
@@ -19,10 +19,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Checkbox } from '@/components/ui/checkbox';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/Form';
+import { useToast } from '@/components/ui/Toast';
 import { CreateCreatorDTO, CreatorResponse } from '@/types/creator';
+
+import './CreatorForm.scss';
 
 interface CreatorFormProps {
   open: boolean;
@@ -99,6 +100,7 @@ export function CreatorForm({
       onSuccess();
       onOpenChange(false);
     } catch (error) {
+      console.error(error);
       toast({
         title: 'Error',
         description: 'Hubo un error al guardar el creador',
@@ -111,7 +113,7 @@ export function CreatorForm({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="creator-form__dialog-content">
         <DialogHeader>
           <DialogTitle>
             {creatorToEdit ? 'Editar Creador' : 'Nuevo Creador'}
@@ -119,7 +121,7 @@ export function CreatorForm({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="creator-form__form">
             <FormField
               control={form.control}
               name="name"
@@ -157,7 +159,7 @@ export function CreatorForm({
                   <FormControl>
                     <Textarea
                       placeholder="Breve biografía..."
-                      className="resize-none"
+                      className="creator-form__textarea"
                       {...field}
                     />
                   </FormControl>

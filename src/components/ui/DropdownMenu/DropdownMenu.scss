@@ -1,0 +1,137 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// DROPDOWN MENU COMPONENT (MOBILE-FIRST)
+// ============================================
+
+// --- ANIMACIONES ---
+@keyframes dropdown-show {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.dropdown {
+  &__content,
+  &__sub-content {
+    z-index: 50;
+    min-width: 128px; // min-w-[8rem]
+    padding: 4px;
+    background-color: $popover;
+    color: $popover-foreground;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    overflow: hidden;
+    box-shadow: $shadow-md;
+
+    &[data-state='open'] {
+      animation: dropdown-show 150ms ease-out;
+    }
+
+    &[data-side='bottom'] {
+      transform: translateY(4px);
+    }
+
+    &[data-side='top'] {
+      transform: translateY(-4px);
+    }
+
+    &[data-side='left'] {
+      transform: translateX(-4px);
+    }
+
+    &[data-side='right'] {
+      transform: translateX(4px);
+    }
+  }
+
+  &__item,
+  &__sub-trigger,
+  &__checkbox-item,
+  &__radio-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 6px $spacing-md;
+    font-size: $font-size-sm;
+    border-radius: $radius-sm;
+    cursor: default;
+    user-select: none;
+    outline: none;
+
+    @include transition(background-color, color);
+
+    &:focus,
+    &[data-state='open'] {
+      background-color: $accent;
+      color: $accent-foreground;
+    }
+
+    &--inset {
+      padding-left: 32px; // pl-8
+    }
+
+    &[data-disabled] {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+  }
+
+  &__sub-trigger-icon {
+    width: 16px;
+    height: 16px;
+    margin-left: auto;
+  }
+
+  &__indicator-container {
+    position: absolute;
+    left: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 14px;
+    height: 14px;
+  }
+
+  &__indicator-icon {
+    width: 16px;
+    height: 16px;
+
+    &--radio {
+      width: 8px;
+      height: 8px;
+      fill: currentcolor;
+    }
+  }
+
+  &__label {
+    padding: 6px $spacing-md;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+
+    &--inset {
+      padding-left: 32px;
+    }
+  }
+
+  &__separator {
+    height: 1px;
+    margin: 4px -4px;
+    background-color: $muted;
+  }
+
+  &__shortcut {
+    margin-left: auto;
+    font-size: $font-size-xs;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+  }
+}

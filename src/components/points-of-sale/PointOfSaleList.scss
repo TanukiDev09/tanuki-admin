@@ -1,0 +1,83 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+@use 'sass:color';
+
+.pos-list {
+  &__container {
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    overflow: hidden;
+  }
+
+  &__empty-cell {
+    height: 6rem; // h-24
+    text-align: center;
+  }
+
+  &__code-cell {
+    font-weight: $font-weight-medium;
+  }
+
+  &__identification {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__type-cell {
+    text-transform: capitalize;
+  }
+
+  &__actions-cell {
+    text-align: right;
+  }
+
+  &__actions-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-xs; // gap-2
+  }
+
+  &__icon {
+    width: 1rem; // w-4 h-4
+    height: 1rem;
+  }
+
+  &__delete-btn {
+    color: $destructive; // text-red-500
+
+    &:hover {
+      background-color: rgba($destructive, 0.1); // hover:bg-red-50
+      color: color.adjust($destructive, $lightness: -10%); // hover:text-red-600
+    }
+  }
+
+  &__empty-text {
+    color: $muted-foreground;
+  }
+
+  &__expand-trigger {
+    text-decoration: underline;
+    cursor: pointer;
+    text-decoration-style: dotted;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+
+  &__expand-count {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__popover-content {
+    width: auto;
+    padding: $spacing-md; // p-3
+  }
+
+  &__popover-list {
+    list-style-type: disc;
+    padding-left: $spacing-md; // pl-4
+    font-size: $font-size-sm;
+  }
+}

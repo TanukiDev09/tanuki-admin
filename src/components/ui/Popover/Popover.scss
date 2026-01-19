@@ -1,0 +1,58 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// POPOVER COMPONENT (MOBILE-FIRST)
+// ============================================
+
+// --- ANIMACIONES ---
+@keyframes popover-show {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.popover {
+  &__content {
+    z-index: 50;
+    width: 288px; // w-72
+    padding: $spacing-md;
+    background-color: $popover;
+    color: $popover-foreground;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    box-shadow: $shadow-md;
+    outline: none;
+
+    &[data-state='open'] {
+      animation: popover-show 150ms ease-out;
+    }
+
+    &[data-side='bottom'] {
+      transform: translateY(4px);
+    }
+
+    &[data-side='top'] {
+      transform: translateY(-4px);
+    }
+
+    &[data-side='left'] {
+      transform: translateX(-4px);
+    }
+
+    &[data-side='right'] {
+      transform: translateX(4px);
+    }
+
+    // En móviles muy pequeños, ajustar el ancho
+    @media (width <= 320px) {
+      width: 260px;
+    }
+  }
+}

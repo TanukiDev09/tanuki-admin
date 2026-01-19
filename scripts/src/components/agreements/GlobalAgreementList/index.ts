@@ -1,0 +1,1 @@
+export { GlobalAgreementList } from './GlobalAgreementList';

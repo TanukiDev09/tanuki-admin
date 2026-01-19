@@ -1,0 +1,133 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// CHECKBOX COMPONENT (MOBILE-FIRST)
+// Notación BEM
+// ============================================
+
+.checkbox {
+  width: 16px;
+
+  // Estilos base (móvil)
+  // peer permite que otros elementos reaccionen a su estado
+  height: 16px;
+  background: $background;
+  border: 1px solid $primary;
+  border-radius: $radius-sm;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  @include transition(background-color, border-color, box-shadow);
+
+  &:focus-visible {
+    outline: none;
+
+    @include focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  // Estado checked
+  &[data-state='checked'] {
+    background: $primary;
+    color: $primary-foreground;
+    border-color: $primary;
+  }
+
+  &[data-state='indeterminate'] {
+    background: $primary;
+    color: $primary-foreground;
+    border-color: $primary;
+  }
+
+  // --- ELEMENTOS ---
+
+  &__indicator {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: currentcolor;
+  }
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  // --- VARIANTES ---
+
+  &--success {
+    border-color: $success;
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background: $success;
+      border-color: $success;
+    }
+  }
+
+  &--danger {
+    border-color: $danger;
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background: $danger;
+      border-color: $danger;
+    }
+  }
+
+  &--info {
+    border-color: $info;
+
+    &[data-state='checked'],
+    &[data-state='indeterminate'] {
+      background: $info;
+      border-color: $info;
+    }
+  }
+
+  // --- TAMAÑOS ---
+
+  &--sm {
+    width: 14px;
+    height: 14px;
+
+    .checkbox__icon {
+      width: 12px;
+      height: 12px;
+    }
+  }
+
+  &--lg {
+    width: 20px;
+    height: 20px;
+
+    .checkbox__icon {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  // --- RESPONSIVE (MOBILE-FIRST) ---
+
+  @include respond-to('md') {
+    width: 18px;
+
+    // En tablets, podríamos aumentar ligeramente el tamaño para mejor UX
+    height: 18px;
+
+    &__icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+// Clase peer para que otros elementos puedan reaccionar al checkbox
+.peer {
+  // Esta clase se usa en el HTML para identificar el checkbox
+}

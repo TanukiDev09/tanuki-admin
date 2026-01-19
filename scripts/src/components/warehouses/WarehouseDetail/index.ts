@@ -1,0 +1,1 @@
+export { WarehouseDetail } from './WarehouseDetail';

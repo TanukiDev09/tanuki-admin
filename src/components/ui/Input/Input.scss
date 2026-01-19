@@ -1,0 +1,75 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// INPUT COMPONENT (MOBILE-FIRST)
+// Notación BEM
+// ============================================
+
+.input {
+  // Estilos base (móvil)
+  display: flex;
+  width: 100%;
+  height: 40px;
+  padding: $spacing-sm 12px;
+  background: $background;
+  color: $foreground;
+  font-family: $font-sans;
+  font-size: $font-size-sm;
+  border: 1px solid $input;
+  border-radius: $radius-md;
+
+  @include transition(border-color, box-shadow);
+
+  &::placeholder {
+    color: $muted-foreground;
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    @include focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  // File input specific styles
+  &[type='file'] {
+    &::file-selector-button {
+      margin-right: $spacing-sm;
+      background: transparent;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      border: 0;
+      cursor: pointer;
+    }
+  }
+
+  // --- VARIANTES ---
+
+  &--error {
+    border-color: $danger;
+
+    &:focus-visible {
+      outline-color: $danger;
+    }
+  }
+
+  &--success {
+    border-color: $success;
+
+    &:focus-visible {
+      outline-color: $success;
+    }
+  }
+
+  // --- RESPONSIVE (MOBILE-FIRST) ---
+
+  @include respond-to('md') {
+    // Ajustes para tablet y superior si son necesarios
+    height: 44px;
+  }
+}

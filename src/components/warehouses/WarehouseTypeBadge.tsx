@@ -1,7 +1,7 @@
-'use client';
 
-import { Badge } from '@/components/ui/badge';
+import { Badge } from '@/components/ui/Badge';
 import { Building2, Package, Warehouse } from 'lucide-react';
+import './WarehouseTypeBadge.scss';
 
 interface WarehouseTypeBadgeProps {
   type: 'editorial' | 'pos' | 'general';
@@ -10,8 +10,8 @@ interface WarehouseTypeBadgeProps {
 export function WarehouseTypeBadge({ type }: WarehouseTypeBadgeProps) {
   if (type === 'editorial') {
     return (
-      <Badge className="bg-purple-500 flex gap-1 items-center w-fit">
-        <Building2 className="w-3 h-3" />
+      <Badge className="warehouse-type-badge warehouse-type-badge--editorial">
+        <Building2 />
         Editorial
       </Badge>
     );
@@ -19,16 +19,16 @@ export function WarehouseTypeBadge({ type }: WarehouseTypeBadgeProps) {
 
   if (type === 'pos') {
     return (
-      <Badge className="bg-blue-500 flex gap-1 items-center w-fit">
-        <Package className="w-3 h-3" />
+      <Badge className="warehouse-type-badge warehouse-type-badge--pos">
+        <Package />
         Punto de Venta
       </Badge>
     );
   }
 
   return (
-    <Badge variant="outline" className="flex gap-1 items-center w-fit">
-      <Warehouse className="w-3 h-3" />
+    <Badge variant="outline" className="warehouse-type-badge warehouse-type-badge--general">
+      <Warehouse />
       General
     </Badge>
   );

@@ -1,0 +1,126 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.global-agreement-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__search {
+    position: relative;
+    width: 100%;
+    max-width: 300px;
+
+    &-icon {
+      position: absolute;
+      top: 50%;
+      left: $spacing-sm;
+      width: $icon-xs;
+      height: $icon-xs;
+      color: $muted-foreground;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    &-input {
+      padding-left: $spacing-xl !important;
+    }
+  }
+
+  &__table-container {
+    @include card-base;
+
+    overflow-x: auto;
+
+    @include custom-scrollbar;
+  }
+
+  &__link {
+    color: inherit;
+    text-decoration: none;
+
+    @include transition(color);
+
+    &:hover {
+      color: $primary;
+      text-decoration: underline;
+    }
+  }
+
+  &__status {
+    &--active {
+      background-color: $success;
+      color: $success-foreground;
+    }
+  }
+
+  &__public-domain {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    background-color: hsl(210deg 100% 96%); // light blue
+    color: hsl(210deg 100% 40%);
+    border-color: hsl(210deg 100% 90%);
+  }
+
+  &__pdf-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: $info;
+    font-size: $font-size-sm;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__action-icon {
+    width: $icon-xs;
+    height: $icon-xs;
+    margin-right: $spacing-xs;
+  }
+
+  &__text-right {
+    text-align: right;
+  }
+
+  &__text-center {
+    text-align: center;
+  }
+
+  &__loading-cell {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    text-align: center;
+  }
+
+  &__book-title {
+    font-weight: $font-weight-medium;
+  }
+
+  &__text-muted {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+    margin-right: 0.25rem; // mr-1
+
+    &--small {
+      display: inline;
+      width: 0.75rem; // w-3
+      height: 0.75rem; // h-3
+      margin-right: 0.25rem;
+    }
+  }
+}

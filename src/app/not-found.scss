@@ -1,0 +1,23 @@
+@use '../styles/variables' as *;
+@use '../styles/mixins' as *;
+
+.not-found {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: $background;
+  color: $foreground;
+
+  &__title {
+    margin-bottom: $spacing-md; // mb-4
+    font-size: $font-size-4xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__description {
+    margin-bottom: $spacing-2xl; // mb-8
+    color: $muted-foreground;
+  }
+}

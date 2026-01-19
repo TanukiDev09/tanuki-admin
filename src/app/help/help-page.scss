@@ -1,0 +1,87 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.help-page {
+  @include container-base;
+  padding: $spacing-xl $spacing-md;
+  max-width: 800px;
+  margin: 0 auto;
+
+  &__header {
+    margin-bottom: $spacing-xl;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-xs;
+    font-family: $font-serif;
+  }
+
+  &__subtitle {
+    color: $muted-foreground;
+  }
+
+  &__glossary {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__term-card {
+    @include card-base;
+    padding: $spacing-lg;
+  }
+
+  &__term-title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-xs;
+    color: $primary;
+    font-family: $font-serif;
+  }
+
+  &__term-definition {
+    color: $muted-foreground;
+    line-height: $line-height-relaxed;
+  }
+
+  &__support-card {
+    @include card-base;
+    padding: $spacing-lg;
+    margin-top: $spacing-2xl;
+    background-color: rgba($info, 0.05);
+    border-color: rgba($info, 0.2);
+  }
+
+  &__support-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-xs;
+    color: $info;
+  }
+
+  &__support-text {
+    font-size: $font-size-sm;
+    color: $muted-foreground;
+  }
+}
+
+.help-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+
+  &__main-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__content {
+    flex: 1;
+    overflow-y: auto;
+    background-color: $background;
+  }
+}

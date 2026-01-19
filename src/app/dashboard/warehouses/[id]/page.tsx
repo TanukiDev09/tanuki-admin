@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/Button';
+import { Separator } from '@/components/ui/Separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
 import { WarehouseForm } from '@/components/warehouses/WarehouseForm';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import dynamic from 'next/dynamic';
@@ -19,6 +19,9 @@ const InventoryAdjustModal = dynamic(() => import('@/components/inventory/Invent
 
 import { Package, MapPin, Building2, ArrowLeft, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
+import './warehouse-detail.scss';
 
 interface WarehouseData {
   _id: string;
@@ -60,6 +63,11 @@ export default function WarehouseDetailPage() {
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
 
+  const { hasPermission } = usePermission();
+  const canUpdateWarehouse = hasPermission(ModuleName.WAREHOUSES, PermissionAction.UPDATE);
+  const canCreateInventory = hasPermission(ModuleName.INVENTORY, PermissionAction.CREATE);
+  const canUpdateInventory = hasPermission(ModuleName.INVENTORY, PermissionAction.UPDATE);
+
   const handleAdjustStock = (item: InventoryItem) => {
     setSelectedItem(item);
     setAdjustModalOpen(true);
@@ -94,64 +102,68 @@ export default function WarehouseDetailPage() {
 
 
 
-  if (loading) return <div className="p-8">Cargando...</div>;
-  if (!warehouse) return <div className="p-8">Bodega no encontrada</div>;
+  if (loading) return <div className="warehouse-detail__loading">Cargando...</div>;
+  if (!warehouse) return <div className="warehouse-detail__error">Bodega no encontrada</div>;
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Button variant="outline" size="default" className="gap-2" asChild>
-            <Link href="/dashboard/warehouses">
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Volver</span>
+    <div className="warehouse-detail">
+      <div className="warehouse-detail__header">
+        <div className="warehouse-detail__header-left">
+          <Button variant="outline" size="default" className="warehouse-detail__back-btn" asChild>
+            <Link href="/dashboard/warehouses" className="warehouse-detail__back-link">
+              <ArrowLeft className="warehouse-detail__icon" />
+              <span className="warehouse-detail__back-text">Volver</span>
             </Link>
           </Button>
-          <div>
-            <div className="flex flex-wrap items-center gap-2">
-              <h2 className="text-2xl font-bold tracking-tight">{warehouse.name}</h2>
+          <div className="warehouse-detail__title-group">
+            <div className="warehouse-detail__title-row">
+              <h2 className="warehouse-detail__title">{warehouse.name}</h2>
               <WarehouseTypeBadge type={warehouse.type} />
               <WarehouseStatusBadge status={warehouse.status} />
             </div>
-            <p className="text-muted-foreground">Código: {warehouse.code}</p>
+            <p className="warehouse-detail__code">Código: {warehouse.code}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setMovementModalOpen(true)}>
-            Registrar Movimiento
-          </Button>
-          <Button onClick={() => setAddBookModalOpen(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Agregar Libro
-          </Button>
+        <div className="warehouse-detail__header-actions">
+          {canCreateInventory && (
+            <Button variant="outline" onClick={() => setMovementModalOpen(true)}>
+              Registrar Movimiento
+            </Button>
+          )}
+          {canUpdateInventory && (
+            <Button onClick={() => setAddBookModalOpen(true)}>
+              <Plus className="warehouse-detail__icon" /> Agregar Libro
+            </Button>
+          )}
         </div>
       </div>
 
       <Separator />
 
-      <Tabs defaultValue="inventory" className="space-y-4">
+      <Tabs defaultValue="inventory" className="warehouse-detail__tabs">
         <TabsList>
           <TabsTrigger value="inventory">Inventario Actual</TabsTrigger>
           <TabsTrigger value="info">Información General</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="inventory" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <TabsContent value="inventory" className="warehouse-detail__section">
+          <div className="warehouse-detail__stats-grid">
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Productos</CardTitle>
-                <Package className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="warehouse-detail__stat-header">
+                <CardTitle className="warehouse-detail__stat-title">Total Productos</CardTitle>
+                <Package className="warehouse-detail__stat-icon" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{inventory.length}</div>
+                <div className="warehouse-detail__stat-value">{inventory.length}</div>
               </CardContent>
             </Card>
             <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Unidades Totales</CardTitle>
-                <Building2 className="h-4 w-4 text-muted-foreground" />
+              <CardHeader className="warehouse-detail__stat-header">
+                <CardTitle className="warehouse-detail__stat-title">Unidades Totales</CardTitle>
+                <Building2 className="warehouse-detail__stat-icon" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="warehouse-detail__stat-value">
                   {inventory.reduce((acc, curr) => acc + curr.quantity, 0)}
                 </div>
               </CardContent>
@@ -174,38 +186,45 @@ export default function WarehouseDetailPage() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="info" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
+        <TabsContent value="info" className="warehouse-detail__section">
+          <div className="warehouse-detail__info-grid">
+            <Card className="warehouse-detail__main-info-card">
               <CardHeader>
                 <CardTitle>Detalles de la Bodega</CardTitle>
               </CardHeader>
               <CardContent>
-                <WarehouseForm mode="edit" initialData={warehouse as any} />
+                <WarehouseForm
+                  mode="edit"
+                  initialData={{
+                    ...warehouse,
+                    pointOfSaleId: warehouse.pointOfSaleId?._id
+                  }}
+                  readOnly={!canUpdateWarehouse}
+                />
               </CardContent>
             </Card>
 
-            <div className="col-span-3 space-y-4">
+            <div className="warehouse-detail__sidebar">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-md">Ubicación y Contacto</CardTitle>
+                  <CardTitle className="warehouse-detail__card-title-sm">Ubicación y Contacto</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4 underline-offset-4">
-                  <div className="flex items-start gap-2">
-                    <MapPin className="w-5 h-5 text-muted-foreground mt-0.5" />
+                <CardContent className="warehouse-detail__location-content">
+                  <div className="warehouse-detail__location-item">
+                    <MapPin className="warehouse-detail__icon" />
                     <div>
-                      <p className="font-medium">{warehouse.city || 'Sin ciudad registrada'}</p>
-                      <p className="text-sm text-muted-foreground">{warehouse.address || 'Sin dirección registrada'}</p>
+                      <p className="warehouse-detail__location-city">{warehouse.city || 'Sin ciudad registrada'}</p>
+                      <p className="warehouse-detail__location-address">{warehouse.address || 'Sin dirección registrada'}</p>
                     </div>
                   </div>
                   {warehouse.pointOfSaleId && (
-                    <div className="flex items-start gap-2 pt-2 border-t">
-                      <Building2 className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div className="warehouse-detail__pos-section">
+                      <Building2 className="warehouse-detail__icon" />
                       <div>
-                        <p className="text-sm text-muted-foreground">Punto de Venta Asociado:</p>
+                        <p className="warehouse-detail__pos-label">Punto de Venta Asociado:</p>
                         <Link
                           href={`/dashboard/points-of-sale/${warehouse.pointOfSaleId._id}`}
-                          className="font-medium text-blue-600 hover:underline"
+                          className="warehouse-detail__pos-link"
                         >
                           {warehouse.pointOfSaleId.name} ({warehouse.pointOfSaleId.code})
                         </Link>
@@ -218,10 +237,10 @@ export default function WarehouseDetailPage() {
               {warehouse.description && (
                 <Card>
                   <CardHeader>
-                    <CardTitle className="text-md">Descripción</CardTitle>
+                    <CardTitle className="warehouse-detail__card-title-sm">Descripción</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm">{warehouse.description}</p>
+                    <p className="warehouse-detail__description-text">{warehouse.description}</p>
                   </CardContent>
                 </Card>
               )}
@@ -229,8 +248,6 @@ export default function WarehouseDetailPage() {
           </div>
         </TabsContent>
       </Tabs>
-
-
 
       <AddBookToInventoryModal
         isOpen={addBookModalOpen}

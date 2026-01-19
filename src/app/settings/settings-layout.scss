@@ -1,0 +1,21 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.settings-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+
+  &__content {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__main {
+    flex: 1;
+    overflow-y: auto;
+    background-color: $background;
+  }
+}

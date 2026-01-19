@@ -1,0 +1,59 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.cost-centers-table {
+  @include card-base;
+  padding: 0;
+  overflow: hidden;
+
+  &__loading,
+  &__empty {
+    padding: $spacing-xl;
+    text-align: center;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    background: $card;
+    border-radius: $radius-lg;
+    border: 1px solid rgba($border, 0.4);
+  }
+
+  &__code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-weight: $font-weight-medium;
+    color: $primary;
+  }
+
+  &__name {
+    font-weight: $font-weight-medium;
+    color: $foreground;
+  }
+
+  &__actions-head {
+    text-align: right;
+    width: 120px;
+  }
+
+  &__actions-cell {
+    text-align: right;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-xs;
+  }
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  &__delete-btn {
+    color: $destructive;
+
+    &:hover {
+      background-color: rgba($destructive, 0.1);
+      color: $destructive;
+    }
+  }
+}

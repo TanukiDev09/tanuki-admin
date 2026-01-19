@@ -1,9 +1,18 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Warehouse from '@/models/Warehouse';
 import PointOfSale from '@/models/PointOfSale';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.WAREHOUSES,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
@@ -76,7 +85,14 @@ const generateWarehouseCode = async () => {
   return `BOD-${String(nextNumber).padStart(3, '0')}`;
 };
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.WAREHOUSES,
+    PermissionAction.CREATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const body = await request.json();

@@ -1,11 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import Movement from '@/models/Movement';
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   props: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.FINANCE,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   await dbConnect();
   const params = await props.params;
   try {
@@ -25,7 +34,13 @@ export async function GET(
     const formattedMovement = {
       ...movement,
       type: normalizedType,
-      amount: parseFloat(movement.amount.toString()),
+      amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
+      quantity: movement.quantity
+        ? parseFloat(movement.quantity.toString())
+        : undefined,
+      unitValue: movement.unitValue
+        ? parseFloat(movement.unitValue.toString())
+        : undefined,
       _id: movement._id.toString(),
     };
 
@@ -105,9 +120,16 @@ const calculateFinancials = (body: MovementBody) => {
 };
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   props: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.FINANCE,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   await dbConnect();
   const params = await props.params;
 
@@ -132,7 +154,7 @@ export async function PUT(
 
     const formattedMovement = {
       ...movement.toObject(),
-      amount: parseFloat(movement.amount.toString()),
+      amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
       unit: movement.unit,
       quantity: movement.quantity
         ? parseFloat(movement.quantity.toString())
@@ -169,9 +191,16 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   props: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.FINANCE,
+    PermissionAction.DELETE
+  );
+  if (permissionError) return permissionError;
+
   await dbConnect();
   const params = await props.params;
   try {

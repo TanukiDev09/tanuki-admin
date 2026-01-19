@@ -1,0 +1,1 @@
+export { InventoryList } from './InventoryList';

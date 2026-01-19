@@ -1,0 +1,43 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.runway-projection-chart {
+  @include card-base;
+
+  background: transparent;
+  border: none;
+  box-shadow: none;
+
+  &__header {
+    padding: 0 0 $spacing-sm;
+  }
+
+  &__title {
+    color: $foreground;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__subtitle {
+    margin-top: $spacing-xs;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__content {
+    padding: 0;
+  }
+
+  &__empty {
+    @include flex-center;
+
+    height: 280px;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__chart-container {
+    width: 100%;
+    height: 280px;
+  }
+}

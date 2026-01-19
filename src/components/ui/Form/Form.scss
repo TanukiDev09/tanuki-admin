@@ -1,0 +1,24 @@
+@use '@/styles/variables' as *;
+
+.form-item {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md; // Increased gap for better spacing
+}
+
+.form-label {
+  &--error {
+    color: hsl(var(--destructive)); // text-destructive
+  }
+}
+
+.form-description {
+  font-size: $font-size-sm; // text-sm
+  color: hsl(var(--muted-foreground)); // text-muted-foreground
+}
+
+.form-message {
+  font-size: $font-size-sm; // text-sm
+  font-weight: $font-weight-medium; // font-medium
+  color: hsl(var(--destructive)); // text-destructive
+}

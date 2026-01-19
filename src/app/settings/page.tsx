@@ -1,13 +1,14 @@
+import './settings.scss';
 
 export default function ConfiguracionPage() {
   return (
-    <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
-      <h1 className="text-2xl font-bold mb-6 font-serif">Configuración</h1>
-      <div className="card p-12 text-center">
-        <p className="text-lg text-muted-foreground mb-2">
+    <div className="settings-page">
+      <h1 className="settings-page__title">Configuración</h1>
+      <div className="settings-page__content">
+        <p className="settings-page__text-lg">
           Configuración del sistema - Por implementar
         </p>
-        <p className="text-sm text-muted-foreground">
+        <p className="settings-page__text-sm">
           (Planificado para fase posterior al MVP)
         </p>
       </div>

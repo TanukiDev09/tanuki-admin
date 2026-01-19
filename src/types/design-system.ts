@@ -157,6 +157,15 @@ export interface ChartContainerProps {
   className?: string;
 }
 
+export interface MovementItemProps {
+  icon: React.ReactNode;
+  iconVariant: IconCircleVariant;
+  title: string;
+  description: string;
+  amount: string;
+  className?: string;
+}
+
 // ============================================
 // UTILITY FUNCTIONS
 // ============================================

@@ -1,0 +1,164 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// NAV LINKS COMPONENT (MOBILE-FIRST)
+// ============================================
+
+.nav-links {
+  // --- MOBILE BOTTOM NAV ---
+  &--mobile {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0;
+    padding: $spacing-sm $spacing-xs;
+    background-color: $background;
+  }
+
+  &__mobile-item {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: $spacing-sm 4px;
+    color: $muted-foreground;
+    text-align: center;
+    text-decoration: none;
+    border-radius: $radius-md;
+
+    @include transition(colors);
+
+    &:hover {
+      color: $foreground;
+    }
+
+    &--active {
+      color: $primary;
+
+      .nav-links__mobile-icon {
+        stroke-width: 2.5;
+      }
+    }
+  }
+
+  &__mobile-icon {
+    width: 20px;
+    height: 20px;
+    margin: 0 auto;
+  }
+
+  &__mobile-label {
+    display: block;
+    font-size: 10px;
+    font-weight: $font-weight-medium;
+    line-height: 1;
+  }
+
+  // --- VERTICAL (SIDEBAR) NAV ---
+  &--vertical {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-md;
+    color: rgba($foreground, 0.7);
+    text-decoration: none;
+    border-radius: $radius-md;
+
+    @include transition(all);
+
+    &:hover {
+      background-color: rgba($muted, 0.5);
+      color: $foreground;
+    }
+
+    &--active {
+      background-color: rgba($primary, 0.05);
+      color: rgba($primary, 0.9);
+      font-weight: $font-weight-medium;
+    }
+
+    // Sidebar collapsed styles
+    .nav-links--collapsed & {
+      justify-content: center;
+      padding: $spacing-sm;
+
+      .nav-links__icon {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  &__label {
+    font-size: $font-size-sm;
+
+    @include text-truncate;
+  }
+
+  // --- HORIZONTAL NAV ---
+  &--horizontal {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    .nav-links__item {
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+
+      &--active {
+        border-bottom-color: $primary;
+      }
+    }
+  }
+
+  // --- DROPDOWN NAV ---
+  &__dropdown {
+    width: 192px; // w-48
+    margin-bottom: $spacing-sm;
+  }
+
+  &__dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    width: 100%;
+    cursor: pointer;
+
+    &--active {
+      background-color: rgba($primary, 0.05);
+      color: $primary;
+      font-weight: $font-weight-medium;
+    }
+
+    &--logout {
+      color: $danger;
+
+      &:focus {
+        background-color: rgba($danger, 0.05);
+        color: $danger;
+      }
+    }
+  }
+
+  &__dropdown-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  &__dropdown-separator {
+    background-color: $border;
+  }
+}

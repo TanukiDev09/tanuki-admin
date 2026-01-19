@@ -1,0 +1,23 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// INVENTORYMOVEMENTSLIST COMPONENT
+// Notación BEM
+// ============================================
+
+.inventory-movements-list {
+  // Estilos base del componente
+  
+  // --- ELEMENTOS ---
+  
+  &__element {
+    // Estilos de elementos
+  }
+  
+  // --- MODIFICADORES ---
+  
+  &--modifier {
+    // Estilos de modificadores
+  }
+}

@@ -1,0 +1,130 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.image-uploader {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  &__label {
+    margin-bottom: $spacing-xs;
+  }
+
+  &__preview {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background-color: $muted;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    overflow: hidden;
+  }
+
+  &__image {
+    object-fit: contain;
+  }
+
+  &__remove-btn {
+    position: absolute;
+    top: $spacing-sm;
+    right: $spacing-sm;
+    z-index: 10;
+  }
+
+  &__dropzone {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    padding: $spacing-2xl;
+    background-color: $card;
+    text-align: center;
+    border: 2px dashed $border;
+    border-radius: $radius-md;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: $muted;
+      border-color: $primary;
+    }
+
+    &--dragging {
+      background-color: rgba($primary, 0.1);
+      border-color: $primary;
+    }
+  }
+
+  &__input {
+    display: none;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__icon-wrapper {
+    padding: $spacing-lg;
+    background-color: $muted;
+    border-radius: $radius-full;
+  }
+
+  &__icon {
+    width: 2rem;
+    height: 2rem;
+    color: $muted-foreground;
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__text {
+    color: $foreground;
+    font-weight: $font-weight-medium;
+  }
+
+  &__hint {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__spinner {
+    width: 2rem;
+    height: 2rem;
+    border: 3px solid rgba($primary, 0.1);
+    border-top-color: $primary;
+    border-radius: $radius-full;
+    animation: spin 1s linear infinite;
+  }
+
+  &__error {
+    margin-top: $spacing-sm;
+    color: $destructive;
+    font-size: $font-size-sm;
+  }
+
+  &__remove-icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

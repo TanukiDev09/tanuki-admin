@@ -1,9 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import Collection from '@/models/Collection';
 
 // GET /api/collections - Listar colecciones activas
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.COLLECTIONS,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 
@@ -26,6 +35,13 @@ export async function GET() {
 
 // POST /api/collections - Crear colección
 export async function POST(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.COLLECTIONS,
+    PermissionAction.CREATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 

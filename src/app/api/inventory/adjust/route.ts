@@ -1,10 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import InventoryItem from '@/models/InventoryItem';
 import '@/models/Warehouse';
 import '@/models/Book';
 
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.INVENTORY,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const body = await request.json();

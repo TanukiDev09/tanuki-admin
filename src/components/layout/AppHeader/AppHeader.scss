@@ -1,0 +1,101 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// APP HEADER COMPONENT (MOBILE-FIRST)
+// ============================================
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  width: 100%;
+  background-color: $card;
+  border-bottom: 1px solid $border;
+  box-shadow: $shadow-sm;
+
+  &__container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 64px; // h-16
+    padding: 0 $spacing-md;
+
+    @include respond-to('md') {
+      padding: 0 $spacing-lg;
+    }
+  }
+
+  &__mobile-logo {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    @include respond-to('lg') {
+      display: none; // Logo is already in sidebar on desktop
+    }
+  }
+
+  &__logo-emoji {
+    font-size: $font-size-2xl;
+  }
+
+  &__logo-title {
+    color: $foreground;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    letter-spacing: -0.025em;
+  }
+
+  &__spacer {
+    display: none;
+
+    @include respond-to('lg') {
+      display: block;
+      flex: 1;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__user-menu {
+    display: none; // Profile/Logout will go into mobile menu later or stay in top header
+
+    @include respond-to('lg') {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+  }
+
+  &__action-button {
+    padding: $spacing-sm;
+    background: transparent;
+    color: $muted-foreground;
+    border: none;
+    border-radius: $radius-md;
+    cursor: pointer;
+
+    @include transition(all);
+
+    &:hover {
+      background-color: $muted;
+      color: $primary;
+    }
+
+    &--logout {
+      &:hover {
+        color: $danger;
+      }
+    }
+  }
+
+  &__action-icon {
+    width: 20px;
+    height: 20px;
+  }
+}

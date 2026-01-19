@@ -1,0 +1,13 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.month-year-select {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-sm;
+  width: 100%;
+
+  &__field {
+    min-width: 0;
+  }
+}

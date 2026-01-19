@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { Separator } from '@/components/ui/Separator';
 import { PointOfSaleForm } from '@/components/points-of-sale/PointOfSaleForm';
 import { PointOfSaleStock } from '@/components/points-of-sale/PointOfSaleStock';
 import dbConnect from '@/lib/mongodb';
@@ -16,17 +16,21 @@ interface LeanPointOfSale {
   _id: Types.ObjectId;
   name: string;
   code?: string;
-  status?: string;
+  status?: 'active' | 'inactive';
+  type?: 'physical' | 'online' | 'event';
+  identificationType?: 'NIT' | 'CC' | 'CE' | 'TI' | 'PP';
+  identificationNumber?: string;
   warehouseId?: Types.ObjectId;
   createdAt?: Date;
   updatedAt?: Date;
   phones?: string[];
   emails?: string[];
-  managers?: Record<string, any>[];
+  managers?: string[];
   images?: string[];
   address?: string;
   city?: string;
   department?: string;
+  discountPercentage?: number;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -59,6 +63,9 @@ async function getPointOfSale(id: string) {
   };
 }
 
+import { formatNumber } from '@/lib/utils';
+import './pos-detail.scss';
+
 export default async function PointOfSaleDetailPage({ params }: PageProps) {
   const { id } = await params;
   const pos = await getPointOfSale(id);
@@ -68,9 +75,16 @@ export default async function PointOfSaleDetailPage({ params }: PageProps) {
   }
 
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-2xl font-bold tracking-tight">{pos.name}</h2>
+    <div className="pos-detail">
+      <div className="pos-detail__header">
+        <div className="pos-detail__title-group">
+          <h2 className="pos-detail__title">{pos.name}</h2>
+          {pos.discountPercentage && pos.discountPercentage > 0 && (
+            <span className="pos-detail__discount-badge">
+              Descuento: {formatNumber(pos.discountPercentage)}%
+            </span>
+          )}
+        </div>
       </div>
       <Separator />
       <Tabs defaultValue="info" className="space-y-4">
@@ -80,10 +94,10 @@ export default async function PointOfSaleDetailPage({ params }: PageProps) {
           <TabsTrigger value="sales" disabled>Ventas (Próximamente)</TabsTrigger>
         </TabsList>
         <TabsContent value="info" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <div className="col-span-4 border rounded-md p-4">
-              <h3 className="mb-4 text-lg font-medium">Editar Detalles</h3>
-              <PointOfSaleForm initialData={pos as any} />
+          <div className="pos-detail__grid">
+            <div className="pos-detail__main-col pos-detail__card">
+              <h3 className="pos-detail__section-title">Editar Detalles</h3>
+              <PointOfSaleForm initialData={pos} />
             </div>
           </div>
         </TabsContent>

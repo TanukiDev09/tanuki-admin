@@ -1,0 +1,251 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.book-management-table {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__filters {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+
+    @media (min-width: $breakpoint-md) {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+
+  &__search-wrapper {
+    position: relative;
+    flex: 1;
+  }
+
+  &__search-icon {
+    position: absolute;
+    top: 50%;
+    left: $spacing-sm;
+    z-index: 1;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: $muted-foreground;
+    transform: translateY(-50%);
+  }
+
+  &__search-input {
+    padding-left: $spacing-xl + $spacing-xs;
+  }
+
+  &__filter-group {
+    display: flex;
+    gap: $spacing-xs;
+    overflow-x: auto;
+    padding-bottom: $spacing-xs;
+
+    @include custom-scrollbar;
+
+    @media (min-width: $breakpoint-md) {
+      padding-bottom: 0;
+      overflow: visible;
+    }
+  }
+
+  &__container {
+    background-color: $card;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    overflow: hidden;
+  }
+
+  &__row {
+    @include transition(background-color);
+
+    &:hover {
+      background-color: rgba($muted, 0.4);
+    }
+  }
+
+  &__cover-wrapper {
+    position: relative;
+    width: 3rem;
+    height: 4rem;
+    background-color: $muted;
+    border-radius: $radius-xs;
+    overflow: hidden;
+  }
+
+  &__cover-image {
+    object-fit: cover;
+  }
+
+  &__no-cover {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 3rem;
+    height: 4rem;
+    background-color: $muted;
+    border: 1px dashed $border;
+    border-radius: $radius-xs;
+  }
+
+  &__isbn {
+    color: $muted-foreground;
+    font-family: monospace;
+    font-size: $font-size-xs;
+  }
+
+  &__title-cell {
+    display: flex;
+    flex-direction: column;
+    gap: calc($spacing-xs / 2);
+    max-width: 250px;
+  }
+
+  &__title-link {
+    color: $foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    @include text-truncate;
+    @include transition(color);
+
+    &:hover {
+      color: $primary;
+      text-decoration: underline;
+    }
+  }
+
+  &__book-meta {
+    color: $muted-foreground;
+  }
+
+  &__author-info {
+    display: flex;
+    flex-direction: column;
+    gap: calc($spacing-xs / 2);
+  }
+
+  &__extra-credits {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__stock-info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__stock-count {
+    font-weight: $font-weight-medium;
+
+    &--in-stock {
+      color: $success;
+    }
+
+    &--out-of-stock {
+      color: $destructive;
+    }
+  }
+
+  &__actions-head {
+    text-align: right;
+  }
+
+  &__icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+  }
+
+  &__icon-muted {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+    color: $muted-foreground;
+  }
+
+  &__price {
+    font-weight: $font-weight-semibold;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-xs;
+  }
+
+  &__action-btn {
+    &--edit {
+      &:hover {
+        background-color: rgba($info, 0.1) !important;
+        color: $info !important;
+      }
+    }
+
+    &--activate {
+      &:hover {
+        background-color: rgba($success, 0.1) !important;
+        color: $success !important;
+      }
+    }
+
+    &--deactivate {
+      &:hover {
+        background-color: rgba($warning, 0.1) !important;
+        color: $warning !important;
+      }
+    }
+
+    &--delete {
+      &:hover {
+        background-color: rgba($destructive, 0.1) !important;
+        color: $destructive !important;
+      }
+    }
+  }
+
+  &__hide-on-mobile {
+    @media (max-width: $breakpoint-sm) {
+      display: none;
+    }
+  }
+
+  &__hide-on-tablet {
+    @media (max-width: $breakpoint-lg) {
+      display: none;
+    }
+  }
+
+  // Loading state
+  &--loading {
+    padding: $spacing-2xl;
+    text-align: center;
+  }
+
+  &__spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid rgba($primary, 0.1);
+    border-top-color: $primary;
+    border-radius: $radius-full;
+    animation: spin 1s linear infinite;
+  }
+
+  &__loading-text {
+    color: $muted-foreground;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

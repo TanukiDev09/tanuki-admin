@@ -1,0 +1,91 @@
+@use 'sass:color';
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.creator-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md; // space-y-4
+  padding: $spacing-lg; // p-8
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__create-icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: $spacing-xs;
+  }
+
+  &__search-container {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__search-wrapper {
+    position: relative;
+    flex: 1;
+    max-width: 24rem; // max-w-sm
+  }
+
+  &__search-icon {
+    position: absolute;
+    top: 0.625rem; // top-2.5
+    left: $spacing-xs; // left-2
+    width: 1rem;
+    height: 1rem;
+    color: $muted-foreground;
+  }
+
+  &__search-input {
+    padding-left: $spacing-xl; // pl-8
+  }
+
+  &__table-wrapper {
+    border: 1px solid $border;
+    border-radius: $radius-md;
+  }
+
+  &__actions-head {
+    text-align: right;
+  }
+
+  &__name-cell {
+    font-weight: $font-weight-medium;
+  }
+
+  &__name-link {
+    font-weight: $font-weight-medium;
+
+    &:hover {
+      color: $primary;
+      text-decoration: underline;
+    }
+  }
+
+  &__actions-cell {
+    text-align: right;
+  }
+
+  &__action-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &__delete-btn {
+    color: $destructive;
+
+    &:hover {
+      color: color.adjust($destructive, $lightness: -10%);
+    }
+  }
+}

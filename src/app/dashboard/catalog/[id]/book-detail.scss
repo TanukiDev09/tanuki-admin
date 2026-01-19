@@ -1,0 +1,220 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+@use 'sass:color';
+
+.book-detail {
+  padding: $spacing-xl;
+
+  &__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+
+  &__container {
+    max-width: 64rem; // max-w-5xl
+    margin: 0 auto;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-xl; // mb-6
+  }
+
+  &__back-button {
+    padding-left: 0;
+  }
+
+  &__header-actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  &__icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: $spacing-xs;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-2xl; // gap-8
+
+    @media (min-width: $breakpoint-md) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  &__left-column {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl; // space-y-6
+  }
+
+  &__cover-wrapper {
+    position: relative;
+    background-color: $muted;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    aspect-ratio: 2/3;
+    overflow: hidden;
+    box-shadow: $shadow-sm;
+  }
+
+  &__cover-image {
+    object-fit: cover;
+  }
+
+  &__cover-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: $muted-foreground;
+  }
+
+  &__info-card {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding: $spacing-md;
+    background-color: $card;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+  }
+
+  &__info-row {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__label {
+    color: $muted-foreground;
+  }
+
+  &__value {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+
+    &--medium {
+      font-size: $font-size-base;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  &__main-content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xl; // space-y-8
+
+    @media (min-width: $breakpoint-md) {
+      grid-column: span 2 / span 2;
+    }
+  }
+
+  &__title-section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__title {
+    margin-bottom: $spacing-xs;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__isbn {
+    margin-bottom: $spacing-md;
+    color: $muted-foreground;
+
+    &-value {
+      color: $foreground;
+      font-family: monospace; // font-mono
+    }
+  }
+
+  &__description {
+    color: rgba($foreground, 0.9);
+    font-size: $font-size-lg;
+    line-height: 1.625; // leading-relaxed
+  }
+
+  &__metadata-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xl; // gap-6
+  }
+
+  &__metadata-item {
+    flex: 1;
+    min-width: 200px;
+
+    h3 {
+      margin-bottom: 0.25rem;
+      color: $muted-foreground;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  &__credits-section {
+    margin-top: $spacing-xl;
+  }
+
+  &__credits-title {
+    margin-bottom: $spacing-md;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em; // tracking-wider
+  }
+
+  &__credits-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+
+    @media (min-width: $breakpoint-sm) {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  &__creator-group {
+    margin-bottom: $spacing-md;
+
+    h4 {
+      margin-bottom: $spacing-xs;
+      color: $muted-foreground;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+    }
+  }
+
+  &__badge-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+  }
+
+  &__badge {
+    padding: 0.25rem 0.75rem;
+    font-size: $font-size-sm;
+  }
+
+  &__extra-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xl;
+    margin-top: $spacing-2xl;
+  }
+
+  &__section-title {
+    margin-bottom: $spacing-md;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+}

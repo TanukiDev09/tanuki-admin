@@ -1,0 +1,202 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// SIDEBAR & MOBILE NAV (MOBILE-FIRST)
+// ============================================
+
+// --- MOBILE NAVIGATION (BOTTOM BAR) ---
+.mobile-nav {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  display: block;
+  padding-bottom: env(safe-area-inset-bottom); // Support for notched iPhones
+  background-color: $background;
+  border-top: 1px solid rgba($border, 0.5);
+
+  @include respond-to('lg') {
+    display: none; // Hide on desktop
+  }
+}
+
+// --- DESKTOP SIDEBAR ---
+.sidebar {
+  position: relative;
+  display: none; // Hidden on mobile/tablet by default
+  flex-direction: column;
+  width: 224px; // 56 * 4
+  height: 100vh;
+  background-color: rgba($muted, 0.3);
+  border-right: 1px solid rgba($border, 0.5);
+
+  @include transition(width);
+
+  @include respond-to('lg') {
+    display: flex;
+  }
+
+  &--collapsed {
+    width: 64px; // 16 * 4
+  }
+
+  &--skeleton {
+    @include respond-to('lg') {
+      display: flex;
+    }
+  }
+
+  // --- ELEMENTOS ---
+
+  &__toggle {
+    position: absolute;
+    top: 24px;
+    right: -12px;
+    z-index: 20;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 24px;
+    height: 24px;
+    background-color: rgba($background, 0.8);
+    color: $muted-foreground;
+    border: 1px solid rgba($border, 0.5);
+    border-radius: $radius-full;
+    cursor: pointer;
+    box-shadow: $shadow-sm;
+
+    @include transition(all);
+
+    &:hover {
+      background-color: $accent;
+      color: $foreground;
+    }
+
+    &-icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__logo-container {
+    padding: $spacing-md;
+    border-bottom: 1px solid rgba($border, 0.5);
+    flex-shrink: 0;
+  }
+
+  &__logo-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    overflow: hidden;
+
+    .sidebar--collapsed & {
+      justify-content: center;
+      padding: 0;
+    }
+  }
+
+  &__logo-emoji {
+    font-size: $font-size-2xl;
+    flex-shrink: 0;
+  }
+
+  &__logo-text {
+    @include transition(opacity);
+
+    white-space: nowrap;
+  }
+
+  &__logo-title {
+    color: rgba($foreground, 0.9);
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    letter-spacing: -0.025em;
+  }
+
+  &__logo-subtitle {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__user {
+    padding: $spacing-md;
+    border-bottom: 1px solid rgba($border, 0.5);
+    flex-shrink: 0;
+
+    .sidebar--collapsed & {
+      padding: $spacing-md $spacing-sm;
+    }
+  }
+
+  &__user-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .sidebar--collapsed & {
+      justify-content: center;
+    }
+  }
+
+  &__user-avatar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    background-color: rgba($primary, 0.1);
+    border-radius: $radius-full;
+    flex-shrink: 0;
+  }
+
+  &__user-icon {
+    width: 16px;
+    height: 16px;
+    color: rgba($primary, 0.7);
+  }
+
+  &__user-info {
+    flex: 1;
+    min-width: 0;
+
+    @include transition(opacity);
+  }
+
+  &__user-name {
+    color: rgba($foreground, 0.8);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    @include text-truncate;
+  }
+
+  &__user-email {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+
+    @include text-truncate;
+  }
+
+  &__nav {
+    flex: 1;
+    padding: $spacing-md;
+    overflow-y: auto;
+
+    @include custom-scrollbar;
+  }
+
+  &__footer {
+    padding: $spacing-md;
+    border-top: 1px solid rgba($border, 0.5);
+    flex-shrink: 0;
+  }
+
+  &__footer-text {
+    color: rgba($muted-foreground, 0.6);
+    font-size: $font-size-xs;
+    text-align: center;
+  }
+}

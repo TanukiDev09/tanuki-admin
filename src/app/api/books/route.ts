@@ -3,11 +3,21 @@ import dbConnect from '@/lib/mongodb';
 import Book from '@/models/Book';
 import '@/models/Creator'; // Import to register schema
 import { sanitizeBook } from '@/types/book';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 
 export const dynamic = 'force-dynamic';
 
 // GET /api/books - Listar libros
 export async function GET(request: NextRequest) {
+  // Verificar permiso de lectura
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.BOOKS,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 
@@ -149,6 +159,14 @@ export async function GET(request: NextRequest) {
 
 // POST /api/books - Crear libro
 export async function POST(request: NextRequest) {
+  // Verificar permiso de creación
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.BOOKS,
+    PermissionAction.CREATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 

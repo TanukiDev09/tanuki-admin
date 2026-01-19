@@ -1,0 +1,178 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// SELECT COMPONENT (MOBILE-FIRST)
+// ============================================
+
+// --- ANIMACIONES ---
+@keyframes select-show {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.select {
+  &__trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 36px;
+    padding: $spacing-sm $spacing-md;
+    background-color: transparent;
+    color: $foreground;
+    font-size: $font-size-sm;
+    border: 1px solid $input;
+    border-radius: $radius-md;
+    cursor: pointer;
+    box-shadow: $shadow-sm;
+
+    @include transition(border-color, box-shadow);
+
+    &::placeholder {
+      color: $muted-foreground;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $ring;
+
+      @include focus-ring;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    &-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.5;
+    }
+
+    span {
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  }
+
+  &__content {
+    position: relative;
+    z-index: 50;
+    min-width: 128px; // min-w-[8rem]
+    max-height: 384px; // max-h-96
+    background-color: $popover;
+    color: $popover-foreground;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    overflow: hidden;
+    box-shadow: $shadow-md;
+
+    &[data-state='open'] {
+      animation: select-show 150ms ease-out;
+    }
+
+    &--popper {
+      &[data-side='bottom'] {
+        transform: translateY(4px);
+      }
+
+      &[data-side='top'] {
+        transform: translateY(-4px);
+      }
+
+      &[data-side='left'] {
+        transform: translateX(-4px);
+      }
+
+      &[data-side='right'] {
+        transform: translateX(4px);
+      }
+    }
+  }
+
+  &__viewport {
+    padding: 4px;
+
+    &--popper {
+      width: 100%;
+      min-width: var(--radix-select-trigger-width);
+      height: var(--radix-select-trigger-height);
+    }
+  }
+
+  &__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 6px $spacing-lg 6px $spacing-md; // py-1.5 pl-2 pr-8
+    font-size: $font-size-sm;
+    border-radius: $radius-sm;
+    cursor: default;
+    user-select: none;
+    outline: none;
+
+    @include transition(background-color, color);
+
+    &:focus {
+      background-color: $accent;
+      color: $accent-foreground;
+    }
+
+    &[data-disabled] {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    &-indicator-container {
+      position: absolute;
+      right: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 14px;
+      height: 14px;
+    }
+
+    &-indicator-icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  &__label {
+    padding: 6px $spacing-md;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__separator {
+    height: 1px;
+    margin: 4px -4px;
+    background-color: $muted;
+  }
+
+  &__scroll-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 0;
+    cursor: default;
+
+    svg {
+      width: 12px;
+      height: 12px;
+    }
+  }
+}

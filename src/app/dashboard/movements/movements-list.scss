@@ -1,0 +1,142 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.movements-list {
+  padding: $spacing-2xl;
+
+  &__container {
+    max-width: 1152px; // max-w-6xl
+    margin: 0 auto;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-2xl; // More separation from content
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__filters {
+    @include card-base;
+
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg; // More space between filter rows
+    margin-bottom: $spacing-2xl; // More space before table
+    padding: $spacing-xl; // Increased internal padding
+    box-shadow: $shadow-sm;
+  }
+
+  &__filters-row {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg; // More space between items in a row
+
+    @media (min-width: $breakpoint-md) {
+      flex-direction: row;
+    }
+
+    &--bottom {
+      align-items: flex-end;
+    }
+  }
+
+  &__search-wrapper {
+    flex: 2;
+  }
+
+  &__type-wrapper,
+  &__date-wrapper {
+    flex: 1;
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: $spacing-xs;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+  }
+
+  &__select {
+    display: flex;
+    width: 100%;
+    height: 2.5rem; // h-10
+    padding: $spacing-xs $spacing-sm;
+    background-color: $background;
+    font-size: $font-size-sm;
+    border: 1px solid $input;
+    border-radius: $radius-md;
+
+    &:focus-visible {
+      outline: none;
+      border-color: $ring;
+    }
+  }
+
+  &__input {
+    height: 2.5rem; // h-10
+  }
+
+  &__clear-btn {
+    height: 2.5rem; // h-10
+  }
+
+  &__table-wrapper {
+    @include card-base;
+
+    box-shadow: $shadow-sm;
+    overflow: hidden;
+  }
+
+  &__link {
+    &:hover {
+      color: $primary;
+      text-decoration: underline;
+    }
+  }
+
+  &__amount {
+    font-weight: $font-weight-medium;
+
+    &--income {
+      color: $success;
+    }
+
+    &--expense {
+      color: $destructive;
+    }
+  }
+
+  &__actions-cell {
+    text-align: right;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-xs;
+  }
+
+  &__icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+    margin-right: $spacing-xs;
+  }
+
+  &__icon-sm {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+  }
+
+  &__no-category {
+    color: $muted-foreground;
+    font-style: italic;
+    font-size: $font-size-xs;
+  }
+}
