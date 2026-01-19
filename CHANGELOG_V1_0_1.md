@@ -38,4 +38,19 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 
 ---
 
-*Este registro solo incluye los cambios realizados en esta sesión específica de optimización del dashboard de movimientos.*
+## [1.0.1] - 2026-01-19 (Sesión 2)
+
+### 📱 Diseño Responsivo & Móvil
+- **Tabla Stacked Responsive**: La tabla de movimientos ahora se adapta automáticamente a cards apiladas en dispositivos móviles (< 1024px), eliminando el scroll horizontal y mejorando la legibilidad.
+- **Filtros Colapsables**: Optimización masiva del espacio vertical en móviles mediante un sistema de filtros colapsables. Solo la búsqueda es visible por defecto, con un toggle para mostrar las opciones avanzadas.
+- **Mobile-First**: Reescritura de estilos SCSS siguiendo un enfoque mobile-first para asegurar consistencia y rendimiento.
+
+### ✨ Mejoras Funcionales
+- **Paginación Implementada**: Sistema completo de paginación para la lista de movimientos.
+  - Controles de navegación (Anterior/Siguiente) y estado visual de página actual.
+  - Indicador de metadatos ("Mostrando X de Y resultados").
+  - Reset automático a la página 1 al aplicar nuevos filtros.
+- **Columnas de Datos**: Se añadieron las columnas "Cantidad" y "Centro Costo" para mayor contexto, reemplazando la columna "Estado" menos relevante.
+
+### 🔧 Calidad de Código
+- **Corrección de Linter SCSS**: Resolución automatizada y manual de errores de estilo CSS (`stylelint`), asegurando el orden correcto de propiedades y espaciado estándar.
