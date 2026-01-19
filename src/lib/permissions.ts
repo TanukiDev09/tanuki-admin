@@ -124,6 +124,7 @@ export async function createDefaultPermissions(
   role: UserRole
 ): Promise<void> {
   try {
+    console.log(`[Permissions] Ensuring default permissions for user ${userId} with role ${role}`);
     const defaultPermissions = getDefaultPermissions(role);
 
     const permissionDocs = Object.entries(defaultPermissions).map(
@@ -135,8 +136,10 @@ export async function createDefaultPermissions(
     );
 
     if (permissionDocs.length > 0) {
+      console.log(`[Permissions] Inserting ${permissionDocs.length} permissions...`);
       // Usar insertMany con ordered: false para continuar si hay duplicados
       await Permission.insertMany(permissionDocs, { ordered: false });
+      console.log('[Permissions] Insert completed');
     }
   } catch (error) {
     // Ignorar errores de duplicados (E11000)
@@ -144,9 +147,11 @@ export async function createDefaultPermissions(
       typeof error === 'object' &&
       error !== null &&
       'code' in error &&
-      (error as { code: number }).code !== 11000
+      (error as { code: number }).code === 11000
     ) {
-      console.error('Error creating default permissions:', error);
+      console.log('[Permissions] Duplicated permissions found, ignoring (this is normal)');
+    } else {
+      console.error('[Permissions] Error creating default permissions:', error);
       throw error;
     }
   }
