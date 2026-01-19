@@ -127,7 +127,7 @@ export default function BookDetailPage(props: { params: Promise<{ id: string }> 
               <div className="book-detail__cover-wrapper">
                 {book.coverImage ? (
                   <Image
-                    src={`/uploads/covers/${book.coverImage}`}
+                    src={book.coverImage.startsWith('http') ? book.coverImage : `/uploads/covers/${book.coverImage}`}
                     alt={book.title}
                     fill
                     className="book-detail__cover-image"

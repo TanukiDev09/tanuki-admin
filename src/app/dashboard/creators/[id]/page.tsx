@@ -205,9 +205,9 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
                 ) : (
                   <div className="creator-detail__books-grid">
                     {books.map(book => (
-                      <div key={book._id} className="creator-detail__book-card" onClick={() => router.push(`/dashboard/catalogo/${book._id}`)}>
+                      <div key={book._id} className="creator-detail__book-card" onClick={() => router.push(`/dashboard/catalog/${book._id}`)}>
                         <div className="creator-detail__book-cover">
-                          {book.coverImage && <Image src={`/uploads/covers/${book.coverImage}`} alt={book.title} fill className="creator-detail__book-image" sizes="56px" />}
+                          {book.coverImage && <Image src={book.coverImage.startsWith('http') ? book.coverImage : `/uploads/covers/${book.coverImage}`} alt={book.title} fill className="creator-detail__book-image" sizes="56px" />}
                         </div>
                         <div className="creator-detail__book-info">
                           <h3 className="creator-detail__book-title">{book.title}</h3>
