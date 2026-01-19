@@ -7,9 +7,7 @@ import '@/models/Warehouse';
 import '@/models/InventoryItem';
 import '@/models/Permission';
 
-const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  'mongodb+srv://juan_o:tenken80@accounting.o7z2iay.mongodb.net/accounting';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
   throw new Error(
@@ -34,7 +32,7 @@ if (!cached) {
 
 async function dbConnect() {
   if (cached.conn) {
-    console.log('[MongoDB] Using cached connection');
+    console.log('[MongoDB] Using cached connection to:', cached.conn.connection.db?.databaseName);
     return cached.conn;
   }
 
@@ -43,9 +41,19 @@ async function dbConnect() {
       bufferCommands: false,
     };
 
-    console.log('[MongoDB] Creating new connection to URI:', MONGODB_URI.split('@')[1] || 'hidden');
+    const sanitizedUri = MONGODB_URI.replace(/:([^@]+)@/, ':****@');
+    console.log('[MongoDB] Attempting connection to:', sanitizedUri);
+
     cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('[MongoDB] Connection established');
+      console.log('[MongoDB] Connection established to database:', mongoose.connection.db?.databaseName);
+      
+      // List collections for deep debugging
+      mongoose.connection.db?.listCollections().toArray().then(cols => {
+        console.log('[MongoDB] Available collections:', cols.map(c => c.name).join(', '));
+      }).catch(err => {
+        console.error('[MongoDB] Error listing collections:', err);
+      });
+
       return mongoose;
     });
   }

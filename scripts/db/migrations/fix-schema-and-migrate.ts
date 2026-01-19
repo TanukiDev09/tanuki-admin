@@ -1,8 +1,11 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  'mongodb+srv://juan_o:tenken80@accounting.o7z2iay.mongodb.net/accounting';
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error('Error: MONGODB_URI environment variable is not defined');
+  process.exit(1);
+}
 
 async function getValidatorInfo(db: mongoose.mongo.Db) {
   const collections = await db.listCollections({ name: 'movements' }).toArray();

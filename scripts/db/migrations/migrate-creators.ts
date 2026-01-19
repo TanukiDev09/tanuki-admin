@@ -36,10 +36,12 @@ function loadEnv() {
 
 loadEnv();
 
-const MONGODB_URI =
-  process.env.MONGODB_URI_DEV ||
-  process.env.MONGODB_URI ||
-  'mongodb+srv://juan_o:tenken80@accounting.o7z2iay.mongodb.net/accounting';
+const MONGODB_URI = process.env.MONGODB_URI_DEV || process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error('Error: MONGODB_URI or MONGODB_URI_DEV environment variable is not defined');
+  process.exit(1);
+}
 
 if (!MONGODB_URI) {
   console.error('Error: MONGODB_URI/MONGODB_URI_DEV is not defined');
