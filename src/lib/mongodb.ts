@@ -41,10 +41,10 @@ async function dbConnect() {
       bufferCommands: false,
     };
 
-    const sanitizedUri = MONGODB_URI.replace(/:([^@]+)@/, ':****@');
+    const sanitizedUri = MONGODB_URI!.replace(/:([^@]+)@/, ':****@');
     console.log('[MongoDB] Attempting connection to:', sanitizedUri);
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((mongoose) => {
       console.log('[MongoDB] Connection established to database:', mongoose.connection.db?.databaseName);
       
       // List collections for deep debugging
