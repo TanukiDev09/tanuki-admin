@@ -247,7 +247,7 @@ export function InventoryMatrixTable() {
                         <div className={`inventory-matrix__cover ${compactMode ? 'inventory-matrix__cover--compact' : 'inventory-matrix__cover--default'}`}>
                           {row.coverImage ? (
                             <Image
-                              src={`/uploads/covers/${row.coverImage}`}
+                              src={row.coverImage.startsWith('http') ? row.coverImage : `/uploads/covers/${row.coverImage}`}
                               alt={row.title}
                               fill
                               sizes="(max-width: 768px) 100px, 30px"

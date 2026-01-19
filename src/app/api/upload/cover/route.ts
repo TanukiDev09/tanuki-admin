@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import path from 'path';
-import { existsSync } from 'fs';
 import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
+import { put } from '@vercel/blob';
 
 export async function POST(request: NextRequest) {
   const permissionError = await requirePermission(
@@ -40,26 +38,19 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Crear directorio si no existe
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'covers');
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true });
-    }
-
     // Generar nombre único para el archivo
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
     const timestamp = Date.now();
     const originalName = file.name.replace(/\s+/g, '-').toLowerCase();
     const filename = `${timestamp}-${originalName}`;
-    const filepath = path.join(uploadsDir, filename);
 
-    // Guardar archivo
-    await writeFile(filepath, buffer);
+    // Subir a Vercel Blob
+    const blob = await put(`covers/${filename}`, file, {
+      access: 'public',
+    });
 
     return NextResponse.json({
       success: true,
-      filename,
+      filename: blob.url, // Devolvemos la URL completa
       message: 'Imagen subida exitosamente',
     });
   } catch (error) {

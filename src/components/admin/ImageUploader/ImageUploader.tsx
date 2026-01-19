@@ -111,7 +111,7 @@ export default function ImageUploader({
       {value ? (
         <div className="image-uploader__preview">
           <Image
-            src={`/uploads/covers/${value}`}
+            src={value.startsWith('http') ? value : `/uploads/covers/${value}`}
             alt="Portada"
             fill
             className="image-uploader__image"
