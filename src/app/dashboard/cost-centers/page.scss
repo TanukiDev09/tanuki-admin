@@ -1,0 +1,54 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.cost-centers-page {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    @include md {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__title {
+    font-size: 2rem;
+    font-weight: $font-weight-bold;
+    color: $foreground;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    font-size: $font-size-base;
+    color: $muted-foreground;
+  }
+
+  &__icon {
+    width: 18px;
+    height: 18px;
+    margin-right: $spacing-xs;
+  }
+
+  &__controls {
+    display: flex;
+    gap: $spacing-md;
+    max-width: 400px;
+  }
+
+  &__search {
+    background-color: $card;
+  }
+}

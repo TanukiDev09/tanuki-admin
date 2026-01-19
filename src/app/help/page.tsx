@@ -32,30 +32,32 @@ const glossaryTerms = [
   },
 ];
 
+import './help-page.scss';
+
 export default function AyudaPage() {
   return (
-    <div className="container mx-auto px-4 md:px-6 py-6 md:py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-3 font-serif">Glosario Financiero</h1>
-        <p className="text-muted-foreground">
+    <div className="help-page">
+      <header className="help-page__header">
+        <h1 className="help-page__title">Glosario Financiero</h1>
+        <p className="help-page__subtitle">
           Términos financieros explicados sin jerga técnica, diseñados para emprendedores.
         </p>
-      </div>
+      </header>
 
-      <div className="space-y-4">
+      <div className="help-page__glossary">
         {glossaryTerms.map((item) => (
-          <div key={item.term} className="card p-6">
-            <h2 className="text-xl font-semibold mb-3 text-primary font-serif">
+          <div key={item.term} className="help-page__term-card">
+            <h2 className="help-page__term-title">
               {item.term}
             </h2>
-            <p className="text-muted-foreground leading-relaxed">{item.definition}</p>
+            <p className="help-page__term-definition">{item.definition}</p>
           </div>
         ))}
       </div>
 
-      <div className="card p-6 mt-8 bg-info/5 border-info/20">
-        <h2 className="text-lg font-semibold mb-2 text-info">¿Necesitas más ayuda?</h2>
-        <p className="text-sm text-muted-foreground">
+      <div className="help-page__support-card">
+        <h2 className="help-page__support-title">¿Necesitas más ayuda?</h2>
+        <p className="help-page__support-text">
           Esta sección se expandirá con tutoriales, videos y guías paso a paso para ayudarte
           a comprender mejor tus finanzas.
         </p>

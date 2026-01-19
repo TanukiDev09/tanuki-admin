@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import Agreement from '@/models/Agreement';
 import Book from '@/models/Book';
@@ -11,7 +13,14 @@ interface Props {
   }>;
 }
 
-export async function GET(request: Request, props: Props) {
+export async function GET(request: NextRequest, props: Props) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.AGREEMENTS,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   const params = await props.params;
   try {
     await dbConnect();
@@ -27,15 +36,21 @@ export async function GET(request: Request, props: Props) {
     }
 
     return NextResponse.json(agreement);
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Error al obtener contrato' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Error al obtener contrato';
+    return NextResponse.json({ message }, { status: 500 });
   }
 }
 
-export async function PUT(request: Request, props: Props) {
+export async function PUT(request: NextRequest, props: Props) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.AGREEMENTS,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   const params = await props.params;
   try {
     await dbConnect();
@@ -82,15 +97,21 @@ export async function PUT(request: Request, props: Props) {
     }
 
     return NextResponse.json(agreement);
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Error al actualizar contrato' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Error al actualizar contrato';
+    return NextResponse.json({ message }, { status: 500 });
   }
 }
 
-export async function DELETE(request: Request, props: Props) {
+export async function DELETE(request: NextRequest, props: Props) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.AGREEMENTS,
+    PermissionAction.DELETE
+  );
+  if (permissionError) return permissionError;
+
   const params = await props.params;
   try {
     await dbConnect();
@@ -118,10 +139,9 @@ export async function DELETE(request: Request, props: Props) {
     }
 
     return NextResponse.json({ message: 'Contrato eliminado correctamente' });
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Error al eliminar contrato' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Error al eliminar contrato';
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

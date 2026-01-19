@@ -1,0 +1,221 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.creator-detail {
+  padding: $spacing-2xl;
+
+  &__container {
+    max-width: 1024px;
+    margin: 0 auto;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__header-btn {
+    padding-left: 0;
+  }
+
+  &__header-actions {
+    display: flex;
+    gap: $spacing-xs;
+  }
+
+  &__icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: $spacing-xs;
+  }
+
+  &__grid {
+    display: grid;
+    gap: $spacing-2xl;
+
+    @include md {
+      grid-template-columns: 1fr 2fr;
+    }
+  }
+
+  &__profile-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  &__avatar-wrapper {
+    position: relative;
+    width: 12rem;
+    height: 12rem;
+    margin: 0 auto;
+    overflow: hidden;
+    background-color: $muted;
+    border: 1px solid $border;
+    border-radius: 9999px;
+    box-shadow: $shadow-sm;
+
+    @include md {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1/1;
+    }
+  }
+
+  &__avatar-image {
+    object-fit: cover;
+  }
+
+  &__avatar-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    color: $primary;
+    font-size: 1.875rem;
+    background-color: rgba($primary, 0.1);
+  }
+
+  &__info-card {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    background-color: $card;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+  }
+
+  &__info-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: $muted-foreground;
+  }
+
+  &__text-foreground {
+    color: $foreground;
+  }
+
+  &__link {
+    color: #2563eb; // blue-600
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    @include text-truncate;
+  }
+
+  &__content-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xl;
+  }
+
+  &__name {
+    margin-bottom: $spacing-xs;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__bio {
+    color: rgba($foreground, 0.9);
+    font-size: $font-size-lg;
+    line-height: 1.625;
+    white-space: pre-wrap;
+  }
+
+  &__section-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin-bottom: $spacing-md;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__icon-lg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  &__book-list-empty {
+    color: $muted-foreground;
+  }
+
+  &__books-grid {
+    display: grid;
+    gap: $spacing-md;
+    grid-template-columns: 1fr;
+
+    @include sm {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  &__book-card {
+    display: flex;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    transition: background-color 0.2s;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba($muted, 0.5);
+    }
+  }
+
+  &__book-cover {
+    position: relative;
+    flex-shrink: 0;
+    width: 3.5rem;
+    height: 5rem;
+    overflow: hidden;
+    background-color: $muted;
+    border-radius: $radius-sm;
+  }
+
+  &__book-image {
+    object-fit: cover;
+  }
+
+  &__book-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0; // for text truncation
+  }
+
+  &__book-title {
+    font-weight: $font-weight-semibold;
+    @include text-truncate-lines(1);
+  }
+
+  &__book-genre {
+    margin-bottom: 4px;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  &__badge-small {
+    font-size: 10px;
+  }
+
+  &__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+  }
+}

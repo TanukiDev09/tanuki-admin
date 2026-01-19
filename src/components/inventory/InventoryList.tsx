@@ -8,14 +8,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+} from '@/components/ui/Table';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { InventoryStockBadge } from './InventoryStockBadge';
-import { History, Plus, Minus, Search } from 'lucide-react';
-import { formatCurrency } from '@/lib/utils';
+import { History, Search } from 'lucide-react';
+import { formatCurrency, formatNumber } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
+import './InventoryList.scss';
 
 interface Book {
   _id: string;
@@ -53,36 +54,36 @@ export function InventoryList({ data, onAdjust }: InventoryListProps) {
   });
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+    <div className="inventory-list">
+      <div className="inventory-list__controls">
+        <div className="inventory-list__search">
+          <Search className="inventory-list__search-icon" />
           <Input
             placeholder="Buscar por título o ISBN..."
-            className="pl-8"
+            className="inventory-list__search-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
       </div>
 
-      <div className="rounded-md border">
+      <div className="inventory-list__table-container">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[80px]">Portada</TableHead>
+              <TableHead className="inventory-list__head-cover">Portada</TableHead>
               <TableHead>Libro</TableHead>
-              <TableHead className="hidden xl:table-cell">ISBN</TableHead>
-              <TableHead className="hidden lg:table-cell text-right">Precio</TableHead>
-              <TableHead className="text-center">Stock</TableHead>
-              <TableHead className="text-center">Estado</TableHead>
-              {onAdjust && <TableHead className="text-right">Acciones</TableHead>}
+              <TableHead className="inventory-list__col-isbn">ISBN</TableHead>
+              <TableHead className="inventory-list__col-price">Precio</TableHead>
+              <TableHead className="inventory-list__stock">Stock</TableHead>
+              <TableHead className="inventory-list__status">Estado</TableHead>
+              {onAdjust && <TableHead className="inventory-list__actions">Acciones</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={onAdjust ? 7 : 6} className="text-center h-24">
+                <TableCell colSpan={onAdjust ? 7 : 6} className="inventory-list__empty">
                   {search ? 'No se encontraron resultados.' : 'No hay productos en esta bodega.'}
                 </TableCell>
               </TableRow>
@@ -90,52 +91,52 @@ export function InventoryList({ data, onAdjust }: InventoryListProps) {
               filteredData.map((item) => (
                 <TableRow key={item._id}>
                   <TableCell>
-                    <div className="relative w-12 h-16 bg-muted rounded overflow-hidden">
+                    <div className="inventory-list__cover-container">
                       {item.bookId.coverImage && !imageError[item.bookId._id] ? (
                         <Image
                           src={item.bookId.coverImage.startsWith('http') ? item.bookId.coverImage : `/uploads/covers/${item.bookId.coverImage}`}
                           alt={item.bookId.title}
                           fill
-                          className="object-cover"
+                          className="inventory-list__cover-image"
                           onError={() => setImageError(prev => ({ ...prev, [item.bookId._id]: true }))}
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-[10px] text-muted-foreground">
+                        <div className="inventory-list__cover-fallback">
                           Sin foto
                         </div>
                       )}
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell>
                     <Link
                       href={`/dashboard/catalog/${item.bookId._id}`}
-                      className="hover:text-primary hover:underline transition-colors"
+                      className="inventory-list__link"
                     >
                       {item.bookId.title}
                     </Link>
                   </TableCell>
-                  <TableCell className="hidden xl:table-cell">{item.bookId.isbn}</TableCell>
-                  <TableCell className="hidden lg:table-cell text-right">
+                  <TableCell className="inventory-list__col-isbn">{item.bookId.isbn}</TableCell>
+                  <TableCell className="inventory-list__col-price">
                     {formatCurrency(item.bookId.price)}
                   </TableCell>
-                  <TableCell className="text-center font-bold">
-                    {item.quantity}
+                  <TableCell className="inventory-list__stock">
+                    {formatNumber(item.quantity)}
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="inventory-list__status">
                     <InventoryStockBadge
                       quantity={item.quantity}
                       minStock={item.minStock}
                     />
                   </TableCell>
                   {onAdjust && (
-                    <TableCell className="text-right">
+                    <TableCell className="inventory-list__actions">
                       <Button
                         variant="ghost"
-                        size="sm"
+                        size="icon"
                         onClick={() => onAdjust(item)}
                         title="Ajustar Stock"
                       >
-                        <History className="h-4 w-4" />
+                        <History className="inventory-list__icon" />
                       </Button>
                     </TableCell>
                   )}

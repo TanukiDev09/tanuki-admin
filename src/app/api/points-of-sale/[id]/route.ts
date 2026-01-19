@@ -1,11 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import PointOfSale from '@/models/PointOfSale';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.POINTS_OF_SALE,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     const { id } = await params;
     await dbConnect();
@@ -20,7 +29,8 @@ export async function GET(
     }
 
     return NextResponse.json(pointOfSale);
-  } catch (error: any) {
+  } catch (error) {
+    console.error('Get POS Error:', error);
     return NextResponse.json(
       { error: 'Error fetching point of sale' },
       { status: 500 }
@@ -29,9 +39,16 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.POINTS_OF_SALE,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     const { id } = await params;
     await dbConnect();
@@ -50,24 +67,35 @@ export async function PUT(
     }
 
     return NextResponse.json(pointOfSale);
-  } catch (error: any) {
-    if (error.code === 11000) {
+  } catch (error: unknown) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code: number }).code === 11000
+    ) {
       return NextResponse.json(
         { error: 'El código del punto de venta ya existe' },
         { status: 400 }
       );
     }
-    return NextResponse.json(
-      { error: error.message || 'Error updating point of sale' },
-      { status: 400 }
-    );
+    const msg =
+      error instanceof Error ? error.message : 'Error updating point of sale';
+    return NextResponse.json({ error: msg }, { status: 400 });
   }
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.POINTS_OF_SALE,
+    PermissionAction.DELETE
+  );
+  if (permissionError) return permissionError;
+
   try {
     const { id } = await params;
     await dbConnect();
@@ -82,7 +110,8 @@ export async function DELETE(
     }
 
     return NextResponse.json({ message: 'Punto de venta eliminado' });
-  } catch (error: any) {
+  } catch (error) {
+    console.error('Delete POS Error:', error);
     return NextResponse.json(
       { error: 'Error deleting point of sale' },
       { status: 500 }

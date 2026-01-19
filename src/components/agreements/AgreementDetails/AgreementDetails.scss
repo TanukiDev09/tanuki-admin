@@ -1,0 +1,67 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.agreement-details {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+
+  @include respond-to('sm') {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__label {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+  }
+
+  &__value {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+
+    &--mono {
+      font-family: monospace;
+    }
+  }
+
+  &__public-domain {
+    flex-direction: column;
+    gap: $spacing-sm;
+    padding: $spacing-lg;
+    background-color: hsl(210deg 100% 96%); // blue-50
+    text-align: center;
+    border: 1px solid hsl(210deg 100% 90%); // blue-200
+    border-radius: $radius-md;
+
+    @include flex-center;
+
+    &-header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: $spacing-sm;
+      color: hsl(210deg 100% 20%); // blue-900
+    }
+
+    &-title {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-semibold;
+    }
+
+    &-text {
+      color: hsl(210deg 100% 40%); // blue-700
+    }
+
+    &-icon {
+      width: $icon-md;
+      height: $icon-md;
+    }
+  }
+}

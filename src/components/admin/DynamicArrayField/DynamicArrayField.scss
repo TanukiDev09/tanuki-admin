@@ -1,0 +1,54 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.dynamic-array-field {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+
+  &__label {
+    margin-bottom: $spacing-xs;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__input {
+    flex: 1;
+  }
+
+  &__remove-btn {
+    color: $muted-foreground;
+
+    &:hover {
+      background-color: rgba($destructive, 0.1);
+      color: $destructive;
+    }
+  }
+
+  &__add-btn {
+    align-self: flex-start;
+    display: flex;
+    align-items: center;
+  }
+
+  &__icon-remove {
+    width: 1.25rem; // w-5
+    height: 1.25rem; // h-5
+  }
+
+  &__icon-add {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+    margin-right: $spacing-xs; // mr-2
+  }
+}

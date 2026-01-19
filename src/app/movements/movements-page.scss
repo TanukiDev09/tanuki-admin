@@ -1,0 +1,50 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.movements-page {
+  @include container-base;
+  padding: $spacing-xl $spacing-md;
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-lg;
+    font-family: $font-serif;
+  }
+
+  &__content {
+    @include card-base;
+    padding: $spacing-3xl;
+    text-align: center;
+  }
+
+  &__status {
+    font-size: $font-size-lg;
+    color: $muted-foreground;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__note {
+    font-size: $font-size-sm;
+    color: $muted-foreground;
+  }
+}
+
+.movements-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+
+  &__main-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  &__content {
+    flex: 1;
+    overflow-y: auto;
+    background-color: $background;
+  }
+}

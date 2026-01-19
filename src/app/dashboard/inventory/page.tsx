@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { InventoryStats } from '@/components/inventory/InventoryStats';
 import { InventoryMatrixTable } from '@/components/inventory/InventoryMatrixTable';
 import { InventoryMovementsList } from '@/components/inventory/InventoryMovementsList';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { RefreshCw } from 'lucide-react';
+import './inventory-page.scss';
 
 export default function InventoryPage() {
   const [stats, setStats] = useState({
@@ -46,11 +47,11 @@ export default function InventoryPage() {
   }, []);
 
   return (
-    <div className="p-8 space-y-8">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Inventario</h1>
-          <p className="text-muted-foreground">
+    <div className="inventory-page">
+      <div className="inventory-page__header">
+        <div className="inventory-page__title-group">
+          <h1 className="inventory-page__title">Inventario</h1>
+          <p className="inventory-page__description">
             Resumen general del estado del inventario y movimientos recientes.
           </p>
         </div>
@@ -59,13 +60,14 @@ export default function InventoryPage() {
         </Button>
       </div>
 
+      <h2 className="sr-only">Resumen de Inventario</h2>
       <InventoryStats stats={stats} isLoading={loading} />
 
-      <div className="space-y-6">
+      <div className="inventory-page__content">
         <InventoryMatrixTable />
 
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Últimos Movimientos</h2>
+        <div className="inventory-page__section">
+          <h2 className="inventory-page__section-title">Últimos Movimientos</h2>
           <InventoryMovementsList movements={movements} isLoading={loading} />
         </div>
       </div>

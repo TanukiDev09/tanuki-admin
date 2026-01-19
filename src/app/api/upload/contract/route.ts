@@ -2,8 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { existsSync } from 'fs';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 
 export async function POST(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.AGREEMENTS,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;

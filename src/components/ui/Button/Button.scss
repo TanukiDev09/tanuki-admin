@@ -1,0 +1,119 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// BUTTON COMPONENT
+// Notación BEM
+// ============================================
+
+.button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  font-family: $font-sans;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  border: none;
+  border-radius: $radius-md;
+  cursor: pointer;
+  white-space: nowrap;
+  outline: none;
+
+  @include transition(background-color, color, box-shadow);
+
+  &:focus-visible {
+    @include focus-ring;
+  }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  // --- VARIANTES ---
+
+  &--default {
+    background: $primary;
+    color: $primary-foreground;
+
+    &:hover:not(:disabled) {
+      background: rgba($primary, 0.9);
+    }
+  }
+
+  &--destructive {
+    background: $destructive;
+    color: $destructive-foreground;
+
+    &:hover:not(:disabled) {
+      background: rgba($destructive, 0.9);
+    }
+  }
+
+  &--outline {
+    background: $background;
+    border: 1px solid $input;
+    color: $foreground;
+
+    &:hover:not(:disabled) {
+      background: $accent;
+      color: $accent-foreground;
+    }
+  }
+
+  &--secondary {
+    background: $secondary;
+    color: $secondary-foreground;
+
+    &:hover:not(:disabled) {
+      background: rgba($secondary, 0.8);
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    color: $foreground;
+
+    &:hover:not(:disabled) {
+      background: $accent;
+      color: $accent-foreground;
+    }
+  }
+
+  &--link {
+    background: transparent;
+    color: $primary;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+
+    &:hover:not(:disabled) {
+      text-decoration: underline;
+    }
+  }
+
+  // --- TAMAÑOS ---
+
+  &--default {
+    height: 40px;
+    padding: $spacing-sm $spacing-md;
+  }
+
+  &--sm {
+    height: 36px;
+    padding: $spacing-sm 12px;
+    border-radius: $radius-md;
+  }
+
+  &--lg {
+    height: 44px;
+    padding: $spacing-sm $spacing-xl;
+    border-radius: $radius-md;
+  }
+
+  &--icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+}

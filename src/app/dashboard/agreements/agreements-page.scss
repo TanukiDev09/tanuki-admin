@@ -1,0 +1,27 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.agreements-page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: $spacing-lg;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__title {
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    letter-spacing: -0.025em;
+  }
+
+  &__description {
+    margin-top: $spacing-xs;
+    color: $muted-foreground;
+  }
+}

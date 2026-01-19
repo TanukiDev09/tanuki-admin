@@ -1,0 +1,67 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// CARD COMPONENT
+// Notación BEM
+// ============================================
+
+.card {
+  background: $card;
+  color: $card-foreground;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+
+  @include transition(box-shadow);
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  // --- ELEMENTOS ---
+
+  &__header {
+    @include flex-column;
+
+    gap: 6px;
+    padding: $spacing-lg;
+  }
+
+  &__title {
+    font-family: $font-serif;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    line-height: 1;
+    letter-spacing: -0.025em;
+  }
+
+  &__description {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__content {
+    padding: $spacing-lg;
+    padding-top: 0;
+  }
+
+  &__footer {
+    @include flex-between;
+
+    padding: $spacing-lg;
+    padding-top: 0;
+  }
+
+  // --- MODIFICADORES ---
+
+  &--transparent {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+  }
+
+  &--bordered {
+    border-width: 2px;
+  }
+}

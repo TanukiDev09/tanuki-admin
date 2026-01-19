@@ -5,6 +5,7 @@ import { verifyPassword } from '@/lib/auth';
 import { generateToken } from '@/lib/jwt';
 import { sanitizeUser } from '@/types/user';
 import { setAuthCookie } from '@/lib/auth-cookies';
+import { createDefaultPermissions } from '@/lib/permissions';
 
 /**
  * POST /api/auth/login
@@ -67,6 +68,9 @@ export async function POST(request: NextRequest) {
     // Actualizar último login
     user.lastLogin = new Date();
     await user.save();
+
+    // Asegurar que tenga permisos por defecto creados
+    await createDefaultPermissions(user._id.toString(), user.role);
 
     // Generar token JWT
     const userResponse = sanitizeUser(user);

@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 import { Work_Sans, Montserrat } from 'next/font/google';
+import '../styles/globals.scss';
 import './globals.css';
+import './root-layout.scss';
 import { AuthProvider } from '@/contexts/AuthContext';
-import { Toaster } from '@/components/ui/toaster';
+import { PermissionProvider } from '@/contexts/PermissionContext';
+import { Toaster } from '@/components/ui/Toast';
 
 
 
@@ -33,12 +36,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className={`${workSans.variable} ${montserrat.variable}`}>
-      <body className="antialiased min-h-screen bg-background text-foreground" suppressHydrationWarning>
+      <body className="root-layout" suppressHydrationWarning>
         <AuthProvider>
-          <ReactQueryProvider>
-            {children}
-            <Toaster />
-          </ReactQueryProvider>
+          <PermissionProvider>
+            <ReactQueryProvider>
+              {children}
+              <Toaster />
+            </ReactQueryProvider>
+          </PermissionProvider>
         </AuthProvider>
       </body>
     </html>

@@ -2,12 +2,19 @@
 
 import { useState } from 'react';
 import { BookPlus } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import BookManagementTable from '@/components/admin/BookManagementTable';
 import CreateBookModal from '@/components/admin/CreateBookModal';
 import EditBookModal from '@/components/admin/EditBookModal';
 import { BookResponse } from '@/types/book';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
+import '../dashboard.scss';
 
 export default function CatalogoPage() {
+  const { hasPermission } = usePermission();
+  const canCreate = hasPermission(ModuleName.BOOKS, PermissionAction.CREATE);
+
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedBook, setSelectedBook] = useState<BookResponse | null>(null);
@@ -69,39 +76,43 @@ export default function CatalogoPage() {
   const handleSuccess = () => {
     setRefreshKey((prev) => prev + 1);
   };
-
   return (
     <>
-      <div className="container mx-auto px-4 md:px-6 py-6 md:py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground mb-2">
-              Catálogo de Libros
-            </h1>
-            <p className="text-foreground-muted">
-              Administra el catálogo de la editorial
-            </p>
+      <div className="dashboard-page">
+        <div className="dashboard-page__container">
+          {/* Header */}
+          <div className="dashboard-page__header">
+            <div className="dashboard-page__title-group">
+              <h1 className="dashboard-page__title">
+                Catálogo de Libros
+              </h1>
+              <p className="dashboard-page__subtitle">
+                Administra el catálogo de la editorial
+              </p>
+            </div>
+            {canCreate && (
+              <Button
+                onClick={() => setCreateModalOpen(true)}
+                className="dashboard-page__action-btn"
+              >
+                <BookPlus className="dashboard-page__icon" />
+                <span className="dashboard-page__text-hidden-sm">Crear Libro</span>
+              </Button>
+            )}
           </div>
-          <button
-            onClick={() => setCreateModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-lg transition-colors"
-          >
-            <BookPlus className="w-5 h-5" />
-            <span className="hidden sm:inline">Crear Libro</span>
-          </button>
-        </div>
 
-        {/* Table */}
-        <BookManagementTable
-          key={refreshKey}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          onToggleStatus={handleToggleStatus}
-        />
+          {/* Table */}
+          <BookManagementTable
+            key={refreshKey}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onToggleStatus={handleToggleStatus}
+          />
+        </div>
       </div>
 
-      {/* Modals */}
+
+
       <CreateBookModal
         isOpen={createModalOpen}
         onClose={() => setCreateModalOpen(false)}

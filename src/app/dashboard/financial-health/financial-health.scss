@@ -1,0 +1,43 @@
+@use '../dashboard.scss' as *;
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.financial-health {
+  @extend %dashboard-base;
+
+  &__header {
+    margin-bottom: $spacing-xl;
+  }
+
+  &__title {
+    color: $foreground;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    letter-spacing: -0.025em;
+  }
+
+  &__subtitle {
+    margin-top: $spacing-sm;
+    color: $muted-foreground;
+  }
+
+  &__metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+
+    @include respond-to('sm') {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @include respond-to('lg') {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  &__projection-wrapper {
+    @include card-base;
+
+    padding: $spacing-lg;
+  }
+}

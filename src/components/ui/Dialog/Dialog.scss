@@ -1,0 +1,167 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// DIALOG COMPONENT (MOBILE-FIRST)
+// ============================================
+
+// --- ANIMACIONES ---
+@keyframes dialog-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dialog-fade-out {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes dialog-content-show {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes dialog-content-hide {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.95);
+  }
+}
+
+.dialog {
+  &__overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background-color: rgb(0 0 0 / 80%);
+    backdrop-filter: blur(2px);
+
+    &[data-state='open'] {
+      animation: dialog-fade-in 150ms ease-out;
+    }
+
+    &[data-state='closed'] {
+      animation: dialog-fade-out 150ms ease-in;
+    }
+  }
+
+  &__content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    z-index: 50;
+    display: grid;
+    gap: $spacing-md;
+    width: 95%; // Mobile-first width
+    max-width: 100%;
+    padding: $spacing-lg;
+    background-color: $background;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    transform: translate(-50%, -50%);
+    box-shadow: $shadow-lg;
+    outline: none;
+
+    &[data-state='open'] {
+      animation: dialog-content-show 200ms ease-out;
+    }
+
+    &[data-state='closed'] {
+      animation: dialog-content-hide 200ms ease-in;
+    }
+
+    @include respond-to('sm') {
+      width: 100%;
+      max-width: 512px; // Original max-w-lg
+    }
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    text-align: center;
+
+    @include respond-to('sm') {
+      text-align: left;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: $spacing-sm;
+
+    @include respond-to('sm') {
+      flex-direction: row;
+      justify-content: flex-end;
+    }
+  }
+
+  &__title {
+    color: $foreground;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-none;
+    letter-spacing: -0.025em;
+  }
+
+  &__description {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__close {
+    position: absolute;
+    top: $spacing-md;
+    right: $spacing-md;
+    padding: $spacing-xs;
+    background: transparent;
+    color: $foreground;
+    border: none;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    opacity: 0.7;
+
+    @include transition(opacity);
+
+    &:hover {
+      opacity: 1;
+    }
+
+    &:focus {
+      @include focus-ring;
+    }
+
+    &:disabled {
+      pointer-events: none;
+    }
+
+    &-icon {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}

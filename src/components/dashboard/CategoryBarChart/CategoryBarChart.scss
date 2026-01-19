@@ -1,0 +1,30 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.category-bar-chart {
+  width: 100%;
+  background-color: transparent;
+
+  &--no-border {
+    border: none;
+    box-shadow: none;
+  }
+
+  &__header {
+    padding-right: 0;
+    padding-bottom: $spacing-sm;
+    padding-left: 0;
+  }
+
+  &__title {
+    color: $foreground;
+    font-family: $font-sans;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__content {
+    padding-right: 0;
+    padding-left: 0;
+  }
+}

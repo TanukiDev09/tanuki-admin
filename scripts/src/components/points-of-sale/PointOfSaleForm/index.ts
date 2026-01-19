@@ -1,0 +1,1 @@
+export { PointOfSaleForm } from './PointOfSaleForm';

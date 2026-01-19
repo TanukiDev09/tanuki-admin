@@ -1,6 +1,10 @@
-@import 'tailwindcss';
+/* ============================================
+   TANUKI ADMIN DASHBOARD - DESIGN SYSTEM
+   Based on the uploaded UI design
+   ============================================ */
 
-@theme {
+:root {
+  /* --- COLORS: Base Palette --- */
   --font-serif: var(--font-montserrat);
   --font-sans: var(--font-work-sans);
 
@@ -21,6 +25,7 @@
 
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted-rgb: var(--muted-rgb);
 
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
@@ -62,15 +67,6 @@
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
-}
-
-:root {
-  /* ============================================
-     TANUKI ADMIN DASHBOARD - DESIGN SYSTEM
-     Based on the uploaded UI design
-     ============================================ */
-
-  /* --- COLORS: Base Palette --- */
 
   /* Background & Surfaces */
   --background: 210 17% 98%; /* #F7F8FA - Light grayish blue */
@@ -94,7 +90,8 @@
 
   /* Muted */
   --muted: 210 40% 96%; /* #F1F5F9 */
-  --muted-foreground: 215 16% 47%; /* #64748B */
+  --muted-foreground: 215 25% 27%; /* #334155 - Slate 700 for high contrast (AAA) */
+  --muted-rgb: 241, 245, 249;
 
   /* Accent */
   --accent: 210 40% 96%;
@@ -163,6 +160,8 @@
   --spacing-3xl: 4rem; /* 64px */
 
   /* --- TYPOGRAPHY SYSTEM --- */
+  --font-sans: var(--font-work-sans), ui-sans-serif, system-ui;
+  --font-serif: var(--font-montserrat), ui-serif, Georgia;
 
   /* Font Sizes */
   --font-size-xs: 0.75rem; /* 12px */
@@ -248,13 +247,19 @@
    ============================================ */
 
 * {
-  @apply border-border;
+  border-color: hsl(var(--border));
+  box-sizing: border-box;
 }
 
 body {
-  @apply bg-background text-foreground font-sans antialiased;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   font-size: var(--font-size-base);
   line-height: var(--line-height-normal);
+  margin: 0;
 }
 
 /* ============================================
@@ -267,7 +272,9 @@ h3,
 h4,
 h5,
 h6 {
-  @apply text-foreground font-serif font-bold;
+  color: hsl(var(--foreground));
+  font-family: var(--font-serif);
+  font-weight: var(--font-weight-bold);
   line-height: var(--line-height-tight);
 }
 

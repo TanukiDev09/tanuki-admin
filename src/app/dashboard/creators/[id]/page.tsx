@@ -1,15 +1,37 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Edit, Book as BookIcon, Globe, MapPin } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
+import { ArrowLeft, Edit, Book as BookIcon, Globe, MapPin, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import { CreatorResponse } from '@/types/creator';
 import { BookResponse } from '@/types/book';
-import { useToast } from '@/components/ui/use-toast';
-import { Separator } from '@/components/ui/separator';
+import { AgreementResponse } from '@/types/agreement';
+import { useToast } from '@/components/ui/Toast';
+import { Separator } from '@/components/ui/Separator';
 import { CreatorForm } from '@/components/creators/CreatorForm';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/Table';
+import { formatNumber } from '@/lib/utils';
+import dynamic from 'next/dynamic';
+import { TrendingUp } from 'lucide-react';
+
+import './creator-detail.scss';
+
+const BookProfitabilityChart = dynamic(() => import('@/components/dashboard/BookProfitabilityChart/BookProfitabilityChart').then(mod => mod.BookProfitabilityChart), {
+  ssr: false,
+  loading: () => <div className="h-[400px] w-full bg-muted/10 animate-pulse rounded-lg" />
+});
 
 export default function CreatorDetailPage(props: { params: Promise<{ id: string }> }) {
   const params = use(props.params);
@@ -17,10 +39,15 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
   const { toast } = useToast();
   const [creator, setCreator] = useState<CreatorResponse | null>(null);
   const [books, setBooks] = useState<BookResponse[]>([]);
+  const [agreements, setAgreements] = useState<AgreementResponse[]>([]);
+  const [financialData, setFinancialData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
-  const fetchData = async () => {
+  const { hasPermission } = usePermission();
+  const canUpdate = hasPermission(ModuleName.CREATORS, PermissionAction.UPDATE);
+
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       // Fetch Creator
@@ -35,7 +62,22 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
         const dataBooks = await resBooks.json();
         setBooks(dataBooks.data || []);
       }
-    } catch (error) {
+
+      // Fetch Agreements by Creator
+      const resAgreements = await fetch(`/api/agreements?creatorId=${params.id}`);
+      if (resAgreements.ok) {
+        const dataAgreements = await resAgreements.json();
+        setAgreements(dataAgreements);
+      }
+
+      // Fetch Financial Summary (Profitability by Book)
+      const resFinance = await fetch(`/api/finance/summary?creatorId=${params.id}&groupBy=book`);
+      if (resFinance.ok) {
+        const dataFinance = await resFinance.json();
+        setFinancialData(dataFinance);
+      }
+    } catch {
+      // ...
       toast({
         title: 'Error',
         description: 'No se pudo cargar la información del creador',
@@ -45,11 +87,11 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.id, toast, router]);
 
   useEffect(() => {
     fetchData();
-  }, [params.id]);
+  }, [fetchData]);
 
   const handleEditSuccess = () => {
     fetchData();
@@ -58,7 +100,7 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="creator-detail__loading">
         Cargando...
       </div>
     );
@@ -68,51 +110,55 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
 
   return (
     <>
-      <div className="p-8">
-        <div className="max-w-5xl mx-auto">
+      <div className="creator-detail">
+        <div className="creator-detail__container">
           {/* Header / Nav */}
-          <div className="mb-6 flex items-center justify-between">
-            <Button variant="ghost" className="pl-0" onClick={() => router.back()}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
+          <div className="creator-detail__header">
+            <Button variant="ghost" className="creator-detail__header-btn" onClick={() => router.back()}>
+              <ArrowLeft className="creator-detail__icon" />
               Volver a Creadores
             </Button>
-            <div className="flex gap-2">
-              <Button onClick={() => setEditModalOpen(true)}>
-                <Edit className="mr-2 h-4 w-4" />
-                Editar Perfil
-              </Button>
+            <div className="creator-detail__header-actions">
+              {canUpdate && (
+                <Button onClick={() => setEditModalOpen(true)}>
+                  <Edit className="creator-detail__icon" />
+                  Editar Perfil
+                </Button>
+              )}
             </div>
           </div>
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="creator-detail__grid">
             {/* Left Column: Profile Info */}
-            <div className="space-y-6">
-              <div className="aspect-square relative rounded-full overflow-hidden border bg-muted shadow-sm mx-auto w-48 h-48 md:w-full md:h-auto">
+            <div className="creator-detail__profile-section">
+              <div className="creator-detail__avatar-wrapper">
                 {creator.photo ? (
-                  <img
-                    src={`/uploads/creators/${creator.photo}`} // Assuming path
+                  <Image
+                    src={`/uploads/creators/${creator.photo}`}
                     alt={creator.name}
-                    className="object-cover w-full h-full"
+                    fill
+                    className="creator-detail__avatar-image"
+                    sizes="(max-width: 768px) 192px, 192px"
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full text-3xl bg-primary/10 text-primary">
+                  <div className="creator-detail__avatar-placeholder">
                     {creator.name.charAt(0)}
                   </div>
                 )}
               </div>
 
-              <div className="bg-card border rounded-lg p-4 space-y-3">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MapPin className="h-4 w-4" />
-                  <span className="text-foreground">{creator.nationality || 'Nacionalidad no especificada'}</span>
+              <div className="creator-detail__info-card">
+                <div className="creator-detail__info-row">
+                  <MapPin className="creator-detail__icon" />
+                  <span className="creator-detail__text-foreground">{creator.nationality || 'Nacionalidad no especificada'}</span>
                 </div>
                 {(creator.website) && (
                   <>
                     <Separator />
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Globe className="h-4 w-4" />
-                      <a href={creator.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate">
+                    <div className="creator-detail__info-row">
+                      <Globe className="creator-detail__icon" />
+                      <a href={creator.website} target="_blank" rel="noopener noreferrer" className="creator-detail__link">
                         {creator.website}
                       </a>
                     </div>
@@ -122,42 +168,131 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
             </div>
 
             {/* Right Column: Bio & Works */}
-            <div className="md:col-span-2 space-y-8">
+            <div className="creator-detail__content-section">
               <div>
-                <h1 className="text-2xl font-bold mb-2">{creator.name}</h1>
-                <p className="text-lg leading-relaxed text-foreground/90 whitespace-pre-wrap">
+                <h1 className="creator-detail__name">{creator.name}</h1>
+                <p className="creator-detail__bio">
                   {creator.bio || 'Sin biografía disponible.'}
                 </p>
               </div>
 
               <Separator />
 
+              {Array.isArray(financialData) && financialData.length > 0 && (
+                <>
+                  <div>
+                    <h2 className="creator-detail__section-title">
+                      <TrendingUp className="creator-detail__icon-lg" />
+                      Rentabilidad por Libro (Histórico)
+                    </h2>
+                    <div className="bg-white p-4 rounded-xl border shadow-sm">
+                      <BookProfitabilityChart data={financialData} />
+                    </div>
+                  </div>
+                  <Separator className="my-6" />
+                </>
+              )}
+
               <div>
-                <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                  <BookIcon className="h-5 w-5" />
+                <h2 className="creator-detail__section-title">
+                  <BookIcon className="creator-detail__icon-lg" />
                   Bibliografía ({books.length})
                 </h2>
 
                 {books.length === 0 ? (
-                  <p className="text-muted-foreground">No hay libros registrados para este creador.</p>
+                  <p className="creator-detail__book-list-empty">No hay libros registrados para este creador.</p>
                 ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="creator-detail__books-grid">
                     {books.map(book => (
-                      <div key={book._id} className="border rounded-lg p-4 flex gap-4 hover:bg-accent/50 transition-colors cursor-pointer" onClick={() => router.push(`/dashboard/catalogo/${book._id}`)}>
-                        <div className="h-20 w-14 bg-muted rounded shrink-0 overflow-hidden">
-                          {book.coverImage && <img src={`/uploads/covers/${book.coverImage}`} alt={book.title} className="w-full h-full object-cover" />}
+                      <div key={book._id} className="creator-detail__book-card" onClick={() => router.push(`/dashboard/catalogo/${book._id}`)}>
+                        <div className="creator-detail__book-cover">
+                          {book.coverImage && <Image src={`/uploads/covers/${book.coverImage}`} alt={book.title} fill className="creator-detail__book-image" sizes="56px" />}
                         </div>
-                        <div>
-                          <h3 className="font-semibold line-clamp-1">{book.title}</h3>
-                          <p className="text-xs text-muted-foreground mb-1">{book.genre}</p>
-                          <div className="flex flex-wrap gap-1">
-                            {(book.authors as any[]).some((a: any) => (typeof a === 'string' ? a : a._id) === creator._id) && <Badge variant="secondary" className="text-[10px]">Autor</Badge>}
-                            {(book.translators as any[]).some((a: any) => (typeof a === 'string' ? a : a._id) === creator._id) && <Badge variant="secondary" className="text-[10px]">Traductor</Badge>}
-                            {(book.illustrators as any[]).some((a: any) => (typeof a === 'string' ? a : a._id) === creator._id) && <Badge variant="secondary" className="text-[10px]">Ilustrador</Badge>}
+                        <div className="creator-detail__book-info">
+                          <h3 className="creator-detail__book-title">{book.title}</h3>
+                          <p className="creator-detail__book-genre">{book.genre}</p>
+                          <div className="creator-detail__badges">
+                            {book.authors?.some(a => (typeof a === 'string' ? a : a._id) === creator._id) && <Badge variant="secondary" className="creator-detail__badge-small">Autor</Badge>}
+                            {book.translators?.some(a => (typeof a === 'string' ? a : a._id) === creator._id) && <Badge variant="secondary" className="creator-detail__badge-small">Traductor</Badge>}
+                            {book.illustrators?.some(a => (typeof a === 'string' ? a : a._id) === creator._id) && <Badge variant="secondary" className="creator-detail__badge-small">Ilustrador</Badge>}
                           </div>
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+
+              <Separator className="my-6" />
+
+              <div>
+                <h2 className="creator-detail__section-title">
+                  <FileText className="creator-detail__icon-lg" />
+                  Contratos ({agreements.length})
+                </h2>
+
+                {agreements.length === 0 ? (
+                  <p className="creator-detail__book-list-empty">No hay contratos registrados.</p>
+                ) : (
+                  <div className="border rounded-md">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Libro</TableHead>
+                          <TableHead>Rol</TableHead>
+                          <TableHead>Estado</TableHead>
+                          <TableHead>Royalties</TableHead>
+                          <TableHead>Documento</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {agreements.map((agreement) => (
+                          <TableRow key={agreement._id}>
+                            <TableCell className="font-medium">
+                              {/* Safe cast or check if book is object */}
+                              {typeof agreement.book === 'object' && agreement.book !== null
+                                ? (agreement.book as { title: string }).title
+                                : 'Libro no disponible'}
+                            </TableCell>
+                            <TableCell className="capitalize">
+                              {agreement.role === 'author' && 'Autor'}
+                              {agreement.role === 'translator' && 'Traductor'}
+                              {agreement.role === 'illustrator' && 'Ilustrador'}
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant={
+                                agreement.status === 'active' ? 'success' :
+                                  agreement.status === 'draft' ? 'secondary' : 'destructive'
+                              }>
+                                {agreement.status === 'active' ? 'Activo' :
+                                  agreement.status === 'draft' ? 'Borrador' : 'Terminado'}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {agreement.isPublicDomain ? (
+                                <Badge variant="outline">Dominio Público</Badge>
+                              ) : (
+                                `${formatNumber(agreement.royaltyPercentage)}%`
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {agreement.signedContractUrl ? (
+                                <a
+                                  href={`/uploads/contracts/${agreement.signedContractUrl}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-1 text-primary hover:underline"
+                                >
+                                  <FileText size={14} /> PDF
+                                </a>
+                              ) : (
+                                <span className="text-muted-foreground">-</span>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
                 )}
               </div>

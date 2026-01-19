@@ -1,0 +1,471 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.inventory-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $spacing-md;
+
+    @include md {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    letter-spacing: -0.025em;
+  }
+
+  &__subtitle {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    width: 100%;
+
+    @include sm {
+      width: auto;
+    }
+  }
+
+  &__search-wrapper {
+    position: relative;
+    flex: 1;
+
+    @include sm {
+      flex: none;
+      width: 256px;
+    }
+  }
+
+  &__search-icon {
+    position: absolute;
+    top: 50%;
+    left: $spacing-sm;
+    width: $icon-xs;
+    height: $icon-xs;
+    color: $muted-foreground;
+    transform: translateY(-50%);
+  }
+
+  &__search-input {
+    padding-left: $spacing-xl !important;
+  }
+
+  &__table-wrapper {
+    @include card-base;
+
+    overflow: hidden;
+    position: relative;
+    background-color: $background;
+  }
+
+  &__scroll-container {
+    width: 100%;
+    overflow-x: auto;
+
+    @include custom-scrollbar;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  &__head-book {
+    position: sticky;
+    left: 0;
+    z-index: 20;
+    background-color: $background;
+    border-right: 1px solid $border;
+    box-shadow: 2px 0 5px -2px rgb(0 0 0 / 10%);
+
+    &--compact {
+      width: 250px;
+      min-width: 250px;
+    }
+
+    &--default {
+      width: 300px;
+      min-width: 300px;
+    }
+  }
+
+  &__head-total {
+    width: 80px;
+    background-color: rgba($muted, 0.4);
+    color: $foreground;
+    font-weight: $font-weight-semibold;
+    text-align: center;
+  }
+
+  &__head-warehouse {
+    min-width: 100px;
+    padding: $spacing-xs $spacing-sm;
+    text-align: center;
+    white-space: nowrap;
+
+    &-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 0;
+    }
+
+    &-name {
+      max-width: 120px;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+
+      @include text-truncate;
+    }
+
+    &-code {
+      height: 16px;
+      padding: 0 4px;
+      color: $muted-foreground;
+      font-size: 9px;
+      font-weight: $font-weight-normal;
+      border: 1px solid rgba($muted-foreground, 0.3);
+      border-radius: $radius-xs;
+    }
+  }
+
+  &__row {
+    @include transition(background-color);
+
+    &--compact {
+      height: 44px;
+    }
+
+    &--default {
+      height: 64px;
+    }
+
+    &--even {
+      background-color: $background;
+    }
+
+    &--odd {
+      background-color: rgba($muted, 0.05);
+    }
+
+    &:hover {
+      background-color: rgba($muted, 0.5) !important;
+    }
+  }
+
+  &__cell-book {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+    border-right: 1px solid $border;
+    box-shadow: 2px 0 5px -2px rgb(0 0 0 / 10%);
+    padding: 0;
+    background-color: $background;
+
+    .inventory-matrix__row:hover & {
+      background-color: transparent;
+    }
+  }
+
+  &__book-link {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    width: 100%;
+    height: 100%;
+    padding: 0 $spacing-md;
+    text-decoration: none;
+
+    @include transition(background-color);
+
+    &:hover {
+      background-color: rgba($muted, 0.5);
+    }
+
+    &--compact {
+      padding: 4px $spacing-md;
+    }
+
+    &--default {
+      padding: $spacing-sm $spacing-md;
+    }
+  }
+
+  &__cover {
+    position: relative;
+    background-color: $muted;
+    border: 1px solid rgba($border, 0.5);
+    border-radius: $radius-xs;
+    flex-shrink: 0;
+    overflow: hidden;
+
+    &--compact {
+      width: 20px;
+      height: 32px;
+    }
+
+    &--default {
+      width: 28px;
+      height: 40px;
+    }
+
+    &-placeholder {
+      width: 100%;
+      height: 100%;
+      color: $muted-foreground;
+      font-size: 8px;
+
+      @include flex-center;
+    }
+
+    &-image {
+      object-fit: cover;
+    }
+  }
+
+  &__book-info {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__book-title {
+    color: rgba($foreground, 0.9);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    @include text-truncate;
+    @include transition(color);
+
+    .inventory-matrix__book-link:hover & {
+      color: $primary;
+    }
+  }
+
+  &__book-isbn {
+    color: $muted-foreground;
+    font-family: $font-family-mono;
+    font-size: 10px;
+
+    @include text-truncate;
+  }
+
+  &__cell-total {
+    padding: $spacing-sm;
+    background-color: rgba($muted, 0.1);
+    text-align: center;
+  }
+
+  &__total-badge {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 32px;
+    padding: 2px $spacing-sm;
+    font-size: $font-size-xs;
+    border-radius: $radius-sm;
+
+    &--has-stock {
+      background-color: rgba($primary, 0.1);
+      color: $primary;
+      font-weight: $font-weight-bold;
+    }
+
+    &--no-stock {
+      background-color: rgba($danger, 0.1);
+      color: $danger;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  &__cell-warehouse {
+    padding: 0;
+    text-align: center;
+  }
+
+  &__warehouse-qty {
+    width: 100%;
+    height: 100%;
+    font-size: $font-size-sm;
+
+    @include flex-center;
+
+    &--empty {
+      color: rgba($muted-foreground, 0.2);
+    }
+
+    &--active {
+      color: rgba($foreground, 0.8);
+      font-weight: $font-weight-medium;
+    }
+
+    &-dot {
+      width: 4px;
+      height: 4px;
+      background-color: rgba($muted-foreground, 0.2);
+      border-radius: 50%;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: $spacing-md;
+    border-top: 1px solid $border;
+  }
+
+  &__pagination-info {
+    display: none;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+
+    @include sm {
+      display: block;
+    }
+  }
+
+  &__pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__page-indicator {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0 $spacing-sm;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+
+  &__current-page {
+    min-width: 32px;
+    padding: 4px $spacing-sm;
+    background-color: $background;
+    text-align: center;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+  }
+
+  &__total-pages {
+    color: $muted-foreground;
+  }
+
+  &__loading,
+  &__empty {
+    flex-direction: column;
+    gap: $spacing-sm;
+    height: 128px;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+
+    @include flex-center;
+  }
+
+  &__spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid $primary;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    border-top-color: transparent;
+  }
+
+  &__popover {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    &-section {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-sm;
+    }
+
+    &-title {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      line-height: 1;
+    }
+
+    &-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: $spacing-sm;
+      max-height: 200px;
+      overflow-y: auto;
+      padding-top: $spacing-sm;
+
+      @include custom-scrollbar;
+    }
+
+    &-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+    }
+
+    &-label {
+      font-size: $font-size-xs;
+
+      @include text-truncate;
+    }
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.inventory-matrix {
+  &__icon {
+    width: 1rem; // h-4
+    height: 1rem; // w-4
+  }
+
+  &__icon-btn {
+    width: 2rem; // h-8
+    height: 2rem; // w-8
+    padding: 0; // p-0
+  }
+
+  &__popover-content {
+    width: 20rem; // w-80
+  }
+}

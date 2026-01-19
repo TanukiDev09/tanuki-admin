@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import {
   Table,
   TableBody,
@@ -11,11 +13,12 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from '@/components/ui/Table';
 import { CreatorResponse } from '@/types/creator';
 import { Edit, Trash2, Plus, Search } from 'lucide-react';
 import { CreatorForm } from './CreatorForm';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/Toast';
+import './CreatorList.scss';
 
 export default function CreatorList() {
   const router = useRouter();
@@ -26,7 +29,13 @@ export default function CreatorList() {
   const [selectedCreator, setSelectedCreator] = useState<
     CreatorResponse | null
   >(null);
+
   const { toast } = useToast();
+  const { hasPermission } = usePermission();
+
+  const canCreate = hasPermission(ModuleName.CREATORS, PermissionAction.CREATE);
+  const canUpdate = hasPermission(ModuleName.CREATORS, PermissionAction.UPDATE);
+  const canDelete = hasPermission(ModuleName.CREATORS, PermissionAction.DELETE);
 
   const fetchCreators = useCallback(async () => {
     try {
@@ -90,74 +99,80 @@ export default function CreatorList() {
   };
 
   return (
-    <div className="space-y-4 p-8">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Gestión de Creadores</h1>
-        <Button onClick={handleCreate}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nuevo Creador
-        </Button>
+    <div className="creator-list">
+      <div className="creator-list__header">
+        <h2 className="creator-list__title">Gestión de Creadores</h2>
+        {canCreate && (
+          <Button onClick={handleCreate}>
+            <Plus className="creator-list__create-icon" />
+            Nuevo Creador
+          </Button>
+        )}
       </div>
 
-      <div className="flex items-center space-x-2">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+      <div className="creator-list__search-container">
+        <div className="creator-list__search-wrapper">
+          <Search className="creator-list__search-icon" />
           <Input
             placeholder="Buscar por nombre..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-8"
+            className="creator-list__search-input"
           />
         </div>
       </div>
 
-      <div className="border rounded-md">
+      <div className="creator-list__table-wrapper">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Nombre</TableHead>
               <TableHead>Nacionalidad</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+              <TableHead className="creator-list__actions-head">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8">
+                <TableCell colSpan={3} className="creator-list__loading-cell">
                   Cargando...
                 </TableCell>
               </TableRow>
             ) : creators.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-8">
+                <TableCell colSpan={3} className="creator-list__loading-cell">
                   No se encontraron creadores
                 </TableCell>
               </TableRow>
             ) : (
-              creators.map((creator) => (
+              creators.filter(c => c).map((creator) => (
                 <TableRow key={creator._id}>
-                  <TableCell className="font-medium">
-                    <a href={`/dashboard/creators/${creator._id}`} className="hover:underline hover:text-primary">
+                  <TableCell className="creator-list__name-cell">
+                    <a href={`/dashboard/creators/${creator._id}`} className="creator-list__name-link">
                       {creator.name}
                     </a>
                   </TableCell>
                   <TableCell>{creator.nationality || '-'}</TableCell>
-                  <TableCell className="text-right">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleEdit(creator)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleDelete(creator._id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  <TableCell className="creator-list__actions-cell">
+                    {canUpdate && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(creator)}
+                      >
+                        <Edit className="creator-list__action-icon" />
+                      </Button>
+                    )}
+                    {canDelete && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDelete(creator._id)}
+                        className="creator-list__delete-btn"
+                      >
+                        <Trash2 className="creator-list__action-icon" />
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))

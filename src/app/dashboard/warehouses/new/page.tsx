@@ -1,19 +1,25 @@
 import { WarehouseForm } from '@/components/warehouses/WarehouseForm';
-import { Separator } from '@/components/ui/separator';
+import { Separator } from '@/components/ui/Separator';
 
 export const metadata = {
   title: 'Nueva Bodega - Admin',
 };
 
+import '../../dashboard.scss';
+
 export default function NewWarehousePage() {
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-2xl font-bold tracking-tight">Crear Nueva Bodega</h2>
-      </div>
-      <Separator />
-      <div className="max-w-4xl border rounded-md p-6 bg-card">
-        <WarehouseForm mode="create" />
+    <div className="dashboard-page">
+      <div className="dashboard-page__container">
+        <div className="dashboard-page__header">
+          <h2 className="dashboard-page__title">Crear Nueva Bodega</h2>
+        </div>
+        <Separator className="dashboard-page__section" />
+        <div className="dashboard-page__section">
+          <div className="dashboard-page__chart-card">
+            <WarehouseForm mode="create" />
+          </div>
+        </div>
       </div>
     </div>
   );

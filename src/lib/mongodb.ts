@@ -5,6 +5,7 @@ import '@/models/Movement';
 import '@/models/Book';
 import '@/models/Warehouse';
 import '@/models/InventoryItem';
+import '@/models/Permission';
 
 const MONGODB_URI =
   process.env.MONGODB_URI ||
@@ -48,7 +49,6 @@ async function dbConnect() {
 
   try {
     cached.conn = await cached.promise;
-    console.log('Connected to MongoDB via Mongoose');
   } catch (e) {
     cached.promise = null;
     throw e;

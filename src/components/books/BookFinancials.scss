@@ -1,0 +1,167 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.book-financials {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__icon {
+    width: 1.25rem; // w-5
+    height: 1.25rem; // h-5
+    color: $primary;
+  }
+
+  &__cost-center-badge {
+    padding: $spacing-xs $spacing-sm;
+    background-color: $muted;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    border-radius: $radius-sm;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+
+    @media (min-width: $breakpoint-md) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__card-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: $spacing-xs;
+  }
+
+  &__card-title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+
+  &__trend-icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+
+    &--up {
+      color: $success;
+    }
+
+    &--down {
+      color: $destructive;
+    }
+
+    &--balance {
+      color: $destructive; // Default to red if not profitable, will be overridden
+    }
+  }
+
+  &__value {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+
+    &--income {
+      color: $success; // darker green
+    }
+
+    &--expense {
+      color: $destructive; // darker red
+    }
+
+    &--balance {
+      color: $destructive;
+    }
+  }
+
+  &__subtext {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__card {
+    &--profitable {
+      background-color: rgba($success, 0.1);
+      border-color: rgba($success, 0.3);
+
+      .book-financials__trend-icon--balance {
+        color: $success;
+      }
+
+      .book-financials__value--balance {
+        color: color-mix(in srgb, $success 80%, black); // darken
+      }
+    }
+
+    &--loss {
+      background-color: rgba($destructive, 0.1);
+      border-color: rgba($destructive, 0.3);
+
+      .book-financials__trend-icon--balance {
+        color: $destructive;
+      }
+
+      .book-financials__value--balance {
+        color: color-mix(in srgb, $destructive 80%, black); // darken
+      }
+    }
+  }
+
+  &__skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  &__skeleton-bar {
+    width: 33%;
+    height: 2rem;
+    background-color: $muted;
+    border-radius: $radius-sm;
+  }
+
+  &__skeleton-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+
+    @media (min-width: $breakpoint-md) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__skeleton-card {
+    height: 6rem;
+    background-color: $muted;
+    border-radius: $radius-md;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}

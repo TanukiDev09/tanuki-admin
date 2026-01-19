@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import User from '@/models/User';
 import { UpdateUserDTO, sanitizeUser } from '@/types/user';
 import { hashPassword, validateEmail } from '@/lib/auth';
 import mongoose from 'mongoose';
+
+interface MongooseValidationErrors {
+  errors: Record<string, { message: string }>;
+}
 
 /**
  * GET /api/users/[id]
@@ -13,6 +19,13 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.USERS,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 
@@ -37,15 +50,17 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      data: user,
+      data: sanitizeUser(user),
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error al obtener usuario:', error);
+    const message =
+      error instanceof Error ? error.message : 'Error desconocido';
     return NextResponse.json(
       {
         success: false,
         error: 'Error al obtener el usuario',
-        message: error.message,
+        message: message,
       },
       { status: 500 }
     );
@@ -56,10 +71,91 @@ export async function GET(
  * PUT /api/users/[id]
  * Actualizar un usuario
  */
+async function prepareUpdateData(body: UpdateUserDTO, id: string) {
+  const { email, name, role, isActive, password } = body;
+  const updateData: Record<string, unknown> = {};
+
+  if (email) {
+    if (!validateEmail(email)) {
+      throw new Error('Email inválido');
+    }
+
+    const existingUser = await User.findOne({
+      email: email.toLowerCase(),
+      _id: { $ne: id },
+    });
+
+    if (existingUser) {
+      throw new Error('El email ya está registrado');
+    }
+    updateData.email = email.toLowerCase();
+  }
+
+  if (name) updateData.name = name;
+  if (role) updateData.role = role;
+  if (typeof isActive === 'boolean') updateData.isActive = isActive;
+  if (password) {
+    updateData.password = await hashPassword(password);
+  }
+
+  return updateData;
+}
+
+function handleUserError(error: unknown) {
+  console.error('Error al actualizar/eliminar usuario:', error);
+
+  if (error instanceof Error && error.name === 'ValidationError') {
+    const mongooseError = error as unknown as MongooseValidationErrors;
+    const messages = Object.values(mongooseError.errors || {}).map(
+      (err) => err.message
+    );
+    return NextResponse.json(
+      { success: false, error: 'Error de validación', messages },
+      { status: 400 }
+    );
+  }
+
+  const message = error instanceof Error ? error.message : 'Error desconocido';
+
+  if (message === 'Email inválido') {
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 400 }
+    );
+  }
+  if (message === 'El email ya está registrado') {
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 409 }
+    );
+  }
+  if (message === 'ID de usuario inválido') {
+    return NextResponse.json(
+      { success: false, error: message },
+      { status: 400 }
+    );
+  }
+
+  return NextResponse.json(
+    {
+      success: false,
+      error: 'Error al procesar la solicitud',
+      message: message,
+    },
+    { status: 500 }
+  );
+}
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.USERS,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 
@@ -74,43 +170,7 @@ export async function PUT(
     }
 
     const body: UpdateUserDTO = await request.json();
-    const { email, name, role, isActive, password } = body;
-
-    // Preparar datos a actualizar
-    const updateData: any = {};
-
-    if (email) {
-      if (!validateEmail(email)) {
-        return NextResponse.json(
-          { success: false, error: 'Email inválido' },
-          { status: 400 }
-        );
-      }
-
-      // Verificar si el email ya está en uso por otro usuario
-      const existingUser = await User.findOne({
-        email: email.toLowerCase(),
-        _id: { $ne: id },
-      });
-
-      if (existingUser) {
-        return NextResponse.json(
-          { success: false, error: 'El email ya está registrado' },
-          { status: 409 }
-        );
-      }
-
-      updateData.email = email.toLowerCase();
-    }
-
-    if (name) updateData.name = name;
-    if (role) updateData.role = role;
-    if (typeof isActive === 'boolean') updateData.isActive = isActive;
-
-    // Si se proporciona nueva contraseña, hashearla
-    if (password) {
-      updateData.password = await hashPassword(password);
-    }
+    const updateData = await prepareUpdateData(body, id);
 
     // Actualizar usuario
     const user = await User.findByIdAndUpdate(id, updateData, {
@@ -127,30 +187,11 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      data: user,
+      data: sanitizeUser(user),
       message: 'Usuario actualizado exitosamente',
     });
-  } catch (error: any) {
-    console.error('Error al actualizar usuario:', error);
-
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(
-        (err: any) => err.message
-      );
-      return NextResponse.json(
-        { success: false, error: 'Error de validación', messages },
-        { status: 400 }
-      );
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Error al actualizar el usuario',
-        message: error.message,
-      },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    return handleUserError(error);
   }
 }
 
@@ -162,6 +203,13 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.USERS,
+    PermissionAction.DELETE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 
@@ -191,16 +239,18 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      data: user,
+      data: sanitizeUser(user),
       message: 'Usuario desactivado exitosamente',
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error al eliminar usuario:', error);
+    const message =
+      error instanceof Error ? error.message : 'Error desconocido';
     return NextResponse.json(
       {
         success: false,
         error: 'Error al eliminar el usuario',
-        message: error.message,
+        message: message,
       },
       { status: 500 }
     );

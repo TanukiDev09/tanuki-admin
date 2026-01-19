@@ -14,6 +14,7 @@ export interface IPointOfSale extends Document {
   warehouseId?: mongoose.Types.ObjectId;
   status: 'active' | 'inactive';
   type: 'physical' | 'online' | 'event';
+  discountPercentage?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -75,6 +76,12 @@ const PointOfSaleSchema: Schema = new Schema(
       type: String,
       enum: ['physical', 'online', 'event'],
       default: 'physical',
+    },
+    discountPercentage: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
     },
   },
   {

@@ -1,0 +1,34 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.settings-page {
+  @include card-base;
+
+  padding-top: $spacing-xl;
+  padding-bottom: $spacing-xl;
+
+  &__title {
+    margin-bottom: $spacing-lg;
+    font-family: $font-serif;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__content {
+    @include card-base;
+
+    padding: $spacing-3xl;
+    text-align: center;
+  }
+
+  &__text-lg {
+    margin-bottom: $spacing-xs;
+    color: $muted-foreground;
+    font-size: $font-size-lg;
+  }
+
+  &__text-sm {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+}

@@ -1,0 +1,130 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// ============================================
+// DASHBOARD LAYOUT & DESIGN SYSTEM
+// Premium UI/UX Redesign
+// ============================================
+
+// Placeholder for extension
+%dashboard-base {
+  &__container {
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-3xl;
+    min-height: 100vh;
+    padding-bottom: 150px; // Significantly increased to fully clear mobile bottom menu
+    
+    // Subtle background mesh/gradient effect could be added here if not in global body
+    
+    @include lg {
+      padding: $spacing-xl;
+      padding-bottom: $spacing-xl; // Reset padding on desktop
+    }
+  }
+
+  // --- HEADER SECTION ---
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg; // Increased from md
+    position: relative;
+    padding-bottom: $spacing-xl; // Increased from lg
+    border-bottom: 1px solid rgba($border, 0.4);
+
+    @include md {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+  }
+
+// ...
+
+  // --- ACTIVITY SECTION ---
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl; // Increased from md
+  }
+  
+  &__section-title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $foreground;
+    margin-bottom: $spacing-md;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    &::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 20px;
+      background: $primary;
+      border-radius: 2px;
+    }
+  }
+
+  &__section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+  }
+
+  &__table-card {
+    background: $card;
+    border-radius: $radius-xl;
+    border: 1px solid rgba($border, 0.4);
+    overflow: hidden;
+    box-shadow: $shadow-sm;
+    
+    // Ensure table inside looks good
+    :global(table) {
+      width: 100%;
+    }
+  }
+}
+
+// Apply the styles
+.dashboard {
+  @extend %dashboard-base;
+}
+
+.dashboard-page {
+  @extend %dashboard-base;
+
+  // --- LEGACY SUPPORT ---
+  &__icon-sm {
+    width: 1rem;
+    height: 1rem;
+    margin-right: $spacing-xs;
+  }
+}
+
+// Sparkline loading state placeholder animation
+.chart-loading-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  background: linear-gradient(
+    90deg, 
+    rgba($muted, 0.1) 25%, 
+    rgba($muted, 0.2) 50%, 
+    rgba($muted, 0.1) 75%
+  );
+  background-size: 200% 100%;
+  border-radius: $radius-md;
+  animation: loading-pulse 1.5s infinite;
+}
+
+@keyframes loading-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

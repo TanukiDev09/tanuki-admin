@@ -1,10 +1,19 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import Book from '@/models/Book';
 import Warehouse from '@/models/Warehouse';
 import InventoryItem from '@/models/InventoryItem';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.INVENTORY,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
@@ -18,7 +27,7 @@ export async function GET(request: Request) {
       .sort({ name: 1 });
 
     // 2. Build query for books
-    const query: any = {};
+    const query: Record<string, unknown> = {};
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -43,7 +52,7 @@ export async function GET(request: Request) {
     }).lean();
 
     // 5. Transform data for matrix
-    const matrixData = books.map((book: any) => {
+    const matrixData = books.map((book) => {
       const bookInventory = inventoryItems.filter(
         (item) => item.bookId.toString() === book._id.toString()
       );

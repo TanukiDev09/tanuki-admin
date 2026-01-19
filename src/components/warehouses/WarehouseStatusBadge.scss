@@ -1,0 +1,25 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.warehouse-status-badge {
+  // Base styles are inherited from Badge component,
+  // but we can enforce specific overrides here if needed.
+
+  &--active {
+    background-color: rgba($success, 0.1);
+    color: $success;
+
+    &:hover {
+      background-color: rgba($success, 0.2);
+    }
+  }
+
+  &--inactive {
+    background-color: rgba($destructive, 0.1);
+    color: $destructive;
+
+    &:hover {
+      background-color: rgba($destructive, 0.2);
+    }
+  }
+}

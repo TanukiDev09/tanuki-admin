@@ -83,6 +83,7 @@ export interface InventoryByWarehouse {
   quantity: number;
   minStock?: number;
   maxStock?: number;
+  inventoryItemId?: string;
 }
 
 // Respuesta de libro
@@ -116,6 +117,7 @@ export interface BookResponse {
 }
 
 // Función helper para sanitizar libro
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function sanitizeBook(book: IBook | Record<string, any>): BookResponse {
   // If it's a mongoose document, convert to object
   const bookObj = book.toObject ? book.toObject() : book;

@@ -1,0 +1,157 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.health-score-card {
+  @include transition(colors);
+
+  &--excellent {
+    background-color: $flow-bg;
+  }
+
+  &--moderate {
+    background-color: rgba($warning, 0.05);
+  } // Custom amber bg
+  &--critical {
+    background-color: $ebb-bg;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-sm;
+    padding-bottom: $spacing-xs;
+    border-bottom: 1px solid rgba($border, 0.1);
+  }
+
+  &__title {
+    color: $foreground;
+    font-family: $font-sans;
+    font-size: 0.7rem; // text-[0.7rem]
+    font-weight: $font-weight-medium;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  &__header-icon {
+    width: 16px;
+    height: 16px;
+    color: $muted-foreground;
+  }
+
+  &__content {
+    padding-top: 0;
+  }
+
+  &__body {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__score {
+    margin-bottom: 4px;
+    color: $foreground;
+    font-family: $font-serif;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-medium;
+    letter-spacing: -0.025em;
+  }
+
+  &__score-total {
+    margin-left: 4px;
+    color: $muted-foreground;
+    font-family: $font-sans;
+    font-size: $font-size-lg;
+  }
+
+  &__description {
+    margin-bottom: $spacing-sm;
+    color: $muted-foreground;
+    font-family: $font-sans;
+    font-size: $font-size-xs;
+  }
+
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: $font-sans;
+    font-size: $font-size-xs;
+
+    &--excellent {
+      color: $flow;
+    }
+
+    &--moderate {
+      color: $warning;
+    }
+
+    &--critical {
+      color: $ebb;
+    }
+  }
+
+  &__status-label {
+    font-weight: $font-weight-medium;
+  }
+
+  &__progress {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    flex-shrink: 0;
+  }
+
+  &__progress-svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+
+  &__progress-bg {
+    fill: none;
+    stroke: $muted;
+    stroke-width: 6;
+    opacity: 0.2;
+  }
+
+  &__progress-fill {
+    fill: none;
+    stroke-width: 6;
+    stroke-linecap: round;
+
+    @include transition(all);
+
+    transition-duration: 500ms;
+  }
+
+  &__progress-text {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: $font-serif;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    inset: 0;
+
+    &--excellent {
+      color: $flow;
+    }
+
+    &--moderate {
+      color: $warning;
+    }
+
+    &--critical {
+      color: $ebb;
+    }
+  }
+}

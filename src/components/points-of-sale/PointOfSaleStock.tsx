@@ -1,13 +1,15 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import { InventoryAdjustModal } from '@/components/inventory/InventoryAdjustModal';
 import { AddBookToInventoryModal } from '@/components/inventory/AddBookToInventoryModal';
 import { Warehouse, Package, Building2, ExternalLink, Plus } from 'lucide-react';
+import { formatNumber } from '@/lib/utils';
 import Link from 'next/link';
+import './PointOfSaleStock.scss';
 
 interface PointOfSaleStockProps {
   warehouseId?: string;
@@ -84,13 +86,13 @@ export function PointOfSaleStock({ warehouseId }: PointOfSaleStockProps) {
 
   if (!warehouseId) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 border rounded-lg bg-muted/20 text-center">
-        <Warehouse className="w-12 h-12 text-muted-foreground mb-4 opacity-50" />
-        <h3 className="text-lg font-medium">No hay bodega asociada</h3>
-        <p className="text-sm text-muted-foreground max-w-xs mt-2">
+      <div className="pos-stock__empty">
+        <Warehouse className="pos-stock__empty-icon" />
+        <h3 className="pos-stock__empty-title">No hay bodega asociada</h3>
+        <p className="pos-stock__empty-text">
           Este punto de venta aún no tiene una bodega asociada para gestionar inventario.
         </p>
-        <div className="mt-6 flex gap-2">
+        <div className="pos-stock__empty-actions">
           <Button variant="outline" asChild>
             <Link href="/dashboard/warehouses/new">
               Crear Nueva Bodega
@@ -102,47 +104,47 @@ export function PointOfSaleStock({ warehouseId }: PointOfSaleStockProps) {
     );
   }
 
-  if (loading) return <div className="p-8 text-center text-muted-foreground">Cargando inventario...</div>;
+  if (loading) return <div className="pos-stock__loading">Cargando inventario...</div>;
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="pos-stock__container">
+      <div className="pos-stock__grid">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Productos</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="pos-stock__stat-header">
+            <CardTitle className="pos-stock__stat-title">Total Productos</CardTitle>
+            <Package className="pos-stock__stat-icon" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{inventory.length}</div>
+            <div className="pos-stock__stat-value">{formatNumber(inventory.length)}</div>
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Unidades Totales</CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
+          <CardHeader className="pos-stock__stat-header">
+            <CardTitle className="pos-stock__stat-title">Unidades Totales</CardTitle>
+            <Building2 className="pos-stock__stat-icon" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
-              {inventory.reduce((acc, curr) => acc + curr.quantity, 0)}
+            <div className="pos-stock__stat-value">
+              {formatNumber(inventory.reduce((acc, curr) => acc + curr.quantity, 0))}
             </div>
           </CardContent>
         </Card>
 
         {warehouse && (
-          <Card className="lg:col-span-2">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Información de Bodega</CardTitle>
-              <Warehouse className="h-4 w-4 text-muted-foreground" />
+          <Card className="pos-stock__warehouse-card">
+            <CardHeader className="pos-stock__stat-header">
+              <CardTitle className="pos-stock__stat-title">Información de Bodega</CardTitle>
+              <Warehouse className="pos-stock__stat-icon" />
             </CardHeader>
             <CardContent>
-              <div className="flex justify-between items-center">
+              <div className="pos-stock__warehouse-info-row">
                 <div>
-                  <p className="text-lg font-bold">{warehouse.name}</p>
-                  <p className="text-sm text-muted-foreground">Código: {warehouse.code}</p>
+                  <p className="pos-stock__warehouse-name">{warehouse.name}</p>
+                  <p className="pos-stock__warehouse-code">Código: {warehouse.code}</p>
                 </div>
                 <Button variant="ghost" size="sm" asChild>
                   <Link href={`/dashboard/warehouses/${warehouseId}`}>
-                    Gestionar <ExternalLink className="ml-2 w-4 h-4" />
+                    Gestionar <ExternalLink className="pos-stock__external-icon" />
                   </Link>
                 </Button>
               </div>
@@ -152,7 +154,7 @@ export function PointOfSaleStock({ warehouseId }: PointOfSaleStockProps) {
       </div>
 
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0">
+        <CardHeader className="pos-stock__inventory-header">
           <div>
             <CardTitle>Inventario en Punto de Venta</CardTitle>
             <CardDescription>
@@ -160,13 +162,13 @@ export function PointOfSaleStock({ warehouseId }: PointOfSaleStockProps) {
             </CardDescription>
           </div>
           <Button size="sm" onClick={() => setAddBookModalOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" /> Agregar Libro
+            <Plus className="pos-stock__add-icon" /> Agregar Libro
           </Button>
         </CardHeader>
         <CardContent>
           <InventoryList
             data={inventory}
-            onAdjustStock={handleAdjustStock}
+            onAdjust={(item) => handleAdjustStock(item, 'set')}
           />
         </CardContent>
       </Card>

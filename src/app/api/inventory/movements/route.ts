@@ -1,4 +1,6 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import InventoryMovement, {
   InventoryMovementType,
@@ -8,8 +10,14 @@ import InventoryItem from '@/models/InventoryItem';
 import Warehouse from '@/models/Warehouse';
 import Movement from '@/models/Movement';
 
+interface BodyWithItems {
+  type: string;
+  items: unknown[];
+  [key: string]: unknown;
+}
+
 // Helper: Validation
-function validateRequestBody(body: any) {
+function validateRequestBody(body: BodyWithItems) {
   const { type, items } = body;
   if (!type || !items || !items.length) {
     return 'Faltan campos requeridos: type, items';
@@ -33,28 +41,49 @@ async function getWarehouses(fromId?: string, toId?: string) {
   return { sourceWarehouse, destWarehouse };
 }
 
+interface WarehouseDoc {
+  type: string;
+  _id: unknown;
+}
+
+function validateEntry(dest: WarehouseDoc | null) {
+  if (!dest) return 'Bodega de destino requerida para Ingreso';
+  if (dest.type === 'pos')
+    return 'Ingresos solo permitidos en Editorial/Distribuidor';
+  return null;
+}
+
+function validateRemission(
+  source: WarehouseDoc | null,
+  dest: WarehouseDoc | null
+) {
+  if (!source || !dest) return 'Origen y Destino requeridos para Remisión';
+  if (source.type === 'pos')
+    return 'Remisión debe salir de Editorial/Distribuidor';
+  if (dest.type !== 'pos') return 'Remisión debe ir a un Punto de Venta';
+  return null;
+}
+
+function validateReturn(
+  source: WarehouseDoc | null,
+  dest: WarehouseDoc | null
+) {
+  if (!source || !dest) return 'Origen y Destino requeridos para Devolución';
+  if (source.type !== 'pos')
+    return 'Devolución debe salir de un Punto de Venta';
+  if (dest.type === 'pos') return 'Devolución debe ir a Editorial/Distribuidor';
+  return null;
+}
+
 // Helper: Business Rules
-function validateRules(type: string, source: any, dest: any) {
+function validateRules(type: string, source: WarehouseDoc, dest: WarehouseDoc) {
   switch (type) {
     case InventoryMovementType.INGRESO:
-      if (!dest) return 'Bodega de destino requerida para Ingreso';
-      if (dest.type === 'pos')
-        return 'Ingresos solo permitidos en Editorial/Distribuidor';
-      break;
+      return validateEntry(dest);
     case InventoryMovementType.REMISION:
-      if (!source || !dest) return 'Origen y Destino requeridos para Remisión';
-      if (source.type === 'pos')
-        return 'Remisión debe salir de Editorial/Distribuidor';
-      if (dest.type !== 'pos') return 'Remisión debe ir a un Punto de Venta';
-      break;
+      return validateRemission(source, dest);
     case InventoryMovementType.DEVOLUCION:
-      if (!source || !dest)
-        return 'Origen y Destino requeridos para Devolución';
-      if (source.type !== 'pos')
-        return 'Devolución debe salir de un Punto de Venta';
-      if (dest.type === 'pos')
-        return 'Devolución debe ir a Editorial/Distribuidor';
-      break;
+      return validateReturn(source, dest);
     case InventoryMovementType.LIQUIDACION:
       if (!source) return 'Bodega de origen requerida para Liquidación';
       break;
@@ -65,7 +94,10 @@ function validateRules(type: string, source: any, dest: any) {
 }
 
 // Helper: Check Stock
-async function checkStock(fromId: string, items: any[]) {
+async function checkStock(
+  fromId: string,
+  items: Array<{ bookId: string; quantity: number }>
+) {
   for (const item of items) {
     const sourceItem = await InventoryItem.findOne({
       warehouseId: fromId,
@@ -79,7 +111,10 @@ async function checkStock(fromId: string, items: any[]) {
 }
 
 // Helper: Create Financial Movement
-async function createFinancialMovement(data: any, date: Date) {
+async function createFinancialMovement(
+  data: Record<string, unknown>,
+  date: Date
+) {
   try {
     const newMovement = await Movement.create({
       ...data,
@@ -97,7 +132,7 @@ async function createFinancialMovement(data: any, date: Date) {
 async function updateInventory(
   fromId: string | undefined,
   toId: string | undefined,
-  items: any[]
+  items: Array<{ bookId: string; quantity: number }>
 ) {
   for (const item of items) {
     if (fromId) {
@@ -127,7 +162,14 @@ async function updateInventory(
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.INVENTORY,
+    PermissionAction.CREATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const body = await request.json();
@@ -235,7 +277,14 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.INVENTORY,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
@@ -243,7 +292,7 @@ export async function GET(request: Request) {
     const type = searchParams.get('type');
     const warehouseId = searchParams.get('warehouseId');
 
-    const query: any = {};
+    const query: Record<string, unknown> = {};
     if (type && type !== 'ALL') {
       query.type = type;
     }
@@ -257,9 +306,25 @@ export async function GET(request: Request) {
     const movements = await InventoryMovement.find(query)
       .sort({ date: -1 })
       .limit(limit)
-      .populate('fromWarehouseId', 'name type')
-      .populate('toWarehouseId', 'name type')
-      .populate('items.bookId', 'title isbn')
+      .populate({
+        path: 'fromWarehouseId',
+        select: 'name type address city pointOfSaleId',
+        populate: {
+          path: 'pointOfSaleId',
+          select:
+            'identificationType identificationNumber address city discountPercentage',
+        },
+      })
+      .populate({
+        path: 'toWarehouseId',
+        select: 'name type address city pointOfSaleId',
+        populate: {
+          path: 'pointOfSaleId',
+          select:
+            'identificationType identificationNumber address city discountPercentage',
+        },
+      })
+      .populate('items.bookId', 'title isbn price')
       .populate('createdBy', 'name');
 
     return NextResponse.json({ success: true, data: movements });

@@ -1,0 +1,48 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.create-user-modal {
+  // DialogContent already handles max-width and centering,
+  // we can add specific width override if needed
+  max-width: 480px;
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    margin-top: $spacing-md;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__select-trigger {
+    width: 100%;
+  }
+
+  &__error {
+    padding: $spacing-sm $spacing-md;
+    background-color: rgba($destructive, 0.1);
+    color: $destructive;
+    font-size: $font-size-sm;
+    border: 1px solid rgba($destructive, 0.3);
+    border-radius: $radius-md;
+  }
+
+  &__footer {
+    gap: $spacing-sm;
+    padding-top: $spacing-md;
+
+    // Ensure consistent stacking on mobile if needed
+    @media (width <= 640px) {
+      flex-direction: column-reverse;
+
+      & > * {
+        width: 100%;
+      }
+    }
+  }
+}

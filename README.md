@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tanuki Admin
 
-## Getting Started
+Sistema de administración integral para gestión de inventario, finanzas y operaciones.
 
-First, run the development server:
+## 🚀 Inicio Rápido
 
 ```bash
+# Instalar dependencias
+npm install
+
+# Ejecutar en modo desarrollo
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Compilar para producción
+npm run build
+
+# Iniciar servidor de producción
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📂 Estructura del Proyecto
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+tanuki-admin/
+├── 📁 docs/              # Documentación completa del proyecto
+├── 📁 config/            # Archivos de configuración
+├── 📁 scripts/           # Scripts de utilidad organizados
+│   ├── db/              # Scripts de base de datos
+│   ├── dev/             # Scripts de desarrollo
+│   └── testing/         # Scripts de pruebas
+├── 📁 src/              # Código fuente de la aplicación
+│   ├── app/            # Páginas y API routes (Next.js)
+│   ├── components/     # Componentes React
+│   ├── lib/            # Utilidades y helpers
+│   ├── models/         # Modelos de MongoDB
+│   └── types/          # Definiciones TypeScript
+├── 📁 cypress/          # Tests end-to-end
+├── 📁 public/           # Assets estáticos
+└── 📁 tools/            # Herramientas de análisis
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📚 Documentación
 
-## Learn More
+Consulta la [documentación completa](./docs/README.md) para más información sobre:
 
-To learn more about Next.js, take a look at the following resources:
+- [Guía de Integración de Permisos API](./docs/api/permissions-integration.md)
+- [Módulo de Catálogo](./docs/modules/catalog.md)
+- [Módulo de Usuarios](./docs/modules/users.md)
+- [Sistema de Diseño](./docs/design/design-system.md)
+- [Referencia Rápida del Sistema de Diseño](./docs/design/quick-reference.md)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Scripts Disponibles
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Desarrollo
+- `npm run dev` - Iniciar servidor de desarrollo
+- `npm run lint` - Ejecutar linter
+- `npm run format` - Formatear código con Prettier
 
-## Deploy on Vercel
+### Testing
+- `npm test` - Ejecutar tests unitarios
+- `npm run test:watch` - Ejecutar tests en modo watch
+- `npm run test:coverage` - Generar reporte de cobertura
+- `npm run test:e2e:open` - Abrir Cypress para tests E2E
+- `npm run test:a11y` - Ejecutar tests de accesibilidad
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Base de Datos
+- `npm run seed:permissions` - Poblar permisos iniciales
+- `npm run discover-routes` - Descubrir rutas de la aplicación
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Producción
+- `npm run build` - Compilar para producción
+- `npm start` - Iniciar servidor de producción
+- `npm run perf` - Análisis de rendimiento con Lighthouse
+
+## 🗂️ Módulos Principales
+
+- **Dashboard**: Panel de control con métricas y estadísticas
+- **Inventario**: Gestión de productos y almacenes
+- **Finanzas**: Control de ingresos, gastos y categorías
+- **Catálogo**: Administración de libros, creadores y colecciones
+- **Usuarios**: Gestión de usuarios y permisos
+- **Puntos de Venta**: Control de PDVs y stock
+- **Acuerdos**: Gestión de contratos y convenios
+
+## 🔧 Tecnologías
+
+- **Framework**: Next.js 16
+- **UI**: React 19, Tailwind CSS 4
+- **Base de Datos**: MongoDB con Mongoose
+- **Autenticación**: JWT
+- **Testing**: Jest, Cypress, Testing Library
+- **Linting**: ESLint, Prettier
+- **Gráficos**: Recharts
+- **Formularios**: React Hook Form + Zod
+
+## 🤝 Contribuir
+
+1. Revisa la [guía de contribución](./docs/CONTRIBUTING.md)
+2. Asegúrate de seguir el [sistema de diseño](./docs/design/design-system.md)
+3. Ejecuta tests antes de hacer commit
+4. Mantén el código formateado con Prettier
+
+## 📝 Licencia
+
+Propietario - Todos los derechos reservados
+
+## 🔗 Enlaces Útiles
+
+- [Plan de Reorganización](./PLAN_REORGANIZACION.md)
+- [Validador de Esquema](./validator.json)
+
+---
+
+**Versión**: 0.1.0  
+**Última actualización**: Enero 2026

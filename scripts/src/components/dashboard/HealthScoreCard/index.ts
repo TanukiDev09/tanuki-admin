@@ -1,0 +1,1 @@
+export { HealthScoreCard } from './HealthScoreCard';

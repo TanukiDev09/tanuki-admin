@@ -1,8 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import InventoryItem from '@/models/InventoryItem';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.INVENTORY,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
@@ -60,12 +69,20 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.INVENTORY,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const body = await request.json();
     const { warehouseId, bookId, quantity } = body;
 
+    // Validaciones
     if (!warehouseId || !bookId) {
       return NextResponse.json(
         { error: 'warehouseId y bookId son requeridos' },
@@ -80,26 +97,26 @@ export async function POST(request: Request) {
       );
     }
 
-    // Try to find existing item
+    // Actualización o Creación
     let item = await InventoryItem.findOne({ warehouseId, bookId });
+    let statusCode = 200;
 
     if (item) {
-      // Update existing
       item.quantity = quantity;
       item.lastUpdated = new Date();
       if (body.minStock !== undefined) item.minStock = body.minStock;
       if (body.maxStock !== undefined) item.maxStock = body.maxStock;
       await item.save();
     } else {
-      // Create new
       item = await InventoryItem.create(body);
+      statusCode = 201;
     }
 
     const populatedItem = await InventoryItem.findById(item._id)
       .populate('warehouseId', 'name code')
       .populate('bookId', 'title isbn price');
 
-    return NextResponse.json(populatedItem, { status: item ? 200 : 201 });
+    return NextResponse.json(populatedItem, { status: statusCode });
   } catch (err) {
     const error =
       err instanceof Error

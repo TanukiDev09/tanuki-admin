@@ -1,0 +1,162 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.book-inventory-summary {
+  &__header-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__icon {
+    width: 1.25rem; // w-5
+    height: 1.25rem; // h-5
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__total-stock {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md;
+    background-color: $muted;
+    border-radius: $radius-md;
+  }
+
+  &__total-label {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__total-value {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__loading {
+    padding-top: $spacing-xl;
+    padding-bottom: $spacing-xl;
+    color: $muted-foreground;
+    text-align: center;
+  }
+
+  &__loading-icon {
+    width: 3rem; // w-12
+    height: 3rem; // h-12
+    margin-right: auto;
+    margin-bottom: $spacing-xs;
+    margin-left: auto;
+    animation: spin 1s linear infinite; // Assuming 'spin' is global or needs @keyframes here
+    opacity: 0.5;
+  }
+
+  &__list-header {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-sm;
+    background-color: rgba($muted, 0.2); // Default bg
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    transition: background-color $transition-base;
+
+    &:hover {
+      background-color: rgba($muted, 0.5);
+    }
+
+    &--has-stock {
+      background-color: rgba($success, 0.05);
+      border-color: rgba($success, 0.3);
+
+      &:hover {
+        background-color: rgba($muted, 0.5); // Or maybe keep greenish tint?
+      }
+    }
+  }
+
+  &__item-info {
+    flex: 1;
+  }
+
+  &__item-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin-bottom: 0.25rem;
+  }
+
+  &__warehouse-icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+    color: $muted-foreground;
+
+    &--stock {
+      color: $success;
+    }
+  }
+
+  &__warehouse-name {
+    font-weight: $font-weight-medium;
+  }
+
+  &__unavailable-badge {
+    font-size: $font-size-xs;
+  }
+
+  &__item-code {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__item-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__stock-display {
+    text-align: right;
+  }
+
+  &__stock-value {
+    color: $muted-foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+
+    &--stock {
+      color: $success;
+    }
+  }
+
+  &__stock-unit {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__action-btn {
+    width: 2rem; // w-8
+    height: 2rem; // h-8
+  }
+
+  &__action-icon {
+    width: 1rem; // w-4
+    height: 1rem;
+  }
+}

@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/use-toast';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
+import { useToast } from '@/components/ui/Toast';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import { Movement } from '@/types/movement';
 import {
@@ -12,7 +12,11 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/Card"
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
+import { formatCurrency, formatNumber } from '@/lib/utils';
+import '../movement-detail.scss';
 
 export default function MovementDetailPage() {
   const router = useRouter();
@@ -20,6 +24,8 @@ export default function MovementDetailPage() {
   const { toast } = useToast();
   const [movement, setMovement] = useState<Movement | null>(null);
   const [loading, setLoading] = useState(true);
+  const { hasPermission } = usePermission();
+  const canUpdate = hasPermission(ModuleName.FINANCE, PermissionAction.UPDATE);
 
   useEffect(() => {
     const fetchMovement = async () => {
@@ -40,93 +46,99 @@ export default function MovementDetailPage() {
     if (params.id) fetchMovement();
   }, [params.id, router, toast]);
 
-  if (loading) return <div className="p-8 text-center">Cargando...</div>;
-  if (!movement) return <div className="p-8 text-center">Movimiento no encontrado</div>;
+  if (loading) return <div className="movement-detail__loading">Cargando...</div>;
+  if (!movement) return <div className="movement-detail__error">Movimiento no encontrado</div>;
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-6 pl-0">
-        <ArrowLeft className="mr-2 h-4 w-4" />
+    <div className="movement-detail">
+      <Button variant="ghost" onClick={() => router.back()} className="movement-detail__back-btn">
+        <ArrowLeft className="movement-detail__icon" />
         Volver
       </Button>
 
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <h1 className="text-2xl font-bold mb-2">Detalle de Movimiento</h1>
-          <Badge variant="outline" className="text-sm">
+      <div className="movement-detail__header">
+        <div className="movement-detail__title-group">
+          <h1 className="movement-detail__title">Detalle de Movimiento</h1>
+          <Badge variant="outline" className="movement-detail__status-badge">
             {movement.status || 'COMPLETED'}
           </Badge>
         </div>
-        <Button onClick={() => router.push(`/dashboard/movements/${movement._id}/editar`)}>
-          <Pencil className="mr-2 h-4 w-4" />
-          Editar
-        </Button>
+        {canUpdate && (
+          <Button onClick={() => router.push(`/dashboard/movements/${movement._id}/editar`)}>
+            <Pencil className="movement-detail__icon" />
+            Editar
+          </Button>
+        )}
       </div>
 
       <Card>
         <CardHeader>
           <CardTitle>{movement.description}</CardTitle>
-          <p className="text-sm text-muted-foreground">{new Date(movement.date).toLocaleDateString()}</p>
+          <p className="movement-detail__date">{new Date(movement.date).toLocaleDateString()}</p>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+        <CardContent className="movement-detail__content">
+          <div className="movement-detail__grid-2">
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground">Tipo</h3>
-              <p className={movement.type === 'INCOME' ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>
+              <h3 className="movement-detail__label">Tipo</h3>
+              <p className={movement.type === 'INCOME' ? 'movement-detail__value--income' : 'movement-detail__value--expense'}>
                 {movement.type === 'INCOME' ? 'INGRESO' : 'EGRESO'}
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground">Monto</h3>
-              <p className="text-xl font-bold">${movement.amount.toLocaleString()}</p>
+              <h3 className="movement-detail__label">Monto</h3>
+              <p className="movement-detail__value--xl">{formatCurrency(movement.amount)}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="movement-detail__grid-3">
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground">Unidad</h3>
+              <h3 className="movement-detail__label">Unidad</h3>
               <p>{movement.unit || '-'}</p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground">Cantidad</h3>
-              <p>{movement.quantity ? Number(movement.quantity).toLocaleString() : '-'}</p>
+              <h3 className="movement-detail__label">Cantidad</h3>
+              <p>{movement.quantity ? formatNumber(movement.quantity) : '-'}</p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground">Valor Unitario</h3>
-              <p>{movement.unitValue ? `$${Number(movement.unitValue).toLocaleString()}` : '-'}</p>
+              <h3 className="movement-detail__label">Valor Unitario</h3>
+              <p>{movement.unitValue ? formatCurrency(Number(movement.unitValue)) : '-'}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="movement-detail__grid-2">
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground">Categoría</h3>
-              <p>{typeof movement.category === 'string' ? movement.category : movement.category.name}</p>
+              <h3 className="movement-detail__label">Categoría</h3>
+              <p>
+                {movement.category
+                  ? (typeof movement.category === 'string' ? movement.category : movement.category.name)
+                  : '-'}
+              </p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground">Centro de Costos</h3>
+              <h3 className="movement-detail__label">Centro de Costos</h3>
               <p>{movement.costCenter || '-'}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="movement-detail__grid-2">
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground">Beneficiario / Pagador</h3>
+              <h3 className="movement-detail__label">Beneficiario / Pagador</h3>
               <p>{movement.beneficiary}</p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground">Canal de Pago</h3>
+              <h3 className="movement-detail__label">Canal de Pago</h3>
               <p>{movement.paymentChannel}</p>
             </div>
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-muted-foreground">Notas</h3>
-            <p className="whitespace-pre-wrap">{movement.notes || 'Sin notas adicionales.'}</p>
+            <h3 className="movement-detail__label">Notas</h3>
+            <p className="movement-detail__notes">{movement.notes || 'Sin notas adicionales.'}</p>
           </div>
 
           {movement.invoiceRef && (
             <div>
-              <h3 className="text-sm font-medium text-muted-foreground">Referencia Factura</h3>
+              <h3 className="movement-detail__label">Referencia Factura</h3>
               <p>{movement.invoiceRef}</p>
             </div>
           )}

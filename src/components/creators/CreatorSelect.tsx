@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Check,
   ChevronsUpDown,
@@ -9,24 +9,24 @@ import {
   PlusCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import {
+
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@/components/ui/command';
+} from '@/components/ui/Command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover';
+} from '@/components/ui/Popover';
 import { CreatorResponse } from '@/types/creator';
-import { Badge } from '@/components/ui/badge';
 import { CreatorForm } from './CreatorForm';
+import './CreatorSelect.scss';
 
 interface CreatorSelectProps {
   value: string[];
@@ -47,12 +47,7 @@ export function CreatorSelect({
   const [search, setSearch] = useState('');
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  // Mantiene los creadores seleccionados aunque no estén en la búsqueda actual
-  const [selectedCreators, setSelectedCreators] = useState<CreatorResponse[]>(
-    []
-  );
-
-  const fetchCreators = async (searchTerm: string = '') => {
+  const fetchCreators = useCallback(async (searchTerm: string = '') => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -67,34 +62,12 @@ export function CreatorSelect({
     } finally {
       setLoading(false);
     }
-  };
-
-  // Cargar creadores seleccionados inicialmente si value tiene IDs
-  useEffect(() => {
-    const fetchSelected = async () => {
-      if (value.length === 0) {
-        setSelectedCreators([]);
-        return;
-      }
-
-      // Filtramos IDs que ya tenemos en selectedCreators para no volver a pedirlos si no es necesario,
-      // pero para simplificar, pediremos todos los que falten o recargaremos.
-      // Mejor estrategia: Pedir los detalles de los IDs en value.
-      // Como no tenemos un endpoint para "getManyByIds", los pediremos uno por uno o asumiremos que
-      // la lista principal los contiene si cargamos todo. Cargar todo puede ser mucho.
-      // Por ahora, cargaremos la lista inicial y si faltan, intentaremos buscarlos.
-
-      // FIX: Si el componente padre pasa IDs que no están en la lista actual, 
-      // necesitamos mostrarlos.
-      // Para esta implementación básica, cargaremos los primeros 100 creators
-      // y esperamos que estén ahí. Una implementación robusta requeriría
-      // un endpoint que acepte lista de IDs.
-
-      // Simplemente cargaremos la lista inicial.
-    };
-
-    fetchCreators('');
   }, []);
+
+  // Cargar creadores inicialmente
+  useEffect(() => {
+    fetchCreators('');
+  }, [fetchCreators]);
 
   // Efecto para buscar con delay
   useEffect(() => {
@@ -102,7 +75,7 @@ export function CreatorSelect({
       fetchCreators(search);
     }, 300);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, fetchCreators]);
 
   const handleSelect = (id: string) => {
     let newValue: string[];
@@ -140,18 +113,18 @@ export function CreatorSelect({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between"
+            className="creator-select__trigger"
           >
-            <span className="truncate">{getSelectedLabels()}</span>
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <span className="creator-select__trigger-text">{getSelectedLabels()}</span>
+            <ChevronsUpDown className="creator-select__icon-muted" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[400px] p-0" align="start">
+        <PopoverContent className="creator-select__popover" align="start">
           <Command shouldFilter={false}>
-            <div className="flex items-center border-b px-3">
-              <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+            <div className="creator-select__search-wrapper">
+              <Search className="creator-select__search-icon" />
               <input
-                className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50"
+                className="creator-select__input"
                 placeholder={placeholder}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
@@ -159,8 +132,8 @@ export function CreatorSelect({
             </div>
             <CommandList>
               {loading && (
-                <div className="flex items-center justify-center p-4">
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                <div className="creator-select__loading">
+                  <Loader2 className="creator-select__loading-icon" />
                 </div>
               )}
 
@@ -177,11 +150,11 @@ export function CreatorSelect({
                   >
                     <Check
                       className={cn(
-                        'mr-2 h-4 w-4',
-                        value.includes(creator._id) ? 'opacity-100' : 'opacity-0'
+                        'creator-select__icon-check',
+                        value.includes(creator._id) ? 'creator-select__icon-check--selected' : 'creator-select__icon-check--unselected'
                       )}
                     />
-                    <div className="flex flex-col">
+                    <div className="creator-select__item-col">
                       <span>{creator.name}</span>
                     </div>
                   </CommandItem>
@@ -190,7 +163,7 @@ export function CreatorSelect({
               <CommandSeparator />
               <CommandGroup>
                 <CommandItem onSelect={() => setIsCreateOpen(true)}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
+                  <PlusCircle className="creator-select__icon-check" />
                   Crear nuevo creador
                 </CommandItem>
               </CommandGroup>

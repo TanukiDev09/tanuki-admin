@@ -1,0 +1,110 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.runway-card {
+  @include transition(colors);
+
+  &--healthy {
+    background-color: $flow-bg;
+  }
+
+  &--warning {
+    background-color: rgba($warning, 0.05);
+  }
+
+  &--critical {
+    background-color: $ebb-bg;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-sm;
+    padding-bottom: $spacing-xs;
+    border-bottom: 1px solid rgba($border, 0.1);
+  }
+
+  &__title {
+    color: $foreground;
+    font-family: $font-sans;
+    font-size: 0.7rem;
+    font-weight: $font-weight-medium;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  &__header-icon {
+    width: 16px;
+    height: 16px;
+    color: $muted-foreground;
+  }
+
+  &__content {
+    padding-top: 0;
+  }
+
+  &__body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: $spacing-md;
+  }
+
+  &__info {
+    flex: 1;
+  }
+
+  &__value {
+    margin-bottom: 4px;
+    color: $foreground;
+    font-family: $font-serif;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-medium;
+    letter-spacing: -0.025em;
+  }
+
+  &__unit {
+    margin-left: 4px;
+    color: $muted-foreground;
+    font-family: $font-sans;
+    font-size: $font-size-lg;
+  }
+
+  &__description {
+    margin-bottom: $spacing-sm;
+    color: $muted-foreground;
+    font-family: $font-sans;
+    font-size: $font-size-xs;
+  }
+
+  &__status {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: $font-sans;
+    font-size: $font-size-xs;
+
+    &--healthy {
+      color: $flow;
+    }
+
+    &--warning {
+      color: $warning;
+    }
+
+    &--critical {
+      color: $ebb;
+    }
+  }
+
+  &__status-icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  &__status-hint {
+    margin-left: 4px;
+  }
+}

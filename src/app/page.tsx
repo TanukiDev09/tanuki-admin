@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginForm from '@/components/auth/LoginForm';
+import './login.scss';
 
 export default function LoginPage() {
   const { user, isLoading } = useAuth();
@@ -19,23 +20,31 @@ export default function LoginPage() {
   // Mostrar loading mientras verifica
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-primary mx-auto mb-4"></div>
-          <p className="text-foreground-muted">Verificando sesión...</p>
+      <main className="login-page login-page--loading">
+        <h1 className="sr-only">Verificando sesión</h1>
+        <div className="login-page__spinner-container">
+          <div className="login-page__spinner"></div>
+          <p className="login-page__loading-text">Verificando sesión...</p>
         </div>
-      </div>
+      </main>
     );
   }
 
-  // Si ya está autenticado, no mostrar el formulario mientras redirige
+  // Si ya está autenticado, redirigiendo
   if (user) {
-    return null;
+    return (
+      <main className="login-page login-page--redirecting">
+        <h1 className="login-page__redirect-text">Redirigiendo al dashboard...</h1>
+      </main>
+    );
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-background via-surface to-background p-4">
-      <LoginForm />
+    <div className="login-page">
+      <div className="login-page__background"></div>
+      <div className="login-page__content">
+        <LoginForm />
+      </div>
     </div>
   );
 }

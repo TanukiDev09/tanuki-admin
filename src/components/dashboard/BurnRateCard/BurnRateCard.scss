@@ -1,0 +1,97 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.burn-rate-card {
+  @include transition(colors);
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-sm;
+    padding-bottom: $spacing-xs;
+    border-bottom: 1px solid rgba($border, 0.1);
+  }
+
+  &__title {
+    color: $foreground;
+    font-family: $font-sans;
+    font-size: 0.7rem;
+    font-weight: $font-weight-medium;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  &__header-icon {
+    width: 16px;
+    height: 16px;
+    color: $muted-foreground;
+  }
+
+  &__content {
+    padding-top: 0;
+  }
+
+  &__body {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: $spacing-md;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__value {
+    margin-bottom: 4px;
+    color: $foreground;
+    font-family: $font-serif;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-medium;
+    letter-spacing: -0.025em;
+
+    @include text-truncate;
+
+    @include respond-to('md') {
+      font-size: $font-size-3xl;
+    }
+  }
+
+  &__unit {
+    margin-left: 4px;
+    color: $muted-foreground;
+    font-family: $font-sans;
+    font-size: $font-size-sm;
+  }
+
+  &__description {
+    margin-bottom: $spacing-sm;
+    color: $muted-foreground;
+    font-family: $font-sans;
+    font-size: $font-size-xs;
+  }
+
+  &__trend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: $font-sans;
+    font-size: $font-size-xs;
+
+    &--down {
+      color: $flow;
+    }
+
+    &--up {
+      color: $ebb;
+    }
+  }
+
+  &__trend-icon {
+    width: 12px;
+    height: 12px;
+  }
+}

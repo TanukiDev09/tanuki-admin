@@ -1,0 +1,67 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// SEPARATOR COMPONENT (MOBILE-FIRST)
+// Notación BEM
+// ============================================
+
+.separator {
+  // Estilos base (móvil)
+  flex-shrink: 0;
+  background: $border;
+
+  // --- MODIFICADORES DE ORIENTACIÓN ---
+
+  &--horizontal {
+    width: 100%;
+    height: 1px;
+  }
+
+  &--vertical {
+    width: 1px;
+    height: 100%;
+  }
+
+  // --- VARIANTES DE COLOR ---
+
+  &--muted {
+    background: $muted;
+  }
+
+  &--primary {
+    background: $primary;
+  }
+
+  &--accent {
+    background: $accent;
+  }
+
+  // --- VARIANTES DE GROSOR ---
+
+  &--thick {
+    &.separator--horizontal {
+      height: 2px;
+    }
+
+    &.separator--vertical {
+      width: 2px;
+    }
+  }
+
+  &--thicker {
+    &.separator--horizontal {
+      height: 4px;
+    }
+
+    &.separator--vertical {
+      width: 4px;
+    }
+  }
+
+  // --- RESPONSIVE (MOBILE-FIRST) ---
+
+  @include respond-to('md') {
+    // Los separators generalmente no necesitan ajustes responsive
+  }
+}

@@ -42,6 +42,11 @@
   ],
   "exclude": [
     "node_modules",
-    "cypress"
+    "cypress",
+    "scripts",
+    "tools",
+    "config",
+    "archive",
+    "_backup"
   ]
 }

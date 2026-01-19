@@ -1,25 +1,26 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+} from '@/components/ui/Dialog';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
+import { useToast } from '@/components/ui/Toast';
+import './CategoryModal.scss';
 
 interface CreateCategoryModalProps {
   isOpen: boolean;
@@ -82,8 +83,8 @@ export default function CreateCategoryModal({
         <DialogHeader>
           <DialogTitle>Crear Nueva Categoría</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
+        <form onSubmit={handleSubmit} className="category-modal__form">
+          <div className="category-modal__field-group">
             <Label htmlFor="name">Nombre</Label>
             <Input
               id="name"
@@ -95,7 +96,7 @@ export default function CreateCategoryModal({
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className="category-modal__field-group">
             <Label htmlFor="type">Tipo</Label>
             <Select
               value={formData.type}
@@ -113,7 +114,7 @@ export default function CreateCategoryModal({
               </SelectContent>
             </Select>
           </div>
-          <div className="space-y-2">
+          <div className="category-modal__field-group">
             <Label htmlFor="description">Descripción</Label>
             <Textarea
               id="description"

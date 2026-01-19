@@ -1,0 +1,70 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.inventory-movements-list {
+  @include card-base;
+
+  overflow-x: auto;
+
+  @include custom-scrollbar;
+
+  &__table {
+    width: 100%;
+  }
+
+  &__date {
+    white-space: nowrap;
+    font-size: $font-size-sm;
+  }
+
+  &__route {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: $font-size-xs;
+
+    &-from {
+      color: $muted-foreground;
+    }
+
+    &-to {
+      color: $foreground;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  &__items-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 80px;
+    font-size: $font-size-sm;
+    overflow-y: auto;
+
+    @include custom-scrollbar;
+  }
+
+  &__item {
+    white-space: nowrap;
+
+    @include text-truncate;
+
+    max-width: 300px;
+  }
+
+  &__user {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__actions {
+    text-align: right;
+  }
+
+  &__loading,
+  &__empty {
+    padding: $spacing-xl;
+    color: $muted-foreground;
+    text-align: center;
+  }
+}

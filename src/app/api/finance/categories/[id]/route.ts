@@ -1,11 +1,20 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import Category from '@/models/Category';
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.CATEGORIES,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   await dbConnect();
   try {
     const { id } = await params;
@@ -18,6 +27,7 @@ export async function GET(
     }
     return NextResponse.json({ data: category });
   } catch (error) {
+    console.error('Error fetching category:', error);
     return NextResponse.json(
       { error: 'Error al obtener la categoría' },
       { status: 500 }
@@ -26,9 +36,16 @@ export async function GET(
 }
 
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.CATEGORIES,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   await dbConnect();
   try {
     const { id } = await params;
@@ -44,8 +61,13 @@ export async function PUT(
       );
     }
     return NextResponse.json({ data: category });
-  } catch (error: any) {
-    if (error.code === 11000) {
+  } catch (error: unknown) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code: number }).code === 11000
+    ) {
       return NextResponse.json(
         { error: 'Ya existe una categoría con ese nombre' },
         { status: 400 }
@@ -59,9 +81,16 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.CATEGORIES,
+    PermissionAction.DELETE
+  );
+  if (permissionError) return permissionError;
+
   await dbConnect();
   try {
     const { id } = await params;
@@ -74,6 +103,7 @@ export async function DELETE(
     }
     return NextResponse.json({ success: true, data: {} });
   } catch (error) {
+    console.error('Error deleting category:', error);
     return NextResponse.json(
       { error: 'Error al eliminar la categoría' },
       { status: 500 }

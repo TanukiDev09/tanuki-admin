@@ -15,11 +15,11 @@ export default function CategoriasLayout({
 }) {
   return (
     <AuthGuard>
-      <div className="flex h-screen overflow-hidden">
+      <div className="categories-layout">
         <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="categories-layout__main-container">
           <AppHeader />
-          <main className="flex-1 overflow-y-auto bg-background">
+          <main className="categories-layout__content">
             {children}
           </main>
         </div>

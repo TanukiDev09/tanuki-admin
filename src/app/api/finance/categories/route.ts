@@ -1,15 +1,24 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import Category from '@/models/Category';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.CATEGORIES,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   await dbConnect();
   try {
     const { searchParams } = new URL(request.url);
     const activeOnly = searchParams.get('active') === 'true';
     const type = searchParams.get('type'); // 'Ingreso' | 'Egreso' | 'Ambos'
 
-    const query: any = {};
+    const query: Record<string, unknown> = {};
     if (activeOnly) {
       query.isActive = true;
     }
@@ -42,11 +51,14 @@ export async function GET(request: Request) {
 
     // Create a map for easy lookup
     const totalsMap = new Map(
-      totals.map((t) => [t._id.toString(), parseFloat(t.total.toString())])
+      totals.map((t) => [
+        t._id.toString(),
+        t.total ? parseFloat(t.total.toString()) : 0,
+      ])
     );
 
     // Merge totals into categories
-    const categoriesWithTotals = categories.map((cat: any) => ({
+    const categoriesWithTotals = categories.map((cat) => ({
       ...cat,
       totalAmount: totalsMap.get(cat._id.toString()) || 0,
     }));
@@ -61,7 +73,14 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.CATEGORIES,
+    PermissionAction.CREATE
+  );
+  if (permissionError) return permissionError;
+
   await dbConnect();
   try {
     const body = await request.json();
@@ -69,9 +88,14 @@ export async function POST(request: Request) {
     const category = await Category.create(body);
 
     return NextResponse.json({ data: category }, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Create Category Error:', error);
-    if (error.code === 11000) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code: number }).code === 11000
+    ) {
       return NextResponse.json(
         { error: 'Ya existe una categoría con ese nombre' },
         { status: 400 }

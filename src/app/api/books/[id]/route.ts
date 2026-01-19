@@ -4,12 +4,22 @@ import Book from '@/models/Book';
 import '@/models/Creator'; // Import to register schema
 import { sanitizeBook } from '@/types/book';
 import mongoose from 'mongoose';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 
 // GET /api/books/[id] - Obtener libro por ID
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verificar permiso de lectura
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.BOOKS,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 
@@ -51,7 +61,7 @@ export async function GET(
           as: 'illustrators',
         },
       },
-      // Lookup inventory items with warehouse details
+      // Lookup inventory items
       {
         $lookup: {
           from: 'inventoryitems',
@@ -60,32 +70,36 @@ export async function GET(
           as: 'inventoryItems',
         },
       },
-      // Lookup warehouse details for each inventory item
+      // Lookup ALL active warehouses
       {
         $lookup: {
           from: 'warehouses',
-          localField: 'inventoryItems.warehouseId',
-          foreignField: '_id',
-          as: 'warehouses',
+          pipeline: [
+            { $match: { status: 'active' } },
+            { $sort: { type: 1, name: 1 } },
+          ],
+          as: 'allWarehouses',
         },
       },
-      // Calculate total stock and format inventory details
+      // Calculate inventory details ensuring ALL warehouses are listed
       {
         $addFields: {
-          totalStock: { $sum: '$inventoryItems.quantity' },
           inventoryDetails: {
             $map: {
-              input: '$inventoryItems',
-              as: 'item',
+              input: '$allWarehouses',
+              as: 'warehouse',
               in: {
                 $let: {
                   vars: {
-                    warehouse: {
+                    matchedItem: {
                       $arrayElemAt: [
                         {
                           $filter: {
-                            input: '$warehouses',
-                            cond: { $eq: ['$$this._id', '$$item.warehouseId'] },
+                            input: '$inventoryItems',
+                            as: 'item',
+                            cond: {
+                              $eq: ['$$item.warehouseId', '$$warehouse._id'],
+                            },
                           },
                         },
                         0,
@@ -93,13 +107,14 @@ export async function GET(
                     },
                   },
                   in: {
-                    warehouseId: '$$item.warehouseId',
+                    warehouseId: '$$warehouse._id',
                     warehouseName: '$$warehouse.name',
                     warehouseCode: '$$warehouse.code',
                     warehouseType: '$$warehouse.type',
-                    quantity: '$$item.quantity',
-                    minStock: '$$item.minStock',
-                    maxStock: '$$item.maxStock',
+                    quantity: { $ifNull: ['$$matchedItem.quantity', 0] },
+                    minStock: { $ifNull: ['$$matchedItem.minStock', 0] },
+                    maxStock: { $ifNull: ['$$matchedItem.maxStock', 0] },
+                    inventoryItemId: { $ifNull: ['$$matchedItem._id', null] },
                   },
                 },
               },
@@ -107,11 +122,15 @@ export async function GET(
           },
         },
       },
-      // Remove temporary fields
+      {
+        $addFields: {
+          totalStock: { $sum: '$inventoryDetails.quantity' },
+        },
+      },
       {
         $project: {
           inventoryItems: 0,
-          warehouses: 0,
+          allWarehouses: 0,
         },
       },
     ]);
@@ -125,10 +144,17 @@ export async function GET(
 
     const book = bookResult[0];
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: book,
     });
+    response.headers.set(
+      'Cache-Control',
+      'no-store, no-cache, must-revalidate, proxy-revalidate'
+    );
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    return response;
   } catch (error) {
     console.error('Error al obtener libro:', error);
     return NextResponse.json(
@@ -143,6 +169,14 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verificar permiso de actualización
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.BOOKS,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 
@@ -217,6 +251,14 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Verificar permiso de eliminación
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.BOOKS,
+    PermissionAction.DELETE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 

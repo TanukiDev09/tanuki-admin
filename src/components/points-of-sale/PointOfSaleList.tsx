@@ -1,7 +1,10 @@
 'use client';
 
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import {
   Table,
   TableBody,
@@ -9,18 +12,18 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
+} from '@/components/ui/Table';
+import { Button } from '@/components/ui/Button';
 import { PointOfSaleStatusBadge } from './PointOfSaleStatusBadge';
 import { IPointOfSale } from '@/models/PointOfSale';
 import { Trash2, Eye } from 'lucide-react';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/components/ui/Toast';
 import Link from 'next/link';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/Popover"
 import {
   Dialog,
   DialogContent,
@@ -28,7 +31,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
+} from '@/components/ui/Dialog';
+import './PointOfSaleList.scss';
 
 interface PointOfSaleListProps {
   data: IPointOfSale[];
@@ -39,6 +43,8 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
   const { toast } = useToast();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [itemToDelete, setItemToDelete] = useState<{ id: string; name: string } | null>(null);
+  const { hasPermission } = usePermission();
+  const canDelete = hasPermission(ModuleName.POINTS_OF_SALE, PermissionAction.DELETE);
 
   const confirmDelete = async () => {
     if (!itemToDelete) return;
@@ -73,7 +79,7 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
   };
 
   const renderArrayCell = (items: string[] | undefined) => {
-    if (!items || items.length === 0) return <span className="text-muted-foreground">-</span>;
+    if (!items || items.length === 0) return <span className="pos-list__empty-text">-</span>;
 
     // Legacy support for single string
     if (typeof items === 'string') return items;
@@ -81,7 +87,7 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
     // Filter out empty strings
     const validItems = items.filter(i => i && i.trim() !== '');
 
-    if (validItems.length === 0) return <span className="text-muted-foreground">-</span>;
+    if (validItems.length === 0) return <span className="pos-list__empty-text">-</span>;
 
     const firstItem = validItems[0];
     const count = validItems.length;
@@ -91,12 +97,12 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
     return (
       <Popover>
         <PopoverTrigger asChild>
-          <span className="cursor-pointer underline decoration-dotted hover:text-primary">
-            {firstItem} <span className="text-xs text-muted-foreground">(+{count - 1})</span>
+          <span className="pos-list__expand-trigger">
+            {firstItem} <span className="pos-list__expand-count">(+{count - 1})</span>
           </span>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-3">
-          <ul className="list-disc pl-4 text-sm">
+        <PopoverContent className="pos-list__popover-content">
+          <ul className="pos-list__popover-list">
             {validItems.map((item, i) => (
               <li key={i}>{item}</li>
             ))}
@@ -108,63 +114,67 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
 
   return (
     <>
-      <div className="rounded-md border">
+      <div className="pos-list__container">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Código</TableHead>
               <TableHead>Nombre</TableHead>
               <TableHead>Tipo</TableHead>
+              <TableHead>Descuento</TableHead>
               <TableHead>Encargado</TableHead>
               <TableHead>Teléfono</TableHead>
               <TableHead>Estado</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+              <TableHead className="pos-list__actions-cell">Acciones</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center h-24">
+                <TableCell colSpan={7} className="pos-list__empty-cell">
                   No hay puntos de venta registrados.
                 </TableCell>
               </TableRow>
             ) : (
               data.map((pos) => (
                 <TableRow key={pos._id as unknown as string}>
-                  <TableCell className="font-medium">
+                  <TableCell className="pos-list__code-cell">
                     {pos.code}
                     {pos.identificationNumber && (
-                      <div className="text-xs text-muted-foreground">
+                      <div className="pos-list__identification">
                         {pos.identificationType} {pos.identificationNumber}
                       </div>
                     )}
                   </TableCell>
                   <TableCell>{pos.name}</TableCell>
-                  <TableCell className="capitalize">
+                  <TableCell className="pos-list__type-cell">
                     {pos.type === 'physical' ? 'Físico' :
                       pos.type === 'online' ? 'Online' : 'Evento'}
                   </TableCell>
+                  <TableCell>{pos.discountPercentage ? `${pos.discountPercentage}%` : '0%'}</TableCell>
                   <TableCell>{renderArrayCell(pos.managers)}</TableCell>
                   <TableCell>{renderArrayCell(pos.phones)}</TableCell>
                   <TableCell>
                     <PointOfSaleStatusBadge status={pos.status} />
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
+                  <TableCell className="pos-list__actions-cell">
+                    <div className="pos-list__actions-group">
                       <Button variant="ghost" size="icon" asChild>
                         <Link href={`/dashboard/points-of-sale/${pos._id}`}>
-                          <Eye className="w-4 h-4" />
+                          <Eye className="pos-list__icon" />
                         </Link>
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                        onClick={() => setItemToDelete({ id: pos._id as unknown as string, name: pos.name })}
-                        disabled={deletingId === (pos._id as unknown as string)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      {canDelete && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="pos-list__delete-btn"
+                          onClick={() => setItemToDelete({ id: pos._id as unknown as string, name: pos.name })}
+                          disabled={deletingId === (pos._id as unknown as string)}
+                        >
+                          <Trash2 className="pos-list__icon" />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>

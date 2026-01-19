@@ -1,0 +1,122 @@
+@use 'sass:color';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.users-table {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__loading {
+    padding: $spacing-xl;
+    background-color: $card;
+    text-align: center;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+  }
+
+  &__spinner {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto $spacing-md;
+    border: 4px solid rgba($primary, 0.1);
+    border-radius: $radius-full;
+    animation: spin 1s linear infinite;
+    border-top-color: $primary;
+  }
+
+  &__loading-text {
+    color: $muted-foreground;
+  }
+
+  &__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+  }
+
+  &__filter-btn {
+    border-radius: $radius-lg;
+  }
+
+  &__container {
+    background-color: $card;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    overflow: hidden;
+  }
+
+  &__row {
+    @include transition(background-color);
+
+    &:hover {
+      background-color: rgba($muted, 0.5);
+    }
+  }
+
+  &__user-name {
+    color: $foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+
+  &__user-email {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__cell--right {
+    text-align: right;
+  }
+
+  &__date {
+    color: $muted-foreground;
+  }
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__action-btn {
+    &--warning {
+      color: $warning;
+
+      &:hover {
+        background-color: rgba($warning, 0.1);
+        color: color.adjust($warning, $lightness: -10%);
+      }
+    }
+
+    &--success {
+      color: $success;
+
+      &:hover {
+        background-color: rgba($success, 0.1);
+        color: color.adjust($success, $lightness: -10%);
+      }
+    }
+
+    &--destructive {
+      color: $destructive;
+
+      &:hover {
+        background-color: rgba($destructive, 0.1);
+        color: color.adjust($destructive, $lightness: -10%);
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,23 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.category-modal {
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    padding: $spacing-sm 0;
+  }
+
+  &__field-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+}

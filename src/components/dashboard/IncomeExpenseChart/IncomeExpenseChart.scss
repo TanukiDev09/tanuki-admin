@@ -1,0 +1,120 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.income-expense-chart {
+  width: 100%;
+  background-color: transparent;
+
+  &--no-border {
+    border: none;
+    box-shadow: none;
+  }
+
+  &__header {
+    padding-right: 0;
+    padding-bottom: $spacing-sm;
+    padding-left: 0;
+  }
+
+  &__header-content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__title {
+    color: $foreground;
+    font-family: $font-sans;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $spacing-xs;
+    background-color: transparent;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    cursor: pointer;
+
+    @include transition(all);
+
+    &:hover:not(:disabled) {
+      background-color: $muted;
+    }
+
+    &:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+  }
+
+  &__button-icon {
+    width: 16px;
+    height: 16px;
+    color: $foreground;
+  }
+
+  &__period {
+    min-width: 120px;
+    color: $muted-foreground;
+    font-family: $font-sans;
+    font-size: $font-size-xs;
+    text-align: center;
+  }
+
+  &__content {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  &__empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 320px;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  // Responsive adjustments
+  @include respond-to-max('sm') {
+    &__header-content {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: $spacing-xs;
+    }
+
+    &__title {
+      font-size: $font-size-lg; // Smaller title on mobile
+    }
+
+    &__controls {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      margin-top: $spacing-xs;
+      background-color: rgba(
+        $muted,
+        0.3
+      ); // Subtle background for controls area
+      padding: 4px;
+      border-radius: $radius-md;
+    }
+
+    &__period {
+      flex: 1;
+      font-size: $font-size-xs;
+    }
+  }
+}

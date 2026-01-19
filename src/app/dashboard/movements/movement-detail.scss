@@ -1,0 +1,98 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.movement-detail {
+  max-width: 48rem; // max-w-3xl
+  margin: 0 auto;
+  padding: $spacing-2xl;
+
+  &__back-btn {
+    margin-bottom: $spacing-xl;
+    padding-left: 0;
+  }
+
+  &__loading,
+  &__error {
+    text-align: center;
+    padding: $spacing-2xl;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-xl;
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__status-badge {
+    font-size: $font-size-sm;
+  }
+
+  &__date {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  &__grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
+  }
+
+  &__grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-md;
+  }
+
+  &__label {
+    margin-bottom: $spacing-2xs;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+
+  &__value {
+    &--income {
+      color: $success;
+      font-weight: $font-weight-bold;
+    }
+
+    &--expense {
+      color: $destructive;
+      font-weight: $font-weight-bold;
+    }
+
+    &--xl {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+    }
+  }
+
+  &__notes {
+    white-space: pre-wrap;
+  }
+
+  &__icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+    margin-right: $spacing-xs;
+  }
+}

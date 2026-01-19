@@ -1,0 +1,116 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.recent-movements {
+  width: 100%;
+  background-color: transparent;
+
+  &--no-border {
+    border: none;
+    box-shadow: none;
+  }
+
+  // Layout classes for dashboard
+
+  &__header {
+    padding: $spacing-lg $spacing-lg $spacing-md;
+  }
+
+  &__title {
+    color: $foreground;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    letter-spacing: -0.02em;
+  }
+
+  &__content {
+    padding: 0 $spacing-lg $spacing-lg;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-sm;
+    border-radius: $radius-lg;
+    transition: background-color 0.2s ease;
+    cursor: default;
+
+    &:hover {
+      background-color: rgba($muted, 0.4);
+    }
+  }
+
+  &__icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px; // Squircleish
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+
+    &--success {
+      background-color: rgba($success, 0.1);
+      color: $success;
+    }
+
+    &--danger {
+      background-color: rgba($destructive, 0.1);
+      color: $destructive;
+    }
+  }
+  
+  &__item:hover &__icon-container {
+    transform: scale(1.1);
+  }
+
+  &__icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  &__item-info {
+    flex: 1;
+    min-width: 0;
+    padding-right: $spacing-md;
+  }
+
+  &__item-description {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $foreground;
+    line-height: 1.4;
+
+    @include text-truncate;
+  }
+
+  &__item-meta {
+    margin-top: 2px;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__item-amount {
+    margin-left: auto;
+    font-family: $font-sans;
+    font-weight: $font-weight-bold;
+    white-space: nowrap;
+    font-size: $font-size-sm;
+
+    &--income {
+      color: $success;
+    }
+
+    &--expense {
+      color: $destructive;
+    }
+  }
+}

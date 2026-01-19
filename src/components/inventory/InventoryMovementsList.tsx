@@ -7,19 +7,57 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { Badge } from '@/components/ui/badge';
+} from '@/components/ui/Table';
+import { Badge } from '@/components/ui/Badge';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+
+import { Button } from '@/components/ui/Button';
+import { FileText } from 'lucide-react';
+import { generateMovementPDF } from '@/lib/inventory/pdfGenerator';
+import { formatNumber } from '@/lib/utils';
+import './InventoryMovementsList.scss';
 
 interface Movement {
   _id: string;
   type: string;
   date: string;
-  fromWarehouseId?: { name: string };
-  toWarehouseId?: { name: string };
-  items: { bookId: { title: string }; quantity: number }[];
+  fromWarehouseId?: {
+    name: string;
+    type: string;
+    address?: string;
+    city?: string;
+    pointOfSaleId?: {
+      identificationType?: string;
+      identificationNumber?: string;
+      address?: string;
+      city?: string;
+      discountPercentage?: number;
+    }
+  };
+  toWarehouseId?: {
+    name: string;
+    type: string;
+    address?: string;
+    city?: string;
+    pointOfSaleId?: {
+      identificationType?: string;
+      identificationNumber?: string;
+      address?: string;
+      city?: string;
+      discountPercentage?: number;
+    }
+  };
+  items: {
+    bookId: {
+      title: string;
+      isbn: string;
+      price: number;
+    };
+    quantity: number
+  }[];
   createdBy?: { name: string };
+  observations?: string;
 }
 
 interface MovementsListProps {
@@ -29,16 +67,20 @@ interface MovementsListProps {
 
 export function InventoryMovementsList({ movements, isLoading }: MovementsListProps) {
   if (isLoading) {
-    return <div className="p-4 text-center">Cargando movimientos...</div>;
+    return <div className="inventory-movements-list__loading">Cargando movimientos...</div>;
   }
 
   if (movements.length === 0) {
-    return <div className="p-4 text-center text-muted-foreground">No hay movimientos recientes</div>;
+    return <div className="inventory-movements-list__empty">No hay movimientos recientes</div>;
   }
 
+  const canGeneratePDF = (type: string) => {
+    return type === 'REMISION' || type === 'DEVOLUCION';
+  };
+
   return (
-    <div className="rounded-md border">
-      <Table>
+    <div className="inventory-movements-list">
+      <Table className="inventory-movements-list__table">
         <TableHeader>
           <TableRow>
             <TableHead>Fecha</TableHead>
@@ -46,38 +88,55 @@ export function InventoryMovementsList({ movements, isLoading }: MovementsListPr
             <TableHead>Origen / Destino</TableHead>
             <TableHead>Items</TableHead>
             <TableHead>Usuario</TableHead>
+            <TableHead className="inventory-movements-list__actions-head">Acciones</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {movements.map((movement) => (
             <TableRow key={movement._id}>
-              <TableCell>
+              <TableCell className="inventory-movements-list__date">
                 {format(new Date(movement.date), 'dd/MM/yyyy HH:mm', { locale: es })}
               </TableCell>
               <TableCell>
                 <Badge variant="outline">{movement.type}</Badge>
               </TableCell>
               <TableCell>
-                <div className="flex flex-col text-xs">
+                <div className="inventory-movements-list__route">
                   {movement.fromWarehouseId && (
-                    <span className="text-muted-foreground">De: {movement.fromWarehouseId.name}</span>
+                    <span className="inventory-movements-list__route-from">De: {movement.fromWarehouseId.name}</span>
                   )}
                   {movement.toWarehouseId && (
-                    <span>A: {movement.toWarehouseId.name}</span>
+                    <span className="inventory-movements-list__route-to">A: {movement.toWarehouseId.name}</span>
                   )}
                 </div>
               </TableCell>
               <TableCell>
-                <div className="max-h-20 overflow-y-auto text-sm">
+                <div className="inventory-movements-list__items-list">
                   {movement.items.map((item, idx) => (
-                    <div key={idx}>
-                      {item.quantity} x {item.bookId?.title || 'Libro desconocido'}
+                    <div key={idx} className="inventory-movements-list__item">
+                      {formatNumber(item.quantity)} x {item.bookId?.title || 'Libro desconocido'}
                     </div>
                   ))}
                 </div>
               </TableCell>
-              <TableCell className="text-sm text-muted-foreground">
+              <TableCell className="inventory-movements-list__user">
                 {movement.createdBy?.name || 'Sistema'}
+              </TableCell>
+              <TableCell className="inventory-movements-list__actions">
+                {canGeneratePDF(movement.type) && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      if (movement.fromWarehouseId && movement.toWarehouseId) {
+                        generateMovementPDF(movement as Parameters<typeof generateMovementPDF>[0]);
+                      }
+                    }}
+                    title="Descargar PDF"
+                  >
+                    <FileText className="inventory-movements-list__icon" />
+                  </Button>
+                )}
               </TableCell>
             </TableRow>
           ))}

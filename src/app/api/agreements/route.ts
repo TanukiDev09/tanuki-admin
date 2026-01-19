@@ -1,18 +1,27 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import Agreement from '@/models/Agreement';
 import Book from '@/models/Book';
 import '@/models/Creator'; // Import to register schema
 import { CreateAgreementDTO } from '@/types/agreement';
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.AGREEMENTS,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
     const bookId = searchParams.get('bookId');
     const creatorId = searchParams.get('creatorId');
 
-    const query: any = {};
+    const query: Record<string, unknown> = {};
 
     if (bookId) {
       query.book = bookId;
@@ -28,15 +37,21 @@ export async function GET(request: Request) {
       .sort({ createdAt: -1 });
 
     return NextResponse.json(agreements);
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Error al obtener contratos' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Error al obtener contratos';
+    return NextResponse.json({ message }, { status: 500 });
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.AGREEMENTS,
+    PermissionAction.CREATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const body: CreateAgreementDTO = await request.json();
@@ -78,16 +93,20 @@ export async function POST(request: Request) {
     await agreement.populate(['book', 'creator']);
 
     return NextResponse.json(agreement, { status: 201 });
-  } catch (error: any) {
-    if (error.code === 11000) {
+  } catch (error: unknown) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code: number }).code === 11000
+    ) {
       return NextResponse.json(
         { message: 'Ya existe un contrato para este creador en este libro' },
         { status: 409 }
       );
     }
-    return NextResponse.json(
-      { message: error.message || 'Error al crear contrato' },
-      { status: 500 }
-    );
+    const message =
+      error instanceof Error ? error.message : 'Error al crear contrato';
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

@@ -1,0 +1,37 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.warehouse-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg; // space-y-6
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md; // gap-4
+
+    @include md {
+      grid-template-columns: repeat(2, 1fr); // md:grid-cols-2
+    }
+  }
+
+  &__field-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm; // space-y-2
+
+    &--full-width {
+      grid-column: 1 / -1; // md:col-span-2
+    }
+  }
+
+  &__input-disabled {
+    background-color: $muted; // bg-muted
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-md; // gap-4 (flex gap-4)
+  }
+}

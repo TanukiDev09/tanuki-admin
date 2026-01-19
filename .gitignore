@@ -43,3 +43,13 @@ next-env.d.ts
 # uploads (ignorar archivos pero mantener carpetas)
 /public/uploads/covers/*
 !/public/uploads/covers/.gitkeep
+
+# tools and reports
+/tools/*.json
+/tools/*.txt
+
+# backups
+/_backup/*
+
+# archive
+/archive/*

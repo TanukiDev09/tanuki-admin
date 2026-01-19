@@ -1,7 +1,9 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Creator from '@/models/Creator';
 import { UpdateCreatorDTO } from '@/types/creator';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 
 interface Props {
   params: Promise<{
@@ -9,7 +11,14 @@ interface Props {
   }>;
 }
 
-export async function GET(request: Request, props: Props) {
+export async function GET(request: NextRequest, props: Props) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.CREATORS,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   const params = await props.params;
   try {
     await dbConnect();
@@ -23,15 +32,21 @@ export async function GET(request: Request, props: Props) {
     }
 
     return NextResponse.json(creator);
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Error al obtener creador' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Error al obtener creador';
+    return NextResponse.json({ message }, { status: 500 });
   }
 }
 
-export async function PUT(request: Request, props: Props) {
+export async function PUT(request: NextRequest, props: Props) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.CREATORS,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   const params = await props.params;
   try {
     await dbConnect();
@@ -51,15 +66,21 @@ export async function PUT(request: Request, props: Props) {
     }
 
     return NextResponse.json(creator);
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Error al actualizar creador' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Error al actualizar creador';
+    return NextResponse.json({ message }, { status: 500 });
   }
 }
 
-export async function DELETE(request: Request, props: Props) {
+export async function DELETE(request: NextRequest, props: Props) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.CREATORS,
+    PermissionAction.DELETE
+  );
+  if (permissionError) return permissionError;
+
   const params = await props.params;
   try {
     await dbConnect();
@@ -73,10 +94,9 @@ export async function DELETE(request: Request, props: Props) {
     }
 
     return NextResponse.json({ message: 'Creador eliminado correctamente' });
-  } catch (error: any) {
-    return NextResponse.json(
-      { message: error.message || 'Error al eliminar creador' },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    const message =
+      error instanceof Error ? error.message : 'Error al eliminar creador';
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

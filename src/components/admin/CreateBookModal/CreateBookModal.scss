@@ -1,0 +1,114 @@
+@use 'sass:color';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.create-book-modal {
+  display: flex;
+  flex-direction: column;
+  width: 95vw;
+  max-width: 700px;
+  max-height: 90vh;
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+    overflow-y: auto;
+    padding-right: $spacing-xs; // Space for scrollbar
+
+    @include custom-scrollbar;
+  }
+
+  &__section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &__section-title {
+    margin-bottom: $spacing-xs;
+    padding-bottom: $spacing-xs;
+    color: $foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid $border;
+  }
+
+  &__grid {
+    display: grid;
+    gap: $spacing-lg;
+
+    &--2col {
+      @media (min-width: $breakpoint-md) {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    &--4col {
+      grid-template-columns: repeat(2, 1fr);
+
+      @media (min-width: $breakpoint-md) {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__input-preview {
+    margin-top: 2px;
+    font-size: $font-size-xs;
+    color: $info;
+    font-weight: $font-weight-medium;
+  }
+
+  &__hint {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__note {
+    padding: $spacing-md;
+    background-color: rgba($info, 0.05);
+    color: $info;
+    font-size: $font-size-sm;
+    border: 1px solid rgba($info, 0.2);
+    border-radius: $radius-md;
+
+    strong {
+      color: color.adjust($info, $lightness: -10%);
+    }
+  }
+
+  &__error {
+    padding: $spacing-sm $spacing-md;
+    background-color: rgba($destructive, 0.1);
+    color: $destructive;
+    font-size: $font-size-sm;
+    border: 1px solid rgba($destructive, 0.3);
+    border-radius: $radius-md;
+  }
+
+  &__footer {
+    margin-top: $spacing-md;
+    padding-top: $spacing-md;
+    border-top: 1px solid $border;
+  }
+
+  &__btn-submit {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__icon {
+    width: 16px;
+    height: 16px;
+  }
+}

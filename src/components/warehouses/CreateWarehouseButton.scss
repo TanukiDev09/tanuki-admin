@@ -1,0 +1,10 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.create-warehouse-button {
+  &__icon {
+    width: 1rem; // w-4
+    height: 1rem; // h-4
+    margin-right: $spacing-xs; // mr-2
+  }
+}

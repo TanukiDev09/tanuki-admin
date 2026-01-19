@@ -1,14 +1,21 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Warehouse from '@/models/Warehouse';
 import PointOfSale from '@/models/PointOfSale';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 
 interface Params {
   params: Promise<{ id: string }>;
 }
 
+interface IWarehouseMethods {
+  pointOfSaleId: string | null;
+  save: () => Promise<void>;
+}
+
 async function associateWithPOS(
-  warehouse: any,
+  warehouse: IWarehouseMethods,
   pointOfSaleId: string,
   warehouseId: string,
   oldPosId?: string
@@ -27,7 +34,10 @@ async function associateWithPOS(
   return true;
 }
 
-async function disassociateFromPOS(warehouse: any, oldPosId?: string) {
+async function disassociateFromPOS(
+  warehouse: IWarehouseMethods,
+  oldPosId?: string
+) {
   warehouse.pointOfSaleId = null;
   await warehouse.save();
 
@@ -36,7 +46,14 @@ async function disassociateFromPOS(warehouse: any, oldPosId?: string) {
   }
 }
 
-export async function PUT(request: Request, { params }: Params) {
+export async function PUT(request: NextRequest, { params }: Params) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.WAREHOUSES,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { id } = await params;

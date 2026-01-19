@@ -8,6 +8,8 @@ export const metadata: Metadata = {
   description: 'Configuración de la aplicación',
 };
 
+import './settings-layout.scss';
+
 export default function ConfiguracionLayout({
   children,
 }: {
@@ -15,11 +17,11 @@ export default function ConfiguracionLayout({
 }) {
   return (
     <AuthGuard>
-      <div className="flex h-screen overflow-hidden">
+      <div className="settings-layout">
         <Sidebar />
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="settings-layout__content">
           <AppHeader />
-          <main className="flex-1 overflow-y-auto bg-background">
+          <main className="settings-layout__main">
             {children}
           </main>
         </div>

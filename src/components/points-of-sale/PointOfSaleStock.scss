@@ -1,0 +1,133 @@
+@use '../../styles/variables' as *;
+
+.pos-stock {
+  &__container {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md; // space-y-4
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md; // gap-4
+
+    @media (min-width: $breakpoint-md) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: $breakpoint-lg) {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  &__stat-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0; // space-y-0
+    padding-bottom: $spacing-xs; // pb-2
+  }
+
+  &__stat-title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+
+  &__stat-icon {
+    width: 1rem; // h-4 w-4
+    color: $muted-foreground;
+  }
+
+  &__stat-value {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__warehouse-card {
+    @media (min-width: $breakpoint-lg) {
+      grid-column: span 2 / span 2;
+    }
+  }
+
+  &__warehouse-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__warehouse-name {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+  }
+
+  &__warehouse-code {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__external-icon {
+    width: 1rem;
+    height: 1rem;
+    margin-left: $spacing-xs;
+  }
+
+  &__inventory-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0; // space-y-0
+  }
+
+  &__add-icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: $spacing-xs;
+  }
+
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: $spacing-3xl; // p-12
+    background-color: rgba($muted, 0.2); // bg-muted/20
+    text-align: center;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+  }
+
+  &__empty-icon {
+    width: 3rem; // w-12 h-12
+    height: 3rem;
+    margin-bottom: $spacing-md; // mb-4
+    color: $muted-foreground;
+    opacity: 0.5;
+  }
+
+  &__empty-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+  }
+
+  &__empty-text {
+    max-width: 20rem; // max-w-xs
+    margin-top: $spacing-xs;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__empty-actions {
+    display: flex;
+    gap: $spacing-xs;
+    margin-top: $spacing-xl; // mt-6
+  }
+
+  &__loading {
+    padding: $spacing-xl;
+    color: $muted-foreground;
+    text-align: center;
+  }
+}

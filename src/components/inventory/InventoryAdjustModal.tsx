@@ -9,12 +9,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/Dialog';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { NumericInput } from '@/components/ui/Input/NumericInput';
+import { Label } from '@/components/ui/Label';
+import { useToast } from '@/components/ui/Toast';
 import { ArrowRight } from 'lucide-react';
+import { formatNumber } from '@/lib/utils';
+import './InventoryAdjustModal.scss';
 
 interface Book {
   _id: string;
@@ -41,18 +44,17 @@ interface StockComparisonProps {
   current: number;
   result: number;
 }
-
 const StockComparison = ({ current, result }: StockComparisonProps) => (
-  <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
-    <div className="text-sm">
-      <p className="text-muted-foreground">Actual</p>
-      <p className="text-2xl font-bold">{current}</p>
+  <div className="inventory-adjust-modal__comparison">
+    <div className="inventory-adjust-modal__comparison-column">
+      <p className="inventory-adjust-modal__comparison-label">Actual</p>
+      <p className="inventory-adjust-modal__comparison-value">{formatNumber(current)}</p>
     </div>
-    <ArrowRight className="h-4 w-4 text-muted-foreground" />
-    <div className="text-sm text-right">
-      <p className="text-muted-foreground">Resultante</p>
-      <p className={`text-2xl font-bold ${result < 0 ? 'text-red-600' : 'text-primary'}`}>
-        {result}
+    <ArrowRight className="inventory-adjust-modal__comparison-arrow" />
+    <div className="inventory-adjust-modal__comparison-column inventory-adjust-modal__comparison-column--right">
+      <p className="inventory-adjust-modal__comparison-label">Resultante</p>
+      <p className={`inventory-adjust-modal__comparison-value ${result < 0 ? 'inventory-adjust-modal__comparison-value--negative' : 'inventory-adjust-modal__comparison-value--positive'}`}>
+        {formatNumber(result)}
       </p>
     </div>
   </div>
@@ -65,24 +67,24 @@ interface AdjustmentInputProps {
 }
 
 const AdjustmentInput = ({ label, value, onChange }: AdjustmentInputProps) => (
-  <div className="space-y-2">
+  <div className="inventory-adjust-modal__field">
     <Label htmlFor="adjustment">{label}</Label>
-    <div className="flex gap-2">
-      <Input
+    <div className="inventory-adjust-modal__input-group">
+      <NumericInput
         id="adjustment"
-        type="number"
-        min={0}
+        placeholder="0"
         value={value}
-        onChange={(e) => onChange(parseInt(e.target.value) || 0)}
-        className="text-lg font-semibold"
+        onValueChange={(val) => onChange(val || 0)}
+        allowDecimals={false}
+        className="inventory-adjust-modal__input"
       />
-      <div className="flex gap-1">
+      <div className="inventory-adjust-modal__quick-actions">
         {[1, 10, 50].map(val => (
           <Button
             key={val}
             variant="outline"
             size="sm"
-            className="h-auto py-1 px-2 text-xs"
+            className="inventory-adjust-modal__quick-btn"
             onClick={() => onChange(value + val)}
           >
             +{val}
@@ -193,14 +195,14 @@ export function InventoryAdjustModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="grid gap-4 py-4">
+        <div className="inventory-adjust-modal__section">
           <StockComparison current={item.quantity} result={calculatedResult} />
           <AdjustmentInput
             label={labels.input}
             value={adjustmentValue}
             onChange={setAdjustmentValue}
           />
-          <div className="space-y-2">
+          <div className="inventory-adjust-modal__field">
             <Label htmlFor="reason">Motivo (Opcional)</Label>
             <Input
               id="reason"
@@ -218,7 +220,7 @@ export function InventoryAdjustModal({
           <Button
             onClick={handleSubmit}
             disabled={loading || (mode === 'remove' && calculatedResult < 0)}
-            className={mode === 'remove' ? 'bg-red-600 hover:bg-red-700' : ''}
+            className={mode === 'remove' ? 'inventory-adjust-modal__btn-confirm--remove' : ''}
           >
             {loading ? 'Procesando...' : 'Confirmar Ajuste'}
           </Button>

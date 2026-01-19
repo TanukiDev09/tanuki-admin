@@ -1,0 +1,123 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.inventory-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+
+  @include respond-to('md') {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @include respond-to('lg') {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  &__card {
+    @include transition(all);
+
+    cursor: default;
+
+    &:hover {
+      border-color: rgba($primary, 0.2);
+    }
+
+    &--warning {
+      &:hover {
+        border-color: rgba($warning, 0.2);
+      }
+    }
+
+    &--danger {
+      &:hover {
+        border-color: rgba($destructive, 0.2);
+      }
+    }
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: $spacing-xs;
+  }
+
+  &__title {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    @include transition(color);
+
+    .inventory-stats__card:hover & {
+      color: $primary;
+    }
+
+    .inventory-stats__card--warning:hover & {
+      color: $warning;
+    }
+
+    .inventory-stats__card--danger:hover & {
+      color: $destructive;
+    }
+  }
+
+  &__icon {
+    width: $icon-xs;
+    height: $icon-xs;
+    color: $muted-foreground;
+
+    @include transition(color);
+
+    .inventory-stats__card:hover & {
+      color: $primary;
+    }
+
+    &--warning {
+      color: $warning;
+    }
+
+    &--danger {
+      color: $destructive;
+    }
+  }
+
+  &__value {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+
+    &--warning {
+      color: $warning;
+    }
+
+    &--danger {
+      color: $destructive;
+    }
+  }
+
+  &__description {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__skeleton {
+    @include animate-pulse;
+
+    &-title {
+      width: 6rem;
+      height: 1rem;
+      background-color: $muted;
+      border-radius: $radius-xs;
+    }
+
+    &-value {
+      width: 4rem;
+      height: 2rem;
+      margin-top: $spacing-sm;
+      background-color: $muted;
+      border-radius: $radius-xs;
+    }
+  }
+}

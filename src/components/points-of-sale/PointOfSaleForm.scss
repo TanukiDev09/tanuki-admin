@@ -1,0 +1,84 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.pos-form {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md; // space-y-4
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-md; // gap-4
+
+    @include md {
+      grid-template-columns: repeat(2, 1fr); // md:grid-cols-2
+    }
+  }
+
+  &__arrays-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg; // gap-6
+    padding-top: $spacing-xs; // pt-2
+
+    @include md {
+      grid-template-columns: repeat(3, 1fr); // md:grid-cols-3
+    }
+  }
+
+  &__field-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm; // space-y-2
+  }
+
+  &__array-column {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm; // space-y-2
+  }
+
+  &__array-header {
+    @include flex-between; // flex justify-between items-center
+  }
+
+  &__array-row {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-xs; // gap-2
+  }
+
+  &__array-input-wrapper {
+    flex: 1; // flex-1
+  }
+
+  &__remove-btn {
+    color: $danger; // text-red-500
+    // Ghost variant usually handles hover bg, but we ensure text color sticks
+    &:hover {
+      background-color: rgba($danger, 0.1);
+      color: $danger;
+    }
+  }
+
+  &__icon-sm {
+    width: 0.75rem; // h-3
+    height: 0.75rem; // w-3
+  }
+
+  &__icon-md {
+    width: 1rem; // h-4
+    height: 1rem; // w-4
+  }
+
+  &__icon--mr {
+    margin-right: 0.25rem; // mr-1
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: $spacing-md; // pt-4
+  }
+}

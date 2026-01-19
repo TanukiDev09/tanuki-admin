@@ -1,0 +1,52 @@
+@use 'sass:color';
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.warehouse-list {
+  @include card-base;
+
+  border: 1px solid $border;
+  border-radius: $radius-md;
+  overflow: hidden;
+
+  &__empty {
+    height: 96px; // approx h-24
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  &__code {
+    font-weight: $font-weight-medium;
+  }
+
+  &__link {
+    color: #1e3a8a; // blue-900
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    &--placeholder {
+      color: $muted-foreground;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-sm;
+  }
+
+  &__action-btn {
+    // Inherits ghost button styles, but we can add specific overrides here if needed
+    &--delete {
+      color: $destructive;
+
+      &:hover {
+        background-color: rgba($destructive, 0.1);
+        color: color.adjust($destructive, $lightness: -10%);
+      }
+    }
+  }
+}

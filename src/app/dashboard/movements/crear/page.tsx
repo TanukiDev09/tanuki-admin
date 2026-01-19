@@ -1,33 +1,57 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea'; // Assuming exists
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { NumericInput } from '@/components/ui/Input/NumericInput';
+import { Label } from '@/components/ui/Label';
+import { Textarea } from '@/components/ui/Textarea';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { useToast } from '@/components/ui/use-toast';
+} from '@/components/ui/Select';
+import { useToast } from '@/components/ui/Toast';
 import { ArrowLeft } from 'lucide-react';
 import { CreateMovementDTO } from '@/types/movement';
 import { CategorySelect } from '@/components/finance/CategorySelect';
+import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
+import { formatCurrency, formatNumber } from '@/lib/utils';
+import '../movement-form.scss';
 
 export default function CreateMovementPage() {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const { hasPermission } = usePermission();
+  const canCreate = hasPermission(ModuleName.FINANCE, PermissionAction.CREATE);
+
   const [formData, setFormData] = useState<Partial<CreateMovementDTO>>({
     date: new Date().toISOString().split('T')[0],
     type: 'INCOME',
     currency: 'COP', // Default
     status: 'COMPLETED',
   });
+
+  useEffect(() => {
+    if (!canCreate) {
+      toast({
+        title: 'Acceso Denegado',
+        description: 'No tienes permisos para crear movimientos financieros',
+        variant: 'destructive',
+      });
+      router.push('/dashboard/movements');
+    }
+  }, [canCreate, router, toast]);
+
+  if (!canCreate) {
+    return <div className="movement-form__loading">Verificando permisos...</div>;
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -43,16 +67,15 @@ export default function CreateMovementPage() {
     setLoading(true);
 
     try {
-      // Enforce validations
-      if (!formData.amount || !formData.description || !formData.category) {
-        toast({ title: 'Error', description: 'Faltan campos requeridos', variant: 'destructive' });
+      if (!formData.type || !formData.description || !formData.date) {
+        toast({ title: 'Error', description: 'Faltan campos requeridos (Tipo, Descripción y Fecha)', variant: 'destructive' });
         setLoading(false);
         return;
       }
 
       const payload = {
         ...formData,
-        fiscalYear: new Date(formData.date as string).getFullYear(),
+        fiscalYear: formData.date ? new Date(formData.date).getFullYear() : new Date().getFullYear(),
       };
 
       const res = await fetch('/api/finance/movements', {
@@ -61,34 +84,48 @@ export default function CreateMovementPage() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error('Error al crear');
+      if (!res.ok) {
+        let errorData;
+        try {
+          errorData = await res.json();
+        } catch {
+          errorData = { error: `Server error (${res.status}): ${res.statusText}` };
+        }
+        throw new Error(errorData.error || errorData.details || 'Error al crear');
+      }
 
       toast({ title: 'Éxito', description: 'Movimiento creado correctamente' });
       router.push('/dashboard/movements');
-    } catch (error) {
-      console.error(error);
-      toast({ title: 'Error', description: 'No se pudo crear el movimiento', variant: 'destructive' });
+    } catch (err) {
+      console.error(err);
+      const error = err as Error;
+      toast({
+        title: 'Error',
+        description: error.message || 'No se pudo crear el movimiento',
+        variant: 'destructive'
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
-      <Button variant="ghost" onClick={() => router.back()} className="mb-6 pl-0">
-        <ArrowLeft className="mr-2 h-4 w-4" />
+    <div className="movement-form">
+      <Button variant="ghost" onClick={() => router.back()} className="movement-form__back-btn">
+        <ArrowLeft className="movement-form__back-btn-icon" />
         Volver
       </Button>
 
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Nuevo Movimiento</h1>
-          <p className="text-muted-foreground">Registra un nuevo ingreso o egreso.</p>
-        </div>
+      <div className="movement-form__header">
+        <h1 className="movement-form__title">Nuevo Movimiento</h1>
+        <p className="movement-form__subtitle">Registra un nuevo ingreso o egreso.</p>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 bg-card p-6 rounded-lg border shadow-sm">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+      <form onSubmit={handleSubmit} className="movement-form__container">
+        <div className="movement-form__section">
+          <h2 className="movement-form__section-title">Información General</h2>
+          <div className="movement-form__grid movement-form__grid--2">
+            <div className="movement-form__field-group">
               <Label htmlFor="type">Tipo</Label>
               <Select
                 value={formData.type}
@@ -104,7 +141,7 @@ export default function CreateMovementPage() {
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="movement-form__field-group">
               <Label htmlFor="date">Fecha</Label>
               <Input
                 id="date"
@@ -117,22 +154,34 @@ export default function CreateMovementPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
+          <div className="movement-form__field-group">
+            <Label htmlFor="description">Descripción</Label>
+            <Input
+              id="description"
+              name="description"
+              placeholder="Descripción breve del movimiento"
+              value={formData.description || ''}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="movement-form__section">
+          <h2 className="movement-form__section-title">Detalles de la Transacción</h2>
+          <div className="movement-form__grid movement-form__grid--3">
+            <div className="movement-form__field-group">
               <Label htmlFor="amount">Monto</Label>
-              <Input
+              <NumericInput
                 id="amount"
                 name="amount"
-                type="number"
-                step="0.01"
                 placeholder="0.00"
-                value={formData.amount || ''}
-                onChange={handleChange}
-                required
+                value={formData.amount}
+                onValueChange={(val) => setFormData(prev => ({ ...prev, amount: val }))}
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="movement-form__field-group">
               <Label htmlFor="currency">Moneda</Label>
               <Select
                 value={formData.currency || 'COP'}
@@ -149,27 +198,27 @@ export default function CreateMovementPage() {
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="movement-form__field-group">
               {formData.currency !== 'COP' && (
                 <>
                   <Label htmlFor="exchangeRate">Tasa de Cambio (TRM)</Label>
-                  <Input
+                  <NumericInput
                     id="exchangeRate"
                     name="exchangeRate"
-                    type="number"
-                    step="0.01"
-                    value={formData.exchangeRate || ''}
-                    onChange={handleChange}
-                    required={formData.currency !== 'COP'}
-                    placeholder="Ej: 4000"
+                    value={formData.exchangeRate}
+                    onValueChange={(val) => setFormData(prev => ({ ...prev, exchangeRate: val }))}
+                    placeholder="Ej: 4 000"
                   />
                 </>
               )}
             </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
+        <div className="movement-form__section">
+          <h2 className="movement-form__section-title">Cantidades e Items</h2>
+          <div className="movement-form__grid movement-form__grid--3">
+            <div className="movement-form__field-group">
               <Label htmlFor="unit">Unidad de Medida</Label>
               <Input
                 id="unit"
@@ -180,56 +229,49 @@ export default function CreateMovementPage() {
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="movement-form__field-group">
               <Label htmlFor="quantity">Cantidad</Label>
-              <Input
+              <NumericInput
                 id="quantity"
                 name="quantity"
-                type="number"
-                step="0.01"
                 placeholder="0"
-                value={formData.quantity || ''}
-                onChange={handleChange}
+                value={formData.quantity}
+                onValueChange={(val) => setFormData(prev => ({ ...prev, quantity: val }))}
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="movement-form__field-group">
               <Label>Valor Unitario (Calculado)</Label>
-              <div className="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
+              <div className="movement-form__calculated-value">
                 {formData.amount && formData.quantity && Number(formData.quantity) !== 0
-                  ? (Number(formData.amount) / Number(formData.quantity)).toLocaleString('es-CO', {
-                    style: 'currency',
-                    currency: formData.currency || 'COP'
-                  })
+                  ? formatCurrency(Number(formData.amount) / Number(formData.quantity), formData.currency)
                   : '$ 0'}
               </div>
             </div>
           </div>
+        </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+        <div className="movement-form__section">
+          <h2 className="movement-form__section-title">Clasificación y Destino</h2>
+          <div className="movement-form__grid movement-form__grid--2">
+            <div className="movement-form__field-group">
               <Label htmlFor="category">Categoría</Label>
               <CategorySelect
-                value={formData.category as any}
+                value={typeof formData.category === 'string' ? formData.category : formData.category?._id}
                 onChange={(val) => handleSelectChange('category', val)}
-                type={formData.type as any}
+                type={formData.type as 'INCOME' | 'EXPENSE'}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="costCenter">Centro de Costos</Label>
-              <Input
-                id="costCenter"
-                name="costCenter"
-                placeholder="Ej. General, Proyecto A"
-                value={formData.costCenter || ''}
-                onChange={handleChange}
-                required
+            <div className="movement-form__field-group">
+              <CostCenterSelect
+                value={formData.costCenter}
+                onChange={(val) => handleSelectChange('costCenter', val)}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="movement-form__grid movement-form__grid--2">
+            <div className="movement-form__field-group">
               <Label htmlFor="beneficiary">Beneficiario / Pagador</Label>
               <Input
                 id="beneficiary"
@@ -237,10 +279,9 @@ export default function CreateMovementPage() {
                 placeholder="Nombre de la persona o entidad"
                 value={formData.beneficiary || ''}
                 onChange={handleChange}
-                required
               />
             </div>
-            <div className="space-y-2">
+            <div className="movement-form__field-group">
               <Label htmlFor="paymentChannel">Canal de Pago</Label>
               <Input
                 id="paymentChannel"
@@ -248,24 +289,14 @@ export default function CreateMovementPage() {
                 placeholder="Ej. Transferencia, Efectivo"
                 value={formData.paymentChannel || ''}
                 onChange={handleChange}
-                required
               />
             </div>
           </div>
+        </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="description">Descripción</Label>
-            <Input
-              id="description"
-              name="description"
-              placeholder="Descripción breve del movimiento"
-              value={formData.description || ''}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
+        <div className="movement-form__section">
+          <h2 className="movement-form__section-title">Notas</h2>
+          <div className="movement-form__field-group">
             <Label htmlFor="notes">Notas Adicionales</Label>
             <Textarea
               id="notes"
@@ -275,17 +306,17 @@ export default function CreateMovementPage() {
               onChange={handleChange}
             />
           </div>
+        </div>
 
-          <div className="flex justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => router.back()} className="mr-2">
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? 'Guardando...' : 'Guardar Movimiento'}
-            </Button>
-          </div>
-        </form>
-      </div>
+        <div className="movement-form__footer">
+          <Button type="button" variant="outline" onClick={() => router.back()}>
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Guardando...' : 'Guardar Movimiento'}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 }

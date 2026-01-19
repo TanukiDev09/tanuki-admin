@@ -1,0 +1,179 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.permission-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__status-text {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    &--has-changes {
+      color: $warning;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+  }
+
+  &__table-container {
+    background-color: $card;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    overflow: hidden;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  &__th {
+    &--module {
+      min-width: 200px;
+      text-align: left;
+    }
+
+    &--action {
+      width: 80px;
+      text-align: center;
+    }
+  }
+
+  &__row {
+    @include transition(background-color);
+
+    &:hover {
+      background-color: rgba($muted, 0.4);
+    }
+  }
+
+  &__module-info {
+    padding: $spacing-md;
+  }
+
+  &__module-label {
+    color: $foreground;
+    font-weight: $font-weight-medium;
+  }
+
+  &__module-description {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__cell--action {
+    padding: $spacing-md;
+    text-align: center;
+  }
+
+  &__btn-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: $spacing-xs;
+  }
+
+  &__check-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  &__check-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: transparent;
+    border: 2px solid $border;
+    border-radius: $radius-xs;
+    cursor: pointer;
+
+    @include transition(all);
+
+    &:hover {
+      border-color: rgba($primary, 0.5);
+    }
+
+    &--active {
+      color: $primary-foreground;
+    }
+
+    &--all {
+      &.permission-matrix__check-button--active {
+        background-color: $primary;
+        border-color: $primary;
+      }
+
+      &:hover:not(.permission-matrix__check-button--active) {
+        border-color: rgba($primary, 0.5);
+      }
+    }
+
+    &--create {
+      &.permission-matrix__check-button--active {
+        background-color: $success;
+        color: white;
+        border-color: $success;
+      }
+
+      &:hover:not(.permission-matrix__check-button--active) {
+        border-color: rgba($success, 0.5);
+      }
+    }
+
+    &--read {
+      &.permission-matrix__check-button--active {
+        background-color: $info;
+        color: white;
+        border-color: $info;
+      }
+
+      &:hover:not(.permission-matrix__check-button--active) {
+        border-color: rgba($info, 0.5);
+      }
+    }
+
+    &--update {
+      &.permission-matrix__check-button--active {
+        background-color: $warning;
+        color: white;
+        border-color: $warning;
+      }
+
+      &:hover:not(.permission-matrix__check-button--active) {
+        border-color: rgba($warning, 0.5);
+      }
+    }
+
+    &--delete {
+      &.permission-matrix__check-button--active {
+        background-color: $danger;
+        color: white;
+        border-color: $danger;
+      }
+
+      &:hover:not(.permission-matrix__check-button--active) {
+        border-color: rgba($danger, 0.5);
+      }
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+}

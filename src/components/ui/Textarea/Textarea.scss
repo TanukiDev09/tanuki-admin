@@ -1,0 +1,87 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// TEXTAREA COMPONENT (MOBILE-FIRST)
+// Notación BEM
+// ============================================
+
+.textarea {
+  // Estilos base (móvil)
+  display: flex;
+  width: 100%;
+  min-height: 80px;
+  padding: $spacing-sm 12px;
+  background: $background;
+  color: $foreground;
+  font-family: $font-sans;
+  font-size: $font-size-sm;
+  border: 1px solid $input;
+  border-radius: $radius-md;
+  line-height: $line-height-normal;
+  resize: vertical;
+
+  @include transition(border-color, box-shadow);
+
+  &::placeholder {
+    color: $muted-foreground;
+  }
+
+  &:focus-visible {
+    outline: none;
+
+    @include focus-ring;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    resize: none;
+  }
+
+  // --- VARIANTES ---
+
+  &--error {
+    border-color: $danger;
+
+    &:focus-visible {
+      outline-color: $danger;
+    }
+  }
+
+  &--success {
+    border-color: $success;
+
+    &:focus-visible {
+      outline-color: $success;
+    }
+  }
+
+  &--no-resize {
+    resize: none;
+  }
+
+  &--auto-resize {
+    resize: auto;
+  }
+
+  // --- TAMAÑOS ---
+
+  &--sm {
+    min-height: 60px;
+    padding: $spacing-xs 10px;
+    font-size: $font-size-xs;
+  }
+
+  &--lg {
+    min-height: 120px;
+    font-size: $font-size-base;
+  }
+
+  // --- RESPONSIVE (MOBILE-FIRST) ---
+
+  @include respond-to('md') {
+    min-height: 100px;
+    padding: $spacing-md 14px;
+  }
+}

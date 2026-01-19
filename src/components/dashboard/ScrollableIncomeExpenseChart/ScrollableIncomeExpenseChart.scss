@@ -1,0 +1,28 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.scrollable-income-expense-chart {
+  @include card-base;
+
+  &__header {
+    margin-bottom: $spacing-md;
+  }
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: $spacing-md;
+
+    @include custom-scrollbar;
+  }
+
+  &__chart-wrapper {
+    height: 400px;
+    min-height: 400px;
+  }
+}

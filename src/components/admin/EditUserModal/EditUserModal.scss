@@ -1,0 +1,40 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.edit-user-modal {
+  max-width: 425px;
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    padding-top: $spacing-md;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__error {
+    padding: $spacing-sm;
+    background-color: rgba($destructive, 0.1);
+    color: $destructive;
+    font-size: $font-size-sm;
+    border-radius: $radius-md;
+  }
+
+  &__hint {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__footer {
+    padding-top: $spacing-md;
+  }
+
+  &__select-trigger {
+    width: 100%;
+  }
+}

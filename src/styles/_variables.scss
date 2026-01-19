@@ -1,0 +1,199 @@
+// ============================================
+// TANUKI ADMIN DASHBOARD - DESIGN SYSTEM
+// Variables globales en SASS
+// ============================================
+
+// --- COLORES: Paleta Base ---
+
+// Backgrounds & Surfaces
+$background: hsl(210deg 17% 98%); // #F7F8FA
+$foreground: hsl(222deg 47% 11%); // #0F172A
+
+// Card Surface
+$card: hsl(0deg 0% 100%); // #FFFFFF
+$card-foreground: hsl(222deg 47% 11%);
+
+// Popover
+$popover: hsl(0deg 0% 100%);
+$popover-foreground: hsl(222deg 47% 11%);
+
+// Primary (Dark text/accents)
+$primary: hsl(222deg 47% 11%); // #0F172A
+$primary-foreground: hsl(0deg 0% 100%);
+
+// Secondary (Light gray)
+$secondary: hsl(214deg 32% 91%); // #E2E8F0
+$secondary-foreground: hsl(222deg 47% 11%);
+
+// Muted
+$muted: hsl(210deg 40% 96%); // #F1F5F9
+$muted-foreground: hsl(215deg 25% 27%); // #334155
+
+// Accent
+$accent: hsl(210deg 40% 96%);
+$accent-foreground: hsl(222deg 47% 11%);
+
+// Destructive
+$destructive: hsl(0deg 84% 60%);
+$destructive-foreground: hsl(0deg 0% 100%);
+
+// Border & Input
+$border: hsl(214deg 32% 91%); // #E2E8F0
+$input: hsl(214deg 32% 91%);
+$ring: hsl(222deg 47% 11%);
+
+// --- COLORES: Semánticos (Status) ---
+
+// Success/Positive (Green)
+$success: hsl(142deg 76% 36%); // #16A34A
+$success-foreground: hsl(0deg 0% 100%);
+
+// Danger/Negative (Red)
+$danger: hsl(0deg 72% 51%); // #DC2626
+$danger-foreground: hsl(0deg 0% 100%);
+
+// Info (Blue)
+$info: hsl(217deg 91% 60%); // #3B82F6
+$info-foreground: hsl(0deg 0% 100%);
+
+// Warning (Yellow/Amber)
+$warning: hsl(38deg 92% 50%); // #F59E0B
+$warning-foreground: hsl(0deg 0% 100%);
+
+// --- COLORES: Legacy Semantic Zones ---
+
+// Flow (Income)
+$flow: hsl(142deg 76% 36%);
+$flow-bg: hsl(142deg 76% 96%);
+
+// Ebb (Expense)
+$ebb: hsl(0deg 72% 51%);
+$ebb-bg: hsl(0deg 72% 96%);
+
+// Balance (Neutral)
+$balance: hsl(217deg 91% 60%);
+$balance-bg: hsl(217deg 91% 96%);
+
+// --- COLORES: Chart Palette ---
+
+$chart-1: hsl(217deg 91% 60%); // Blue
+$chart-2: hsl(0deg 72% 51%); // Red
+$chart-3: hsl(45deg 93% 47%); // Yellow
+$chart-4: hsl(142deg 76% 36%); // Green
+$chart-5: hsl(25deg 95% 53%); // Orange
+$chart-6: hsl(262deg 83% 58%); // Purple
+$chart-7: hsl(199deg 89% 48%); // Cyan
+$chart-8: hsl(280deg 89% 60%); // Magenta
+
+// --- SISTEMA DE ESPACIADO ---
+
+$spacing-2xs: 0.125rem; // 2px
+$spacing-xs: 0.25rem; // 4px
+$spacing-sm: 0.5rem; // 8px
+$spacing-md: 1rem; // 16px
+$spacing-lg: 1.5rem; // 24px
+$spacing-xl: 2rem; // 32px
+$spacing-2xl: 3rem; // 48px
+$spacing-3xl: 4rem; // 64px
+
+// --- SISTEMA DE TIPOGRAFÍA ---
+
+// Font Families
+$font-serif: 'Montserrat', serif;
+$font-sans: 'Work Sans', sans-serif;
+$font-family-mono:
+  ui-monospace, sfmono-regular, menlo, monaco, consolas, 'Liberation Mono',
+  'Courier New', monospace;
+
+// Font Sizes
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-base: 1rem; // 16px
+$font-size-lg: 1.125rem; // 18px
+$font-size-xl: 1.25rem; // 20px
+$font-size-2xl: 1.5rem; // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem; // 36px
+
+// Font Weights
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Line Heights
+$line-height-none: 1;
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+// --- SISTEMA DE SOMBRAS ---
+
+$shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 5%);
+$shadow-sm:
+  0 1px 3px 0 rgb(0 0 0 / 10%),
+  0 1px 2px -1px rgb(0 0 0 / 10%);
+$shadow-md:
+  0 4px 6px -1px rgb(0 0 0 / 10%),
+  0 2px 4px -2px rgb(0 0 0 / 10%);
+$shadow-lg:
+  0 10px 15px -3px rgb(0 0 0 / 10%),
+  0 4px 6px -4px rgb(0 0 0 / 10%);
+$shadow-xl:
+  0 20px 25px -5px rgb(0 0 0 / 10%),
+  0 8px 10px -6px rgb(0 0 0 / 10%);
+$shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 25%);
+
+// --- SISTEMA DE BORDER RADIUS ---
+
+$radius: 0.75rem; // 12px - Default
+$radius-xs: 0.25rem; // 4px
+$radius-sm: 0.5rem; // 8px
+$radius-md: 0.75rem; // 12px
+$radius-lg: 1rem; // 16px
+$radius-xl: 1.5rem; // 24px
+$radius-full: 9999px; // Circular
+
+// --- VARIABLES ESPECÍFICAS DE COMPONENTES ---
+
+// Cards
+$card-padding: $spacing-lg;
+$card-shadow: $shadow-sm;
+$card-radius: $radius-md;
+$card-hover-shadow: $shadow-md;
+
+// Stat Cards
+$stat-card-padding: $spacing-lg;
+$stat-card-radius: $radius-md;
+$stat-value-size: $font-size-3xl;
+$stat-label-size: $font-size-xs;
+
+// Progress/Health Score Circle
+$progress-size: 120px;
+$progress-stroke-width: 8px;
+
+// Chart Heights
+$chart-height-sm: 200px;
+$chart-height-md: 300px;
+$chart-height-lg: 400px;
+
+// Icon Sizes
+$icon-xs: 1rem; // 16px
+$icon-sm: 1.25rem; // 20px
+$icon-md: 1.5rem; // 24px
+$icon-lg: 2rem; // 32px
+$icon-xl: 3rem; // 48px
+
+// --- TRANSICIONES ---
+
+$transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+$transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+
+// --- BREAKPOINTS ---
+
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;

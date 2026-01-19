@@ -1,0 +1,160 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+// ============================================
+// TABLE COMPONENT (MOBILE-FIRST)
+// Notación BEM
+// ============================================
+
+.table-wrapper {
+  // Estilos base (móvil)
+  position: relative;
+  width: 100%;
+  overflow: auto;
+
+  @include custom-scrollbar;
+
+  // En móvil, las tablas necesitan scroll horizontal
+  -webkit-overflow-scrolling: touch; // Smooth scrolling en iOS
+}
+
+.table {
+  // Estilos base (móvil)
+  width: 100%;
+  caption-side: bottom;
+  font-size: $font-size-sm;
+  border-collapse: collapse;
+
+  // --- ELEMENTOS ---
+
+  &__header {
+    // Sticky header para mantener visible al hacer scroll
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: $background;
+
+    tr {
+      border-bottom: 1px solid $border;
+    }
+  }
+
+  &__body {
+    tr:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  &__footer {
+    border-top: 1px solid $border;
+    background: rgba($muted, 0.5);
+    font-weight: $font-weight-medium;
+
+    > tr:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  &__row {
+    border-bottom: 1px solid $border;
+
+    @include transition(background-color, color);
+
+    &:hover {
+      background: rgba($muted, 0.5);
+    }
+
+    &[data-state='selected'] {
+      background: $muted;
+    }
+  }
+
+  &__head {
+    // Estilos base (móvil) - más compactos
+    height: 40px;
+    padding: $spacing-sm;
+    background: $background;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    text-align: left;
+    vertical-align: middle;
+
+    // Checkbox column tiene padding especial
+    &:has([role='checkbox']) {
+      padding-right: 0;
+    }
+
+    @include respond-to('md') {
+      // En tablets y desktop, más espacioso
+      height: 48px;
+      padding: $spacing-md;
+      font-size: $font-size-sm;
+    }
+  }
+
+  &__cell {
+    // Estilos base (móvil) - más compactos
+    padding: $spacing-sm;
+    vertical-align: middle;
+    font-size: $font-size-xs;
+
+    &:has([role='checkbox']) {
+      padding-right: 0;
+    }
+
+    @include respond-to('md') {
+      // En tablets y desktop, más espacioso
+      padding: $spacing-md;
+      font-size: $font-size-sm;
+    }
+  }
+
+  &__caption {
+    margin-top: $spacing-md;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  // --- VARIANTES ---
+
+  &--compact {
+    .table__head,
+    .table__cell {
+      padding: $spacing-xs;
+    }
+  }
+
+  &--comfortable {
+    .table__head {
+      height: 56px;
+      padding: $spacing-lg;
+    }
+
+    .table__cell {
+      padding: $spacing-lg;
+    }
+  }
+
+  &--bordered {
+    .table__cell,
+    .table__head {
+      border: 1px solid $border;
+    }
+  }
+
+  &--striped {
+    .table__body {
+      .table__row:nth-child(even) {
+        background: rgba($muted, 0.3);
+      }
+    }
+  }
+
+  // --- RESPONSIVE (MOBILE-FIRST) ---
+
+  @include respond-to('lg') {
+    // En desktop, podemos permitir más espacio
+    font-size: $font-size-base;
+  }
+}
