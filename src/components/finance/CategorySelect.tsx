@@ -26,11 +26,23 @@ import './CategorySelect.scss';
 
 interface CategorySelectProps {
   value?: string;
-  onChange: (value: string) => void;
+  onValueChange: (value: string) => void;
   type?: 'Ingreso' | 'Egreso' | 'Ambos' | 'INCOME' | 'EXPENSE';
+  placeholder?: string;
+  showSearch?: boolean;
+  allowNull?: boolean;
+  nullLabel?: string;
+  allowCreation?: boolean;
 }
 
-export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
+export function CategorySelect({
+  value,
+  onValueChange,
+  type,
+  allowNull,
+  nullLabel = 'Ninguna',
+  allowCreation = true,
+}: CategorySelectProps) {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -116,7 +128,7 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
       // Note: We might need to re-fetch if we want to ensure sort order,
       // but simplistic append is usually fine for UX feedback
       setCategories([...categories, data.data]);
-      onChange(data.data._id);
+      onValueChange(data.data._id);
 
       setShowNewModal(false);
       setNewCategoryName('');
@@ -138,7 +150,7 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
           if (val === 'ADD_NEW') {
             setShowNewModal(true);
           } else {
-            onChange(val);
+            onValueChange(val);
           }
         }}
       >
@@ -151,6 +163,9 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
           <SelectItem value="none" disabled style={{ display: 'none' }}>
             Selecciona categoría
           </SelectItem>
+          {allowNull && (
+            <SelectItem value="__UNDEFINED__">{nullLabel}</SelectItem>
+          )}
           {categories.map((cat) => (
             <SelectItem key={cat._id} value={cat._id}>
               {cat.name}
@@ -162,13 +177,17 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
             </div>
           )}
 
-          <SelectSeparator />
-          <SelectItem value="ADD_NEW" className="category-select__add-item">
-            <div className="category-select__add-content">
-              <Plus className="category-select__add-icon" />
-              <span>Crear nueva categoría...</span>
-            </div>
-          </SelectItem>
+          {allowCreation && (
+            <>
+              <SelectSeparator />
+              <SelectItem value="ADD_NEW" className="category-select__add-item">
+                <div className="category-select__add-content">
+                  <Plus className="category-select__add-icon" />
+                  <span>Crear nueva categoría...</span>
+                </div>
+              </SelectItem>
+            </>
+          )}
         </SelectContent>
       </Select>
 

@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
-import Movement from '@/models/Movement';
+import * as mongoose from 'mongoose';
+import Movement, { IMovement } from '@/models/Movement';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,55 +17,156 @@ interface MovementDoc {
   [key: string]: unknown;
 }
 
-function buildQuery(searchParams: URLSearchParams) {
-  const type = searchParams.get('type');
+type MovementQuery = {
+  [key: string]:
+    | string
+    | number
+    | boolean
+    | Date
+    | RegExp
+    | MovementQuery
+    | MovementQuery[]
+    | { [key: string]: unknown }
+    | null
+    | undefined;
+};
+
+const handleUndefined = (field: string, conditions: MovementQuery[]) => {
+  const baseOr: MovementQuery[] = [
+    { [field]: null },
+    { [field]: { $exists: false } },
+  ];
+
+  if (
+    field === 'paymentChannel' ||
+    field === 'costCenter' ||
+    field === 'unit'
+  ) {
+    baseOr.push({ [field]: '' } as MovementQuery);
+  }
+
+  if (field === 'costCenter') {
+    baseOr.push(
+      { 'allocations.costCenter': null } as MovementQuery,
+      {
+        'allocations.costCenter': { $exists: false },
+      } as MovementQuery
+    );
+  }
+
+  conditions.push({ $or: baseOr });
+};
+
+const applyBaseFilters = (
+  searchParams: URLSearchParams,
+  conditions: MovementQuery[]
+) => {
   const category = searchParams.get('category');
+  const paymentChannel = searchParams.get('paymentChannel');
+  const costCenter = searchParams.get('costCenter');
+  const unit = searchParams.get('unit');
+
+  if (category === '__UNDEFINED__') handleUndefined('category', conditions);
+  else if (category) conditions.push({ category } as MovementQuery);
+
+  if (paymentChannel === '__UNDEFINED__')
+    handleUndefined('paymentChannel', conditions);
+  else if (paymentChannel) conditions.push({ paymentChannel } as MovementQuery);
+
+  if (costCenter === '__UNDEFINED__') {
+    handleUndefined('costCenter', conditions);
+  } else if (costCenter) {
+    conditions.push({
+      $or: [{ 'allocations.costCenter': costCenter }, { costCenter }],
+    } as MovementQuery);
+  }
+
+  if (unit === '__UNDEFINED__') handleUndefined('unit', conditions);
+  else if (unit) conditions.push({ unit } as MovementQuery);
+};
+
+const applyNumericFilters = (
+  searchParams: URLSearchParams,
+  conditions: MovementQuery[]
+) => {
+  const minAmount = searchParams.get('minAmount');
+  const maxAmount = searchParams.get('maxAmount');
+  const minQuantity = searchParams.get('minQuantity');
+  const maxQuantity = searchParams.get('maxQuantity');
+
+  if (minAmount || maxAmount) {
+    const amountQuery: Record<string, number> = {};
+    if (minAmount) amountQuery.$gte = parseFloat(minAmount);
+    if (maxAmount) amountQuery.$lte = parseFloat(maxAmount);
+    conditions.push({ amount: amountQuery } as MovementQuery);
+  }
+
+  if (minQuantity === '__UNDEFINED__' || maxQuantity === '__UNDEFINED__') {
+    handleUndefined('quantity', conditions);
+  } else if (minQuantity || maxQuantity) {
+    const quantityQuery: Record<string, number> = {};
+    if (minQuantity) quantityQuery.$gte = parseFloat(minQuantity);
+    if (maxQuantity) quantityQuery.$lte = parseFloat(maxQuantity);
+    conditions.push({
+      quantity: quantityQuery,
+    } as MovementQuery);
+  }
+};
+
+const applyOtherFilters = (
+  searchParams: URLSearchParams,
+  conditions: MovementQuery[]
+) => {
+  const type = searchParams.get('type');
   const search = searchParams.get('search');
   const startDate = searchParams.get('startDate');
   const endDate = searchParams.get('endDate');
-  const costCenter = searchParams.get('costCenter');
-
-  const query: Record<string, unknown> = {};
-
-  if (category) {
-    query.category = category;
-  }
-
-  if (costCenter) {
-    query.$or = [
-      { 'allocations.costCenter': costCenter },
-      { costCenter: costCenter },
-    ];
-  }
 
   if (type) {
-    if (type === 'INCOME') query.type = { $in: ['INCOME', 'Ingreso'] };
-    else if (type === 'EXPENSE') query.type = { $in: ['EXPENSE', 'Egreso'] };
-    else query.type = type;
+    const typeMap: Record<string, string[]> = {
+      INCOME: ['INCOME', 'Ingreso'],
+      EXPENSE: ['EXPENSE', 'Egreso'],
+    };
+    conditions.push({
+      type: typeMap[type] ? { $in: typeMap[type] } : type,
+    } as MovementQuery);
   }
 
-  if (startDate) {
-    const start = new Date(startDate);
-    start.setUTCHours(0, 0, 0, 0);
-    query.date = { ...((query.date as object) || {}), $gte: start };
-  }
-
-  if (endDate) {
-    const end = new Date(endDate);
-    end.setUTCHours(23, 59, 59, 999);
-    query.date = { ...((query.date as object) || {}), $lte: end };
+  if (startDate || endDate) {
+    const dateQuery: Record<string, Date> = {};
+    if (startDate) {
+      const start = new Date(startDate);
+      start.setUTCHours(0, 0, 0, 0);
+      dateQuery.$gte = start;
+    }
+    if (endDate) {
+      const end = new Date(endDate);
+      end.setUTCHours(23, 59, 59, 999);
+      dateQuery.$lte = end;
+    }
+    conditions.push({ date: dateQuery } as MovementQuery);
   }
 
   if (search) {
     const searchRegex = new RegExp(search, 'i');
-    query.$or = [
-      { description: searchRegex },
-      { beneficiary: searchRegex },
-      { notes: searchRegex },
-    ];
+    conditions.push({
+      $or: [
+        { description: searchRegex },
+        { beneficiary: searchRegex },
+        { notes: searchRegex },
+      ],
+    } as MovementQuery);
   }
+};
 
-  return query;
+function buildQuery(searchParams: URLSearchParams): MovementQuery {
+  const andConditions: MovementQuery[] = [];
+
+  applyBaseFilters(searchParams, andConditions);
+  applyNumericFilters(searchParams, andConditions);
+  applyOtherFilters(searchParams, andConditions);
+
+  return andConditions.length > 0 ? { $and: andConditions } : {};
 }
 
 function formatMovements(movements: MovementDoc[]) {
@@ -95,16 +197,52 @@ export async function GET(request: NextRequest) {
 
   await dbConnect();
   const { searchParams } = new URL(request.url);
+
+  // Special case: Get distinct units
+  if (searchParams.get('distinct') === 'unit') {
+    try {
+      const units = await Movement.distinct('unit', {
+        unit: { $ne: '', $exists: true },
+      });
+      return NextResponse.json({ data: units.filter(Boolean) });
+    } catch (error) {
+      console.error('Distinct Units Error:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch distinct units' },
+        { status: 500 }
+      );
+    }
+  }
+
+  // Special case: Get distinct payment channels
+  if (searchParams.get('distinct') === 'paymentChannel') {
+    try {
+      const channels = await Movement.distinct('paymentChannel', {
+        paymentChannel: { $ne: '', $exists: true },
+      });
+      return NextResponse.json({ data: channels.filter(Boolean) });
+    } catch (error) {
+      console.error('Distinct Payment Channels Error:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch distinct payment channels' },
+        { status: 500 }
+      );
+    }
+  }
+
   const page = parseInt(searchParams.get('page') || '1');
   const limit = parseInt(searchParams.get('limit') || '10');
   const skip = (page - 1) * limit;
+  const sortParam = searchParams.get('sort') || 'newest';
+  const sort: { [key: string]: mongoose.SortOrder } =
+    sortParam === 'oldest' ? { date: 1 } : { date: -1 };
 
   try {
     const query = buildQuery(searchParams);
 
     const [movements, total] = await Promise.all([
       Movement.find(query)
-        .sort({ date: -1 }) // Newest first
+        .sort(sort) // Dynamic sort
         .skip(skip)
         .limit(limit)
         .populate({ path: 'category', select: 'name' })
@@ -313,10 +451,12 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ data: formattedMovement }, { status: 201 });
   } catch (err: unknown) {
-    // Explicitly cast to any or specific error type to access properties
-    // Explicitly cast to any or specific error type to access properties
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const error = err as any;
+    const error = err as {
+      code?: number;
+      errInfo?: unknown;
+      message?: string;
+      stack?: string;
+    };
     console.error('Create Movement Error:', error);
 
     if (error.code === 121 && error.errInfo) {

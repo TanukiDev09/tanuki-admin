@@ -357,7 +357,7 @@ export default function CreateBookModal({
               <div className="create-book-modal__field">
                 <CostCenterSelect
                   value={formData.costCenter}
-                  onChange={(value: string) =>
+                  onValueChange={(value: string) =>
                     setFormData({ ...formData, costCenter: value })
                   }
                 />

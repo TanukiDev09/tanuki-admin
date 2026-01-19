@@ -272,12 +272,12 @@ export default function CreateMovementPage() {
               <Label>Valor Unitario (Calculado)</Label>
               <div className="movement-form__calculated-value">
                 {formData.amount &&
-                formData.quantity &&
-                Number(formData.quantity) !== 0
+                  formData.quantity &&
+                  Number(formData.quantity) !== 0
                   ? formatCurrency(
-                      Number(formData.amount) / Number(formData.quantity),
-                      formData.currency
-                    )
+                    Number(formData.amount) / Number(formData.quantity),
+                    formData.currency
+                  )
                   : '$ 0'}
               </div>
             </div>
@@ -297,14 +297,14 @@ export default function CreateMovementPage() {
                     ? formData.category
                     : formData.category?._id
                 }
-                onChange={(val) => handleSelectChange('category', val)}
+                onValueChange={(val) => handleSelectChange('category', val)}
                 type={formData.type as 'INCOME' | 'EXPENSE'}
               />
             </div>
             <div className="movement-form__field-group">
               <CostCenterSelect
                 value={formData.costCenter}
-                onChange={(val) => handleSelectChange('costCenter', val)}
+                onValueChange={(val) => handleSelectChange('costCenter', val)}
               />
             </div>
           </div>
