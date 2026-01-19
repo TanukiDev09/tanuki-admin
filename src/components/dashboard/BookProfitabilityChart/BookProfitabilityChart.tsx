@@ -9,8 +9,7 @@ import {
   YAxis,
   Tooltip,
   Legend,
-  CartesianGrid,
-  Cell
+  CartesianGrid
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { formatCurrency } from '@/lib/utils'; // Assuming this utility exists
@@ -71,7 +70,7 @@ export function BookProfitabilityChart({ data }: BookProfitabilityChartProps) {
                   color: 'var(--color-popover-foreground)',
                   borderRadius: '8px'
                 }}
-                formatter={(value: number) => formatCurrency(value)}
+                formatter={(value: number | undefined) => value !== undefined ? formatCurrency(value) : ''}
                 cursor={{ fill: '#F1F5F9', opacity: 0.4 }}
               />
               <Legend iconType="circle" />

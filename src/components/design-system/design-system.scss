@@ -15,8 +15,8 @@
   }
 
   &__description {
-    font-size: $font-size-sm;
     color: $muted-foreground;
+    font-size: $font-size-sm;
   }
 
   &__amount {
@@ -26,9 +26,9 @@
 
 .design-system-section {
   &__title {
+    margin-bottom: $spacing-md;
     font-size: $font-size-2xl;
     font-weight: $font-weight-bold;
-    margin-bottom: $spacing-md;
   }
 }
 
@@ -63,10 +63,10 @@
 }
 
 .design-system-page {
-  padding: $spacing-lg;
   display: flex;
   flex-direction: column;
   gap: $spacing-lg;
+  padding: $spacing-lg;
 }
 
 .design-system-list {
@@ -76,7 +76,7 @@
 }
 
 .design-system-card-title {
+  margin-bottom: $spacing-md;
   font-size: $font-size-xl;
   font-weight: $font-weight-bold;
-  margin-bottom: $spacing-md;
 }

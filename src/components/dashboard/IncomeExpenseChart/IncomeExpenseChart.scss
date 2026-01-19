@@ -104,11 +104,12 @@
       justify-content: space-between;
       width: 100%;
       margin-top: $spacing-xs;
+      padding: 4px;
       background-color: rgba(
         $muted,
         0.3
       ); // Subtle background for controls area
-      padding: 4px;
+
       border-radius: $radius-md;
     }
 

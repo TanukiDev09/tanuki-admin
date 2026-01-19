@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/Badge';
 import { CreatorResponse } from '@/types/creator';
 import { BookResponse } from '@/types/book';
 import { AgreementResponse } from '@/types/agreement';
+import { BookProfitability } from '@/types/financial-summary';
 import { useToast } from '@/components/ui/Toast';
 import { Separator } from '@/components/ui/Separator';
 import { CreatorForm } from '@/components/creators/CreatorForm';
@@ -40,7 +41,7 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
   const [creator, setCreator] = useState<CreatorResponse | null>(null);
   const [books, setBooks] = useState<BookResponse[]>([]);
   const [agreements, setAgreements] = useState<AgreementResponse[]>([]);
-  const [financialData, setFinancialData] = useState<any>(null);
+  const [financialData, setFinancialData] = useState<BookProfitability[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
 

@@ -5,9 +5,9 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-3xl;
+  width: 100%;
   max-width: 900px;
   margin: 0 auto;
-  width: 100%;
   padding-bottom: calc($spacing-3xl * 1.5);
 
   &__header {
@@ -22,8 +22,8 @@
     align-items: center;
     gap: $spacing-xs;
     color: $muted-foreground;
-    text-decoration: none;
     font-size: $font-size-sm;
+    text-decoration: none;
     transition: color 0.2s;
 
     &:hover {
@@ -36,25 +36,26 @@
   }
 
   &__title {
-    font-size: 2rem;
-    font-weight: $font-weight-bold;
-    color: $foreground;
     display: flex;
     align-items: center;
     gap: $spacing-md;
+    color: $foreground;
+    font-size: 2rem;
+    font-weight: $font-weight-bold;
   }
 
   &__code-badge {
+    padding: $spacing-xs $spacing-sm;
     background-color: rgba($primary, 0.1);
     color: $primary;
-    padding: $spacing-xs $spacing-sm;
-    border-radius: $radius-full;
-    font-size: $font-size-sm;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: $font-size-sm;
+    border-radius: $radius-full;
   }
 
   &__card {
     @include card-base;
+
     padding: $spacing-xl;
   }
 
@@ -68,15 +69,15 @@
 
   &__label {
     display: block;
+    margin-bottom: $spacing-xs;
+    color: $muted-foreground;
     font-size: $font-size-sm;
     font-weight: $font-weight-medium;
-    color: $muted-foreground;
-    margin-bottom: $spacing-xs;
   }
 
   &__value {
-    font-size: $font-size-base;
     color: $foreground;
+    font-size: $font-size-base;
     line-height: $line-height-relaxed;
   }
 
@@ -103,18 +104,18 @@
   }
 
   &__section-title {
-    font-size: $font-size-2xl;
-    font-weight: $font-weight-bold;
-    color: $foreground;
-    margin-bottom: $spacing-lg;
     display: flex;
     align-items: center;
     gap: $spacing-sm;
+    margin-bottom: $spacing-lg;
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
 
     &.subsection {
-      font-size: $font-size-lg;
       margin-bottom: $spacing-md;
       color: $muted-foreground;
+      font-size: $font-size-lg;
       
       &::before {
         display: none;
@@ -152,33 +153,33 @@
 
   // 3. Historia Financiera (Full Width Chart)
   &__chart-section {
-    background: white;
-    border-radius: $radius-xl;
-    padding: $spacing-xl;
-    box-shadow: $shadow-sm;
-    border: 1px solid rgba($border, 0.5);
     min-height: 400px;
+    padding: $spacing-xl;
+    background: white;
+    border: 1px solid rgba($border, 0.5);
+    border-radius: $radius-xl;
+    box-shadow: $shadow-sm;
   }
 
   &__movements-section {
-    margin-top: $spacing-3xl;
     display: flex;
     flex-direction: column;
     gap: $spacing-xl;
+    margin-top: $spacing-3xl;
   }
 }
 
 // Custom specialized card styles for this view
 .premium-stat-card {
-    background: white;
-    border-radius: $radius-xl;
-    padding: $spacing-xl;
-    box-shadow: $shadow-sm;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    transition: transform 0.2s, box-shadow 0.2s;
+    padding: $spacing-xl;
+    background: white;
     border: 1px solid rgba($border, 0.3);
+    border-radius: $radius-xl;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: $shadow-sm;
 
     &:hover {
         transform: translateY(-2px);
@@ -193,9 +194,9 @@
     }
 
     &__label {
+        color: $muted-foreground;
         font-size: $font-size-sm;
         font-weight: $font-weight-bold;
-        color: $muted-foreground;
         text-transform: uppercase;
         letter-spacing: 0.05em;
     }
@@ -206,16 +207,16 @@
     }
 
     &__value {
+        margin-bottom: $spacing-xs;
+        color: $foreground;
         font-size: $font-size-4xl; // Big number
         font-weight: 800;
-        color: $foreground;
-        margin-bottom: $spacing-xs;
         letter-spacing: -0.02em;
     }
 
     &__subtext {
-        font-size: $font-size-sm;
         color: $muted-foreground;
+        font-size: $font-size-sm;
     }
 
     &--highlight {

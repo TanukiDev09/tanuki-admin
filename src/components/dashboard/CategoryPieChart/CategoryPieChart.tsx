@@ -74,7 +74,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
                   borderRadius: 'var(--radius-md)',
                   boxShadow: 'var(--shadow-sm)',
                 }}
-                formatter={(value: number) => formatCurrency(value)}
+                formatter={(value: number | undefined) => value !== undefined ? formatCurrency(value) : ''}
                 itemStyle={{ color: 'var(--color-foreground)' }}
               />
               <Legend

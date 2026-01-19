@@ -9,30 +9,29 @@
 // Placeholder for extension
 %dashboard-base {
   &__container {
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
-    padding: $spacing-lg;
     display: flex;
     flex-direction: column;
     gap: $spacing-3xl;
+    width: 100%;
+    max-width: 1600px;
     min-height: 100vh;
+    margin: 0 auto;
+    padding: $spacing-lg;
     padding-bottom: 150px; // Significantly increased to fully clear mobile bottom menu
     
     // Subtle background mesh/gradient effect could be added here if not in global body
     
     @include lg {
-      padding: $spacing-xl;
-      padding-bottom: $spacing-xl; // Reset padding on desktop
+      padding: $spacing-xl; // Reset padding on desktop
     }
   }
 
   // --- HEADER SECTION ---
   &__header {
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: $spacing-lg; // Increased from md
-    position: relative;
     padding-bottom: $spacing-xl; // Increased from lg
     border-bottom: 1px solid rgba($border, 0.4);
 
@@ -53,13 +52,13 @@
   }
   
   &__section-title {
-    font-size: $font-size-xl;
-    font-weight: $font-weight-semibold;
-    color: $foreground;
-    margin-bottom: $spacing-md;
     display: flex;
     align-items: center;
     gap: $spacing-sm;
+    margin-bottom: $spacing-md;
+    color: $foreground;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
 
     &::before {
       content: '';
@@ -80,8 +79,8 @@
 
   &__table-card {
     background: $card;
-    border-radius: $radius-xl;
     border: 1px solid rgba($border, 0.4);
+    border-radius: $radius-xl;
     overflow: hidden;
     box-shadow: $shadow-sm;
     

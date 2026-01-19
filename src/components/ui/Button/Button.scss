@@ -53,8 +53,8 @@
 
   &--outline {
     background: $background;
-    border: 1px solid $input;
     color: $foreground;
+    border: 1px solid $input;
 
     &:hover:not(:disabled) {
       background: $accent;

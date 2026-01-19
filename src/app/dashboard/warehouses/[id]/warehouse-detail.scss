@@ -11,8 +11,8 @@
   &__loading,
   &__error {
     padding: $spacing-3xl;
-    text-align: center;
     color: $muted-foreground;
+    text-align: center;
   }
 
   &__section {
@@ -202,7 +202,7 @@
   }
 
   &__description-text {
-    font-size: $font-size-sm;
     color: $foreground;
+    font-size: $font-size-sm;
   }
 }

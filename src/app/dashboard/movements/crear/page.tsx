@@ -21,7 +21,7 @@ import { CategorySelect } from '@/components/finance/CategorySelect';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
-import { formatCurrency, formatNumber } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import '../movement-form.scss';
 
 export default function CreateMovementPage() {

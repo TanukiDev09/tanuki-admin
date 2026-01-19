@@ -13,12 +13,12 @@
 }
 
 .form-description {
-  font-size: $font-size-sm; // text-sm
   color: hsl(var(--muted-foreground)); // text-muted-foreground
+  font-size: $font-size-sm; // text-sm
 }
 
 .form-message {
+  color: hsl(var(--destructive)); // text-destructive
   font-size: $font-size-sm; // text-sm
   font-weight: $font-weight-medium; // font-medium
-  color: hsl(var(--destructive)); // text-destructive
 }

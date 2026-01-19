@@ -74,9 +74,9 @@
     align-items: center;
     width: 100%;
     height: 100%;
+    background-color: rgba($primary, 0.1);
     color: $primary;
     font-size: 1.875rem;
-    background-color: rgba($primary, 0.1);
   }
 
   &__info-card {
@@ -149,8 +149,8 @@
 
   &__books-grid {
     display: grid;
-    gap: $spacing-md;
     grid-template-columns: 1fr;
+    gap: $spacing-md;
 
     @include sm {
       grid-template-columns: repeat(2, 1fr);
@@ -163,8 +163,8 @@
     padding: $spacing-md;
     border: 1px solid $border;
     border-radius: $radius-lg;
-    transition: background-color 0.2s;
     cursor: pointer;
+    transition: background-color 0.2s;
 
     &:hover {
       background-color: rgba($muted, 0.5);
@@ -193,6 +193,7 @@
 
   &__book-title {
     font-weight: $font-weight-semibold;
+
     @include text-truncate-lines(1);
   }
 
@@ -214,8 +215,8 @@
 
   &__loading {
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     height: 100vh;
   }
 }

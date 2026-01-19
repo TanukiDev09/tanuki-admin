@@ -2,10 +2,10 @@
 @use '../../../../styles/mixins' as *;
 
 .pos-detail {
-  padding: $spacing-2xl;
   display: flex;
   flex-direction: column;
   gap: $spacing-md;
+  padding: $spacing-2xl;
 
   &__header {
     display: flex;
@@ -30,12 +30,12 @@
     display: inline-flex;
     align-items: center;
     padding: 2px 10px;
-    border: 1px solid transparent;
-    border-radius: $radius-full;
     background-color: $secondary;
     color: $secondary-foreground;
     font-size: $font-size-xs;
     font-weight: $font-weight-semibold;
+    border: 1px solid transparent;
+    border-radius: $radius-full;
     transition: background-color $transition-base;
 
     &:hover {
@@ -69,9 +69,9 @@
   }
 
   &__card {
+    padding: $spacing-md;
     border: 1px solid $border;
     border-radius: $radius-md;
-    padding: $spacing-md;
   }
 
   &__section-title {

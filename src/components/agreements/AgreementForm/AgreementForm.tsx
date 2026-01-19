@@ -24,7 +24,6 @@ import { useToast } from '@/components/ui/Toast';
 import { CreateAgreementDTO, AgreementResponse, AgreementRole, AgreementStatus } from '@/types/agreement';
 import { CreatorSelect } from '@/components/creators/CreatorSelect';
 import { FileText, Loader2, Upload, Info } from 'lucide-react';
-import { formatCurrency, formatNumber } from '@/lib/utils';
 import './AgreementForm.scss';
 
 interface AgreementFormProps {

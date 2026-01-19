@@ -16,9 +16,9 @@ export function formatCurrency(amount: number, currency: string = 'COP') {
     .join('');
 }
 
-export function formatNumber(amount: number | string) {
+export function formatNumber(amount: number | string): string {
   const value = typeof amount === 'string' ? parseFloat(amount) : amount;
-  if (isNaN(value)) return amount;
+  if (isNaN(value)) return String(amount);
 
   return new Intl.NumberFormat('es-CO', {
     minimumFractionDigits: 0,

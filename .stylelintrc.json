@@ -68,6 +68,12 @@
         "ignoreProperties": ["composes", "compose-with"]
       }
     ],
+    "selector-pseudo-class-no-unknown": [
+      true,
+      {
+        "ignorePseudoClasses": ["global", "local", "export"]
+      }
+    ],
     "scss/percent-placeholder-pattern": "^[a-z0-9-]+(__[a-z0-9-]+)?(--[a-z0-9-]+)?$"
   }
 }

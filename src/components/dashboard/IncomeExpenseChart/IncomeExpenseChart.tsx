@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   Bar,
   BarChart,
@@ -11,7 +11,6 @@ import {
   Legend,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import './IncomeExpenseChart.scss';
 
@@ -21,32 +20,11 @@ interface IncomeExpenseChartProps {
 }
 
 export function IncomeExpenseChart({ data, title }: IncomeExpenseChartProps) {
-  // Use a larger page size to show full month
-  const itemsPerPage = 31;
-  const [currentPage, setCurrentPage] = useState(0);
-
   // Handle undefined or empty data
   const safeData = useMemo(() => data || [], [data]);
-  const totalPages = Math.ceil(safeData.length / itemsPerPage);
-
-  const paginatedData = useMemo(() => {
-    const start = currentPage * itemsPerPage;
-    const end = start + itemsPerPage;
-    return safeData.slice(start, end);
-  }, [safeData, currentPage, itemsPerPage]);
 
   // Detect key
   const xAxisKey = safeData.length > 0 && safeData[0].month ? 'month' : 'day';
-
-  const periodLabel = useMemo(() => {
-    if (paginatedData.length === 0) return '';
-    // Handle both 'day' and 'month' keys
-    const first = paginatedData[0][xAxisKey];
-    const last = paginatedData[paginatedData.length - 1][xAxisKey];
-    return `${first} - ${last}`;
-  }, [paginatedData, xAxisKey]);
-
-  // ... handlers
 
   return (
     <Card className="income-expense-chart income-expense-chart--no-border">
@@ -67,7 +45,7 @@ export function IncomeExpenseChart({ data, title }: IncomeExpenseChartProps) {
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={320}>
-            <BarChart data={paginatedData} barSize={24} barCategoryGap="15%">
+            <BarChart data={safeData} barSize={24} barCategoryGap="15%">
               <XAxis
                 dataKey={xAxisKey}
                 xAxisId={0}

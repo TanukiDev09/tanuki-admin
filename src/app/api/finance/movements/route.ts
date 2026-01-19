@@ -183,7 +183,7 @@ function validateAndSanitize(body: CreateMovementBody) {
 // Helper to calculate derived financial values
 function calculateFinancials(body: CreateMovementBody, amount: number) {
   // Normalize type
-  let type = body.type;
+  let type: string = body.type || 'Ingreso';
   if (type === 'INCOME') type = 'Ingreso';
   if (type === 'EXPENSE') type = 'Egreso';
 

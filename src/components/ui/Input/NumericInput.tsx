@@ -29,6 +29,7 @@ export const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps
           }
         }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [value]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,9 +37,6 @@ export const NumericInput = React.forwardRef<HTMLInputElement, NumericInputProps
 
       // Allow only digits, spaces, and one decimal separator
       const decimalSeparator = ','; // Using comma for es-CO
-      const regex = allowDecimals
-        ? new RegExp(`^-?\\d*[${decimalSeparator}]?\\d*$`)
-        : /^-?\d*$/;
 
       // Strip spaces for validation and parsing
       const cleanValue = input.replace(/\s/g, '');
