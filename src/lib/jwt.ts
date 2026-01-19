@@ -1,8 +1,16 @@
 import jwt from 'jsonwebtoken';
 import { UserResponse } from '@/types/user';
 
-// Clave secreta para firmar tokens (en producción usar variable de entorno)
-const JWT_SECRET = process.env.JWT_SECRET || 'tanuki-admin-secret-key-2024';
+// Clave secreta para firmar tokens (DEBE estar en variables de entorno)
+const JWT_SECRET = process.env.JWT_SECRET;
+
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET must be defined in production environment');
+}
+
+// Fallback solo para desarrollo local si no se ha configurado el .env aún, 
+// pero lanzaremos un error en producción.
+const FINAL_JWT_SECRET = JWT_SECRET || 'development-only-fallback-key';
 const JWT_EXPIRES_IN = '7d'; // Token válido por 7 días
 
 export interface JWTPayload {
@@ -23,7 +31,7 @@ export function generateToken(user: UserResponse): string {
     role: user.role,
   };
 
-  return jwt.sign(payload, JWT_SECRET, {
+  return jwt.sign(payload, FINAL_JWT_SECRET, {
     expiresIn: JWT_EXPIRES_IN,
   });
 }
@@ -34,7 +42,7 @@ export function generateToken(user: UserResponse): string {
  */
 export function verifyToken(token: string): JWTPayload | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
+    const decoded = jwt.verify(token, FINAL_JWT_SECRET) as JWTPayload;
     return decoded;
   } catch {
     return null;

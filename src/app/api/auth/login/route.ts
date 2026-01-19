@@ -14,8 +14,9 @@ import { createDefaultPermissions } from '@/lib/permissions';
 export async function POST(request: NextRequest) {
   try {
     console.log('[Login API] Starting login process...');
-    await dbConnect();
-    console.log('[Login API] DB connected');
+    const conn = await dbConnect();
+    const dbName = conn.connection.db?.databaseName;
+    console.log('[Login API] DB connected to:', dbName);
 
     const body = await request.json();
     const { email, password } = body;
@@ -38,7 +39,15 @@ export async function POST(request: NextRequest) {
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      console.warn('[Login API] User not found:', email);
+      const allUsersCount = await User.countDocuments();
+      console.warn(`[Login API] User not found: "${email}". Total users count in DB: ${allUsersCount}`);
+      
+      // Si hay pocos usuarios, podrías querer ver cuáles son (opcional, solo para debug inicial)
+      if (allUsersCount > 0 && allUsersCount < 5) {
+        const users = await User.find({}, 'email');
+        console.log('[Login API] Existing user emails:', users.map(u => u.email).join(', '));
+      }
+
       return NextResponse.json(
         {
           success: false,
