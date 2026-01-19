@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/Table';
-import { Eye, Plus, Trash2, Pencil } from 'lucide-react';
+import { Eye, Plus, Trash2, Pencil, Filter, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CategorySelect } from '@/components/finance/CategorySelect';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
 import { useToast } from '@/components/ui/Toast';
@@ -38,6 +38,7 @@ export default function MovementsPage() {
   const [movements, setMovements] = useState<Movement[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [typeFilter, setTypeFilter] = useState('ALL');
   const [categoryFilter, setCategoryFilter] = useState('ALL');
   const [costCenterFilter, setCostCenterFilter] = useState('ALL');
@@ -59,6 +60,10 @@ export default function MovementsPage() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [sortOrder, setSortOrder] = useState('newest');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const limit = 10;
   const { hasPermission } = usePermission();
   const canCreate = hasPermission(ModuleName.FINANCE, PermissionAction.CREATE);
   const canUpdate = hasPermission(ModuleName.FINANCE, PermissionAction.UPDATE);
@@ -84,6 +89,8 @@ export default function MovementsPage() {
       addParam('startDate', startDate);
       addParam('endDate', endDate);
       addParam('sort', sortOrder);
+      addParam('page', page.toString());
+      addParam('limit', limit.toString());
 
       if (quantityUndefined) {
         params.append('minQuantity', '__UNDEFINED__');
@@ -96,6 +103,8 @@ export default function MovementsPage() {
       if (!res.ok) throw new Error('Error al cargar movimientos');
       const data = await res.json();
       setMovements(data.data || []);
+      setTotalPages(data.meta?.total_pages || 1);
+      setTotalResults(data.meta?.total || 0);
     } catch (error) {
       console.error(error);
       toast({
@@ -122,6 +131,8 @@ export default function MovementsPage() {
     toast,
     quantityUndefined,
     sortOrder,
+    page,
+    limit,
   ]);
 
   const fetchUnitsAndChannels = useCallback(async () => {
@@ -170,7 +181,28 @@ export default function MovementsPage() {
     setStartDate('');
     setEndDate('');
     setSortOrder('newest');
+    setPage(1);
   };
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [
+    search,
+    typeFilter,
+    categoryFilter,
+    costCenterFilter,
+    paymentChannelFilter,
+    minAmount,
+    maxAmount,
+    unitFilter,
+    minQuantity,
+    maxQuantity,
+    startDate,
+    endDate,
+    quantityUndefined,
+    sortOrder,
+  ]);
 
   const handleDelete = async (id: string) => {
     if (
@@ -217,8 +249,8 @@ export default function MovementsPage() {
         </div>
 
         {/* Filters */}
-        <div className="movements-list__filters">
-          <div className="movements-list__filters-row">
+        <div className={`movements-list__filters ${showAdvancedFilters ? 'movements-list__filters--expanded' : ''}`}>
+          <div className="movements-list__filters-primary">
             <div className="movements-list__search-wrapper">
               <Label className="movements-list__label">Búsqueda</Label>
               <Input
@@ -229,186 +261,199 @@ export default function MovementsPage() {
                 className="movements-list__input"
               />
             </div>
-            <div className="movements-list__type-wrapper">
-              <Label className="movements-list__label">Tipo</Label>
-              <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className="movements-list__select">
-                  <SelectValue placeholder="Todos los Tipos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">Todos los Tipos</SelectItem>
-                  <SelectItem value="INCOME">Ingresos</SelectItem>
-                  <SelectItem value="EXPENSE">Egresos</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="movements-list__category-wrapper">
-              <Label className="movements-list__label">Categoría</Label>
-              <CategorySelect
-                value={categoryFilter === 'ALL' ? '' : categoryFilter}
-                onValueChange={(val) => setCategoryFilter(val || 'ALL')}
-                placeholder="Todas"
-                showSearch={true}
-                allowNull={true}
-                nullLabel="Sin definir"
-                allowCreation={false}
-                type={
-                  typeFilter === 'INCOME'
-                    ? 'Ingreso'
-                    : typeFilter === 'EXPENSE'
-                      ? 'Egreso'
-                      : undefined
-                }
-              />
-            </div>
-            <div className="movements-list__cost-center-wrapper">
-              <Label className="movements-list__label">Centro Costos</Label>
-              <CostCenterSelect
-                value={costCenterFilter === 'ALL' ? '' : costCenterFilter}
-                onValueChange={(val) => setCostCenterFilter(val || 'ALL')}
-                allowNull={true}
-                nullLabel="Sin definir"
-                allowCreation={false}
-                hideLabel={true}
-              />
-            </div>
-            <div className="movements-list__payment-channel-wrapper">
-              <Label className="movements-list__label">Canal de Pago</Label>
-              <Select
-                value={paymentChannelFilter}
-                onValueChange={setPaymentChannelFilter}
-              >
-                <SelectTrigger className="movements-list__select">
-                  <SelectValue placeholder="Todos los Canales" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">Todos los Canales</SelectItem>
-                  <SelectItem value="__UNDEFINED__">Sin definir (-)</SelectItem>
-                  {availablePaymentChannels.map((channel) => (
-                    <SelectItem key={channel} value={channel}>
-                      {channel}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div className="movements-list__filters-row">
-            <div className="movements-list__range-group">
-              <div className="movements-list__field">
-                <Label className="movements-list__label">Monto</Label>
-                <div className="movements-list__range-inputs">
-                  <NumericInput
-                    placeholder="Min 0"
-                    value={minAmount}
-                    onValueChange={setMinAmount}
-                    className="movements-list__input"
-                  />
-                  <span className="movements-list__range-separator">-</span>
-                  <NumericInput
-                    placeholder="Máx"
-                    value={maxAmount}
-                    onValueChange={setMaxAmount}
-                    className="movements-list__input"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="movements-list__unit-wrapper">
-              <Label className="movements-list__label">Unidad</Label>
-              <Select value={unitFilter} onValueChange={setUnitFilter}>
-                <SelectTrigger className="movements-list__select">
-                  <SelectValue placeholder="Todas las Unidades" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">Todas las Unidades</SelectItem>
-                  <SelectItem value="__UNDEFINED__">Sin definir (-)</SelectItem>
-                  {availableUnits.map((unit) => (
-                    <SelectItem key={unit} value={unit}>
-                      {unit}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="movements-list__range-group">
-              <div className="movements-list__field">
-                <div className="movements-list__label-with-action">
-                  <Label className="movements-list__label">Cantidad</Label>
-                  <label className="movements-list__inline-checkbox">
-                    <input
-                      type="checkbox"
-                      checked={quantityUndefined}
-                      onChange={(e) => setQuantityUndefined(e.target.checked)}
-                    />
-                    <span>Sin definir</span>
-                  </label>
-                </div>
-                <div className="movements-list__range-inputs">
-                  <NumericInput
-                    placeholder="Min 0"
-                    value={minQuantity}
-                    onValueChange={setMinQuantity}
-                    className="movements-list__input"
-                    disabled={quantityUndefined}
-                  />
-                  <span className="movements-list__range-separator">-</span>
-                  <NumericInput
-                    placeholder="Máx"
-                    value={maxQuantity}
-                    onValueChange={setMaxQuantity}
-                    className="movements-list__input"
-                    disabled={quantityUndefined}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="movements-list__filters-row movements-list__filters-row--bottom">
-            <div className="movements-list__date-range">
-              <div className="movements-list__field">
-                <Label className="movements-list__label">Desde</Label>
-                <Input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="movements-list__input"
-                />
-              </div>
-              <div className="movements-list__field">
-                <Label className="movements-list__label">Hasta</Label>
-                <Input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                  className="movements-list__input"
-                />
-              </div>
-            </div>
-
-            <div className="movements-list__field movements-list__sort-field">
-              <Label className="movements-list__label">Orden</Label>
-              <Select value={sortOrder} onValueChange={setSortOrder}>
-                <SelectTrigger className="movements-list__select">
-                  <SelectValue placeholder="Ordenar por" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="newest">Más recientes</SelectItem>
-                  <SelectItem value="oldest">Más antiguos</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             <Button
               variant="outline"
-              onClick={clearFilters}
-              className="movements-list__clear-btn"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="movements-list__toggle-filters"
             >
-              Limpiar Filtros
+              {showAdvancedFilters ? <X className="movements-list__icon-sm" /> : <Filter className="movements-list__icon-sm" />}
+              <span>{showAdvancedFilters ? 'Ocultar' : 'Filtros'}</span>
             </Button>
+          </div>
+
+          <div className="movements-list__filters-advanced">
+            <div className="movements-list__filters-row">
+              <div className="movements-list__type-wrapper">
+                <Label className="movements-list__label">Tipo</Label>
+                <Select value={typeFilter} onValueChange={setTypeFilter}>
+                  <SelectTrigger className="movements-list__select">
+                    <SelectValue placeholder="Todos los Tipos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">Todos los Tipos</SelectItem>
+                    <SelectItem value="INCOME">Ingresos</SelectItem>
+                    <SelectItem value="EXPENSE">Egresos</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="movements-list__category-wrapper">
+                <Label className="movements-list__label">Categoría</Label>
+                <CategorySelect
+                  value={categoryFilter === 'ALL' ? '' : categoryFilter}
+                  onValueChange={(val) => setCategoryFilter(val || 'ALL')}
+                  placeholder="Todas"
+                  showSearch={true}
+                  allowNull={true}
+                  nullLabel="Sin definir"
+                  allowCreation={false}
+                  type={
+                    typeFilter === 'INCOME'
+                      ? 'Ingreso'
+                      : typeFilter === 'EXPENSE'
+                        ? 'Egreso'
+                        : undefined
+                  }
+                />
+              </div>
+              <div className="movements-list__cost-center-wrapper">
+                <Label className="movements-list__label">Centro Costos</Label>
+                <CostCenterSelect
+                  value={costCenterFilter === 'ALL' ? '' : costCenterFilter}
+                  onValueChange={(val) => setCostCenterFilter(val || 'ALL')}
+                  allowNull={true}
+                  nullLabel="Sin definir"
+                  allowCreation={false}
+                  hideLabel={true}
+                />
+              </div>
+              <div className="movements-list__payment-channel-wrapper">
+                <Label className="movements-list__label">Canal de Pago</Label>
+                <Select
+                  value={paymentChannelFilter}
+                  onValueChange={setPaymentChannelFilter}
+                >
+                  <SelectTrigger className="movements-list__select">
+                    <SelectValue placeholder="Todos los Canales" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">Todos los Canales</SelectItem>
+                    <SelectItem value="__UNDEFINED__">Sin definir (-)</SelectItem>
+                    {availablePaymentChannels.map((channel) => (
+                      <SelectItem key={channel} value={channel}>
+                        {channel}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="movements-list__filters-row">
+              <div className="movements-list__range-group">
+                <div className="movements-list__field">
+                  <Label className="movements-list__label">Monto</Label>
+                  <div className="movements-list__range-inputs">
+                    <NumericInput
+                      placeholder="Min 0"
+                      value={minAmount}
+                      onValueChange={setMinAmount}
+                      className="movements-list__input"
+                    />
+                    <span className="movements-list__range-separator">-</span>
+                    <NumericInput
+                      placeholder="Máx"
+                      value={maxAmount}
+                      onValueChange={setMaxAmount}
+                      className="movements-list__input"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="movements-list__unit-wrapper">
+                <Label className="movements-list__label">Unidad</Label>
+                <Select value={unitFilter} onValueChange={setUnitFilter}>
+                  <SelectTrigger className="movements-list__select">
+                    <SelectValue placeholder="Todas las Unidades" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">Todas las Unidades</SelectItem>
+                    <SelectItem value="__UNDEFINED__">Sin definir (-)</SelectItem>
+                    {availableUnits.map((unit) => (
+                      <SelectItem key={unit} value={unit}>
+                        {unit}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="movements-list__range-group">
+                <div className="movements-list__field">
+                  <div className="movements-list__label-with-action">
+                    <Label className="movements-list__label">Cantidad</Label>
+                    <label className="movements-list__inline-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={quantityUndefined}
+                        onChange={(e) => setQuantityUndefined(e.target.checked)}
+                      />
+                      <span>Sin definir</span>
+                    </label>
+                  </div>
+                  <div className="movements-list__range-inputs">
+                    <NumericInput
+                      placeholder="Min 0"
+                      value={minQuantity}
+                      onValueChange={setMinQuantity}
+                      className="movements-list__input"
+                      disabled={quantityUndefined}
+                    />
+                    <span className="movements-list__range-separator">-</span>
+                    <NumericInput
+                      placeholder="Máx"
+                      value={maxQuantity}
+                      onValueChange={setMaxQuantity}
+                      className="movements-list__input"
+                      disabled={quantityUndefined}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="movements-list__filters-row movements-list__filters-row--bottom">
+              <div className="movements-list__date-range">
+                <div className="movements-list__field">
+                  <Label className="movements-list__label">Desde</Label>
+                  <Input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="movements-list__input"
+                  />
+                </div>
+                <div className="movements-list__field">
+                  <Label className="movements-list__label">Hasta</Label>
+                  <Input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="movements-list__input"
+                  />
+                </div>
+              </div>
+
+              <div className="movements-list__field movements-list__sort-field">
+                <Label className="movements-list__label">Orden</Label>
+                <Select value={sortOrder} onValueChange={setSortOrder}>
+                  <SelectTrigger className="movements-list__select">
+                    <SelectValue placeholder="Ordenar por" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Más recientes</SelectItem>
+                    <SelectItem value="oldest">Más antiguos</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button
+                variant="outline"
+                onClick={clearFilters}
+                className="movements-list__clear-btn"
+              >
+                Limpiar Filtros
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -420,8 +465,9 @@ export default function MovementsPage() {
                 <TableHead>Descripción</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Categoría</TableHead>
+                <TableHead>Centro Costo</TableHead>
                 <TableHead>Monto</TableHead>
-                <TableHead>Estado</TableHead>
+                <TableHead>Cantidad</TableHead>
                 <TableHead className="movements-list__th-right">
                   Acciones
                 </TableHead>
@@ -431,7 +477,7 @@ export default function MovementsPage() {
               {loading ? (
                 <TableRow>
                   <TableCell
-                    colSpan={7}
+                    colSpan={8}
                     className="movements-list__loading-row"
                   >
                     Cargando...
@@ -439,19 +485,19 @@ export default function MovementsPage() {
                 </TableRow>
               ) : movements.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="movements-list__empty-row">
+                  <TableCell colSpan={8} className="movements-list__empty-row">
                     No hay movimientos registrados.
                   </TableCell>
                 </TableRow>
               ) : (
                 movements.map((movement) => (
                   <TableRow key={movement._id}>
-                    <TableCell>
+                    <TableCell data-label="Fecha">
                       {new Date(movement.date).toLocaleDateString('es-CO', {
                         timeZone: 'UTC',
                       })}
                     </TableCell>
-                    <TableCell className="movements-list__description-link">
+                    <TableCell data-label="Descripción" className="movements-list__description-link">
                       <a
                         href={`/dashboard/movements/${movement._id}`}
                         className="movements-list__link"
@@ -459,7 +505,7 @@ export default function MovementsPage() {
                         {movement.description}
                       </a>
                     </TableCell>
-                    <TableCell>
+                    <TableCell data-label="Tipo">
                       <Badge
                         variant={
                           movement.type === 'INCOME' ? 'default' : 'destructive'
@@ -468,7 +514,7 @@ export default function MovementsPage() {
                         {movement.type === 'INCOME' ? 'Ingreso' : 'Egreso'}
                       </Badge>
                     </TableCell>
-                    <TableCell>
+                    <TableCell data-label="Categoría">
                       {movement.category ? (
                         typeof movement.category === 'string' ? (
                           movement.category
@@ -481,7 +527,14 @@ export default function MovementsPage() {
                         </span>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell data-label="Centro Costo">
+                      {movement.costCenter || (
+                        <span className="movements-list__no-category">
+                          Sin definir
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell data-label="Monto">
                       <span
                         className={`movements-list__amount ${movement.type === 'INCOME' ? 'movements-list__amount--income' : 'movements-list__amount--expense'}`}
                       >
@@ -489,9 +542,18 @@ export default function MovementsPage() {
                         {formatCurrency(movement.amount)}
                       </span>
                     </TableCell>
-                    <TableCell>
-                      {movement.status && (
-                        <Badge variant="outline">{movement.status}</Badge>
+                    <TableCell data-label="Cantidad">
+                      {movement.quantity ? (
+                        <span className="movements-list__quantity">
+                          {movement.quantity}{' '}
+                          {movement.unit && (
+                            <span className="movements-list__unit">
+                              {movement.unit}
+                            </span>
+                          )}
+                        </span>
+                      ) : (
+                        <span className="movements-list__no-category">-</span>
                       )}
                     </TableCell>
                     <TableCell className="movements-list__actions-cell">
@@ -539,6 +601,39 @@ export default function MovementsPage() {
               )}
             </TableBody>
           </Table>
+        </div>
+
+        {/* Pagination */}
+        <div className="movements-list__pagination">
+          <div className="movements-list__pagination-info">
+            Mostrando <strong>{movements.length}</strong> de{' '}
+            <strong>{totalResults}</strong> resultados
+          </div>
+          <div className="movements-list__pagination-controls">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1 || loading}
+              className="movements-list__pagination-btn"
+            >
+              <ChevronLeft className="movements-list__icon-xs" />
+              Anterior
+            </Button>
+            <div className="movements-list__pagination-current">
+              Página <strong>{page}</strong> de <strong>{totalPages}</strong>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages || loading}
+              className="movements-list__pagination-btn"
+            >
+              Siguiente
+              <ChevronRight className="movements-list__icon-xs" />
+            </Button>
+          </div>
         </div>
       </div>
     </div>
