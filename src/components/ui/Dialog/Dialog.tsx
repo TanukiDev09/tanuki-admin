@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
-import "./Dialog.scss";
+import * as React from 'react';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
+import './Dialog.scss';
 
 const Dialog = DialogPrimitive.Root;
 
@@ -19,7 +19,7 @@ const DialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    className={`dialog__overlay ${className || ""}`}
+    className={`dialog__overlay ${className || ''}`}
     {...props}
   />
 ));
@@ -33,7 +33,7 @@ const DialogContent = React.forwardRef<
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
-      className={`dialog__content ${className || ""}`}
+      className={`dialog__content ${className || ''}`}
       {...props}
     >
       {children}
@@ -50,17 +50,17 @@ const DialogHeader = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={`dialog__header ${className || ""}`} {...props} />
+  <div className={`dialog__header ${className || ''}`} {...props} />
 );
-DialogHeader.displayName = "DialogHeader";
+DialogHeader.displayName = 'DialogHeader';
 
 const DialogFooter = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={`dialog__footer ${className || ""}`} {...props} />
+  <div className={`dialog__footer ${className || ''}`} {...props} />
 );
-DialogFooter.displayName = "DialogFooter";
+DialogFooter.displayName = 'DialogFooter';
 
 const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
@@ -68,7 +68,7 @@ const DialogTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Title
     ref={ref}
-    className={`dialog__title ${className || ""}`}
+    className={`dialog__title ${className || ''}`}
     {...props}
   />
 ));
@@ -80,7 +80,7 @@ const DialogDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Description
     ref={ref}
-    className={`dialog__description ${className || ""}`}
+    className={`dialog__description ${className || ''}`}
     {...props}
   />
 ));

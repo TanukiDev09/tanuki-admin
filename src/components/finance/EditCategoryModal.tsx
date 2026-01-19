@@ -73,7 +73,8 @@ export default function EditCategoryModal({
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error || 'Error al actualizar categoría');
+      if (!res.ok)
+        throw new Error(data.error || 'Error al actualizar categoría');
 
       toast({
         title: 'Éxito',

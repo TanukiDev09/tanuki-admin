@@ -3,54 +3,65 @@
 ## ✅ APIs Ya Protegidas
 
 ### Books (COMPLETO)
+
 - ✅ `/api/books` - GET (READ), POST (CREATE)
 - ✅ `/api/books/[id]` - GET (READ), PUT (UPDATE), DELETE (DELETE)
 
 ## 🔄 APIs Pendientes de Proteger
 
 ### Creators
+
 - `/api/creators` - GET, POST
 - `/api/creators/[id]` - GET, PUT, DELETE
 - **Módulo**: `ModuleName.CREATORS`
 
 ### Warehouses
+
 - `/api/warehouses` - GET, POST
 - `/api/warehouses/[id]` - GET, PUT, DELETE
 - **Módulo**: `ModuleName.WAREHOUSES`
 
 ### Inventory
+
 - `/api/inventory/*` - Múltiples rutas
 - **Módulo**: `ModuleName.INVENTORY`
 
 ### Points of Sale
+
 - `/api/points-of-sale` - GET, POST
 - `/api/points-of-sale/[id]` - GET, PUT, DELETE
 - **Módulo**: `ModuleName.POINTS_OF_SALE`
 
 ### Finance/Movements
+
 - `/api/finance/movements` - GET, POST
 - `/api/finance/movements/[id]` - GET, PUT, DELETE
 - `/api/finance/categories` - GET, POST
 - **Módulo**: `ModuleName.FINANCE`
 
 ### Categories
+
 - `/api/finance/categories/` - GET, POST
 - **Módulo**: `ModuleName.CATEGORIES`
 
 ### Cost Centers
+
 - `/api/costcenters` - GET, POST
 - **Módulo**: `ModuleName.COST_CENTERS`
 
 ### Agreements
+
 - `/api/agreements` - GET, POST
 - `/api/agreements/[id]` - GET, PUT, DELETE
 - **Módulo**: `ModuleName.AGREEMENTS`
 
 ### Collections
+
 - `/api/collections` - GET, POST
 - **Módulo**: `ModuleName.COLLECTIONS`
 
 ### Users (Admin Only)
+
 - `/api/users` - GET, POST
 - `/api/users/[id]` - GET, PUT, DELETE
 - **Módulo**: `ModuleName.USERS`
@@ -73,7 +84,7 @@ export async function GET(request) {
     PermissionAction.READ  // ← GET = READ
   );
   if (permissionError) return permissionError;
-  
+
   try {
     // ... código existente
   }
@@ -86,7 +97,7 @@ export async function POST(request) {
     PermissionAction.CREATE  // ← POST = CREATE
   );
   if (permissionError) return permissionError;
-  
+
   try {
     // ... código existente
   }
@@ -99,7 +110,7 @@ export async function PUT(request, { params }) {
     PermissionAction.UPDATE  // ← PUT = UPDATE
   );
   if (permissionError) return permissionError;
-  
+
   try {
     // ... código existente
   }
@@ -112,7 +123,7 @@ export async function DELETE(request, { params }) {
     PermissionAction.DELETE  // ← DELETE = DELETE
   );
   if (permissionError) return permissionError;
-  
+
   try {
     // ... código existente
   }
@@ -122,7 +133,7 @@ export async function DELETE(request, { params }) {
 ## Map de Métodos HTTP → PermissionAction
 
 | Método HTTP | PermissionAction |
-|-------------|------------------|
+| ----------- | ---------------- |
 | GET         | READ             |
 | POST        | CREATE           |
 | PUT/PATCH   | UPDATE           |
@@ -131,17 +142,21 @@ export async function DELETE(request, { params }) {
 ## ⚠️ Casos Especiales
 
 ### APIs de Admin Only
+
 Para `/api/users`, `/api/permissions`, etc., el middleware ya verifica automáticamente si el usuario es admin y da acceso total (bypass).
 
 ### APIs Públicas
+
 Si un endpoint NO debe requerir autenticación (ej: login), NO añadir requirePermission.
 
 ### APIs de Solo Lectura
+
 Algunos endpoints pueden estar diseñados como públicos (ej: catálogo público de libros). Evaluar caso por caso.
 
 ## 🚀 Checklist de Verificación
 
 Para cada ruta modificada, verificar:
+
 - ✅ Imports añadidos correctamente
 - ✅ `ModuleName` correcto para el módulo
 - ✅ `PermissionAction` correcto para el método HTTP
@@ -150,7 +165,9 @@ Para cada ruta modificada, verificar:
 - ✅ Código existente sin modificar
 
 ## 🧪 Testing
+
 Después de aplicar permisos:
+
 1. Ejecutar `npm run dev`
 2. Testear con usuario admin (debe funcionar todo)
 3. Testear con usuario sin permisos (debe recibir 403)

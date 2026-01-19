@@ -1,5 +1,5 @@
-import "./commands";
-import "cypress-axe";
+import './commands';
+import 'cypress-axe';
 
 // Load axe-core before each test
 beforeEach(() => {

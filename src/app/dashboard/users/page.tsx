@@ -92,17 +92,20 @@ export default function UsuariosPage() {
           {/* Header */}
           <div className="dashboard-page__header">
             <div className="dashboard-page__title-group">
-              <h1 className="dashboard-page__title">
-                Gestión de Usuarios
-              </h1>
+              <h1 className="dashboard-page__title">Gestión de Usuarios</h1>
               <p className="dashboard-page__subtitle">
                 Administra los usuarios del sistema
               </p>
             </div>
             {canCreate && (
-              <Button onClick={() => setCreateModalOpen(true)} className="dashboard-page__action-btn">
+              <Button
+                onClick={() => setCreateModalOpen(true)}
+                className="dashboard-page__action-btn"
+              >
                 <UserPlus className="dashboard-page__icon" />
-                <span className="dashboard-page__text-hidden-sm">Crear Usuario</span>
+                <span className="dashboard-page__text-hidden-sm">
+                  Crear Usuario
+                </span>
               </Button>
             )}
           </div>
@@ -118,10 +121,9 @@ export default function UsuariosPage() {
       </div>
 
       {/* Modals */}
-      < CreateUserModal
+      <CreateUserModal
         isOpen={createModalOpen}
-        onClose={() => setCreateModalOpen(false)
-        }
+        onClose={() => setCreateModalOpen(false)}
         onSuccess={handleSuccess}
       />
       <EditUserModal

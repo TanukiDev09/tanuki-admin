@@ -33,14 +33,18 @@ export default function CategoriesTable({
 }: CategoriesTableProps) {
   const router = useRouter();
   const { hasPermission } = usePermission();
-  const canUpdate = hasPermission(ModuleName.CATEGORIES, PermissionAction.UPDATE);
-  const canDelete = hasPermission(ModuleName.CATEGORIES, PermissionAction.DELETE);
+  const canUpdate = hasPermission(
+    ModuleName.CATEGORIES,
+    PermissionAction.UPDATE
+  );
+  const canDelete = hasPermission(
+    ModuleName.CATEGORIES,
+    PermissionAction.DELETE
+  );
 
   if (loading) {
     return (
-      <div className="categories-table__loading">
-        Cargando categorías...
-      </div>
+      <div className="categories-table__loading">Cargando categorías...</div>
     );
   }
 
@@ -61,7 +65,9 @@ export default function CategoriesTable({
             <TableHead>Total Acumulado</TableHead>
             <TableHead>Tipo</TableHead>
             <TableHead>Estado</TableHead>
-            <TableHead className="categories-table__actions-head">Acciones</TableHead>
+            <TableHead className="categories-table__actions-head">
+              Acciones
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -69,7 +75,9 @@ export default function CategoriesTable({
             <TableRow key={category._id}>
               <TableCell className="categories-table__name">
                 <span
-                  onClick={() => router.push(`/dashboard/categories/${category._id}`)}
+                  onClick={() =>
+                    router.push(`/dashboard/categories/${category._id}`)
+                  }
                 >
                   {category.name}
                 </span>

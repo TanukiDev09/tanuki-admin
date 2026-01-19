@@ -6,7 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/Card';
 import {
   Form,
   FormControl,
@@ -67,7 +73,9 @@ export function ChangePasswordForm() {
       const result = await response.json();
 
       if (!response.ok) {
-        throw new Error(result.error || result.message || 'Error al actualizar contraseña');
+        throw new Error(
+          result.error || result.message || 'Error al actualizar contraseña'
+        );
       }
 
       toast({
@@ -78,7 +86,8 @@ export function ChangePasswordForm() {
 
       form.reset();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Error desconocido';
+      const message =
+        error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: 'Error',
         description: message,
@@ -94,12 +103,16 @@ export function ChangePasswordForm() {
       <CardHeader>
         <CardTitle>Cambiar Contraseña</CardTitle>
         <CardDescription>
-          Ingresa tu contraseña actual y la nueva contraseña para asegurar tu cuenta.
+          Ingresa tu contraseña actual y la nueva contraseña para asegurar tu
+          cuenta.
         </CardDescription>
       </CardHeader>
       <CardContent className="change-password-form__content">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="change-password-form__form">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="change-password-form__form"
+          >
             <FormField
               control={form.control}
               name="oldPassword"
@@ -142,8 +155,14 @@ export function ChangePasswordForm() {
               )}
             />
 
-            <Button type="submit" className="change-password-form__submit-btn" disabled={isLoading}>
-              {isLoading && <Loader2 className="change-password-form__spinner" />}
+            <Button
+              type="submit"
+              className="change-password-form__submit-btn"
+              disabled={isLoading}
+            >
+              {isLoading && (
+                <Loader2 className="change-password-form__spinner" />
+              )}
               Actualizar Contraseña
             </Button>
           </form>

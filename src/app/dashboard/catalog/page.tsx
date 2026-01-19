@@ -46,10 +46,7 @@ export default function CatalogoPage() {
     }
   };
 
-  const handleToggleStatus = async (
-    bookId: string,
-    currentStatus: boolean
-  ) => {
+  const handleToggleStatus = async (bookId: string, currentStatus: boolean) => {
     const action = currentStatus ? 'desactivar' : 'activar';
     if (!confirm(`¿Estás seguro de que deseas ${action} este libro?`)) {
       return;
@@ -83,9 +80,7 @@ export default function CatalogoPage() {
           {/* Header */}
           <div className="dashboard-page__header">
             <div className="dashboard-page__title-group">
-              <h1 className="dashboard-page__title">
-                Catálogo de Libros
-              </h1>
+              <h1 className="dashboard-page__title">Catálogo de Libros</h1>
               <p className="dashboard-page__subtitle">
                 Administra el catálogo de la editorial
               </p>
@@ -96,7 +91,9 @@ export default function CatalogoPage() {
                 className="dashboard-page__action-btn"
               >
                 <BookPlus className="dashboard-page__icon" />
-                <span className="dashboard-page__text-hidden-sm">Crear Libro</span>
+                <span className="dashboard-page__text-hidden-sm">
+                  Crear Libro
+                </span>
               </Button>
             )}
           </div>
@@ -110,8 +107,6 @@ export default function CatalogoPage() {
           />
         </div>
       </div>
-
-
 
       <CreateBookModal
         isOpen={createModalOpen}

@@ -18,7 +18,10 @@ interface RunwayProjectionChartProps {
   className?: string;
 }
 
-export function RunwayProjectionChart({ data = [], className }: RunwayProjectionChartProps) {
+export function RunwayProjectionChart({
+  data = [],
+  className,
+}: RunwayProjectionChartProps) {
   // Find zero point
   const zeroPoint = data.findIndex((d) => d.balance === 0);
   const hasZeroPoint = zeroPoint !== -1;
@@ -41,11 +44,22 @@ export function RunwayProjectionChart({ data = [], className }: RunwayProjection
         ) : (
           <div className="runway-projection-chart__chart-container">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={data} margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+              <AreaChart
+                data={data}
+                margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+              >
                 <defs>
                   <linearGradient id="cashGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(var(--balance))" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="hsl(var(--balance))" stopOpacity={0} />
+                    <stop
+                      offset="5%"
+                      stopColor="hsl(var(--balance))"
+                      stopOpacity={0.3}
+                    />
+                    <stop
+                      offset="95%"
+                      stopColor="hsl(var(--balance))"
+                      stopOpacity={0}
+                    />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -60,7 +74,9 @@ export function RunwayProjectionChart({ data = [], className }: RunwayProjection
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `$ ${formatNumber((value / 1000000).toFixed(0))} M`}
+                  tickFormatter={(value) =>
+                    `$ ${formatNumber((value / 1000000).toFixed(0))} M`
+                  }
                 />
                 <Tooltip
                   contentStyle={{
@@ -71,9 +87,7 @@ export function RunwayProjectionChart({ data = [], className }: RunwayProjection
                     borderRadius: 'var(--radius)',
                   }}
                   formatter={(value: number | undefined) =>
-                    value !== undefined
-                      ? formatCurrency(value)
-                      : ''
+                    value !== undefined ? formatCurrency(value) : ''
                   }
                   labelFormatter={(label) => `Mes: ${label}`}
                 />
@@ -91,7 +105,7 @@ export function RunwayProjectionChart({ data = [], className }: RunwayProjection
                       value: 'Advertencia: Se agota efectivo',
                       position: 'top',
                       fontSize: 11,
-                      fill: 'hsl(var(--ebb))'
+                      fill: 'hsl(var(--ebb))',
                     }}
                   />
                 )}

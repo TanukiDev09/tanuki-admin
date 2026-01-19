@@ -39,7 +39,9 @@ loadEnv();
 const MONGODB_URI = process.env.MONGODB_URI_DEV || process.env.MONGODB_URI;
 
 if (!MONGODB_URI) {
-  console.error('Error: MONGODB_URI or MONGODB_URI_DEV environment variable is not defined');
+  console.error(
+    'Error: MONGODB_URI or MONGODB_URI_DEV environment variable is not defined'
+  );
   process.exit(1);
 }
 

@@ -3,8 +3,6 @@
 import './dashboard.scss';
 import { ModuleLinks } from '@/components/dashboard/ModuleLinks/ModuleLinks';
 
-
-
 export default function DashboardPage() {
   return (
     <div className="dashboard__container">

@@ -10,15 +10,29 @@ import { ArrowUpRight, ArrowDownRight, Scale } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import './financial-health.scss';
 
-const RunwayProjectionChart = dynamic(() => import('@/components/dashboard/RunwayProjectionChart').then(mod => mod.RunwayProjectionChart), {
-  ssr: false,
-  loading: () => <div className="chart-loading-placeholder" />
-});
+const RunwayProjectionChart = dynamic(
+  () =>
+    import('@/components/dashboard/RunwayProjectionChart').then(
+      (mod) => mod.RunwayProjectionChart
+    ),
+  {
+    ssr: false,
+    loading: () => <div className="chart-loading-placeholder" />,
+  }
+);
 
-const ScrollableIncomeExpenseChart = dynamic(() => import('@/components/dashboard/ScrollableIncomeExpenseChart').then(mod => mod.ScrollableIncomeExpenseChart), {
-  ssr: false,
-  loading: () => <div className="chart-loading-placeholder" style={{ height: '400px' }} />
-});
+const ScrollableIncomeExpenseChart = dynamic(
+  () =>
+    import('@/components/dashboard/ScrollableIncomeExpenseChart').then(
+      (mod) => mod.ScrollableIncomeExpenseChart
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="chart-loading-placeholder" style={{ height: '400px' }} />
+    ),
+  }
+);
 
 interface FinancialHealthData {
   totals: {
@@ -48,12 +62,14 @@ export default function FinancialHealthPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await fetch('/api/finance/summary', { cache: 'no-store' });
+        const response = await fetch('/api/finance/summary', {
+          cache: 'no-store',
+        });
         if (!response.ok) throw new Error('Failed to fetch summary data');
         const summaryData: FinancialHealthData = await response.json();
         setData(summaryData);
       } catch (error) {
-        console.error("Failed to fetch financial health data", error);
+        console.error('Failed to fetch financial health data', error);
       } finally {
         setLoading(false);
       }
@@ -65,8 +81,14 @@ export default function FinancialHealthPage() {
   if (loading) {
     return (
       <div className="financial-health__container">
-        <div className="chart-loading-placeholder" style={{ height: '100px', marginTop: '20px' }} />
-        <div className="chart-loading-placeholder" style={{ marginTop: '20px' }} />
+        <div
+          className="chart-loading-placeholder"
+          style={{ height: '100px', marginTop: '20px' }}
+        />
+        <div
+          className="chart-loading-placeholder"
+          style={{ marginTop: '20px' }}
+        />
       </div>
     );
   }
@@ -136,9 +158,7 @@ export default function FinancialHealthPage() {
 
       {/* Historical Flow Chart */}
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">
-          Historia Financiera
-        </h2>
+        <h2 className="financial-health__section-title">Historia Financiera</h2>
         <ScrollableIncomeExpenseChart data={data.monthly} />
       </section>
 

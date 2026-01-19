@@ -7,8 +7,6 @@ import { AuthProvider } from '@/contexts/AuthContext';
 import { PermissionProvider } from '@/contexts/PermissionContext';
 import { Toaster } from '@/components/ui/Toast';
 
-
-
 const workSans = Work_Sans({
   subsets: ['latin'],
   variable: '--font-work-sans',

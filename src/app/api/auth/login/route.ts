@@ -13,14 +13,12 @@ import { createDefaultPermissions } from '@/lib/permissions';
  */
 export async function POST(request: NextRequest) {
   try {
-    console.log('[Login API] Starting login process...');
     const conn = await dbConnect();
     const dbName = conn.connection.db?.databaseName;
-    console.log('[Login API] DB connected to:', dbName);
+
 
     const body = await request.json();
     const { email, password } = body;
-    console.log('[Login API] Request received for email:', email);
 
     // Validar campos requeridos
     if (!email || !password) {
@@ -35,17 +33,17 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar usuario por email
-    console.log('[Login API] Searching for user...');
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
       const allUsersCount = await User.countDocuments();
-      console.warn(`[Login API] User not found: "${email}". Total users count in DB: ${allUsersCount}`);
-      
+      console.warn(
+        `[Login API] User not found: "${email}". Total users count in DB: ${allUsersCount}`
+      );
+
       // Si hay pocos usuarios, podrías querer ver cuáles son (opcional, solo para debug inicial)
       if (allUsersCount > 0 && allUsersCount < 5) {
         const users = await User.find({}, 'email');
-        console.log('[Login API] Existing user emails:', users.map(u => u.email).join(', '));
       }
 
       return NextResponse.json(
@@ -56,7 +54,6 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-    console.log('[Login API] User found:', user.email, 'Role:', user.role);
 
     // Verificar si el usuario está activo
     if (!user.isActive) {
@@ -71,7 +68,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar contraseña
-    console.log('[Login API] Verifying password...');
     const isPasswordValid = await verifyPassword(password, user.password);
 
     if (!isPasswordValid) {
@@ -84,31 +80,22 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-    console.log('[Login API] Password verified');
 
     // Actualizar último login
     user.lastLogin = new Date();
     await user.save();
-    console.log('[Login API] Last login updated');
 
     // Asegurar que tenga permisos por defecto creados
-    console.log('[Login API] Checking/creating default permissions...');
     await createDefaultPermissions(user._id.toString(), user.role);
-    console.log('[Login API] Permissions check completed');
 
     // Generar token JWT
-    console.log('[Login API] Generating token...');
     const userResponse = sanitizeUser(user);
     const token = generateToken(userResponse);
-    console.log('[Login API] Token generated');
 
     // Guardar token en cookie HttpOnly
-    console.log('[Login API] Setting auth cookie...');
     await setAuthCookie(token);
-    console.log('[Login API] Auth cookie set');
 
     // Retornar token y datos del usuario (mantener token en body por compatibilidad temporal)
-    console.log('[Login API] Login successful');
     return NextResponse.json({
       success: true,
       data: {

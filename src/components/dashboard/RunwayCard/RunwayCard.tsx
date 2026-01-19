@@ -13,8 +13,10 @@ interface RunwayCardProps {
 export function RunwayCard({ runway, className }: RunwayCardProps) {
   // Color coding: Green (>12), Amber (6-12), Red (<6)
   const getHealthStatus = () => {
-    if (runway >= 12) return { variant: 'healthy', icon: CheckCircle, label: 'Saludable' };
-    if (runway >= 6) return { variant: 'warning', icon: AlertTriangle, label: 'Atención' };
+    if (runway >= 12)
+      return { variant: 'healthy', icon: CheckCircle, label: 'Saludable' };
+    if (runway >= 6)
+      return { variant: 'warning', icon: AlertTriangle, label: 'Atención' };
     return { variant: 'critical', icon: AlertTriangle, label: 'Crítico' };
   };
 
@@ -23,11 +25,11 @@ export function RunwayCard({ runway, className }: RunwayCardProps) {
   const displayValue = runway > 99 ? '∞' : formatNumber(runway.toFixed(1));
 
   return (
-    <Card className={`runway-card runway-card--${status.variant} ${className || ''}`}>
+    <Card
+      className={`runway-card runway-card--${status.variant} ${className || ''}`}
+    >
       <CardHeader className="runway-card__header">
-        <CardTitle className="runway-card__title">
-          PISTA FINANCIERA
-        </CardTitle>
+        <CardTitle className="runway-card__title">PISTA FINANCIERA</CardTitle>
         <Timer className="runway-card__header-icon" />
       </CardHeader>
       <CardContent className="runway-card__content">
@@ -37,12 +39,24 @@ export function RunwayCard({ runway, className }: RunwayCardProps) {
               {displayValue}
               <span className="runway-card__unit">meses</span>
             </div>
-            <p className="runway-card__description">Tiempo hasta agotar efectivo</p>
-            <div className={`runway-card__status runway-card__status--${status.variant}`}>
+            <p className="runway-card__description">
+              Tiempo hasta agotar efectivo
+            </p>
+            <div
+              className={`runway-card__status runway-card__status--${status.variant}`}
+            >
               <Icon className="runway-card__status-icon" />
               <span>{status.label}</span>
-              {runway < 12 && runway >= 6 && <span className="runway-card__status-hint">• Planear recarga en 3-4m</span>}
-              {runway < 6 && <span className="runway-card__status-hint">• Acción inmediata requerida</span>}
+              {runway < 12 && runway >= 6 && (
+                <span className="runway-card__status-hint">
+                  • Planear recarga en 3-4m
+                </span>
+              )}
+              {runway < 6 && (
+                <span className="runway-card__status-hint">
+                  • Acción inmediata requerida
+                </span>
+              )}
             </div>
           </div>
         </div>

@@ -16,14 +16,19 @@ import './categories-page.scss';
 export default function CategoriesPage() {
   const { toast } = useToast();
   const { hasPermission } = usePermission();
-  const canCreate = hasPermission(ModuleName.CATEGORIES, PermissionAction.CREATE);
+  const canCreate = hasPermission(
+    ModuleName.CATEGORIES,
+    PermissionAction.CREATE
+  );
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null
+  );
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -78,7 +83,8 @@ export default function CategoriesPage() {
   const filteredCategories = categories.filter(
     (c) =>
       c.name.toLowerCase().includes(search.toLowerCase()) ||
-      (c.description && c.description.toLowerCase().includes(search.toLowerCase()))
+      (c.description &&
+        c.description.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (

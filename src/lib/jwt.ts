@@ -8,7 +8,7 @@ if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
   throw new Error('JWT_SECRET must be defined in production environment');
 }
 
-// Fallback solo para desarrollo local si no se ha configurado el .env aún, 
+// Fallback solo para desarrollo local si no se ha configurado el .env aún,
 // pero lanzaremos un error en producción.
 const FINAL_JWT_SECRET = JWT_SECRET || 'development-only-fallback-key';
 const JWT_EXPIRES_IN = '7d'; // Token válido por 7 días

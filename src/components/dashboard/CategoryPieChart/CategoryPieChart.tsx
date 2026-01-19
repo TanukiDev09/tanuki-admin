@@ -30,14 +30,16 @@ const COLORS = [
 export function CategoryPieChart({ data }: CategoryPieChartProps) {
   // Sort by value (descending) and take top 5 for better pie visualization
   const sortedData = (data || [])
-    .filter(item => item.value > 0)
+    .filter((item) => item.value > 0)
     .sort((a, b) => b.value - a.value)
     .slice(0, 5);
 
   return (
     <Card className="category-pie-chart category-pie-chart--no-border">
       <CardHeader className="category-pie-chart__header">
-        <CardTitle className="category-pie-chart__title">Gastos por Categoría</CardTitle>
+        <CardTitle className="category-pie-chart__title">
+          Gastos por Categoría
+        </CardTitle>
       </CardHeader>
       <CardContent className="category-pie-chart__content">
         {sortedData.length === 0 ? (
@@ -74,7 +76,9 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
                   borderRadius: 'var(--radius-md)',
                   boxShadow: 'var(--shadow-sm)',
                 }}
-                formatter={(value: number | undefined) => value !== undefined ? formatCurrency(value) : ''}
+                formatter={(value: number | undefined) =>
+                  value !== undefined ? formatCurrency(value) : ''
+                }
                 itemStyle={{ color: 'var(--color-foreground)' }}
               />
               <Legend
@@ -84,7 +88,7 @@ export function CategoryPieChart({ data }: CategoryPieChartProps) {
                 wrapperStyle={{
                   fontFamily: 'var(--font-sans)',
                   fontSize: '12px',
-                  paddingLeft: '10px'
+                  paddingLeft: '10px',
                 }}
               />
             </PieChart>

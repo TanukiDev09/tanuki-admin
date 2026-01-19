@@ -19,9 +19,7 @@ export default function MovimientosLayout({
         <Sidebar />
         <div className="movements-layout__main-container">
           <AppHeader />
-          <main className="movements-layout__content">
-            {children}
-          </main>
+          <main className="movements-layout__content">{children}</main>
         </div>
       </div>
     </AuthGuard>

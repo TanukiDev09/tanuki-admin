@@ -14,9 +14,13 @@ import {
   UserCog,
   Shield,
   Calculator,
-  LucideIcon
+  LucideIcon,
 } from 'lucide-react';
-import { ModuleName, PermissionAction, MODULE_METADATA } from '@/types/permission';
+import {
+  ModuleName,
+  PermissionAction,
+  MODULE_METADATA,
+} from '@/types/permission';
 import { usePermissions } from '@/contexts/PermissionContext';
 import './ModuleLinks.scss';
 
@@ -59,20 +63,31 @@ export function ModuleLinks() {
     return (
       <div className="module-links">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="module-card module-card--skeleton" style={{ height: '140px', background: 'rgba(0,0,0,0.05)', animation: 'pulse 1.5s infinite' }} />
+          <div
+            key={i}
+            className="module-card module-card--skeleton"
+            style={{
+              height: '140px',
+              background: 'rgba(0,0,0,0.05)',
+              animation: 'pulse 1.5s infinite',
+            }}
+          />
         ))}
       </div>
     );
   }
 
   // Filter modules based on read permission
-  const accessibleModules = Object.values(ModuleName).filter(moduleName =>
+  const accessibleModules = Object.values(ModuleName).filter((moduleName) =>
     hasPermission(moduleName, PermissionAction.READ)
   );
 
   if (accessibleModules.length === 0) {
     return (
-      <div className="module-links__empty" style={{ padding: '2rem', textAlign: 'center', color: 'gray' }}>
+      <div
+        className="module-links__empty"
+        style={{ padding: '2rem', textAlign: 'center', color: 'gray' }}
+      >
         No tienes acceso a ningún módulo. Contacta a un administrador.
       </div>
     );

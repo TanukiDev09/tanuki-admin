@@ -3,7 +3,14 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/Card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardFooter,
+} from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
@@ -26,7 +33,8 @@ export default function LoginForm() {
       await login(email, password);
       router.push('/dashboard');
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error al iniciar sesión';
+      const message =
+        err instanceof Error ? err.message : 'Error al iniciar sesión';
       setError(message);
     } finally {
       setIsLoading(false);
@@ -38,15 +46,13 @@ export default function LoginForm() {
       <Card className="login-form__card">
         <CardHeader className="login-form__header">
           <CardTitle className="login-form__title">Tanuki Admin</CardTitle>
-          <CardDescription>Ingresa tus credenciales para continuar</CardDescription>
+          <CardDescription>
+            Ingresa tus credenciales para continuar
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="login-form__form">
-            {error && (
-              <div className="login-form__error">
-                {error}
-              </div>
-            )}
+            {error && <div className="login-form__error">{error}</div>}
 
             <div className="login-form__field">
               <Label htmlFor="email">Email</Label>

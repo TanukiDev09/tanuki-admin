@@ -19,7 +19,9 @@ interface FinancialData {
   };
 }
 
-export default function BookFinancials({ costCenterName }: BookFinancialsProps) {
+export default function BookFinancials({
+  costCenterName,
+}: BookFinancialsProps) {
   const [data, setData] = useState<FinancialData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -33,7 +35,9 @@ export default function BookFinancials({ costCenterName }: BookFinancialsProps) 
 
       try {
         setLoading(true);
-        const res = await fetch(`/api/finance/summary?costCenter=${encodeURIComponent(costCenterName)}`);
+        const res = await fetch(
+          `/api/finance/summary?costCenter=${encodeURIComponent(costCenterName)}`
+        );
         if (!res.ok) throw new Error('Failed to fetch');
         const jsonData = await res.json();
         setData(jsonData);
@@ -83,37 +87,45 @@ export default function BookFinancials({ costCenterName }: BookFinancialsProps) 
       <div className="book-financials__grid">
         <Card>
           <CardHeader className="book-financials__card-header">
-            <CardTitle className="book-financials__card-title">Ingresos Totales</CardTitle>
+            <CardTitle className="book-financials__card-title">
+              Ingresos Totales
+            </CardTitle>
             <TrendingUp className="book-financials__trend-icon book-financials__trend-icon--up" />
           </CardHeader>
           <CardContent>
             <div className="book-financials__value book-financials__value--income">
               {formatCurrency(totals.income)}
             </div>
-            <p className="book-financials__subtext">
-              Acumulado histórico
-            </p>
+            <p className="book-financials__subtext">Acumulado histórico</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="book-financials__card-header">
-            <CardTitle className="book-financials__card-title">Gastos Totales</CardTitle>
+            <CardTitle className="book-financials__card-title">
+              Gastos Totales
+            </CardTitle>
             <TrendingDown className="book-financials__trend-icon book-financials__trend-icon--down" />
           </CardHeader>
           <CardContent>
             <div className="book-financials__value book-financials__value--expense">
               {formatCurrency(totals.expenses)}
             </div>
-            <p className="book-financials__subtext">
-              Acumulado histórico
-            </p>
+            <p className="book-financials__subtext">Acumulado histórico</p>
           </CardContent>
         </Card>
 
-        <Card className={isProfitable ? "book-financials__card--profitable" : "book-financials__card--loss"}>
+        <Card
+          className={
+            isProfitable
+              ? 'book-financials__card--profitable'
+              : 'book-financials__card--loss'
+          }
+        >
           <CardHeader className="book-financials__card-header">
-            <CardTitle className="book-financials__card-title">Balance Neto</CardTitle>
+            <CardTitle className="book-financials__card-title">
+              Balance Neto
+            </CardTitle>
             <DollarSign className="book-financials__trend-icon book-financials__trend-icon--balance" />
           </CardHeader>
           <CardContent>

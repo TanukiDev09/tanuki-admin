@@ -26,9 +26,8 @@ export default function CreatorList() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCreator, setSelectedCreator] = useState<
-    CreatorResponse | null
-  >(null);
+  const [selectedCreator, setSelectedCreator] =
+    useState<CreatorResponse | null>(null);
 
   const { toast } = useToast();
   const { hasPermission } = usePermission();
@@ -128,7 +127,9 @@ export default function CreatorList() {
             <TableRow>
               <TableHead>Nombre</TableHead>
               <TableHead>Nacionalidad</TableHead>
-              <TableHead className="creator-list__actions-head">Acciones</TableHead>
+              <TableHead className="creator-list__actions-head">
+                Acciones
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -145,37 +146,42 @@ export default function CreatorList() {
                 </TableCell>
               </TableRow>
             ) : (
-              creators.filter(c => c).map((creator) => (
-                <TableRow key={creator._id}>
-                  <TableCell className="creator-list__name-cell">
-                    <a href={`/dashboard/creators/${creator._id}`} className="creator-list__name-link">
-                      {creator.name}
-                    </a>
-                  </TableCell>
-                  <TableCell>{creator.nationality || '-'}</TableCell>
-                  <TableCell className="creator-list__actions-cell">
-                    {canUpdate && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(creator)}
+              creators
+                .filter((c) => c)
+                .map((creator) => (
+                  <TableRow key={creator._id}>
+                    <TableCell className="creator-list__name-cell">
+                      <a
+                        href={`/dashboard/creators/${creator._id}`}
+                        className="creator-list__name-link"
                       >
-                        <Edit className="creator-list__action-icon" />
-                      </Button>
-                    )}
-                    {canDelete && (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleDelete(creator._id)}
-                        className="creator-list__delete-btn"
-                      >
-                        <Trash2 className="creator-list__action-icon" />
-                      </Button>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
+                        {creator.name}
+                      </a>
+                    </TableCell>
+                    <TableCell>{creator.nationality || '-'}</TableCell>
+                    <TableCell className="creator-list__actions-cell">
+                      {canUpdate && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(creator)}
+                        >
+                          <Edit className="creator-list__action-icon" />
+                        </Button>
+                      )}
+                      {canDelete && (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleDelete(creator._id)}
+                          className="creator-list__delete-btn"
+                        >
+                          <Trash2 className="creator-list__action-icon" />
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))
             )}
           </TableBody>
         </Table>

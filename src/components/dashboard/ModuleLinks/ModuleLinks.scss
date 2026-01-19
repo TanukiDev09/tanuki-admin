@@ -50,7 +50,11 @@
     align-items: center;
     width: 48px;
     height: 48px;
-    background: linear-gradient(135deg, rgba($primary, 0.05) 0%, rgba($background, 0.5) 100%);
+    background: linear-gradient(
+      135deg,
+      rgba($primary, 0.05) 0%,
+      rgba($background, 0.5) 100%
+    );
     border-radius: 12px;
     flex-shrink: 0;
   }

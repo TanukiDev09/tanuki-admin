@@ -12,21 +12,17 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET(request: NextRequest) {
   try {
-    console.log('[Me API] Checking current session...');
     await dbConnect();
 
     // Extraer token de cookie o header
     let token = await getAuthCookie();
-    console.log('[Me API] Token from cookie:', token ? 'Present' : 'Missing');
 
     if (!token) {
       const authHeader = request.headers.get('authorization');
       token = extractTokenFromHeader(authHeader) || undefined;
-      console.log('[Me API] Token from header:', token ? 'Present' : 'Missing');
     }
 
     if (!token) {
-      console.log('[Me API] No token found');
       return NextResponse.json(
         {
           success: false,
@@ -37,7 +33,6 @@ export async function GET(request: NextRequest) {
     }
 
     // Verificar token
-    console.log('[Me API] Verifying token...');
     const payload = verifyToken(token);
 
     if (!payload) {
@@ -50,10 +45,8 @@ export async function GET(request: NextRequest) {
         { status: 200 }
       );
     }
-    console.log('[Me API] Token payload:', payload.email, payload.userId);
 
     // Obtener usuario de la base de datos
-    console.log('[Me API] Fetching user from DB...');
     const user = await User.findById(payload.userId).select('-password');
 
     if (!user) {
@@ -66,7 +59,6 @@ export async function GET(request: NextRequest) {
         { status: 404 }
       );
     }
-    console.log('[Me API] User found:', user.email);
 
     // Verificar si el usuario está activo
     if (!user.isActive) {
@@ -80,7 +72,6 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    console.log('[Me API] Session verified successfully');
     return NextResponse.json(
       {
         success: true,

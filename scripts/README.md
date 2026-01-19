@@ -21,6 +21,7 @@ scripts/
 Scripts para migrar y transformar datos existentes.
 
 #### `migrate-categories-real.ts`
+
 Migra categorías financieras a la nueva estructura.
 
 ```bash
@@ -28,6 +29,7 @@ npx tsx scripts/db/migrations/migrate-categories-real.ts
 ```
 
 #### `migrate-creators.ts`
+
 Migra datos de creadores (autores, ilustradores, etc.).
 
 ```bash
@@ -35,6 +37,7 @@ npx tsx scripts/db/migrations/migrate-creators.ts
 ```
 
 #### `fix-schema-and-migrate.ts`
+
 Corrige problemas de esquema y migra datos.
 
 ```bash
@@ -50,6 +53,7 @@ npx tsx scripts/db/migrations/fix-schema-and-migrate.ts
 Scripts para poblar datos iniciales en la base de datos.
 
 #### `seedPermissions.ts`
+
 Crea los permisos iniciales del sistema.
 
 ```bash
@@ -61,6 +65,7 @@ npx tsx scripts/db/seed/seedPermissions.ts
 **Cuándo usar**: En la configuración inicial del proyecto o después de resetear la DB.
 
 #### `populate-categories.ts`
+
 Crea categorías financieras predeterminadas.
 
 ```bash
@@ -68,6 +73,7 @@ npx tsx scripts/db/seed/populate-categories.ts
 ```
 
 #### `initialize-inventory.ts` / `initialize-inventory.js`
+
 Inicializa el inventario con datos de ejemplo.
 
 ```bash
@@ -85,6 +91,7 @@ node scripts/db/seed/initialize-inventory.js
 Scripts para inspeccionar y verificar el estado de la base de datos.
 
 #### `inspect-db.ts`
+
 Inspecciona la estructura y contenido de la base de datos.
 
 ```bash
@@ -92,6 +99,7 @@ npx tsx scripts/db/inspect/inspect-db.ts
 ```
 
 #### `inspect-validator.ts`
+
 Verifica el esquema de validación.
 
 ```bash
@@ -99,6 +107,7 @@ npx tsx scripts/db/inspect/inspect-validator.ts
 ```
 
 #### `check-movements.ts`
+
 Verifica la integridad de movimientos financieros.
 
 ```bash
@@ -106,6 +115,7 @@ npx tsx scripts/db/inspect/check-movements.ts
 ```
 
 #### `check_matrix.js`
+
 Verifica la matriz de inventario.
 
 ```bash
@@ -119,6 +129,7 @@ node scripts/db/inspect/check_matrix.js
 Herramientas útiles durante el desarrollo.
 
 #### `create-test-user.js`
+
 Crea un usuario de prueba para testing.
 
 ```bash
@@ -128,6 +139,7 @@ node scripts/dev/create-test-user.js
 **Salida**: Credenciales del usuario creado para usar en desarrollo.
 
 #### `discover-routes.js`
+
 Descubre y lista todas las rutas de la aplicación.
 
 ```bash
@@ -139,6 +151,7 @@ node scripts/dev/discover-routes.js
 **Útil para**: Documentar API, verificar rutas disponibles.
 
 #### `update_validator_allow_fields.js`
+
 Actualiza campos permitidos en el validador de esquema.
 
 ```bash
@@ -152,6 +165,7 @@ node scripts/dev/update_validator_allow_fields.js
 Scripts para verificar funcionalidad y realizar pruebas.
 
 #### `test-users-api.js`
+
 Prueba el API de usuarios.
 
 ```bash
@@ -161,6 +175,7 @@ node scripts/testing/test-users-api.js
 **Requiere**: Servidor corriendo en puerto configurado.
 
 #### `verify_edit_movement.js`
+
 Verifica que la edición de movimientos funcione correctamente.
 
 ```bash
@@ -168,6 +183,7 @@ node scripts/testing/verify_edit_movement.js
 ```
 
 #### `verify_movement_fields.js`
+
 Verifica todos los campos de movimientos.
 
 ```bash
@@ -186,6 +202,7 @@ node scripts/testing/verify_movement_fields.js
    - Ejecutar scripts destructivos
 
 2. **Ambiente**: Asegúrate de estar en el ambiente correcto:
+
    ```bash
    # Verificar variables de entorno
    echo $NODE_ENV
@@ -240,16 +257,16 @@ Cuando crees un nuevo script:
 ```typescript
 /**
  * Script: migrate-example.ts
- * 
+ *
  * Descripción: Migra datos de ejemplo de formato antiguo a nuevo.
- * 
+ *
  * Uso:
  *   npx tsx scripts/db/migrations/migrate-example.ts
- * 
+ *
  * Efectos:
  *   - Modifica la colección 'examples' en la base de datos
  *   - NO es reversible automáticamente (hacer backup primero)
- * 
+ *
  * Requisitos:
  *   - MongoDB corriendo
  *   - Variables de entorno configuradas
@@ -260,9 +277,9 @@ import mongoose from 'mongoose';
 async function migrate() {
   try {
     console.log('🚀 Iniciando migración...');
-    
+
     // Código de migración aquí
-    
+
     console.log('✅ Migración completada exitosamente');
   } catch (error) {
     console.error('❌ Error en migración:', error);
@@ -293,18 +310,21 @@ Antes de ejecutar cualquier script en producción:
 ## 🆘 Troubleshooting
 
 ### Error: "Cannot connect to database"
+
 ```bash
 # Verificar que MongoDB esté corriendo
 # Verificar variables de entorno en .env.local
 ```
 
 ### Error: "Module not found"
+
 ```bash
 # Instalar dependencias
 npm install
 ```
 
 ### Script se ejecuta pero no hace cambios
+
 ```bash
 # Verificar que tengas permisos de escritura
 # Verificar la cadena de conexión a DB

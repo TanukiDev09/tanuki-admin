@@ -12,7 +12,10 @@ interface UserPermissionsSelectProps {
   selectedUserId?: string;
 }
 
-export function UserPermissionsSelect({ onUserSelect, selectedUserId }: UserPermissionsSelectProps) {
+export function UserPermissionsSelect({
+  onUserSelect,
+  selectedUserId,
+}: UserPermissionsSelectProps) {
   const [users, setUsers] = useState<UserResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -53,7 +56,15 @@ export function UserPermissionsSelect({ onUserSelect, selectedUserId }: UserPerm
     }
   };
 
-  const getRoleVariant = (role: string): 'default' | 'secondary' | 'outline' | 'destructive' | 'success' | 'warning' => {
+  const getRoleVariant = (
+    role: string
+  ):
+    | 'default'
+    | 'secondary'
+    | 'outline'
+    | 'destructive'
+    | 'success'
+    | 'warning' => {
     switch (role) {
       case 'admin':
         return 'default';
@@ -97,27 +108,34 @@ export function UserPermissionsSelect({ onUserSelect, selectedUserId }: UserPerm
       <div className="user-permissions-select__list">
         {filteredUsers.length === 0 ? (
           <div className="user-permissions-select__empty">
-            {search ? 'No se encontraron usuarios' : 'No hay usuarios disponibles'}
+            {search
+              ? 'No se encontraron usuarios'
+              : 'No hay usuarios disponibles'}
           </div>
         ) : (
           filteredUsers.map((user) => (
             <button
               key={user._id}
               onClick={() => onUserSelect(user)}
-              className={`user-permissions-select__item ${selectedUserId === user._id ? 'user-permissions-select__item--active' : ''
-                }`}
+              className={`user-permissions-select__item ${
+                selectedUserId === user._id
+                  ? 'user-permissions-select__item--active'
+                  : ''
+              }`}
             >
               <div className="user-permissions-select__item-avatar">
                 <UserIcon className="user-permissions-select__avatar-icon" />
               </div>
               <div className="user-permissions-select__item-content">
-                <div className="user-permissions-select__item-name">{user.name}</div>
-                <div className="user-permissions-select__item-email">{user.email}</div>
+                <div className="user-permissions-select__item-name">
+                  {user.name}
+                </div>
+                <div className="user-permissions-select__item-email">
+                  {user.email}
+                </div>
               </div>
               <div className="user-permissions-select__item-role">
-                <Badge variant={getRoleVariant(user.role)}>
-                  {user.role}
-                </Badge>
+                <Badge variant={getRoleVariant(user.role)}>{user.role}</Badge>
               </div>
             </button>
           ))

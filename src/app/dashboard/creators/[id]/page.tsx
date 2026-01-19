@@ -3,7 +3,14 @@
 import { useState, useEffect, use, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft, Edit, Book as BookIcon, Globe, MapPin, FileText } from 'lucide-react';
+import {
+  ArrowLeft,
+  Edit,
+  Book as BookIcon,
+  Globe,
+  MapPin,
+  FileText,
+} from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { CreatorResponse } from '@/types/creator';
@@ -29,19 +36,31 @@ import { TrendingUp } from 'lucide-react';
 
 import './creator-detail.scss';
 
-const BookProfitabilityChart = dynamic(() => import('@/components/dashboard/BookProfitabilityChart/BookProfitabilityChart').then(mod => mod.BookProfitabilityChart), {
-  ssr: false,
-  loading: () => <div className="h-[400px] w-full bg-muted/10 animate-pulse rounded-lg" />
-});
+const BookProfitabilityChart = dynamic(
+  () =>
+    import('@/components/dashboard/BookProfitabilityChart/BookProfitabilityChart').then(
+      (mod) => mod.BookProfitabilityChart
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[400px] w-full bg-muted/10 animate-pulse rounded-lg" />
+    ),
+  }
+);
 
-export default function CreatorDetailPage(props: { params: Promise<{ id: string }> }) {
+export default function CreatorDetailPage(props: {
+  params: Promise<{ id: string }>;
+}) {
   const params = use(props.params);
   const router = useRouter();
   const { toast } = useToast();
   const [creator, setCreator] = useState<CreatorResponse | null>(null);
   const [books, setBooks] = useState<BookResponse[]>([]);
   const [agreements, setAgreements] = useState<AgreementResponse[]>([]);
-  const [financialData, setFinancialData] = useState<BookProfitability[] | null>(null);
+  const [financialData, setFinancialData] = useState<
+    BookProfitability[] | null
+  >(null);
   const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
 
@@ -58,21 +77,27 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
       setCreator(dataCreator);
 
       // Fetch Books by Creator
-      const resBooks = await fetch(`/api/books?creatorId=${params.id}&limit=100`);
+      const resBooks = await fetch(
+        `/api/books?creatorId=${params.id}&limit=100`
+      );
       if (resBooks.ok) {
         const dataBooks = await resBooks.json();
         setBooks(dataBooks.data || []);
       }
 
       // Fetch Agreements by Creator
-      const resAgreements = await fetch(`/api/agreements?creatorId=${params.id}`);
+      const resAgreements = await fetch(
+        `/api/agreements?creatorId=${params.id}`
+      );
       if (resAgreements.ok) {
         const dataAgreements = await resAgreements.json();
         setAgreements(dataAgreements);
       }
 
       // Fetch Financial Summary (Profitability by Book)
-      const resFinance = await fetch(`/api/finance/summary?creatorId=${params.id}&groupBy=book`);
+      const resFinance = await fetch(
+        `/api/finance/summary?creatorId=${params.id}&groupBy=book`
+      );
       if (resFinance.ok) {
         const dataFinance = await resFinance.json();
         setFinancialData(dataFinance);
@@ -100,11 +125,7 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
   };
 
   if (loading) {
-    return (
-      <div className="creator-detail__loading">
-        Cargando...
-      </div>
-    );
+    return <div className="creator-detail__loading">Cargando...</div>;
   }
 
   if (!creator) return null;
@@ -115,7 +136,11 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
         <div className="creator-detail__container">
           {/* Header / Nav */}
           <div className="creator-detail__header">
-            <Button variant="ghost" className="creator-detail__header-btn" onClick={() => router.back()}>
+            <Button
+              variant="ghost"
+              className="creator-detail__header-btn"
+              onClick={() => router.back()}
+            >
               <ArrowLeft className="creator-detail__icon" />
               Volver a Creadores
             </Button>
@@ -152,14 +177,21 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
               <div className="creator-detail__info-card">
                 <div className="creator-detail__info-row">
                   <MapPin className="creator-detail__icon" />
-                  <span className="creator-detail__text-foreground">{creator.nationality || 'Nacionalidad no especificada'}</span>
+                  <span className="creator-detail__text-foreground">
+                    {creator.nationality || 'Nacionalidad no especificada'}
+                  </span>
                 </div>
-                {(creator.website) && (
+                {creator.website && (
                   <>
                     <Separator />
                     <div className="creator-detail__info-row">
                       <Globe className="creator-detail__icon" />
-                      <a href={creator.website} target="_blank" rel="noopener noreferrer" className="creator-detail__link">
+                      <a
+                        href={creator.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="creator-detail__link"
+                      >
                         {creator.website}
                       </a>
                     </div>
@@ -201,21 +233,78 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
                 </h2>
 
                 {books.length === 0 ? (
-                  <p className="creator-detail__book-list-empty">No hay libros registrados para este creador.</p>
+                  <p className="creator-detail__book-list-empty">
+                    No hay libros registrados para este creador.
+                  </p>
                 ) : (
                   <div className="creator-detail__books-grid">
-                    {books.map(book => (
-                      <div key={book._id} className="creator-detail__book-card" onClick={() => router.push(`/dashboard/catalog/${book._id}`)}>
+                    {books.map((book) => (
+                      <div
+                        key={book._id}
+                        className="creator-detail__book-card"
+                        onClick={() =>
+                          router.push(`/dashboard/catalog/${book._id}`)
+                        }
+                      >
                         <div className="creator-detail__book-cover">
-                          {book.coverImage && <Image src={book.coverImage.startsWith('http') ? book.coverImage : `/uploads/covers/${book.coverImage}`} alt={book.title} fill className="creator-detail__book-image" sizes="56px" />}
+                          {book.coverImage && (
+                            <Image
+                              src={
+                                book.coverImage.startsWith('http')
+                                  ? book.coverImage
+                                  : `/uploads/covers/${book.coverImage}`
+                              }
+                              alt={book.title}
+                              fill
+                              className="creator-detail__book-image"
+                              sizes="56px"
+                            />
+                          )}
                         </div>
                         <div className="creator-detail__book-info">
-                          <h3 className="creator-detail__book-title">{book.title}</h3>
-                          <p className="creator-detail__book-genre">{book.genre}</p>
+                          <h3 className="creator-detail__book-title">
+                            {book.title}
+                          </h3>
+                          <p className="creator-detail__book-genre">
+                            {book.genre}
+                          </p>
                           <div className="creator-detail__badges">
-                            {book.authors?.some(a => (typeof a === 'string' ? a : a._id) === creator._id) && <Badge variant="secondary" className="creator-detail__badge-small">Autor</Badge>}
-                            {book.translators?.some(a => (typeof a === 'string' ? a : a._id) === creator._id) && <Badge variant="secondary" className="creator-detail__badge-small">Traductor</Badge>}
-                            {book.illustrators?.some(a => (typeof a === 'string' ? a : a._id) === creator._id) && <Badge variant="secondary" className="creator-detail__badge-small">Ilustrador</Badge>}
+                            {book.authors?.some(
+                              (a) =>
+                                (typeof a === 'string' ? a : a._id) ===
+                                creator._id
+                            ) && (
+                              <Badge
+                                variant="secondary"
+                                className="creator-detail__badge-small"
+                              >
+                                Autor
+                              </Badge>
+                            )}
+                            {book.translators?.some(
+                              (a) =>
+                                (typeof a === 'string' ? a : a._id) ===
+                                creator._id
+                            ) && (
+                              <Badge
+                                variant="secondary"
+                                className="creator-detail__badge-small"
+                              >
+                                Traductor
+                              </Badge>
+                            )}
+                            {book.illustrators?.some(
+                              (a) =>
+                                (typeof a === 'string' ? a : a._id) ===
+                                creator._id
+                            ) && (
+                              <Badge
+                                variant="secondary"
+                                className="creator-detail__badge-small"
+                              >
+                                Ilustrador
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -233,7 +322,9 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
                 </h2>
 
                 {agreements.length === 0 ? (
-                  <p className="creator-detail__book-list-empty">No hay contratos registrados.</p>
+                  <p className="creator-detail__book-list-empty">
+                    No hay contratos registrados.
+                  </p>
                 ) : (
                   <div className="border rounded-md">
                     <Table>
@@ -251,7 +342,8 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
                           <TableRow key={agreement._id}>
                             <TableCell className="font-medium">
                               {/* Safe cast or check if book is object */}
-                              {typeof agreement.book === 'object' && agreement.book !== null
+                              {typeof agreement.book === 'object' &&
+                              agreement.book !== null
                                 ? (agreement.book as { title: string }).title
                                 : 'Libro no disponible'}
                             </TableCell>
@@ -261,12 +353,20 @@ export default function CreatorDetailPage(props: { params: Promise<{ id: string 
                               {agreement.role === 'illustrator' && 'Ilustrador'}
                             </TableCell>
                             <TableCell>
-                              <Badge variant={
-                                agreement.status === 'active' ? 'success' :
-                                  agreement.status === 'draft' ? 'secondary' : 'destructive'
-                              }>
-                                {agreement.status === 'active' ? 'Activo' :
-                                  agreement.status === 'draft' ? 'Borrador' : 'Terminado'}
+                              <Badge
+                                variant={
+                                  agreement.status === 'active'
+                                    ? 'success'
+                                    : agreement.status === 'draft'
+                                      ? 'secondary'
+                                      : 'destructive'
+                                }
+                              >
+                                {agreement.status === 'active'
+                                  ? 'Activo'
+                                  : agreement.status === 'draft'
+                                    ? 'Borrador'
+                                    : 'Terminado'}
                               </Badge>
                             </TableCell>
                             <TableCell>

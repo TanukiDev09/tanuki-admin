@@ -5,11 +5,7 @@ const Card = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={`card ${className || ''}`}
-    {...props}
-  />
+  <div ref={ref} className={`card ${className || ''}`} {...props} />
 ));
 Card.displayName = 'Card';
 
@@ -17,11 +13,7 @@ const CardHeader = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement>
 >(({ className, ...props }, ref) => (
-  <div
-    ref={ref}
-    className={`card__header ${className || ''}`}
-    {...props}
-  />
+  <div ref={ref} className={`card__header ${className || ''}`} {...props} />
 ));
 CardHeader.displayName = 'CardHeader';
 
@@ -29,11 +21,7 @@ const CardTitle = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLHeadingElement>
 >(({ className, ...props }, ref) => (
-  <h3
-    ref={ref}
-    className={`card__title ${className || ''}`}
-    {...props}
-  />
+  <h3 ref={ref} className={`card__title ${className || ''}`} {...props} />
 ));
 CardTitle.displayName = 'CardTitle';
 
@@ -41,11 +29,7 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p
-    ref={ref}
-    className={`card__description ${className || ''}`}
-    {...props}
-  />
+  <p ref={ref} className={`card__description ${className || ''}`} {...props} />
 ));
 CardDescription.displayName = 'CardDescription';
 
@@ -65,4 +49,11 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = 'CardFooter';
 
-export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter };
+export {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+};

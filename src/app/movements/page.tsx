@@ -8,9 +8,7 @@ export default function MovimientosPage() {
         <p className="movements-page__status">
           Vista de movimientos - Por implementar
         </p>
-        <p className="movements-page__note">
-          (Planificado para Fase 2)
-        </p>
+        <p className="movements-page__note">(Planificado para Fase 2)</p>
       </div>
     </div>
   );

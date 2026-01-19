@@ -41,7 +41,11 @@ interface WarehouseFormProps {
   readOnly?: boolean;
 }
 
-export function WarehouseForm({ initialData, mode = 'create', readOnly = false }: WarehouseFormProps) {
+export function WarehouseForm({
+  initialData,
+  mode = 'create',
+  readOnly = false,
+}: WarehouseFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -50,7 +54,10 @@ export function WarehouseForm({ initialData, mode = 'create', readOnly = false }
     code: initialData?.code || '',
     name: initialData?.name || '',
     type: initialData?.type || 'general',
-    pointOfSaleId: (initialData?.pointOfSaleId as unknown as { _id: string })?._id || (initialData?.pointOfSaleId as string) || '',
+    pointOfSaleId:
+      (initialData?.pointOfSaleId as unknown as { _id: string })?._id ||
+      (initialData?.pointOfSaleId as string) ||
+      '',
     address: initialData?.address || '',
     city: initialData?.city || '',
     description: initialData?.description || '',
@@ -67,7 +74,10 @@ export function WarehouseForm({ initialData, mode = 'create', readOnly = false }
         code: initialData.code || '',
         name: initialData.name || '',
         type: initialData.type || 'general',
-        pointOfSaleId: (initialData.pointOfSaleId as unknown as { _id: string })?._id || (initialData.pointOfSaleId as string) || '',
+        pointOfSaleId:
+          (initialData.pointOfSaleId as unknown as { _id: string })?._id ||
+          (initialData.pointOfSaleId as string) ||
+          '',
         address: initialData.address || '',
         city: initialData.city || '',
         description: initialData.description || '',
@@ -93,9 +103,10 @@ export function WarehouseForm({ initialData, mode = 'create', readOnly = false }
     setLoading(true);
 
     try {
-      const url = mode === 'edit' && initialData?._id
-        ? `/api/warehouses/${initialData._id}`
-        : '/api/warehouses';
+      const url =
+        mode === 'edit' && initialData?._id
+          ? `/api/warehouses/${initialData._id}`
+          : '/api/warehouses';
 
       const method = mode === 'edit' ? 'PUT' : 'POST';
 
@@ -127,7 +138,8 @@ export function WarehouseForm({ initialData, mode = 'create', readOnly = false }
       router.push(`/dashboard/warehouses/${data._id}`);
       router.refresh();
     } catch (err) {
-      const error = err instanceof Error ? err : new Error('No se pudo guardar la bodega');
+      const error =
+        err instanceof Error ? err : new Error('No se pudo guardar la bodega');
       toast({
         title: 'Error',
         description: error.message,
@@ -145,7 +157,6 @@ export function WarehouseForm({ initialData, mode = 'create', readOnly = false }
   return (
     <form onSubmit={handleSubmit} className="warehouse-form">
       <div className="warehouse-form__grid">
-
         {mode === 'edit' && (
           <div className="warehouse-form__field-group">
             <Label htmlFor="code">Código</Label>
@@ -174,7 +185,9 @@ export function WarehouseForm({ initialData, mode = 'create', readOnly = false }
           <Label htmlFor="type">Tipo *</Label>
           <Select
             value={formData.type}
-            onValueChange={(value: WarehouseFormData['type']) => handleChange('type', value)}
+            onValueChange={(value: WarehouseFormData['type']) =>
+              handleChange('type', value)
+            }
             disabled={loading || readOnly}
           >
             <SelectTrigger>
@@ -192,7 +205,9 @@ export function WarehouseForm({ initialData, mode = 'create', readOnly = false }
           <Label htmlFor="status">Estado *</Label>
           <Select
             value={formData.status}
-            onValueChange={(value: WarehouseFormData['status']) => handleChange('status', value)}
+            onValueChange={(value: WarehouseFormData['status']) =>
+              handleChange('status', value)
+            }
             disabled={loading || readOnly}
           >
             <SelectTrigger>
@@ -209,7 +224,9 @@ export function WarehouseForm({ initialData, mode = 'create', readOnly = false }
           <Label htmlFor="pointOfSale">Punto de Venta</Label>
           <Select
             value={formData.pointOfSaleId || 'none'}
-            onValueChange={(value) => handleChange('pointOfSaleId', value === 'none' ? '' : value)}
+            onValueChange={(value) =>
+              handleChange('pointOfSaleId', value === 'none' ? '' : value)
+            }
             disabled={loading || readOnly}
           >
             <SelectTrigger>
@@ -264,7 +281,11 @@ export function WarehouseForm({ initialData, mode = 'create', readOnly = false }
       <div className="warehouse-form__actions">
         {!readOnly && (
           <Button type="submit" disabled={loading}>
-            {loading ? 'Guardando...' : mode === 'edit' ? 'Actualizar' : 'Crear Bodega'}
+            {loading
+              ? 'Guardando...'
+              : mode === 'edit'
+                ? 'Actualizar'
+                : 'Crear Bodega'}
           </Button>
         )}
         <Button

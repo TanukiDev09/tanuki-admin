@@ -33,7 +33,7 @@ interface Movement {
       address?: string;
       city?: string;
       discountPercentage?: number;
-    }
+    };
   };
   toWarehouseId?: {
     name: string;
@@ -46,7 +46,7 @@ interface Movement {
       address?: string;
       city?: string;
       discountPercentage?: number;
-    }
+    };
   };
   items: {
     bookId: {
@@ -54,7 +54,7 @@ interface Movement {
       isbn: string;
       price: number;
     };
-    quantity: number
+    quantity: number;
   }[];
   createdBy?: { name: string };
   observations?: string;
@@ -65,13 +65,24 @@ interface MovementsListProps {
   isLoading: boolean;
 }
 
-export function InventoryMovementsList({ movements, isLoading }: MovementsListProps) {
+export function InventoryMovementsList({
+  movements,
+  isLoading,
+}: MovementsListProps) {
   if (isLoading) {
-    return <div className="inventory-movements-list__loading">Cargando movimientos...</div>;
+    return (
+      <div className="inventory-movements-list__loading">
+        Cargando movimientos...
+      </div>
+    );
   }
 
   if (movements.length === 0) {
-    return <div className="inventory-movements-list__empty">No hay movimientos recientes</div>;
+    return (
+      <div className="inventory-movements-list__empty">
+        No hay movimientos recientes
+      </div>
+    );
   }
 
   const canGeneratePDF = (type: string) => {
@@ -88,14 +99,18 @@ export function InventoryMovementsList({ movements, isLoading }: MovementsListPr
             <TableHead>Origen / Destino</TableHead>
             <TableHead>Items</TableHead>
             <TableHead>Usuario</TableHead>
-            <TableHead className="inventory-movements-list__actions-head">Acciones</TableHead>
+            <TableHead className="inventory-movements-list__actions-head">
+              Acciones
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {movements.map((movement) => (
             <TableRow key={movement._id}>
               <TableCell className="inventory-movements-list__date">
-                {format(new Date(movement.date), 'dd/MM/yyyy HH:mm', { locale: es })}
+                {format(new Date(movement.date), 'dd/MM/yyyy HH:mm', {
+                  locale: es,
+                })}
               </TableCell>
               <TableCell>
                 <Badge variant="outline">{movement.type}</Badge>
@@ -103,10 +118,14 @@ export function InventoryMovementsList({ movements, isLoading }: MovementsListPr
               <TableCell>
                 <div className="inventory-movements-list__route">
                   {movement.fromWarehouseId && (
-                    <span className="inventory-movements-list__route-from">De: {movement.fromWarehouseId.name}</span>
+                    <span className="inventory-movements-list__route-from">
+                      De: {movement.fromWarehouseId.name}
+                    </span>
                   )}
                   {movement.toWarehouseId && (
-                    <span className="inventory-movements-list__route-to">A: {movement.toWarehouseId.name}</span>
+                    <span className="inventory-movements-list__route-to">
+                      A: {movement.toWarehouseId.name}
+                    </span>
                   )}
                 </div>
               </TableCell>
@@ -114,7 +133,8 @@ export function InventoryMovementsList({ movements, isLoading }: MovementsListPr
                 <div className="inventory-movements-list__items-list">
                   {movement.items.map((item, idx) => (
                     <div key={idx} className="inventory-movements-list__item">
-                      {formatNumber(item.quantity)} x {item.bookId?.title || 'Libro desconocido'}
+                      {formatNumber(item.quantity)} x{' '}
+                      {item.bookId?.title || 'Libro desconocido'}
                     </div>
                   ))}
                 </div>
@@ -129,7 +149,9 @@ export function InventoryMovementsList({ movements, isLoading }: MovementsListPr
                     size="icon"
                     onClick={() => {
                       if (movement.fromWarehouseId && movement.toWarehouseId) {
-                        generateMovementPDF(movement as Parameters<typeof generateMovementPDF>[0]);
+                        generateMovementPDF(
+                          movement as Parameters<typeof generateMovementPDF>[0]
+                        );
                       }
                     }}
                     title="Descargar PDF"

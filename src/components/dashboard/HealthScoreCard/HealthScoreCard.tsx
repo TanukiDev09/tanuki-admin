@@ -9,11 +9,24 @@ interface HealthScoreCardProps {
   className?: string;
 }
 
-export function HealthScoreCard({ score = 0, className }: HealthScoreCardProps) {
+export function HealthScoreCard({
+  score = 0,
+  className,
+}: HealthScoreCardProps) {
   // Color coding: Green (>=70), Amber (40-69), Red (<40)
   const getHealthStatus = () => {
-    if (score >= 70) return { variant: 'excellent', fill: 'var(--color-flow)', label: 'Excelente' };
-    if (score >= 40) return { variant: 'moderate', fill: 'var(--color-chart-amber)', label: 'Moderado' };
+    if (score >= 70)
+      return {
+        variant: 'excellent',
+        fill: 'var(--color-flow)',
+        label: 'Excelente',
+      };
+    if (score >= 40)
+      return {
+        variant: 'moderate',
+        fill: 'var(--color-chart-amber)',
+        label: 'Moderado',
+      };
     return { variant: 'critical', fill: 'var(--color-ebb)', label: 'Crítico' };
   };
 
@@ -22,7 +35,9 @@ export function HealthScoreCard({ score = 0, className }: HealthScoreCardProps) 
   const offset = circumference - (score / 100) * circumference;
 
   return (
-    <Card className={`health-score-card health-score-card--${status.variant} ${className || ''}`}>
+    <Card
+      className={`health-score-card health-score-card--${status.variant} ${className || ''}`}
+    >
       <CardHeader className="health-score-card__header">
         <CardTitle className="health-score-card__title">
           PUNTUACIÓN DE SALUD
@@ -36,15 +51,24 @@ export function HealthScoreCard({ score = 0, className }: HealthScoreCardProps) 
               {score}
               <span className="health-score-card__score-total">/100</span>
             </div>
-            <p className="health-score-card__description">Índice de salud del negocio</p>
-            <div className={`health-score-card__status health-score-card__status--${status.variant}`}>
-              <span className="health-score-card__status-label">{status.label}</span>
+            <p className="health-score-card__description">
+              Índice de salud del negocio
+            </p>
+            <div
+              className={`health-score-card__status health-score-card__status--${status.variant}`}
+            >
+              <span className="health-score-card__status-label">
+                {status.label}
+              </span>
             </div>
           </div>
 
           {/* Circular Progress */}
           <div className="health-score-card__progress">
-            <svg className="health-score-card__progress-svg" viewBox="0 0 96 96">
+            <svg
+              className="health-score-card__progress-svg"
+              viewBox="0 0 96 96"
+            >
               {/* Background circle */}
               <circle
                 cx="48"
@@ -63,7 +87,9 @@ export function HealthScoreCard({ score = 0, className }: HealthScoreCardProps) 
                 className="health-score-card__progress-fill"
               />
             </svg>
-            <div className={`health-score-card__progress-text health-score-card__progress-text--${status.variant}`}>
+            <div
+              className={`health-score-card__progress-text health-score-card__progress-text--${status.variant}`}
+            >
               {score}
             </div>
           </div>

@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
   CartesianGrid,
-  ResponsiveContainer
+  ResponsiveContainer,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { formatCurrency, formatNumber } from '@/lib/utils';
@@ -19,7 +19,10 @@ interface ScrollableIncomeExpenseChartProps {
   className?: string;
 }
 
-export function ScrollableIncomeExpenseChart({ data, className }: ScrollableIncomeExpenseChartProps) {
+export function ScrollableIncomeExpenseChart({
+  data,
+  className,
+}: ScrollableIncomeExpenseChartProps) {
   // Calculate width based on data length to enable scrolling
   // 100px per data point seems reasonable for readability
   const minWidth = Math.max(data.length * 80, 800);
@@ -27,7 +30,9 @@ export function ScrollableIncomeExpenseChart({ data, className }: ScrollableInco
   return (
     <Card className={`scrollable-income-expense-chart ${className || ''}`}>
       <CardHeader className="scrollable-income-expense-chart__header">
-        <CardTitle className="scrollable-income-expense-chart__title">Flujo de Caja Histórico</CardTitle>
+        <CardTitle className="scrollable-income-expense-chart__title">
+          Flujo de Caja Histórico
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="scrollable-income-expense-chart__scroll-container">
@@ -41,7 +46,11 @@ export function ScrollableIncomeExpenseChart({ data, className }: ScrollableInco
                 margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                 barSize={40}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  vertical={false}
+                  stroke="hsl(var(--border))"
+                />
                 <XAxis
                   dataKey="month"
                   stroke="hsl(var(--muted-foreground))"
@@ -54,7 +63,9 @@ export function ScrollableIncomeExpenseChart({ data, className }: ScrollableInco
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `$ ${formatNumber((value / 1000000).toFixed(0))} M`}
+                  tickFormatter={(value) =>
+                    `$ ${formatNumber((value / 1000000).toFixed(0))} M`
+                  }
                 />
                 <Tooltip
                   cursor={{ fill: 'hsl(var(--muted)/0.4)' }}

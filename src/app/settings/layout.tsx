@@ -21,9 +21,7 @@ export default function ConfiguracionLayout({
         <Sidebar />
         <div className="settings-layout__content">
           <AppHeader />
-          <main className="settings-layout__main">
-            {children}
-          </main>
+          <main className="settings-layout__main">{children}</main>
         </div>
       </div>
     </AuthGuard>

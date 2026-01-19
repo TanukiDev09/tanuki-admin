@@ -4,8 +4,6 @@ import Warehouse from '@/models/Warehouse';
 import { WarehouseList } from '@/components/warehouses/WarehouseList';
 import { CreateWarehouseButton } from '@/components/warehouses/CreateWarehouseButton';
 
-
-
 export const metadata = {
   title: 'Bodegas - Admin',
   description: 'Gestión de bodegas e inventario',

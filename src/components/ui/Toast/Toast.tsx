@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import * as ToastPrimitives from "@radix-ui/react-toast";
-import { X } from "lucide-react";
-import "./Toast.scss";
+import * as React from 'react';
+import * as ToastPrimitives from '@radix-ui/react-toast';
+import { X } from 'lucide-react';
+import './Toast.scss';
 
 const ToastProvider = ToastPrimitives.Provider;
 
@@ -13,7 +13,7 @@ const ToastViewport = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Viewport
     ref={ref}
-    className={`toast__viewport ${className || ""}`}
+    className={`toast__viewport ${className || ''}`}
     {...props}
   />
 ));
@@ -22,13 +22,13 @@ ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 const Toast = React.forwardRef<
   React.ElementRef<typeof ToastPrimitives.Root>,
   React.ComponentPropsWithoutRef<typeof ToastPrimitives.Root> & {
-    variant?: "default" | "destructive" | "success";
+    variant?: 'default' | 'destructive' | 'success';
   }
->(({ className, variant = "default", ...props }, ref) => {
+>(({ className, variant = 'default', ...props }, ref) => {
   return (
     <ToastPrimitives.Root
       ref={ref}
-      className={`toast toast--${variant} ${className || ""}`}
+      className={`toast toast--${variant} ${className || ''}`}
       {...props}
     />
   );
@@ -41,7 +41,7 @@ const ToastAction = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Action
     ref={ref}
-    className={`toast__action ${className || ""}`}
+    className={`toast__action ${className || ''}`}
     {...props}
   />
 ));
@@ -53,7 +53,7 @@ const ToastClose = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Close
     ref={ref}
-    className={`toast__close ${className || ""}`}
+    className={`toast__close ${className || ''}`}
     toast-close=""
     {...props}
   >
@@ -68,7 +68,7 @@ const ToastTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Title
     ref={ref}
-    className={`toast__title ${className || ""}`}
+    className={`toast__title ${className || ''}`}
     {...props}
   />
 ));
@@ -80,7 +80,7 @@ const ToastDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <ToastPrimitives.Description
     ref={ref}
-    className={`toast__description ${className || ""}`}
+    className={`toast__description ${className || ''}`}
     {...props}
   />
 ));

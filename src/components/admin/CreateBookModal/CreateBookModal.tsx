@@ -73,7 +73,9 @@ export default function CreateBookModal({
         authors: [],
         translators: [],
         illustrators: [],
-        publicationDate: new Date(`${formData.publicationYear}-${formData.publicationMonth}-01`),
+        publicationDate: new Date(
+          `${formData.publicationYear}-${formData.publicationMonth}-01`
+        ),
         genre: formData.genre,
         language: formData.language,
         pages: parseInt(formData.pages),
@@ -122,7 +124,6 @@ export default function CreateBookModal({
       onSuccess();
       onClose();
       router.push(`/dashboard/catalog/${data.data._id}`);
-
     } catch (err: unknown) {
       setError((err as Error).message);
     } finally {
@@ -131,22 +132,23 @@ export default function CreateBookModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !loading && !open && onClose()}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !loading && !open && onClose()}
+    >
       <DialogContent className="create-book-modal">
         <DialogHeader>
           <DialogTitle>Crear Libro</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="create-book-modal__form">
-          {error && (
-            <div className="create-book-modal__error">
-              {error}
-            </div>
-          )}
+          {error && <div className="create-book-modal__error">{error}</div>}
 
           {/* SECTION: Basic Info */}
           <div className="create-book-modal__section">
-            <h3 className="create-book-modal__section-title">Información Básica</h3>
+            <h3 className="create-book-modal__section-title">
+              Información Básica
+            </h3>
 
             <div className="create-book-modal__grid create-book-modal__grid--2col">
               <div className="create-book-modal__field">
@@ -155,7 +157,9 @@ export default function CreateBookModal({
                   id="isbn"
                   type="text"
                   value={formData.isbn}
-                  onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, isbn: e.target.value })
+                  }
                   required
                   pattern="\d{10}|\d{13}"
                   placeholder="9781234567890"
@@ -168,8 +172,12 @@ export default function CreateBookModal({
                 <MonthYearSelect
                   month={formData.publicationMonth}
                   year={formData.publicationYear}
-                  onMonthChange={(month: string) => setFormData({ ...formData, publicationMonth: month })}
-                  onYearChange={(year: string) => setFormData({ ...formData, publicationYear: year })}
+                  onMonthChange={(month: string) =>
+                    setFormData({ ...formData, publicationMonth: month })
+                  }
+                  onYearChange={(year: string) =>
+                    setFormData({ ...formData, publicationYear: year })
+                  }
                   required
                 />
               </div>
@@ -181,14 +189,18 @@ export default function CreateBookModal({
                 id="title"
                 type="text"
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, title: e.target.value })
+                }
                 required
                 placeholder="El nombre del viento"
               />
             </div>
 
             <div className="create-book-modal__note">
-              <strong>Nota:</strong> Los autores, traductores e ilustradores se asignarán mediante <strong>Contratos</strong> una vez creado el libro.
+              <strong>Nota:</strong> Los autores, traductores e ilustradores se
+              asignarán mediante <strong>Contratos</strong> una vez creado el
+              libro.
             </div>
           </div>
 
@@ -199,7 +211,12 @@ export default function CreateBookModal({
             <div className="create-book-modal__grid create-book-modal__grid--2col">
               <div className="create-book-modal__field">
                 <Label htmlFor="language">Idioma *</Label>
-                <Select value={formData.language} onValueChange={(val: string) => setFormData({ ...formData, language: val })}>
+                <Select
+                  value={formData.language}
+                  onValueChange={(val: string) =>
+                    setFormData({ ...formData, language: val })
+                  }
+                >
                   <SelectTrigger id="language">
                     <SelectValue placeholder="Seleccionar idioma" />
                   </SelectTrigger>
@@ -220,7 +237,9 @@ export default function CreateBookModal({
                   id="genre"
                   type="text"
                   value={formData.genre}
-                  onChange={(e) => setFormData({ ...formData, genre: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, genre: e.target.value })
+                  }
                   required
                   placeholder="Fantasía, Ciencia Ficción, etc."
                 />
@@ -230,14 +249,18 @@ export default function CreateBookModal({
             <div className="create-book-modal__field">
               <CollectionSelect
                 value={formData.collectionName}
-                onChange={(value: string) => setFormData({ ...formData, collectionName: value })}
+                onChange={(value: string) =>
+                  setFormData({ ...formData, collectionName: value })
+                }
               />
             </div>
           </div>
 
           {/* SECTION: Physical Details */}
           <div className="create-book-modal__section">
-            <h3 className="create-book-modal__section-title">Detalles Físicos</h3>
+            <h3 className="create-book-modal__section-title">
+              Detalles Físicos
+            </h3>
 
             <div className="create-book-modal__field">
               <Label htmlFor="pages">Páginas *</Label>
@@ -245,7 +268,9 @@ export default function CreateBookModal({
                 id="pages"
                 placeholder="350"
                 value={formData.pages}
-                onValueChange={(val) => setFormData({ ...formData, pages: val?.toString() || '' })}
+                onValueChange={(val) =>
+                  setFormData({ ...formData, pages: val?.toString() || '' })
+                }
                 allowDecimals={false}
                 required
               />
@@ -258,7 +283,9 @@ export default function CreateBookModal({
                   id="height"
                   placeholder="23.0"
                   value={formData.height}
-                  onValueChange={(val) => setFormData({ ...formData, height: val?.toString() || '' })}
+                  onValueChange={(val) =>
+                    setFormData({ ...formData, height: val?.toString() || '' })
+                  }
                 />
               </div>
               <div className="create-book-modal__field">
@@ -267,7 +294,9 @@ export default function CreateBookModal({
                   id="width"
                   placeholder="15.0"
                   value={formData.width}
-                  onValueChange={(val) => setFormData({ ...formData, width: val?.toString() || '' })}
+                  onValueChange={(val) =>
+                    setFormData({ ...formData, width: val?.toString() || '' })
+                  }
                 />
               </div>
               <div className="create-book-modal__field">
@@ -276,7 +305,9 @@ export default function CreateBookModal({
                   id="spine"
                   placeholder="2.5"
                   value={formData.spine}
-                  onValueChange={(val) => setFormData({ ...formData, spine: val?.toString() || '' })}
+                  onValueChange={(val) =>
+                    setFormData({ ...formData, spine: val?.toString() || '' })
+                  }
                 />
               </div>
               <div className="create-book-modal__field">
@@ -285,7 +316,9 @@ export default function CreateBookModal({
                   id="weight"
                   placeholder="450"
                   value={formData.weight}
-                  onValueChange={(val) => setFormData({ ...formData, weight: val?.toString() || '' })}
+                  onValueChange={(val) =>
+                    setFormData({ ...formData, weight: val?.toString() || '' })
+                  }
                   allowDecimals={false}
                 />
               </div>
@@ -294,7 +327,9 @@ export default function CreateBookModal({
             <div className="create-book-modal__field">
               <ImageUploader
                 value={formData.coverImage}
-                onChange={(filename: string) => setFormData({ ...formData, coverImage: filename })}
+                onChange={(filename: string) =>
+                  setFormData({ ...formData, coverImage: filename })
+                }
                 onRemove={() => setFormData({ ...formData, coverImage: '' })}
               />
             </div>
@@ -302,7 +337,9 @@ export default function CreateBookModal({
 
           {/* SECTION: Commercial */}
           <div className="create-book-modal__section">
-            <h3 className="create-book-modal__section-title">Gestión Comercial</h3>
+            <h3 className="create-book-modal__section-title">
+              Gestión Comercial
+            </h3>
 
             <div className="create-book-modal__grid create-book-modal__grid--2col">
               <div className="create-book-modal__field">
@@ -311,14 +348,18 @@ export default function CreateBookModal({
                   id="price"
                   placeholder="29.99"
                   value={formData.price}
-                  onValueChange={(val) => setFormData({ ...formData, price: val?.toString() || '' })}
+                  onValueChange={(val) =>
+                    setFormData({ ...formData, price: val?.toString() || '' })
+                  }
                   required
                 />
               </div>
               <div className="create-book-modal__field">
                 <CostCenterSelect
                   value={formData.costCenter}
-                  onChange={(value: string) => setFormData({ ...formData, costCenter: value })}
+                  onChange={(value: string) =>
+                    setFormData({ ...formData, costCenter: value })
+                  }
                 />
               </div>
             </div>
@@ -326,13 +367,17 @@ export default function CreateBookModal({
 
           {/* SECTION: Description */}
           <div className="create-book-modal__section">
-            <h3 className="create-book-modal__section-title">Información Adicional</h3>
+            <h3 className="create-book-modal__section-title">
+              Información Adicional
+            </h3>
             <div className="create-book-modal__field">
               <Label htmlFor="description">Descripción</Label>
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 rows={4}
                 placeholder="Sinopsis del libro..."
               />

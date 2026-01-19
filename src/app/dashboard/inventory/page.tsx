@@ -9,7 +9,13 @@ import { RefreshCw, Plus } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import './inventory-page.scss';
 
-const InventoryMovementModal = dynamic(() => import('@/components/inventory/InventoryMovementModal').then(mod => mod.InventoryMovementModal), { ssr: false });
+const InventoryMovementModal = dynamic(
+  () =>
+    import('@/components/inventory/InventoryMovementModal').then(
+      (mod) => mod.InventoryMovementModal
+    ),
+  { ssr: false }
+);
 
 export default function InventoryPage() {
   const [stats, setStats] = useState({
@@ -27,7 +33,7 @@ export default function InventoryPage() {
     try {
       const [statsRes, movementsRes] = await Promise.all([
         fetch('/api/inventory/stats'),
-        fetch('/api/inventory/movements?limit=10')
+        fetch('/api/inventory/movements?limit=10'),
       ]);
 
       const statsData = await statsRes.json();
@@ -60,10 +66,18 @@ export default function InventoryPage() {
           </p>
         </div>
         <div className="inventory-page__header-actions">
-          <Button onClick={() => setMovementModalOpen(true)} className="inventory-page__btn">
+          <Button
+            onClick={() => setMovementModalOpen(true)}
+            className="inventory-page__btn"
+          >
             <Plus className="inventory-page__icon" /> Nuevo Movimiento
           </Button>
-          <Button variant="outline" size="icon" onClick={fetchData} title="Actualizar">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={fetchData}
+            title="Actualizar"
+          >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>

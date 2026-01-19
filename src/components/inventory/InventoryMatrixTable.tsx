@@ -13,7 +13,14 @@ import {
 } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { ChevronLeft, ChevronRight, Search, Settings2, EyeOff, LayoutTemplate } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Search,
+  Settings2,
+  EyeOff,
+  LayoutTemplate,
+} from 'lucide-react';
 
 import {
   Popover,
@@ -97,14 +104,16 @@ export function InventoryMatrixTable() {
   };
 
   const toggleWarehouseVisibility = (warehouseId: string) => {
-    setHiddenWarehouses(prev =>
+    setHiddenWarehouses((prev) =>
       prev.includes(warehouseId)
-        ? prev.filter(id => id !== warehouseId)
+        ? prev.filter((id) => id !== warehouseId)
         : [...prev, warehouseId]
     );
   };
 
-  const visibleWarehouses = warehouses.filter(w => !hiddenWarehouses.includes(w._id));
+  const visibleWarehouses = warehouses.filter(
+    (w) => !hiddenWarehouses.includes(w._id)
+  );
 
   return (
     <div className="inventory-matrix">
@@ -133,11 +142,15 @@ export function InventoryMatrixTable() {
                 <Settings2 className="inventory-matrix__icon" />
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="inventory-matrix__popover-content" align="end">
+            <PopoverContent
+              className="inventory-matrix__popover-content"
+              align="end"
+            >
               <div className="inventory-matrix__popover">
                 <div className="inventory-matrix__popover-section">
                   <h4 className="inventory-matrix__popover-title">
-                    <LayoutTemplate className="inventory-matrix__icon" /> Visualización
+                    <LayoutTemplate className="inventory-matrix__icon" />{' '}
+                    Visualización
                   </h4>
                   <div className="inventory-matrix__popover-item">
                     <Checkbox
@@ -145,15 +158,27 @@ export function InventoryMatrixTable() {
                       checked={compactMode}
                       onCheckedChange={(checked) => setCompactMode(!!checked)}
                     />
-                    <Label htmlFor="compact-mode" className="inventory-matrix__popover-label">Modo compacto</Label>
+                    <Label
+                      htmlFor="compact-mode"
+                      className="inventory-matrix__popover-label"
+                    >
+                      Modo compacto
+                    </Label>
                   </div>
                   <div className="inventory-matrix__popover-item">
                     <Checkbox
                       id="show-zeros"
                       checked={showZeroValues}
-                      onCheckedChange={(checked) => setShowZeroValues(!!checked)}
+                      onCheckedChange={(checked) =>
+                        setShowZeroValues(!!checked)
+                      }
                     />
-                    <Label htmlFor="show-zeros" className="inventory-matrix__popover-label">Mostrar valores cero</Label>
+                    <Label
+                      htmlFor="show-zeros"
+                      className="inventory-matrix__popover-label"
+                    >
+                      Mostrar valores cero
+                    </Label>
                   </div>
                 </div>
 
@@ -161,15 +186,21 @@ export function InventoryMatrixTable() {
 
                 <div className="inventory-matrix__popover-section">
                   <h4 className="inventory-matrix__popover-title">
-                    <EyeOff className="inventory-matrix__icon" /> Columnas (Bodegas)
+                    <EyeOff className="inventory-matrix__icon" /> Columnas
+                    (Bodegas)
                   </h4>
                   <div className="inventory-matrix__popover-grid">
-                    {warehouses.map(w => (
-                      <div key={w._id} className="inventory-matrix__popover-item">
+                    {warehouses.map((w) => (
+                      <div
+                        key={w._id}
+                        className="inventory-matrix__popover-item"
+                      >
                         <Checkbox
                           id={`w-${w._id}`}
                           checked={!hiddenWarehouses.includes(w._id)}
-                          onCheckedChange={() => toggleWarehouseVisibility(w._id)}
+                          onCheckedChange={() =>
+                            toggleWarehouseVisibility(w._id)
+                          }
                         />
                         <Label
                           htmlFor={`w-${w._id}`}
@@ -193,16 +224,24 @@ export function InventoryMatrixTable() {
           <Table className="inventory-matrix__table">
             <TableHeader>
               <TableRow>
-                <TableHead className={`inventory-matrix__head-book ${compactMode ? 'inventory-matrix__head-book--compact' : 'inventory-matrix__head-book--default'}`}>
+                <TableHead
+                  className={`inventory-matrix__head-book ${compactMode ? 'inventory-matrix__head-book--compact' : 'inventory-matrix__head-book--default'}`}
+                >
                   Libro
                 </TableHead>
                 <TableHead className="inventory-matrix__head-total">
                   Total
                 </TableHead>
                 {visibleWarehouses.map((w) => (
-                  <TableHead key={w._id} className="inventory-matrix__head-warehouse">
+                  <TableHead
+                    key={w._id}
+                    className="inventory-matrix__head-warehouse"
+                  >
                     <div className="inventory-matrix__head-warehouse-content">
-                      <span className="inventory-matrix__head-warehouse-name" title={w.name}>
+                      <span
+                        className="inventory-matrix__head-warehouse-name"
+                        title={w.name}
+                      >
                         {w.name}
                       </span>
                       <span className="inventory-matrix__head-warehouse-code">
@@ -244,10 +283,16 @@ export function InventoryMatrixTable() {
                         href={`/dashboard/catalog/${row._id}`}
                         className={`inventory-matrix__book-link ${compactMode ? 'inventory-matrix__book-link--compact' : 'inventory-matrix__book-link--default'}`}
                       >
-                        <div className={`inventory-matrix__cover ${compactMode ? 'inventory-matrix__cover--compact' : 'inventory-matrix__cover--default'}`}>
+                        <div
+                          className={`inventory-matrix__cover ${compactMode ? 'inventory-matrix__cover--compact' : 'inventory-matrix__cover--default'}`}
+                        >
                           {row.coverImage ? (
                             <Image
-                              src={row.coverImage.startsWith('http') ? row.coverImage : `/uploads/covers/${row.coverImage}`}
+                              src={
+                                row.coverImage.startsWith('http')
+                                  ? row.coverImage
+                                  : `/uploads/covers/${row.coverImage}`
+                              }
                               alt={row.title}
                               fill
                               sizes="(max-width: 768px) 100px, 30px"
@@ -260,7 +305,10 @@ export function InventoryMatrixTable() {
                           )}
                         </div>
                         <div className="inventory-matrix__book-info">
-                          <span className="inventory-matrix__book-title" title={row.title}>
+                          <span
+                            className="inventory-matrix__book-title"
+                            title={row.title}
+                          >
                             {row.title}
                           </span>
                           <span className="inventory-matrix__book-isbn">
@@ -270,15 +318,22 @@ export function InventoryMatrixTable() {
                       </Link>
                     </TableCell>
                     <TableCell className="inventory-matrix__cell-total">
-                      <div className={`inventory-matrix__total-badge ${row.totalStock > 0 ? 'inventory-matrix__total-badge--has-stock' : 'inventory-matrix__total-badge--no-stock'}`}>
+                      <div
+                        className={`inventory-matrix__total-badge ${row.totalStock > 0 ? 'inventory-matrix__total-badge--has-stock' : 'inventory-matrix__total-badge--no-stock'}`}
+                      >
                         {row.totalStock}
                       </div>
                     </TableCell>
                     {visibleWarehouses.map((w) => {
                       const qty = row.stockByWarehouse[w._id] || 0;
                       return (
-                        <TableCell key={w._id} className="inventory-matrix__cell-warehouse">
-                          <div className={`inventory-matrix__warehouse-qty ${qty === 0 ? 'inventory-matrix__warehouse-qty--empty' : 'inventory-matrix__warehouse-qty--active'}`}>
+                        <TableCell
+                          key={w._id}
+                          className="inventory-matrix__cell-warehouse"
+                        >
+                          <div
+                            className={`inventory-matrix__warehouse-qty ${qty === 0 ? 'inventory-matrix__warehouse-qty--empty' : 'inventory-matrix__warehouse-qty--active'}`}
+                          >
                             {qty === 0 && !showZeroValues ? (
                               <span className="inventory-matrix__warehouse-qty-dot" />
                             ) : (
@@ -300,13 +355,15 @@ export function InventoryMatrixTable() {
       {pagination && pagination.pages > 1 && (
         <div className="inventory-matrix__footer">
           <p className="inventory-matrix__pagination-info">
-            Mostrando {((page - 1) * pagination.limit) + 1} a {Math.min(page * pagination.limit, pagination.total)} de {pagination.total} registros
+            Mostrando {(page - 1) * pagination.limit + 1} a{' '}
+            {Math.min(page * pagination.limit, pagination.total)} de{' '}
+            {pagination.total} registros
           </p>
           <div className="inventory-matrix__pagination-controls">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage(p => Math.max(1, p - 1))}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1 || loading}
               className="inventory-matrix__icon-btn"
             >
@@ -316,12 +373,14 @@ export function InventoryMatrixTable() {
               <span className="inventory-matrix__current-page">
                 {pagination.page}
               </span>
-              <span className="inventory-matrix__total-pages">/ {pagination.pages}</span>
+              <span className="inventory-matrix__total-pages">
+                / {pagination.pages}
+              </span>
             </div>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage(p => Math.min(pagination.pages, p + 1))}
+              onClick={() => setPage((p) => Math.min(pagination.pages, p + 1))}
               disabled={page === pagination.pages || loading}
               className="inventory-matrix__icon-btn"
             >

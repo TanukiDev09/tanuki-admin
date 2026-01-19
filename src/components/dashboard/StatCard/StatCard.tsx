@@ -9,7 +9,14 @@ interface StatCardProps {
   subtext?: string;
   trend?: string;
   className?: string;
-  variant?: 'flow' | 'ebb' | 'balance' | 'default' | 'success' | 'info' | 'danger';
+  variant?:
+    | 'flow'
+    | 'ebb'
+    | 'balance'
+    | 'default'
+    | 'success'
+    | 'info'
+    | 'danger';
   sparklineData?: number[];
   trendDirection?: 'up' | 'down';
   trendValue?: string;
@@ -50,7 +57,9 @@ export function StatCard({
             </div>
             {subtext && <p className="stat-card__subtext">{subtext}</p>}
             {trendValue && (
-              <div className={`stat-card__trend stat-card__trend--${trendDirection}`}>
+              <div
+                className={`stat-card__trend stat-card__trend--${trendDirection}`}
+              >
                 {trendDirection === 'up' ? (
                   <TrendingUp className="stat-card__trend-icon" />
                 ) : (
@@ -62,7 +71,11 @@ export function StatCard({
           </div>
           {sparklineData && sparklineData.length > 0 && (
             <div className="stat-card__sparkline">
-              <Sparkline data={sparklineData} color={sparklineColor[variant]} height={48} />
+              <Sparkline
+                data={sparklineData}
+                color={sparklineColor[variant]}
+                height={48}
+              />
             </div>
           )}
         </div>

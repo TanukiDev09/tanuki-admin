@@ -40,7 +40,9 @@ export default function MonthYearSelect({
 
   // Generar años desde 1900 hasta el año actual + 2
   const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: currentYear - 1900 + 3 }, (_, i) => (currentYear + 2 - i).toString());
+  const years = Array.from({ length: currentYear - 1900 + 3 }, (_, i) =>
+    (currentYear + 2 - i).toString()
+  );
 
   return (
     <div className="month-year-select">

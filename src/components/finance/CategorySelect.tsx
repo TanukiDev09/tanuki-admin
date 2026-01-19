@@ -37,14 +37,20 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
   // Creation Modal State
   const [showNewModal, setShowNewModal] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
-  const [newCategoryType, setNewCategoryType] = useState<'Ingreso' | 'Egreso'>('Ingreso');
+  const [newCategoryType, setNewCategoryType] = useState<'Ingreso' | 'Egreso'>(
+    'Ingreso'
+  );
   const [newCategoryDescription, setNewCategoryDescription] = useState('');
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
 
   // Determine fixed type if prop is specific
-  const fixedType = (type === 'INCOME' || type === 'Ingreso') ? 'Ingreso' :
-    (type === 'EXPENSE' || type === 'Egreso') ? 'Egreso' : null;
+  const fixedType =
+    type === 'INCOME' || type === 'Ingreso'
+      ? 'Ingreso'
+      : type === 'EXPENSE' || type === 'Egreso'
+        ? 'Egreso'
+        : null;
 
   useEffect(() => {
     if (fixedType) {
@@ -96,7 +102,7 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
           name: newCategoryName,
           type: newCategoryType,
           description: newCategoryDescription,
-          isActive: true
+          isActive: true,
         }),
       });
 
@@ -107,7 +113,7 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
       }
 
       // Add to list and select it
-      // Note: We might need to re-fetch if we want to ensure sort order, 
+      // Note: We might need to re-fetch if we want to ensure sort order,
       // but simplistic append is usually fine for UX feedback
       setCategories([...categories, data.data]);
       onChange(data.data._id);
@@ -137,10 +143,14 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
         }}
       >
         <SelectTrigger>
-          <SelectValue placeholder={loading ? "Cargando..." : "Selecciona categoría"} />
+          <SelectValue
+            placeholder={loading ? 'Cargando...' : 'Selecciona categoría'}
+          />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="none" disabled style={{ display: 'none' }}>Selecciona categoría</SelectItem>
+          <SelectItem value="none" disabled style={{ display: 'none' }}>
+            Selecciona categoría
+          </SelectItem>
           {categories.map((cat) => (
             <SelectItem key={cat._id} value={cat._id}>
               {cat.name}
@@ -162,17 +172,21 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
         </SelectContent>
       </Select>
 
-      <Dialog open={showNewModal} onOpenChange={(open) => !creating && setShowNewModal(open)}>
+      <Dialog
+        open={showNewModal}
+        onOpenChange={(open) => !creating && setShowNewModal(open)}
+      >
         <DialogContent className="category-select__modal">
           <DialogHeader>
             <DialogTitle>Crear Nueva Categoría</DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleCreateNew} className="category-select__create-form">
+          <form
+            onSubmit={handleCreateNew}
+            className="category-select__create-form"
+          >
             {error && (
-              <div className="category-select__form-error">
-                {error}
-              </div>
+              <div className="category-select__form-error">{error}</div>
             )}
 
             <div className="category-select__form-field">
@@ -194,7 +208,9 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
                 <div style={{ display: 'flex', gap: '1rem' }}>
                   <Button
                     type="button"
-                    variant={newCategoryType === 'Ingreso' ? 'default' : 'outline'}
+                    variant={
+                      newCategoryType === 'Ingreso' ? 'default' : 'outline'
+                    }
                     onClick={() => setNewCategoryType('Ingreso')}
                     className="flex-1"
                   >
@@ -202,7 +218,9 @@ export function CategorySelect({ value, onChange, type }: CategorySelectProps) {
                   </Button>
                   <Button
                     type="button"
-                    variant={newCategoryType === 'Egreso' ? 'default' : 'outline'}
+                    variant={
+                      newCategoryType === 'Egreso' ? 'default' : 'outline'
+                    }
                     onClick={() => setNewCategoryType('Egreso')}
                     className="flex-1"
                   >

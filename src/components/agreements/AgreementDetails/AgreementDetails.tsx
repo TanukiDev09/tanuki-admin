@@ -9,18 +9,25 @@ interface AgreementDetailsProps {
   className?: string;
 }
 
-export function AgreementDetails({ agreement, className }: AgreementDetailsProps) {
-  const isPublicDomain = (agreement as { isPublicDomain?: boolean }).isPublicDomain;
+export function AgreementDetails({
+  agreement,
+  className,
+}: AgreementDetailsProps) {
+  const isPublicDomain = (agreement as { isPublicDomain?: boolean })
+    .isPublicDomain;
 
   if (isPublicDomain) {
     return (
       <div className={`agreement-details__public-domain ${className || ''}`}>
         <div className="agreement-details__public-domain-header">
           <BookOpen className="agreement-details__public-domain-icon" />
-          <h3 className="agreement-details__public-domain-title">Obra de Dominio Público</h3>
+          <h3 className="agreement-details__public-domain-title">
+            Obra de Dominio Público
+          </h3>
         </div>
         <p className="agreement-details__public-domain-text">
-          Esta obra no requiere pago de regalías ni adelantos. Los derechos de autor han expirado o no aplican.
+          Esta obra no requiere pago de regalías ni adelantos. Los derechos de
+          autor han expirado o no aplican.
         </p>
       </div>
     );
@@ -39,7 +46,9 @@ export function AgreementDetails({ agreement, className }: AgreementDetailsProps
           {agreement.royaltyPercentage > 0 ? '% Royalties' : 'Monto Pago'}
         </h3>
         <p className="agreement-details__value agreement-details__value--mono">
-          {agreement.royaltyPercentage > 0 ? `${agreement.royaltyPercentage}%` : `$${agreement.advancePayment || 0}`}
+          {agreement.royaltyPercentage > 0
+            ? `${agreement.royaltyPercentage}%`
+            : `$${agreement.advancePayment || 0}`}
         </p>
       </div>
       {agreement.royaltyPercentage > 0 && (
@@ -53,9 +62,13 @@ export function AgreementDetails({ agreement, className }: AgreementDetailsProps
       <div className="agreement-details__field">
         <h3 className="agreement-details__label">Fechas</h3>
         <p className="agreement-details__value">
-          {agreement.validFrom ? new Date(agreement.validFrom).toLocaleDateString() : '—'}
+          {agreement.validFrom
+            ? new Date(agreement.validFrom).toLocaleDateString()
+            : '—'}
           {' -> '}
-          {agreement.validUntil ? new Date(agreement.validUntil).toLocaleDateString() : 'Indefinido'}
+          {agreement.validUntil
+            ? new Date(agreement.validUntil).toLocaleDateString()
+            : 'Indefinido'}
         </p>
       </div>
     </div>

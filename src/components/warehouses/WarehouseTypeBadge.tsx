@@ -1,4 +1,3 @@
-
 import { Badge } from '@/components/ui/Badge';
 import { Building2, Package, Warehouse } from 'lucide-react';
 import './WarehouseTypeBadge.scss';
@@ -27,7 +26,10 @@ export function WarehouseTypeBadge({ type }: WarehouseTypeBadgeProps) {
   }
 
   return (
-    <Badge variant="outline" className="warehouse-type-badge warehouse-type-badge--general">
+    <Badge
+      variant="outline"
+      className="warehouse-type-badge warehouse-type-badge--general"
+    >
       <Warehouse />
       General
     </Badge>

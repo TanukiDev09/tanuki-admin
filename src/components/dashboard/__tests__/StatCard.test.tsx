@@ -4,13 +4,7 @@ import { TrendingUp } from 'lucide-react';
 
 describe('StatCard', () => {
   it('renders title and value correctly', () => {
-    render(
-      <StatCard
-        title="Test Metric"
-        value="$1,000"
-        icon={TrendingUp}
-      />
-    );
+    render(<StatCard title="Test Metric" value="$1,000" icon={TrendingUp} />);
 
     expect(screen.getByText('Test Metric')).toBeInTheDocument();
     expect(screen.getByText('$1,000')).toBeInTheDocument();

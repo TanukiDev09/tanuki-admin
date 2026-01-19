@@ -4,7 +4,9 @@ interface PointOfSaleStatusBadgeProps {
   status: 'active' | 'inactive';
 }
 
-export function PointOfSaleStatusBadge({ status }: PointOfSaleStatusBadgeProps) {
+export function PointOfSaleStatusBadge({
+  status,
+}: PointOfSaleStatusBadgeProps) {
   const variants = {
     active: 'bg-green-100 text-green-900 hover:bg-green-100',
     inactive: 'bg-red-100 text-red-900 hover:bg-red-100',

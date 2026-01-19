@@ -19,7 +19,10 @@ import './CreatePointOfSaleButton.scss';
 export function CreatePointOfSaleButton() {
   const [open, setOpen] = useState(false);
   const { hasPermission } = usePermission();
-  const canCreate = hasPermission(ModuleName.POINTS_OF_SALE, PermissionAction.CREATE);
+  const canCreate = hasPermission(
+    ModuleName.POINTS_OF_SALE,
+    PermissionAction.CREATE
+  );
 
   if (!canCreate) return null;
 

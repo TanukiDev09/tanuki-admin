@@ -26,11 +26,15 @@ export default function ProfilePage() {
             <div className="profile-page__info-group">
               <div className="profile-page__field">
                 <label className="profile-page__label">Nombre</label>
-                <div className="profile-page__value">{user?.name || 'Cargando...'}</div>
+                <div className="profile-page__value">
+                  {user?.name || 'Cargando...'}
+                </div>
               </div>
               <div className="profile-page__field">
                 <label className="profile-page__label">Email</label>
-                <div className="profile-page__value">{user?.email || 'Cargando...'}</div>
+                <div className="profile-page__value">
+                  {user?.email || 'Cargando...'}
+                </div>
               </div>
               <div className="profile-page__field">
                 <label className="profile-page__label">Rol</label>

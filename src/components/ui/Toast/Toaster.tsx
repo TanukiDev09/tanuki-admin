@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   Toast,
@@ -7,8 +7,8 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "./Toast";
-import { useToast } from "./use-toast";
+} from './Toast';
+import { useToast } from './use-toast';
 
 export function Toaster() {
   const { toasts } = useToast();
@@ -17,7 +17,13 @@ export function Toaster() {
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
         return (
-          <Toast key={id} {...props} variant={props.variant as "default" | "destructive" | "success" | undefined}>
+          <Toast
+            key={id}
+            {...props}
+            variant={
+              props.variant as 'default' | 'destructive' | 'success' | undefined
+            }
+          >
             <div className="toast__content">
               {title && <ToastTitle>{title}</ToastTitle>}
               {description && (

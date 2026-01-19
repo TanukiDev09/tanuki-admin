@@ -134,7 +134,10 @@ export default function CostCenterSelect({
                 </SelectItem>
               ))}
               <SelectSeparator />
-              <SelectItem value="ADD_NEW" className="cost-center-select__add-item">
+              <SelectItem
+                value="ADD_NEW"
+                className="cost-center-select__add-item"
+              >
                 <div className="cost-center-select__add-content">
                   <Plus className="cost-center-select__add-icon" />
                   <span>Crear nuevo centro de costo...</span>
@@ -145,17 +148,21 @@ export default function CostCenterSelect({
         </div>
       </div>
 
-      <Dialog open={showNewModal} onOpenChange={(open) => !creating && setShowNewModal(open)}>
+      <Dialog
+        open={showNewModal}
+        onOpenChange={(open) => !creating && setShowNewModal(open)}
+      >
         <DialogContent className="cost-center-select__modal">
           <DialogHeader>
             <DialogTitle>Crear Centro de Costo</DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleCreateNew} className="cost-center-select__create-form">
+          <form
+            onSubmit={handleCreateNew}
+            className="cost-center-select__create-form"
+          >
             {error && (
-              <div className="cost-center-select__form-error">
-                {error}
-              </div>
+              <div className="cost-center-select__form-error">{error}</div>
             )}
 
             <div className="cost-center-select__form-field">
@@ -230,6 +237,6 @@ export default function CostCenterSelect({
           </form>
         </DialogContent>
       </Dialog>
-    </div >
+    </div>
   );
 }

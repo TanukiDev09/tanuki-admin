@@ -17,7 +17,9 @@ import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import './agreement-page.scss';
 
-export default function AgreementDetailPage(props: { params: Promise<{ id: string }> }) {
+export default function AgreementDetailPage(props: {
+  params: Promise<{ id: string }>;
+}) {
   const params = use(props.params);
   const router = useRouter();
   const { toast } = useToast();
@@ -26,7 +28,10 @@ export default function AgreementDetailPage(props: { params: Promise<{ id: strin
   const [editModalOpen, setEditModalOpen] = useState(false);
 
   const { hasPermission } = usePermission();
-  const canUpdate = hasPermission(ModuleName.AGREEMENTS, PermissionAction.UPDATE);
+  const canUpdate = hasPermission(
+    ModuleName.AGREEMENTS,
+    PermissionAction.UPDATE
+  );
 
   const fetchAgreement = useCallback(async () => {
     try {
@@ -79,16 +84,27 @@ export default function AgreementDetailPage(props: { params: Promise<{ id: strin
 
   if (!agreement) return null;
 
-  const creatorName = (agreement.creator as unknown as ICreator)?.name || 'Desconocido';
-  const bookTitle = (agreement.book as unknown as IBook)?.title || 'Desconocido';
-  const roleLabel = agreement.role === 'author' ? 'Autor' : agreement.role === 'illustrator' ? 'Ilustrador' : 'Traductor';
+  const creatorName =
+    (agreement.creator as unknown as ICreator)?.name || 'Desconocido';
+  const bookTitle =
+    (agreement.book as unknown as IBook)?.title || 'Desconocido';
+  const roleLabel =
+    agreement.role === 'author'
+      ? 'Autor'
+      : agreement.role === 'illustrator'
+        ? 'Ilustrador'
+        : 'Traductor';
 
   return (
     <>
       <div className="agreement-page">
         <div className="agreement-page__container">
           <div className="agreement-page__header-nav">
-            <Button variant="ghost" className="agreement-page__back-btn" onClick={() => router.back()}>
+            <Button
+              variant="ghost"
+              className="agreement-page__back-btn"
+              onClick={() => router.back()}
+            >
               <ArrowLeft className="agreement-page__icon" />
               Volver
             </Button>
@@ -106,7 +122,9 @@ export default function AgreementDetailPage(props: { params: Promise<{ id: strin
             <div className="agreement-page__card-header">
               <div>
                 <h1 className="agreement-page__title">Contrato: {bookTitle}</h1>
-                <p className="agreement-page__subtitle">{creatorName} — {roleLabel}</p>
+                <p className="agreement-page__subtitle">
+                  {creatorName} — {roleLabel}
+                </p>
               </div>
               {getStatusBadge(agreement.status)}
             </div>
@@ -117,7 +135,9 @@ export default function AgreementDetailPage(props: { params: Promise<{ id: strin
               <Separator />
 
               <div>
-                <h3 className="agreement-page__section-title">Documento Firmado</h3>
+                <h3 className="agreement-page__section-title">
+                  Documento Firmado
+                </h3>
                 <SignedContractInfo url={agreement.signedContractUrl} />
               </div>
             </div>

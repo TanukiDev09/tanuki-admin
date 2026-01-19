@@ -31,8 +31,14 @@ export default function CostCentersTable({
 }: CostCentersTableProps) {
   const router = useRouter();
   const { hasPermission } = usePermission();
-  const canUpdate = hasPermission(ModuleName.COST_CENTERS, PermissionAction.UPDATE);
-  const canDelete = hasPermission(ModuleName.COST_CENTERS, PermissionAction.DELETE);
+  const canUpdate = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.UPDATE
+  );
+  const canDelete = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.DELETE
+  );
 
   if (loading) {
     return (
@@ -58,7 +64,9 @@ export default function CostCentersTable({
             <TableHead>Código</TableHead>
             <TableHead>Nombre</TableHead>
             <TableHead>Descripción</TableHead>
-            <TableHead className="cost-centers-table__actions-head">Acciones</TableHead>
+            <TableHead className="cost-centers-table__actions-head">
+              Acciones
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -69,21 +77,27 @@ export default function CostCentersTable({
               </TableCell>
               <TableCell className="cost-centers-table__name">
                 <span
-                  style={{ cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '4px' }}
-                  onClick={() => router.push(`/dashboard/cost-centers/${cc._id}`)}
+                  style={{
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                    textUnderlineOffset: '4px',
+                  }}
+                  onClick={() =>
+                    router.push(`/dashboard/cost-centers/${cc._id}`)
+                  }
                 >
                   {cc.name}
                 </span>
               </TableCell>
-              <TableCell>
-                {cc.description || '-'}
-              </TableCell>
+              <TableCell>{cc.description || '-'}</TableCell>
               <TableCell className="cost-centers-table__actions-cell">
                 <div className="cost-centers-table__actions">
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => router.push(`/dashboard/cost-centers/${cc._id}`)}
+                    onClick={() =>
+                      router.push(`/dashboard/cost-centers/${cc._id}`)
+                    }
                     title="Ver Detalle"
                   >
                     <Eye className="cost-centers-table__icon" />

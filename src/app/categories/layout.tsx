@@ -19,9 +19,7 @@ export default function CategoriasLayout({
         <Sidebar />
         <div className="categories-layout__main-container">
           <AppHeader />
-          <main className="categories-layout__content">
-            {children}
-          </main>
+          <main className="categories-layout__content">{children}</main>
         </div>
       </div>
     </AuthGuard>

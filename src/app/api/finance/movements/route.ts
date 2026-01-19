@@ -33,7 +33,7 @@ function buildQuery(searchParams: URLSearchParams) {
   if (costCenter) {
     query.$or = [
       { 'allocations.costCenter': costCenter },
-      { costCenter: costCenter }
+      { costCenter: costCenter },
     ];
   }
 

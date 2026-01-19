@@ -1,7 +1,17 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { PermissionMatrix, ModuleName, PermissionAction } from '@/types/permission';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
+import {
+  PermissionMatrix,
+  ModuleName,
+  PermissionAction,
+} from '@/types/permission';
 import { useAuth } from './AuthContext';
 
 interface PermissionContextType {
@@ -12,7 +22,9 @@ interface PermissionContextType {
   refetchPermissions: () => Promise<void>;
 }
 
-const PermissionContext = createContext<PermissionContextType | undefined>(undefined);
+const PermissionContext = createContext<PermissionContextType | undefined>(
+  undefined
+);
 
 export function PermissionProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
@@ -62,7 +74,10 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?._id]);
 
-  const hasPermission = (module: ModuleName, action: PermissionAction): boolean => {
+  const hasPermission = (
+    module: ModuleName,
+    action: PermissionAction
+  ): boolean => {
     // Admin tiene todos los permisos
     if (user?.role === 'admin') {
       return true;

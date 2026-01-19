@@ -113,7 +113,9 @@
     color: $foreground;
 
     [cmdk-group-heading] {
-      padding: $spacing-xs + 0.125rem $spacing-xs $spacing-xs + 0.125rem $spacing-xs; // py-1.5 roughly // px-2
+      padding: $spacing-xs + 0.125rem $spacing-xs $spacing-xs + 0.125rem
+        $spacing-xs; // py-1.5 roughly // px-2
+
       color: $muted-foreground;
       font-size: $font-size-xs;
       font-weight: $font-weight-medium;
@@ -131,7 +133,9 @@
     position: relative;
     display: flex;
     align-items: center;
-    padding: $spacing-xs + 0.125rem $spacing-xs $spacing-xs + 0.125rem $spacing-xs; // py-1.5 // px-2
+    padding: $spacing-xs + 0.125rem $spacing-xs $spacing-xs + 0.125rem
+      $spacing-xs; // py-1.5 // px-2
+
     font-size: $font-size-sm;
     border-radius: $radius-sm;
     cursor: default;

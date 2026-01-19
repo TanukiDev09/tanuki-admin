@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
@@ -16,11 +15,11 @@ async function checkDatabases() {
     console.log('Connecting to cluster...');
     const client = await mongoose.connect(MONGODB_URI);
     const admin = client.connection.db?.admin();
-    
+
     if (admin) {
       const dbs = await admin.listDatabases();
       console.log('Databases on this cluster:');
-      dbs.databases.forEach(db => {
+      dbs.databases.forEach((db) => {
         console.log(`- ${db.name}`);
       });
     } else {
@@ -31,8 +30,10 @@ async function checkDatabases() {
     const currentDb = client.connection.db;
     console.log('Current Database:', currentDb?.databaseName);
     const collections = await currentDb?.listCollections().toArray();
-    console.log('Collections in current DB:', collections?.map(c => c.name).join(', '));
-
+    console.log(
+      'Collections in current DB:',
+      collections?.map((c) => c.name).join(', ')
+    );
   } catch (err) {
     console.error('Error:', err);
   } finally {

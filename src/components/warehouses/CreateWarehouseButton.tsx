@@ -9,7 +9,10 @@ import './CreateWarehouseButton.scss';
 
 export function CreateWarehouseButton() {
   const { hasPermission } = usePermission();
-  const canCreate = hasPermission(ModuleName.WAREHOUSES, PermissionAction.CREATE);
+  const canCreate = hasPermission(
+    ModuleName.WAREHOUSES,
+    PermissionAction.CREATE
+  );
 
   if (!canCreate) return null;
 

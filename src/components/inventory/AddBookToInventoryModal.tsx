@@ -57,13 +57,19 @@ export function AddBookToInventoryModal({
   }, [isOpen]);
 
   const fetchBooks = async (term: string) => {
-    const response = await fetch(`/api/books?search=${encodeURIComponent(term)}&limit=10`);
+    const response = await fetch(
+      `/api/books?search=${encodeURIComponent(term)}&limit=10`
+    );
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Error fetching books');
     return data.data as Book[];
   };
 
-  const { data: booksData, refetch: refetchBooks, isFetching: isFetchingBooks } = useQuery<Book[], Error>({
+  const {
+    data: booksData,
+    refetch: refetchBooks,
+    isFetching: isFetchingBooks,
+  } = useQuery<Book[], Error>({
     queryKey: ['searchBooks', searchTerm],
     queryFn: () => fetchBooks(searchTerm),
     enabled: false,
@@ -159,14 +165,20 @@ export function AddBookToInventoryModal({
               />
             </div>
             <Button onClick={() => refetchBooks()} disabled={isFetchingBooks}>
-              {isFetchingBooks ? <Loader2 className="add-book-inventory-modal__spinner" /> : 'Buscar'}
+              {isFetchingBooks ? (
+                <Loader2 className="add-book-inventory-modal__spinner" />
+              ) : (
+                'Buscar'
+              )}
             </Button>
           </div>
 
           <div className="add-book-inventory-modal__results-list">
             {searchResults.length === 0 ? (
               <p className="add-book-inventory-modal__empty">
-                {searchTerm ? 'No se encontraron resultados.' : 'Busca un libro para comenzar.'}
+                {searchTerm
+                  ? 'No se encontraron resultados.'
+                  : 'Busca un libro para comenzar.'}
               </p>
             ) : (
               searchResults.map((book) => {
@@ -174,15 +186,27 @@ export function AddBookToInventoryModal({
                 const hasImage = book.coverImage && !imageError[book._id];
 
                 return (
-                  <div key={book._id} className="add-book-inventory-modal__book-card">
+                  <div
+                    key={book._id}
+                    className="add-book-inventory-modal__book-card"
+                  >
                     <div className="add-book-inventory-modal__cover-wrapper">
                       {hasImage ? (
                         <Image
-                          src={book.coverImage!.startsWith('http') ? book.coverImage! : `/uploads/covers/${book.coverImage}`}
+                          src={
+                            book.coverImage!.startsWith('http')
+                              ? book.coverImage!
+                              : `/uploads/covers/${book.coverImage}`
+                          }
                           alt={book.title}
                           fill
                           className="add-book-inventory-modal__cover-image"
-                          onError={() => setImageError(prev => ({ ...prev, [book._id]: true }))}
+                          onError={() =>
+                            setImageError((prev) => ({
+                              ...prev,
+                              [book._id]: true,
+                            }))
+                          }
                         />
                       ) : (
                         <div className="add-book-inventory-modal__cover-fallback">
@@ -191,14 +215,19 @@ export function AddBookToInventoryModal({
                       )}
                     </div>
                     <div className="add-book-inventory-modal__book-info">
-                      <p className="add-book-inventory-modal__book-title" title={book.title}>
+                      <p
+                        className="add-book-inventory-modal__book-title"
+                        title={book.title}
+                      >
                         {book.title}
                       </p>
-                      <p className="add-book-inventory-modal__book-isbn">ISBN: {book.isbn}</p>
+                      <p className="add-book-inventory-modal__book-isbn">
+                        ISBN: {book.isbn}
+                      </p>
                     </div>
                     <Button
                       size="sm"
-                      variant={isAlreadyIn ? "ghost" : "outline"}
+                      variant={isAlreadyIn ? 'ghost' : 'outline'}
                       disabled={isAlreadyIn || addingId === book._id}
                       onClick={() => handleAdd(book)}
                       className="add-book-inventory-modal__action-btn"

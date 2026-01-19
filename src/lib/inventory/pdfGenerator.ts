@@ -166,13 +166,13 @@ export const generateMovementPDF = (movement: Movement) => {
   const totalLibOverall = movement.items.reduce((sum, item) => {
     const pvp = item.bookId?.price || 0;
     const totalPpv = pvp * item.quantity;
-    return sum + (totalPpv * (appliedDiscount / 100));
+    return sum + totalPpv * (appliedDiscount / 100);
   }, 0);
 
   const totalEditOverall = movement.items.reduce((sum, item) => {
     const pvp = item.bookId?.price || 0;
     const totalPpv = pvp * item.quantity;
-    return sum + (totalPpv * (1 - appliedDiscount / 100));
+    return sum + totalPpv * (1 - appliedDiscount / 100);
   }, 0);
 
   autoTable(doc, {
