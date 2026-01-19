@@ -13,12 +13,17 @@ import { createDefaultPermissions } from '@/lib/permissions';
  */
 export async function POST(request: NextRequest) {
   try {
+    console.log('[Login API] Starting login process...');
     await dbConnect();
+    console.log('[Login API] DB connected');
 
-    const { email, password } = await request.json();
+    const body = await request.json();
+    const { email, password } = body;
+    console.log('[Login API] Request received for email:', email);
 
     // Validar campos requeridos
     if (!email || !password) {
+      console.warn('[Login API] Missing email or password');
       return NextResponse.json(
         {
           success: false,
@@ -29,9 +34,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Buscar usuario por email
+    console.log('[Login API] Searching for user...');
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
+      console.warn('[Login API] User not found:', email);
       return NextResponse.json(
         {
           success: false,
@@ -40,9 +47,11 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+    console.log('[Login API] User found:', user.email, 'Role:', user.role);
 
     // Verificar si el usuario está activo
     if (!user.isActive) {
+      console.warn('[Login API] User is inactive:', email);
       return NextResponse.json(
         {
           success: false,
@@ -53,9 +62,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Verificar contraseña
+    console.log('[Login API] Verifying password...');
     const isPasswordValid = await verifyPassword(password, user.password);
 
     if (!isPasswordValid) {
+      console.warn('[Login API] Invalid password for user:', email);
       return NextResponse.json(
         {
           success: false,
@@ -64,22 +75,31 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+    console.log('[Login API] Password verified');
 
     // Actualizar último login
     user.lastLogin = new Date();
     await user.save();
+    console.log('[Login API] Last login updated');
 
     // Asegurar que tenga permisos por defecto creados
+    console.log('[Login API] Checking/creating default permissions...');
     await createDefaultPermissions(user._id.toString(), user.role);
+    console.log('[Login API] Permissions check completed');
 
     // Generar token JWT
+    console.log('[Login API] Generating token...');
     const userResponse = sanitizeUser(user);
     const token = generateToken(userResponse);
+    console.log('[Login API] Token generated');
 
     // Guardar token en cookie HttpOnly
+    console.log('[Login API] Setting auth cookie...');
     await setAuthCookie(token);
+    console.log('[Login API] Auth cookie set');
 
     // Retornar token y datos del usuario (mantener token en body por compatibilidad temporal)
+    console.log('[Login API] Login successful');
     return NextResponse.json({
       success: true,
       data: {
@@ -89,7 +109,7 @@ export async function POST(request: NextRequest) {
       message: 'Login exitoso',
     });
   } catch (error: unknown) {
-    console.error('Error en login:', error);
+    console.error('[Login API] Critical error during login:', error);
     const message =
       error instanceof Error ? error.message : 'Error desconocido';
 

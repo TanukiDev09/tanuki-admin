@@ -20,7 +20,15 @@ export async function verifyPassword(
   password: string,
   hashedPassword: string
 ): Promise<boolean> {
-  return await bcrypt.compare(password, hashedPassword);
+  try {
+    console.log('[Auth Lib] Verifying password...');
+    const match = await bcrypt.compare(password, hashedPassword);
+    console.log('[Auth Lib] Password match result:', match);
+    return match;
+  } catch (error) {
+    console.error('[Auth Lib] Error comparing passwords:', error);
+    return false;
+  }
 }
 
 /**
