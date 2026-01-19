@@ -36,9 +36,6 @@ const PermissionSchema: Schema = new Schema(
 // Asegura que un usuario solo tenga un documento de permisos por módulo
 PermissionSchema.index({ userId: 1, module: 1 }, { unique: true });
 
-// Índice para búsquedas por módulo
-PermissionSchema.index({ module: 1 });
-
 // Método para verificar si tiene una acción específica
 PermissionSchema.methods.hasAction = function (
   action: PermissionAction
