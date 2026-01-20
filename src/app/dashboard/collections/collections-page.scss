@@ -1,0 +1,53 @@
+.collections-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1.5rem;
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  &__title {
+    margin: 0;
+    color: #1e293b;
+    font-size: 1.875rem;
+    font-weight: 700;
+  }
+
+  &__subtitle {
+    margin-top: 0.25rem;
+    color: #64748b;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__search {
+    max-width: 320px;
+  }
+
+  &__icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.5rem;
+  }
+}
+
+@media (width <= 640px) {
+  .collections-page {
+    &__header {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    &__search {
+      max-width: 100%;
+    }
+  }
+}

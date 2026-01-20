@@ -1,0 +1,51 @@
+.collections-table {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+
+  &__loading,
+  &__empty {
+    padding: 2rem;
+    color: #64748b;
+    text-align: center;
+  }
+
+  &__name {
+    font-weight: 500;
+  }
+
+  &__description {
+    max-width: 300px;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__actions-head {
+    text-align: right;
+  }
+
+  &__actions-cell {
+    width: 100px;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  &__delete-btn {
+    &:hover {
+      background-color: #fef2f2;
+      color: #ef4444;
+    }
+  }
+
+  &__icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
