@@ -37,6 +37,15 @@
     padding-left: $spacing-xl + $spacing-xs;
   }
 
+  &__collection-filter-wrapper {
+    width: 100%;
+    min-width: 200px;
+
+    @media (min-width: $breakpoint-md) {
+      width: auto;
+    }
+  }
+
   &__filter-group {
     display: flex;
     gap: $spacing-xs;
