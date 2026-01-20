@@ -32,6 +32,152 @@ import {
 import { formatCurrency } from '@/lib/utils';
 import './movements-list.scss';
 
+interface MovementTableRowProps {
+  movement: Movement;
+  canUpdate: boolean;
+  canDelete: boolean;
+  onDelete: (id: string) => void;
+  onEdit: (id: string) => void;
+  onView: (id: string) => void;
+}
+
+const MovementTableRow = ({
+  movement,
+  canUpdate,
+  canDelete,
+  onDelete,
+  onEdit,
+  onView,
+}: MovementTableRowProps) => {
+  const renderSalesChannel = () => {
+    if (!movement.salesChannel) {
+      return <span className="movements-list__no-category">-</span>;
+    }
+
+    let channelLabel = '';
+    switch (movement.salesChannel) {
+      case 'LIBRERIA':
+        channelLabel = `Librería: ${typeof movement.pointOfSale === 'object'
+            ? movement.pointOfSale.name
+            : 'Varios'
+          }`;
+        break;
+      case 'DIRECTA':
+        channelLabel = 'Directa';
+        break;
+      case 'FERIA':
+        channelLabel = 'Feria';
+        break;
+      default:
+        channelLabel = 'Otro';
+    }
+
+    return <Badge variant="outline">{channelLabel}</Badge>;
+  };
+
+  return (
+    <TableRow key={movement._id}>
+      <TableCell data-label="Fecha">
+        {new Date(movement.date).toLocaleDateString('es-CO', {
+          timeZone: 'UTC',
+        })}
+      </TableCell>
+      <TableCell
+        data-label="Descripción"
+        className="movements-list__description-link"
+      >
+        <a
+          href={`/dashboard/movements/${movement._id}`}
+          className="movements-list__link"
+        >
+          {movement.description}
+        </a>
+      </TableCell>
+      <TableCell data-label="Tipo">
+        <Badge
+          variant={movement.type === 'INCOME' ? 'default' : 'destructive'}
+        >
+          {movement.type === 'INCOME' ? 'Ingreso' : 'Egreso'}
+        </Badge>
+      </TableCell>
+      <TableCell data-label="Categoría">
+        {movement.category ? (
+          typeof movement.category === 'string' ? (
+            movement.category
+          ) : (
+            movement.category.name
+          )
+        ) : (
+          <span className="movements-list__no-category">Sin categoría</span>
+        )}
+      </TableCell>
+      <TableCell data-label="Centro Costo">
+        {movement.costCenter || (
+          <span className="movements-list__no-category">Sin definir</span>
+        )}
+      </TableCell>
+      <TableCell data-label="Monto">
+        <span
+          className={`movements-list__amount ${movement.type === 'INCOME'
+              ? 'movements-list__amount--income'
+              : 'movements-list__amount--expense'
+            }`}
+        >
+          {movement.type === 'INCOME' ? '+' : '-'}
+          {formatCurrency(movement.amount)}
+        </span>
+      </TableCell>
+      <TableCell data-label="Canal">{renderSalesChannel()}</TableCell>
+      <TableCell data-label="Cantidad">
+        {movement.quantity ? (
+          <span className="movements-list__quantity">
+            {movement.quantity}{' '}
+            {movement.unit && (
+              <span className="movements-list__unit">{movement.unit}</span>
+            )}
+          </span>
+        ) : (
+          <span className="movements-list__no-category">-</span>
+        )}
+      </TableCell>
+      <TableCell className="movements-list__actions-cell">
+        <div className="movements-list__actions">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => onView(movement._id)}
+            title="Ver detalle"
+          >
+            <Eye className="movements-list__icon-sm" />
+          </Button>
+          {canUpdate && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onEdit(movement._id)}
+              title="Editar"
+            >
+              <Pencil className="movements-list__icon-sm" />
+            </Button>
+          )}
+
+          {canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onDelete(movement._id)}
+              className="movements-list__delete-btn"
+              title="Eliminar"
+            >
+              <Trash2 className="movements-list__icon-sm" />
+            </Button>
+          )}
+        </div>
+      </TableCell>
+    </TableRow>
+  );
+};
+
 export default function MovementsPage() {
   const router = useRouter();
   const { toast } = useToast();
@@ -57,6 +203,7 @@ export default function MovementsPage() {
   const [availablePaymentChannels, setAvailablePaymentChannels] = useState<
     string[]
   >([]);
+  const [salesChannelFilter, setSalesChannelFilter] = useState('ALL');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [sortOrder, setSortOrder] = useState('newest');
@@ -83,6 +230,7 @@ export default function MovementsPage() {
       addParam('category', categoryFilter, categoryFilter !== 'ALL');
       addParam('costCenter', costCenterFilter, costCenterFilter !== 'ALL');
       addParam('paymentChannel', paymentChannelFilter, paymentChannelFilter !== 'ALL');
+      addParam('salesChannel', salesChannelFilter, salesChannelFilter !== 'ALL');
       addParam('minAmount', minAmount?.toString());
       addParam('maxAmount', maxAmount?.toString());
       addParam('unit', unitFilter, unitFilter !== 'ALL');
@@ -128,6 +276,7 @@ export default function MovementsPage() {
     maxQuantity,
     startDate,
     endDate,
+    salesChannelFilter,
     toast,
     quantityUndefined,
     sortOrder,
@@ -172,6 +321,7 @@ export default function MovementsPage() {
     setCategoryFilter('ALL');
     setCostCenterFilter('ALL');
     setPaymentChannelFilter('ALL');
+    setSalesChannelFilter('ALL');
     setMinAmount('');
     setMaxAmount('');
     setUnitFilter('ALL');
@@ -336,6 +486,24 @@ export default function MovementsPage() {
                   </SelectContent>
                 </Select>
               </div>
+              <div className="movements-list__sales-channel-wrapper">
+                <Label className="movements-list__label">Canal de Venta</Label>
+                <Select
+                  value={salesChannelFilter}
+                  onValueChange={setSalesChannelFilter}
+                >
+                  <SelectTrigger className="movements-list__select">
+                    <SelectValue placeholder="Todos los Canales" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ALL">Todos los Canales</SelectItem>
+                    <SelectItem value="DIRECTA">Venta Directa</SelectItem>
+                    <SelectItem value="LIBRERIA">Librería</SelectItem>
+                    <SelectItem value="FERIA">Feria</SelectItem>
+                    <SelectItem value="OTRO">Otro / No Aplica</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="movements-list__filters-row">
@@ -467,6 +635,7 @@ export default function MovementsPage() {
                 <TableHead>Categoría</TableHead>
                 <TableHead>Centro Costo</TableHead>
                 <TableHead>Monto</TableHead>
+                <TableHead>Canal</TableHead>
                 <TableHead>Cantidad</TableHead>
                 <TableHead className="movements-list__th-right">
                   Acciones
@@ -477,7 +646,7 @@ export default function MovementsPage() {
               {loading ? (
                 <TableRow>
                   <TableCell
-                    colSpan={8}
+                    colSpan={9}
                     className="movements-list__loading-row"
                   >
                     Cargando...
@@ -485,118 +654,21 @@ export default function MovementsPage() {
                 </TableRow>
               ) : movements.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={8} className="movements-list__empty-row">
+                  <TableCell colSpan={9} className="movements-list__empty-row">
                     No hay movimientos registrados.
                   </TableCell>
                 </TableRow>
               ) : (
                 movements.map((movement) => (
-                  <TableRow key={movement._id}>
-                    <TableCell data-label="Fecha">
-                      {new Date(movement.date).toLocaleDateString('es-CO', {
-                        timeZone: 'UTC',
-                      })}
-                    </TableCell>
-                    <TableCell data-label="Descripción" className="movements-list__description-link">
-                      <a
-                        href={`/dashboard/movements/${movement._id}`}
-                        className="movements-list__link"
-                      >
-                        {movement.description}
-                      </a>
-                    </TableCell>
-                    <TableCell data-label="Tipo">
-                      <Badge
-                        variant={
-                          movement.type === 'INCOME' ? 'default' : 'destructive'
-                        }
-                      >
-                        {movement.type === 'INCOME' ? 'Ingreso' : 'Egreso'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell data-label="Categoría">
-                      {movement.category ? (
-                        typeof movement.category === 'string' ? (
-                          movement.category
-                        ) : (
-                          movement.category.name
-                        )
-                      ) : (
-                        <span className="movements-list__no-category">
-                          Sin categoría
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell data-label="Centro Costo">
-                      {movement.costCenter || (
-                        <span className="movements-list__no-category">
-                          Sin definir
-                        </span>
-                      )}
-                    </TableCell>
-                    <TableCell data-label="Monto">
-                      <span
-                        className={`movements-list__amount ${movement.type === 'INCOME' ? 'movements-list__amount--income' : 'movements-list__amount--expense'}`}
-                      >
-                        {movement.type === 'INCOME' ? '+' : '-'}
-                        {formatCurrency(movement.amount)}
-                      </span>
-                    </TableCell>
-                    <TableCell data-label="Cantidad">
-                      {movement.quantity ? (
-                        <span className="movements-list__quantity">
-                          {movement.quantity}{' '}
-                          {movement.unit && (
-                            <span className="movements-list__unit">
-                              {movement.unit}
-                            </span>
-                          )}
-                        </span>
-                      ) : (
-                        <span className="movements-list__no-category">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="movements-list__actions-cell">
-                      <div className="movements-list__actions">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() =>
-                            router.push(`/dashboard/movements/${movement._id}`)
-                          }
-                          title="Ver detalle"
-                        >
-                          <Eye className="movements-list__icon-sm" />
-                        </Button>
-                        {canUpdate && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() =>
-                              router.push(
-                                `/dashboard/movements/${movement._id}/editar`
-                              )
-                            }
-                            title="Editar"
-                          >
-                            <Pencil className="movements-list__icon-sm" />
-                          </Button>
-                        )}
-
-                        {canDelete && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleDelete(movement._id)}
-                            className="movements-list__delete-btn"
-                            title="Eliminar"
-                          >
-                            <Trash2 className="movements-list__icon-sm" />
-                          </Button>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  <MovementTableRow
+                    key={movement._id}
+                    movement={movement}
+                    canUpdate={canUpdate}
+                    canDelete={canDelete}
+                    onDelete={handleDelete}
+                    onEdit={(id) => router.push(`/dashboard/movements/${id}/editar`)}
+                    onView={(id) => router.push(`/dashboard/movements/${id}`)}
+                  />
                 ))
               )}
             </TableBody>
@@ -636,6 +708,6 @@ export default function MovementsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 }

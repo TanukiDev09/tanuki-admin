@@ -3,7 +3,7 @@ import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import * as mongoose from 'mongoose';
-import Movement, { IMovement } from '@/models/Movement';
+import Movement from '@/models/Movement';
 
 export const dynamic = 'force-dynamic';
 
@@ -246,6 +246,7 @@ export async function GET(request: NextRequest) {
         .skip(skip)
         .limit(limit)
         .populate({ path: 'category', select: 'name' })
+        .populate({ path: 'pointOfSale', select: 'name' })
         .lean<MovementDoc[]>(), // lean for better performance since reads
       Movement.countDocuments(query),
     ]);
@@ -296,6 +297,8 @@ interface CreateMovementBody {
   receiverId?: string;
   receiverName?: string;
   notes?: string;
+  salesChannel?: string;
+  pointOfSale?: string;
   [key: string]: unknown;
 }
 
@@ -397,6 +400,11 @@ function buildMovementDoc(
     paymentChannel: body.paymentChannel || 'otro',
     notes: body.notes || 'Sin notas adicionales',
     date: new Date(body.date as string),
+    salesChannel: body.salesChannel,
+    pointOfSale:
+      body.pointOfSale && mongoose.isValidObjectId(body.pointOfSale)
+        ? body.pointOfSale
+        : null,
   };
 }
 

@@ -18,7 +18,10 @@ export async function GET(
   await dbConnect();
   const params = await props.params;
   try {
-    const movement = await Movement.findById(params.id).lean();
+    const movement = await Movement.findById(params.id)
+      .populate({ path: 'category', select: 'name' })
+      .populate({ path: 'pointOfSale', select: 'name' })
+      .lean();
 
     if (!movement) {
       return NextResponse.json(

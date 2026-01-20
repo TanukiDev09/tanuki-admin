@@ -20,6 +20,8 @@ export interface IMovement extends Document {
   unit?: string;
   quantity?: mongoose.Types.Decimal128;
   unitValue?: mongoose.Types.Decimal128;
+  salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'OTRO';
+  pointOfSale?: mongoose.Types.ObjectId | string;
 
   // Validation fields
   flowDirection: string;
@@ -54,6 +56,11 @@ const MovementSchema: Schema = new Schema(
     unit: { type: String },
     quantity: { type: Schema.Types.Decimal128 },
     unitValue: { type: Schema.Types.Decimal128 },
+    salesChannel: {
+      type: String,
+      enum: ['LIBRERIA', 'FERIA', 'DIRECTA', 'OTRO'],
+    },
+    pointOfSale: { type: Schema.Types.ObjectId, ref: 'PointOfSale' },
 
     // Fields required by the strict MongoDB JSON Schema Validator
     flowDirection: { type: String, enum: ['inflow', 'outflow'] },
