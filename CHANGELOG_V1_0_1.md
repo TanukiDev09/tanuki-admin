@@ -54,3 +54,27 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 
 ### 🔧 Calidad de Código
 - **Corrección de Linter SCSS**: Resolución automatizada y manual de errores de estilo CSS (`stylelint`), asegurando el orden correcto de propiedades y espaciado estándar.
+
+---
+
+## [1.0.1] - 2026-01-20 (Sesión 3)
+
+### ✨ Canales de Venta & Puntos de Venta
+- **Implementación de Canales de Venta**: Se añadió la clasificación de movimientos por canales:
+  - **Venta Directa, Feria y Librería**.
+  - **Asociación de Puntos de Venta (POS)**: Integración con el modelo de Puntos de Venta para registrar el origen específico de los ingresos por librería.
+- **Nuevo Componente `POSSelect`**: Selector premium que permite:
+  - Búsqueda de puntos de venta activos.
+  - Creación rápida de nuevos puntos de venta mediante un modal integrado.
+- **Inteligencia de Formulario**: 
+  - **Auto-completado de Beneficiario**: Al seleccionar una librería, el sistema sugiere automáticamente el nombre del punto de venta como beneficiario/pagador, optimizando la carga de datos.
+  - **Lógica Condicional**: Los campos se adaptan dinámicamente según el canal seleccionado (ej. ocultar Canal de Pago si es una venta por Librería).
+
+### 🚀 Refinamiento del Listado de Movimientos
+- **Columna de Canales**: Nueva columna en la tabla principal que muestra el canal de venta y el punto de venta asociado mediante un sistema de Badges.
+- **Filtrado por Canal**: Integración de un nuevo filtro avanzado para segmentar movimientos por su canal de origen.
+
+### 🔧 Calidad & Estabilidad
+- **Type Safety Robusto**: Corrección integral de errores de tipos en los formularios de creación y edición, asegurando el cumplimiento estricto de los DTOs.
+- **Refactorización de UI**: Extracción del componente `MovementTableRow` para reducir la complejidad cognitiva y mejorar la mantenibilidad del dashboard.
+- **Linter Clean**: Estado final de linters (JS/CSS) totalmente limpio.

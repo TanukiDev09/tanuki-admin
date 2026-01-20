@@ -13,9 +13,7 @@ import { createDefaultPermissions } from '@/lib/permissions';
  */
 export async function POST(request: NextRequest) {
   try {
-    const conn = await dbConnect();
-    const dbName = conn.connection.db?.databaseName;
-
+    await dbConnect();
 
     const body = await request.json();
     const { email, password } = body;
@@ -44,6 +42,10 @@ export async function POST(request: NextRequest) {
       // Si hay pocos usuarios, podrías querer ver cuáles son (opcional, solo para debug inicial)
       if (allUsersCount > 0 && allUsersCount < 5) {
         const users = await User.find({}, 'email');
+        console.debug(
+          '[Login API] Potential users:',
+          users.map((u) => u.email).join(', ')
+        );
       }
 
       return NextResponse.json(

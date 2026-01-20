@@ -19,6 +19,7 @@ import { ArrowLeft } from 'lucide-react';
 import { CreateMovementDTO } from '@/types/movement';
 import { CategorySelect } from '@/components/finance/CategorySelect';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
+import { POSSelect } from '@/components/admin/POSSelect/POSSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency } from '@/lib/utils';
@@ -36,6 +37,7 @@ export default function CreateMovementPage() {
     type: 'INCOME',
     currency: 'COP', // Default
     status: 'COMPLETED',
+    salesChannel: 'OTRO',
   });
 
   useEffect(() => {
@@ -292,11 +294,7 @@ export default function CreateMovementPage() {
             <div className="movement-form__field-group">
               <Label htmlFor="category">Categoría</Label>
               <CategorySelect
-                value={
-                  typeof formData.category === 'string'
-                    ? formData.category
-                    : formData.category?._id
-                }
+                value={formData.category}
                 onValueChange={(val) => handleSelectChange('category', val)}
                 type={formData.type as 'INCOME' | 'EXPENSE'}
               />
@@ -311,6 +309,51 @@ export default function CreateMovementPage() {
 
           <div className="movement-form__grid movement-form__grid--2">
             <div className="movement-form__field-group">
+              <Label htmlFor="salesChannel">Canal de Venta</Label>
+              <Select
+                value={formData.salesChannel || 'OTRO'}
+                onValueChange={(val) => handleSelectChange('salesChannel', val)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona canal" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DIRECTA">Venta Directa</SelectItem>
+                  <SelectItem value="LIBRERIA">Librería</SelectItem>
+                  <SelectItem value="FERIA">Feria</SelectItem>
+                  <SelectItem value="OTRO">Otro / No Aplica</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {formData.salesChannel === 'LIBRERIA' ? (
+              <div className="movement-form__field-group">
+                <POSSelect
+                  value={formData.pointOfSale}
+                  onValueChange={(val, name) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      pointOfSale: val,
+                      beneficiary: name || prev.beneficiary,
+                    }));
+                  }}
+                />
+              </div>
+            ) : (
+              <div className="movement-form__field-group">
+                <Label htmlFor="paymentChannel">Canal de Pago</Label>
+                <Input
+                  id="paymentChannel"
+                  name="paymentChannel"
+                  placeholder="Ej. Transferencia, Efectivo"
+                  value={formData.paymentChannel || ''}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
+          </div>
+
+          <div className="movement-form__grid movement-form__grid--2">
+            <div className="movement-form__field-group">
               <Label htmlFor="beneficiary">Beneficiario / Pagador</Label>
               <Input
                 id="beneficiary"
@@ -320,16 +363,18 @@ export default function CreateMovementPage() {
                 onChange={handleChange}
               />
             </div>
-            <div className="movement-form__field-group">
-              <Label htmlFor="paymentChannel">Canal de Pago</Label>
-              <Input
-                id="paymentChannel"
-                name="paymentChannel"
-                placeholder="Ej. Transferencia, Efectivo"
-                value={formData.paymentChannel || ''}
-                onChange={handleChange}
-              />
-            </div>
+            {formData.salesChannel === 'LIBRERIA' && (
+              <div className="movement-form__field-group">
+                <Label htmlFor="paymentChannel">Canal de Pago</Label>
+                <Input
+                  id="paymentChannel"
+                  name="paymentChannel"
+                  placeholder="Ej. Transferencia, Efectivo"
+                  value={formData.paymentChannel || ''}
+                  onChange={handleChange}
+                />
+              </div>
+            )}
           </div>
         </div>
 
