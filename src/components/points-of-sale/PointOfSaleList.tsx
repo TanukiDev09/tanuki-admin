@@ -24,7 +24,17 @@ import {
   PopoverTrigger,
 } from '@/components/ui/Popover';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
+import { Input } from '@/components/ui/Input';
+import { Search } from 'lucide-react';
+import {
   Dialog,
+
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -50,6 +60,23 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
     ModuleName.POINTS_OF_SALE,
     PermissionAction.DELETE
   );
+
+  const [searchQuery, setSearchQuery] = useState('');
+  const [cityFilter, setCityFilter] = useState('all');
+
+  // Get unique cities for the dropdown
+  const cities = Array.from(new Set(data.map((pos) => pos.city).filter(Boolean))) as string[];
+
+  const filteredData = data.filter((pos) => {
+    const matchesSearch =
+      pos.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      pos.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (pos.address && pos.address.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesCity = cityFilter === 'all' || pos.city === cityFilter;
+
+    return matchesSearch && matchesCity;
+  });
 
   const confirmDelete = async () => {
     if (!itemToDelete) return;
@@ -122,6 +149,33 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
 
   return (
     <>
+      <div className="pos-list__filters">
+        <div className="pos-list__search">
+          <Search className="pos-list__search-icon" />
+          <Input
+            placeholder="Buscar por nombre, código o dirección..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pos-list__search-input"
+          />
+        </div>
+        <div className="pos-list__city-filter">
+          <Select value={cityFilter} onValueChange={setCityFilter}>
+            <SelectTrigger className="pos-list__city-trigger">
+              <SelectValue placeholder="Filtrar por ciudad" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas las ciudades</SelectItem>
+              {cities.sort().map((city) => (
+                <SelectItem key={city} value={city}>
+                  {city}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
       <div className="pos-list__container">
         <Table>
           <TableHeader>
@@ -137,14 +191,16 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.length === 0 ? (
+            {filteredData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="pos-list__empty-cell">
-                  No hay puntos de venta registrados.
+                <TableCell colSpan={8} className="pos-list__empty-cell">
+                  {data.length === 0
+                    ? "No hay puntos de venta registrados."
+                    : "No se encontraron resultados para los filtros aplicados."}
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((pos) => (
+              filteredData.map((pos) => (
                 <TableRow key={pos._id as unknown as string}>
                   <TableCell className="pos-list__code-cell">
                     {pos.code}
