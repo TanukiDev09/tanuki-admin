@@ -130,18 +130,18 @@
     display: flex;
     align-items: center;
     gap: $spacing-2xs;
+    max-width: fit-content;
     padding: $spacing-2xs;
     background-color: $muted;
     border-radius: $radius-sm;
-    max-width: fit-content;
 
     &-btn {
       @include button-reset;
 
       padding: $spacing-xs $spacing-md;
+      color: $muted-foreground;
       font-size: $font-size-xs;
       font-weight: $font-weight-medium;
-      color: $muted-foreground;
       border-radius: $radius-xs;
       transition: $transition-fast;
 
@@ -163,9 +163,9 @@
 
   &__allocation-container {
     margin-top: $spacing-sm;
+    background-color: $card;
     border: 1px solid $border;
     border-radius: $radius-md;
-    background-color: $card;
     overflow: hidden;
   }
 
@@ -175,13 +175,13 @@
     font-size: $font-size-sm;
 
     th {
-      background-color: $muted;
       padding: $spacing-sm $spacing-md;
-      text-align: left;
-      font-weight: $font-weight-semibold;
+      background-color: $muted;
       color: $muted-foreground;
-      text-transform: uppercase;
       font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      text-align: left;
+      text-transform: uppercase;
       letter-spacing: 0.05em;
     }
 
@@ -210,9 +210,10 @@
 
   &__remove-allocation {
     @include button-reset;
+
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     padding: $spacing-xs;
     color: $muted-foreground;
     border-radius: $radius-xs;
@@ -230,21 +231,21 @@
   }
 
   &__add-allocation {
-    width: 100%;
-    padding: $spacing-sm;
     display: flex;
     justify-content: center;
     align-items: center;
     gap: $spacing-xs;
+    width: 100%;
+    width: calc(100% - #{2 * $spacing-md});
+    margin: $spacing-md;
+    padding: $spacing-sm;
     background: transparent;
-    border: 1px dashed $border;
-    border-radius: $radius-sm;
     color: $info;
     font-size: $font-size-xs;
     font-weight: $font-weight-medium;
+    border: 1px dashed $border;
+    border-radius: $radius-sm;
     cursor: pointer;
-    margin: $spacing-md;
-    width: calc(100% - #{2 * $spacing-md});
     transition: $transition-fast;
 
     &:hover {
@@ -254,21 +255,21 @@
   }
 
   &__allocation-summary {
-    padding: $spacing-md;
-    background-color: $muted;
-    border-top: 1px solid $border;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: $spacing-md;
+    background-color: $muted;
     font-size: $font-size-xs;
+    border-top: 1px solid $border;
 
     &-label {
       color: $muted-foreground;
     }
 
     &-total {
-      font-weight: $font-weight-bold;
       font-family: $font-family-mono;
+      font-weight: $font-weight-bold;
 
       &--match {
         color: $success;
@@ -284,8 +285,8 @@
       align-items: center;
       gap: $spacing-2xs;
       padding: 2px $spacing-sm;
-      border-radius: $radius-full;
       font-weight: $font-weight-medium;
+      border-radius: $radius-full;
 
       &--success {
         background-color: rgba($success, 0.1);

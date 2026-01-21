@@ -248,21 +248,6 @@ function validateAndNormalizeAllocations(
   return null;
 }
 
-async function updateInventoryMovementLink(
-  body: MovementBody,
-  movementId: string
-) {
-  if (body.inventoryMovementId) {
-    try {
-      await InventoryMovement.findByIdAndUpdate(body.inventoryMovementId, {
-        financialMovementId: movementId,
-      });
-    } catch (linkErr) {
-      console.error('Error linking to inventory movement (PUT):', linkErr);
-    }
-  }
-}
-
 export async function PUT(
   request: NextRequest,
   props: { params: Promise<{ id: string }> }
@@ -306,7 +291,17 @@ export async function PUT(
       );
     }
 
-    await updateInventoryMovementLink(body, movement._id.toString());
+    // 4.1 Update Inventory Movement link if provided/updated
+    if (body.inventoryMovementId) {
+      try {
+        await InventoryMovement.findByIdAndUpdate(body.inventoryMovementId, {
+          financialMovementId: movement._id,
+        });
+      } catch (linkErr) {
+        console.error('Error linking to inventory movement (PUT):', linkErr);
+      }
+    }
+
     return NextResponse.json({ data: formatMovement(movement) });
   } catch (err: unknown) {
     const error = err as { name?: string; errors?: unknown; message?: string };
@@ -319,10 +314,8 @@ export async function PUT(
       );
     }
 
-    return NextResponse.json(
-      { error: error.message || 'Failed to update movement' },
-      { status: 500 }
-    );
+    const message = error.message || 'Failed to update movement';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 

@@ -104,13 +104,13 @@
     font-size: $font-size-sm;
 
     th {
+      padding: $spacing-xs $spacing-sm;
       background: $muted;
       color: $muted-foreground;
-      font-weight: $font-weight-medium;
-      text-transform: uppercase;
       font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
       text-align: left;
-      padding: $spacing-xs $spacing-sm;
+      text-transform: uppercase;
     }
 
     td {
@@ -120,8 +120,8 @@
   }
 
   &__allocation-amount {
-    text-align: right;
     font-family: $font-family-mono;
     font-weight: $font-weight-medium;
+    text-align: right;
   }
 }
