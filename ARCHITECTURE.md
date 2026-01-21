@@ -7,23 +7,23 @@ This document describes the high-level architecture, technical stack, and design
 ```mermaid
 graph TD
     User((User/Browser))
-    
+
     subgraph "Frontend (Next.js App Router)"
         UI[Pages & Server/Client Components]
         Context[React Context / TanStack Query]
     end
-    
+
     subgraph "Backend (Next.js API)"
         API[API Route Handlers]
         Permissions[Permissions Middleware]
         Lib[Business Logic / Lib]
     end
-    
+
     subgraph "Data Persistence"
         MongoDB[(MongoDB - Mongoose)]
         VBlob[Vercel Blob Storage]
     end
-    
+
     User <--> UI
     UI <--> Context
     Context <--> API
@@ -35,17 +35,17 @@ graph TD
 
 ## 🛠️ Technology Stack
 
-| Layer | Technology |
-| :--- | :--- |
-| **Framework** | Next.js 16 (App Router) |
-| **Language** | TypeScript |
-| **Database** | MongoDB with Mongoose ODM |
-| **Storage** | Vercel Blob (Images/Assets) |
+| Layer                | Technology                                                   |
+| :------------------- | :----------------------------------------------------------- |
+| **Framework**        | Next.js 16 (App Router)                                      |
+| **Language**         | TypeScript                                                   |
+| **Database**         | MongoDB with Mongoose ODM                                    |
+| **Storage**          | Vercel Blob (Images/Assets)                                  |
 | **State Management** | TanStack Query (Server State) + React Context (Client State) |
-| **Styling** | SASS (BEM) + Tailwind CSS |
-| **UI Components** | Radix UI + Lucide React icons |
-| **Validation** | Zod (Schema validation) |
-| **Auth** | Custom JWT-based implementation |
+| **Styling**          | SASS (BEM) + Tailwind CSS                                    |
+| **UI Components**    | Radix UI + Lucide React icons                                |
+| **Validation**       | Zod (Schema validation)                                      |
+| **Auth**             | Custom JWT-based implementation                              |
 
 ## 📁 Directory Structure & Responsibilities
 

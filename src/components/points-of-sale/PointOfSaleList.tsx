@@ -34,7 +34,6 @@ import { Input } from '@/components/ui/Input';
 import { Search } from 'lucide-react';
 import {
   Dialog,
-
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -65,13 +64,16 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
   const [cityFilter, setCityFilter] = useState('all');
 
   // Get unique cities for the dropdown
-  const cities = Array.from(new Set(data.map((pos) => pos.city).filter(Boolean))) as string[];
+  const cities = Array.from(
+    new Set(data.map((pos) => pos.city).filter(Boolean))
+  ) as string[];
 
   const filteredData = data.filter((pos) => {
     const matchesSearch =
       pos.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       pos.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (pos.address && pos.address.toLowerCase().includes(searchQuery.toLowerCase()));
+      (pos.address &&
+        pos.address.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const matchesCity = cityFilter === 'all' || pos.city === cityFilter;
 
@@ -195,8 +197,8 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
               <TableRow>
                 <TableCell colSpan={8} className="pos-list__empty-cell">
                   {data.length === 0
-                    ? "No hay puntos de venta registrados."
-                    : "No se encontraron resultados para los filtros aplicados."}
+                    ? 'No hay puntos de venta registrados.'
+                    : 'No se encontraron resultados para los filtros aplicados.'}
                 </TableCell>
               </TableRow>
             ) : (

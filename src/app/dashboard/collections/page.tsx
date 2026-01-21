@@ -27,9 +27,8 @@ export default function CollectionsPage() {
 
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedCollection, setSelectedCollection] = useState<Collection | null>(
-    null
-  );
+  const [selectedCollection, setSelectedCollection] =
+    useState<Collection | null>(null);
 
   const fetchCollections = useCallback(async () => {
     try {

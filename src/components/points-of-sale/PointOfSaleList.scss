@@ -5,9 +5,9 @@
 .pos-list {
   &__filters {
     display: flex;
+    align-items: center;
     gap: $spacing-md;
     margin-bottom: $spacing-lg;
-    align-items: center;
 
     @include respond-to-max('md') {
       flex-direction: column;
@@ -22,8 +22,8 @@
 
   &__search-icon {
     position: absolute;
-    left: $spacing-sm;
     top: 50%;
+    left: $spacing-sm;
     transform: translateY(-50%);
     width: 1.1rem;
     height: 1.1rem;

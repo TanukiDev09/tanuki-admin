@@ -19,4 +19,5 @@ Lanzamiento oficial de la plataforma **Tanuki Admin**, un sistema integral de ge
 - **Infraestructura Técnica**: Basado en Next.js 16, Mongoose y un sistema de diseño híbrido (SASS/BEM + Tailwind).
 
 ---
+
 [1.0.0]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v1.0.0

@@ -58,8 +58,12 @@ export default function EditMovementPage() {
           exchangeRate: m.exchangeRate,
           date: m.date ? m.date.split('T')[0] : '', // Format date for input
           salesChannel: m.salesChannel || 'OTRO',
-          pointOfSale: typeof m.pointOfSale === 'object' ? m.pointOfSale?._id : m.pointOfSale,
-          category: typeof m.category === 'object' ? m.category?._id : m.category,
+          pointOfSale:
+            typeof m.pointOfSale === 'object'
+              ? m.pointOfSale?._id
+              : m.pointOfSale,
+          category:
+            typeof m.category === 'object' ? m.category?._id : m.category,
         });
       } catch (error) {
         console.error(error);
@@ -296,12 +300,12 @@ export default function EditMovementPage() {
               <Label>Valor Unitario (Calculado)</Label>
               <div className="movement-form__calculated-value">
                 {formData.amount &&
-                  formData.quantity &&
-                  Number(formData.quantity) !== 0
+                formData.quantity &&
+                Number(formData.quantity) !== 0
                   ? formatCurrency(
-                    Number(formData.amount) / Number(formData.quantity),
-                    formData.currency
-                  )
+                      Number(formData.amount) / Number(formData.quantity),
+                      formData.currency
+                    )
                   : '$ 0'}
               </div>
             </div>

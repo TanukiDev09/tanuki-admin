@@ -116,7 +116,9 @@ export default function CostCenterSelect({
 
   return (
     <div className="cost-center-select">
-      {!hideLabel && <Label className="cost-center-select__label">{label}</Label>}
+      {!hideLabel && (
+        <Label className="cost-center-select__label">{label}</Label>
+      )}
 
       <div className="cost-center-select__controls">
         <div className="cost-center-select__select-wrapper">

@@ -14,7 +14,16 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/Table';
-import { Eye, Plus, Trash2, Pencil, Filter, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Eye,
+  Plus,
+  Trash2,
+  Pencil,
+  Filter,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react';
 import { CategorySelect } from '@/components/finance/CategorySelect';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
 import { useToast } from '@/components/ui/Toast';
@@ -57,10 +66,11 @@ const MovementTableRow = ({
     let channelLabel = '';
     switch (movement.salesChannel) {
       case 'LIBRERIA':
-        channelLabel = `Librería: ${typeof movement.pointOfSale === 'object'
+        channelLabel = `Librería: ${
+          typeof movement.pointOfSale === 'object'
             ? movement.pointOfSale.name
             : 'Varios'
-          }`;
+        }`;
         break;
       case 'DIRECTA':
         channelLabel = 'Directa';
@@ -94,9 +104,7 @@ const MovementTableRow = ({
         </a>
       </TableCell>
       <TableCell data-label="Tipo">
-        <Badge
-          variant={movement.type === 'INCOME' ? 'default' : 'destructive'}
-        >
+        <Badge variant={movement.type === 'INCOME' ? 'default' : 'destructive'}>
           {movement.type === 'INCOME' ? 'Ingreso' : 'Egreso'}
         </Badge>
       </TableCell>
@@ -118,10 +126,11 @@ const MovementTableRow = ({
       </TableCell>
       <TableCell data-label="Monto">
         <span
-          className={`movements-list__amount ${movement.type === 'INCOME'
+          className={`movements-list__amount ${
+            movement.type === 'INCOME'
               ? 'movements-list__amount--income'
               : 'movements-list__amount--expense'
-            }`}
+          }`}
         >
           {movement.type === 'INCOME' ? '+' : '-'}
           {formatCurrency(movement.amount)}
@@ -221,7 +230,11 @@ export default function MovementsPage() {
       setLoading(true);
       const params = new URLSearchParams();
 
-      const addParam = (key: string, value: string | undefined | null, condition = true) => {
+      const addParam = (
+        key: string,
+        value: string | undefined | null,
+        condition = true
+      ) => {
         if (value && condition) params.append(key, value.toString());
       };
 
@@ -229,8 +242,16 @@ export default function MovementsPage() {
       addParam('type', typeFilter, typeFilter !== 'ALL');
       addParam('category', categoryFilter, categoryFilter !== 'ALL');
       addParam('costCenter', costCenterFilter, costCenterFilter !== 'ALL');
-      addParam('paymentChannel', paymentChannelFilter, paymentChannelFilter !== 'ALL');
-      addParam('salesChannel', salesChannelFilter, salesChannelFilter !== 'ALL');
+      addParam(
+        'paymentChannel',
+        paymentChannelFilter,
+        paymentChannelFilter !== 'ALL'
+      );
+      addParam(
+        'salesChannel',
+        salesChannelFilter,
+        salesChannelFilter !== 'ALL'
+      );
       addParam('minAmount', minAmount?.toString());
       addParam('maxAmount', maxAmount?.toString());
       addParam('unit', unitFilter, unitFilter !== 'ALL');
@@ -399,7 +420,9 @@ export default function MovementsPage() {
         </div>
 
         {/* Filters */}
-        <div className={`movements-list__filters ${showAdvancedFilters ? 'movements-list__filters--expanded' : ''}`}>
+        <div
+          className={`movements-list__filters ${showAdvancedFilters ? 'movements-list__filters--expanded' : ''}`}
+        >
           <div className="movements-list__filters-primary">
             <div className="movements-list__search-wrapper">
               <Label className="movements-list__label">Búsqueda</Label>
@@ -416,7 +439,11 @@ export default function MovementsPage() {
               onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
               className="movements-list__toggle-filters"
             >
-              {showAdvancedFilters ? <X className="movements-list__icon-sm" /> : <Filter className="movements-list__icon-sm" />}
+              {showAdvancedFilters ? (
+                <X className="movements-list__icon-sm" />
+              ) : (
+                <Filter className="movements-list__icon-sm" />
+              )}
               <span>{showAdvancedFilters ? 'Ocultar' : 'Filtros'}</span>
             </Button>
           </div>
@@ -477,7 +504,9 @@ export default function MovementsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ALL">Todos los Canales</SelectItem>
-                    <SelectItem value="__UNDEFINED__">Sin definir (-)</SelectItem>
+                    <SelectItem value="__UNDEFINED__">
+                      Sin definir (-)
+                    </SelectItem>
                     {availablePaymentChannels.map((channel) => (
                       <SelectItem key={channel} value={channel}>
                         {channel}
@@ -536,7 +565,9 @@ export default function MovementsPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="ALL">Todas las Unidades</SelectItem>
-                    <SelectItem value="__UNDEFINED__">Sin definir (-)</SelectItem>
+                    <SelectItem value="__UNDEFINED__">
+                      Sin definir (-)
+                    </SelectItem>
                     {availableUnits.map((unit) => (
                       <SelectItem key={unit} value={unit}>
                         {unit}
@@ -666,7 +697,9 @@ export default function MovementsPage() {
                     canUpdate={canUpdate}
                     canDelete={canDelete}
                     onDelete={handleDelete}
-                    onEdit={(id) => router.push(`/dashboard/movements/${id}/editar`)}
+                    onEdit={(id) =>
+                      router.push(`/dashboard/movements/${id}/editar`)
+                    }
                     onView={(id) => router.push(`/dashboard/movements/${id}`)}
                   />
                 ))
@@ -708,6 +741,6 @@ export default function MovementsPage() {
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 }
