@@ -154,12 +154,6 @@ const calculateFinancials = (body: MovementBody) => {
   calculateUnitValue(body);
 };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function formatMovement(movement: any) {
-  return {
-    ...movement.toObject(),
-    amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
-    unit: movement.unit,
 function formatMovement(
   movement: mongoose.Document & MovementDoc
 ): FormattedMovement {
@@ -176,10 +170,6 @@ function formatMovement(
     unitValue: movement.unitValue
       ? parseFloat(movement.unitValue.toString())
       : undefined,
-    _id: movement._id.toString(),
-  };
-}
-/* eslint-enable @typescript-eslint/no-explicit-any */
     allocations: obj.allocations?.map((a) => ({
       ...a,
       amount: a.amount ? parseFloat(a.amount.toString()) : 0,
@@ -258,21 +248,6 @@ function validateAndNormalizeAllocations(
   return null;
 }
 
-async function updateInventoryMovementLink(
-  body: MovementBody,
-  movementId: string
-) {
-  if (body.inventoryMovementId) {
-    try {
-      await InventoryMovement.findByIdAndUpdate(body.inventoryMovementId, {
-        financialMovementId: movementId,
-      });
-    } catch (linkErr) {
-      console.error('Error linking to inventory movement (PUT):', linkErr);
-    }
-  }
-}
-
 export async function PUT(
   request: NextRequest,
   props: { params: Promise<{ id: string }> }
@@ -329,11 +304,6 @@ export async function PUT(
 
     return NextResponse.json({ data: formatMovement(movement) });
   } catch (err: unknown) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const error = err as any;
-    await updateInventoryMovementLink(body, movement._id.toString());
-    return NextResponse.json({ data: formatMovement(movement) });
-  } catch (err: unknown) {
     const error = err as { name?: string; errors?: unknown; message?: string };
     console.error('Update Movement Error:', error);
 
@@ -346,10 +316,6 @@ export async function PUT(
 
     const message = error.message || 'Failed to update movement';
     return NextResponse.json({ error: message }, { status: 500 });
-    return NextResponse.json(
-      { error: error.message || 'Failed to update movement' },
-      { status: 500 }
-    );
   }
 }
 

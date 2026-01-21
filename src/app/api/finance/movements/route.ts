@@ -488,13 +488,6 @@ async function linkInventoryMovement(
   }
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function formatSingleMovement(movement: any) {
-  const obj = movement.toObject ? movement.toObject() : movement;
-  return {
-    ...obj,
-    amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
-    unit: movement.unit,
 function formatSingleMovement(
   movement: mongoose.Document & MovementDoc
 ): FormattedMovement {
@@ -511,10 +504,6 @@ function formatSingleMovement(
     unitValue: movement.unitValue
       ? parseFloat(movement.unitValue.toString())
       : undefined,
-    _id: movement._id.toString(),
-  };
-}
-/* eslint-enable @typescript-eslint/no-explicit-any */
     allocations: obj.allocations?.map((a) => ({
       ...a,
       amount: a.amount ? parseFloat(a.amount.toString()) : 0,

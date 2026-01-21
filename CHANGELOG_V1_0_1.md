@@ -84,6 +84,7 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 - **Type Safety Robusto**: Corrección integral de errores de tipos en los formularios de creación y edición, asegurando el cumplimiento estricto de los DTOs.
 - **Refactorización de UI**: Extracción del componente `MovementTableRow` para reducir la complejidad cognitiva y mejorar la mantenibilidad del dashboard.
 - **Linter Clean**: Estado final de linters (JS/CSS) totalmente limpio.
+
 ---
 
 ## [1.0.1] - 2026-01-20 (Sesión 4)

@@ -15,8 +15,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/Button';
-import { FileText, ExternalLink } from 'lucide-react';
-import { generateMovementPDF } from '@/lib/inventory/pdfGenerator';
 import { FileText, ExternalLink, Eye } from 'lucide-react';
 import { generateMovementPDF } from '@/lib/inventory/pdfGenerator';
 import { EditorialSettings } from '@/types/settings';

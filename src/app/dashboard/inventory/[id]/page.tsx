@@ -18,9 +18,7 @@ import {
   Loader2,
   User,
   Building2,
-  Hash,
-  Package,
-  FileText
+  Package
 } from 'lucide-react';
 import {
   Table,
