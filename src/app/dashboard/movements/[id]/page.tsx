@@ -5,7 +5,8 @@ import { useRouter, useParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { useToast } from '@/components/ui/Toast';
-import { ArrowLeft, Pencil } from 'lucide-react';
+import { ArrowLeft, Pencil, Package, ExternalLink } from 'lucide-react';
+
 import { Movement } from '@/types/movement';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { usePermission } from '@/hooks/usePermissions';
@@ -165,13 +166,35 @@ export default function MovementDetailPage() {
             </p>
           </div>
 
+
           {movement.invoiceRef && (
             <div>
               <h3 className="movement-detail__label">Referencia Factura</h3>
               <p>{movement.invoiceRef}</p>
             </div>
           )}
+
+          {movement.inventoryMovementId && (
+            <div className="movement-detail__link-section mt-4">
+              <h3 className="movement-detail__label flex items-center gap-2">
+                <Package className="w-4 h-4" /> Movimiento de Inventario Vinculado
+              </h3>
+              <div className="flex items-center gap-4 p-4 bg-muted rounded-lg mt-2">
+                <div className="flex-1 text-sm">
+                  <strong>Relacionado con Control de Stock</strong>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => router.push('/dashboard/inventory')}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" /> Ir a Inventario
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
+
       </Card>
     </div>
   );

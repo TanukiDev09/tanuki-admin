@@ -3,6 +3,7 @@ import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import Movement from '@/models/Movement';
+import InventoryMovement from '@/models/InventoryMovement';
 
 export async function GET(
   request: NextRequest,
@@ -122,6 +123,23 @@ const calculateFinancials = (body: MovementBody) => {
   calculateUnitValue(body);
 };
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function formatMovement(movement: any) {
+  return {
+    ...movement.toObject(),
+    amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
+    unit: movement.unit,
+    quantity: movement.quantity
+      ? parseFloat(movement.quantity.toString())
+      : undefined,
+    unitValue: movement.unitValue
+      ? parseFloat(movement.unitValue.toString())
+      : undefined,
+    _id: movement._id.toString(),
+  };
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 export async function PUT(
   request: NextRequest,
   props: { params: Promise<{ id: string }> }
@@ -155,40 +173,31 @@ export async function PUT(
       );
     }
 
-    const formattedMovement = {
-      ...movement.toObject(),
-      amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
-      unit: movement.unit,
-      quantity: movement.quantity
-        ? parseFloat(movement.quantity.toString())
-        : undefined,
-      unitValue: movement.unitValue
-        ? parseFloat(movement.unitValue.toString())
-        : undefined,
-      _id: movement._id.toString(),
-    };
+    // 4.1 Update Inventory Movement link if provided/updated
+    if (body.inventoryMovementId) {
+      try {
+        await InventoryMovement.findByIdAndUpdate(body.inventoryMovementId, {
+          financialMovementId: movement._id,
+        });
+      } catch (linkErr) {
+        console.error('Error linking to inventory movement (PUT):', linkErr);
+      }
+    }
 
-    return NextResponse.json({ data: formattedMovement });
-  } catch (error: unknown) {
+    return NextResponse.json({ data: formatMovement(movement) });
+  } catch (err: unknown) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const error = err as any;
     console.error('Update Movement Error:', error);
 
-    if (
-      error &&
-      typeof error === 'object' &&
-      'name' in error &&
-      (error as { name: string }).name === 'ValidationError'
-    ) {
+    if (error.name === 'ValidationError') {
       return NextResponse.json(
-        {
-          error: 'Validation Error',
-          details: (error as { errors?: unknown }).errors,
-        },
+        { error: 'Validation Error', details: error.errors },
         { status: 400 }
       );
     }
 
-    const message =
-      error instanceof Error ? error.message : 'Failed to update movement';
+    const message = error.message || 'Failed to update movement';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

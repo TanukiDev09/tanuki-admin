@@ -13,8 +13,9 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 import { Button } from '@/components/ui/Button';
-import { FileText } from 'lucide-react';
+import { FileText, ExternalLink } from 'lucide-react';
 import { generateMovementPDF } from '@/lib/inventory/pdfGenerator';
+
 import { formatNumber } from '@/lib/utils';
 import './InventoryMovementsList.scss';
 
@@ -58,7 +59,9 @@ interface Movement {
   }[];
   createdBy?: { name: string };
   observations?: string;
+  financialMovementId?: string | { _id: string };
 }
+
 
 interface MovementsListProps {
   movements: Movement[];
@@ -159,7 +162,24 @@ export function InventoryMovementsList({
                     <FileText className="inventory-movements-list__icon" />
                   </Button>
                 )}
+                {movement.financialMovementId && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      const id =
+                        typeof movement.financialMovementId === 'object'
+                          ? movement.financialMovementId?._id
+                          : movement.financialMovementId;
+                      if (id) window.open(`/dashboard/movements/${id}`, '_blank');
+                    }}
+                    title="Ver Movimiento Financiero"
+                  >
+                    <ExternalLink className="inventory-movements-list__icon text-primary" />
+                  </Button>
+                )}
               </TableCell>
+
             </TableRow>
           ))}
         </TableBody>

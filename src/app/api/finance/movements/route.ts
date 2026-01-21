@@ -4,6 +4,7 @@ import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import * as mongoose from 'mongoose';
 import Movement from '@/models/Movement';
+import InventoryMovement from '@/models/InventoryMovement';
 
 export const dynamic = 'force-dynamic';
 
@@ -299,6 +300,7 @@ interface CreateMovementBody {
   notes?: string;
   salesChannel?: string;
   pointOfSale?: string;
+  inventoryMovementId?: string;
   [key: string]: unknown;
 }
 
@@ -408,6 +410,37 @@ function buildMovementDoc(
   };
 }
 
+async function linkInventoryMovement(
+  inventoryMovementId: string,
+  movementId: mongoose.Types.ObjectId | string
+) {
+  try {
+    await InventoryMovement.findByIdAndUpdate(inventoryMovementId, {
+      financialMovementId: movementId,
+    });
+  } catch (linkErr) {
+    console.error('Error linking to inventory movement:', linkErr);
+  }
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+function formatSingleMovement(movement: any) {
+  const obj = movement.toObject ? movement.toObject() : movement;
+  return {
+    ...obj,
+    amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
+    unit: movement.unit,
+    quantity: movement.quantity
+      ? parseFloat(movement.quantity.toString())
+      : undefined,
+    unitValue: movement.unitValue
+      ? parseFloat(movement.unitValue.toString())
+      : undefined,
+    _id: movement._id.toString(),
+  };
+}
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 export async function POST(request: NextRequest) {
   const permissionError = await requirePermission(
     request,
@@ -438,24 +471,22 @@ export async function POST(request: NextRequest) {
 
     // 4. DB Operations
     const movement = await Movement.create(finalDoc);
-    const populatedMovement = await movement.populate({
-      path: 'category',
-      select: 'name',
-    });
+
+    // 4.1 Update Inventory Movement link if provided
+    if (finalDoc.inventoryMovementId) {
+      await linkInventoryMovement(
+        finalDoc.inventoryMovementId as string,
+        movement._id
+      );
+    }
+
+    const populatedMovement = await movement.populate([
+      { path: 'category', select: 'name' },
+      { path: 'inventoryMovementId', select: 'type date' },
+    ]);
 
     // 5. Formatting
-    const formattedMovement = {
-      ...populatedMovement.toObject(),
-      amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
-      unit: movement.unit,
-      quantity: movement.quantity
-        ? parseFloat(movement.quantity.toString())
-        : undefined,
-      unitValue: movement.unitValue
-        ? parseFloat(movement.unitValue.toString())
-        : undefined,
-      _id: movement._id.toString(),
-    };
+    const formattedMovement = formatSingleMovement(populatedMovement);
 
     return NextResponse.json({ data: formattedMovement }, { status: 201 });
   } catch (err: unknown) {

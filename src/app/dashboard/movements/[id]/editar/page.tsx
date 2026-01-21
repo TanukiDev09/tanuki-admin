@@ -23,7 +23,9 @@ import { POSSelect } from '@/components/admin/POSSelect/POSSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency } from '@/lib/utils';
+import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import '../../movement-form.scss';
+
 
 export default function EditMovementPage() {
   const router = useRouter();
@@ -64,7 +66,12 @@ export default function EditMovementPage() {
               : m.pointOfSale,
           category:
             typeof m.category === 'object' ? m.category?._id : m.category,
+          inventoryMovementId:
+            typeof m.inventoryMovementId === 'object'
+              ? m.inventoryMovementId?._id
+              : m.inventoryMovementId,
         });
+
       } catch (error) {
         console.error(error);
         toast({
@@ -300,12 +307,12 @@ export default function EditMovementPage() {
               <Label>Valor Unitario (Calculado)</Label>
               <div className="movement-form__calculated-value">
                 {formData.amount &&
-                formData.quantity &&
-                Number(formData.quantity) !== 0
+                  formData.quantity &&
+                  Number(formData.quantity) !== 0
                   ? formatCurrency(
-                      Number(formData.amount) / Number(formData.quantity),
-                      formData.currency
-                    )
+                    Number(formData.amount) / Number(formData.quantity),
+                    formData.currency
+                  )
                   : '$ 0'}
               </div>
             </div>
@@ -416,7 +423,27 @@ export default function EditMovementPage() {
               onChange={handleChange}
             />
           </div>
+
+          <div className="movement-form__field-group">
+            <Label>Vincular Movimiento de Inventario / Liquidación (Opcional)</Label>
+            <InventoryMovementSearchSelect
+              value={formData.inventoryMovementId as string}
+              onValueChange={(val) =>
+                setFormData(prev => ({ ...prev, inventoryMovementId: val }))
+              }
+              type={formData.type === 'INCOME' ? 'LIQUIDACION' : 'INGRESO'}
+              placeholder={
+                formData.type === 'INCOME'
+                  ? 'Buscar liquidación de venta...'
+                  : 'Buscar compra de libros...'
+              }
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Relacione este pago con un registro de inventario previo.
+            </p>
+          </div>
         </div>
+
 
         <div className="movement-form__footer">
           <Button type="button" variant="outline" onClick={() => router.back()}>

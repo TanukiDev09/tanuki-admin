@@ -23,7 +23,9 @@ import { POSSelect } from '@/components/admin/POSSelect/POSSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency } from '@/lib/utils';
+import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import '../movement-form.scss';
+
 
 export default function CreateMovementPage() {
   const router = useRouter();
@@ -274,12 +276,12 @@ export default function CreateMovementPage() {
               <Label>Valor Unitario (Calculado)</Label>
               <div className="movement-form__calculated-value">
                 {formData.amount &&
-                formData.quantity &&
-                Number(formData.quantity) !== 0
+                  formData.quantity &&
+                  Number(formData.quantity) !== 0
                   ? formatCurrency(
-                      Number(formData.amount) / Number(formData.quantity),
-                      formData.currency
-                    )
+                    Number(formData.amount) / Number(formData.quantity),
+                    formData.currency
+                  )
                   : '$ 0'}
               </div>
             </div>
@@ -390,7 +392,27 @@ export default function CreateMovementPage() {
               onChange={handleChange}
             />
           </div>
+
+          <div className="movement-form__field-group">
+            <Label>Vincular Movimiento de Inventario / Liquidación (Opcional)</Label>
+            <InventoryMovementSearchSelect
+              value={formData.inventoryMovementId}
+              onValueChange={(val) =>
+                setFormData(prev => ({ ...prev, inventoryMovementId: val }))
+              }
+              type={formData.type === 'INCOME' ? 'LIQUIDACION' : 'INGRESO'}
+              placeholder={
+                formData.type === 'INCOME'
+                  ? 'Buscar liquidación de venta...'
+                  : 'Buscar compra de libros...'
+              }
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Seleccione una liquidación o ingreso de inventario previo para vincularlo a este pago.
+            </p>
+          </div>
         </div>
+
 
         <div className="movement-form__footer">
           <Button type="button" variant="outline" onClick={() => router.back()}>
