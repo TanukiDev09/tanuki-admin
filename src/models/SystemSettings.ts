@@ -33,9 +33,6 @@ const SystemSettingsSchema: Schema = new Schema(
   }
 );
 
-// Index to quickly find by key
-SystemSettingsSchema.index({ key: 1 });
-
 export default mongoose.models.SystemSettings ||
   mongoose.model<ISystemSettings>(
     'SystemSettings',
