@@ -24,6 +24,10 @@ export interface Movement {
   salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'OTRO';
   pointOfSale?: string | { _id: string; name: string };
   inventoryMovementId?: string;
+  allocations?: {
+    costCenter: string;
+    amount: number;
+  }[];
 }
 
 export interface CreateMovementDTO extends Omit<

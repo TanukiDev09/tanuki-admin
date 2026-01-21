@@ -210,6 +210,7 @@ export function InventoryMovementModal({
 
     if ('quantity' in item && 'bookId' in item) {
       const invItem = item as InventoryItem;
+      if (!invItem.bookId) return; // Skip if bookId is null
       bookId = invItem.bookId._id;
       title = invItem.bookId.title;
       maxQty = invItem.quantity;
@@ -462,11 +463,12 @@ export function InventoryMovementModal({
         {searchResults.length === 0 && (
           <p className="inventory-movement-modal__empty">Sin resultados</p>
         )}
-        {searchResults.map((item) => {
+        {searchResults.map((item, index) => {
           let bookId: string, title: string, quantity: number | undefined;
 
           if ('bookId' in item) {
             const invItem = item as InventoryItem;
+            if (!invItem.bookId) return null; // Skip if bookId is null
             bookId = invItem.bookId._id;
             title = invItem.bookId.title;
             quantity = invItem.quantity;
@@ -476,10 +478,11 @@ export function InventoryMovementModal({
             title = book.title;
           }
 
+          if (!bookId) return null; // Double safety
           const isAdded = items.some((i) => i.bookId === bookId);
 
           return (
-            <div key={bookId} className="inventory-movement-modal__item">
+            <div key={bookId || index} className="inventory-movement-modal__item">
               <div className="inventory-movement-modal__item-info">
                 <span className="inventory-movement-modal__item-title">
                   {title}

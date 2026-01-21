@@ -8,6 +8,11 @@ import InventoryMovement from '@/models/InventoryMovement';
 
 export const dynamic = 'force-dynamic';
 
+interface Allocation {
+  costCenter: string;
+  amount: { toString: () => string } | number;
+}
+
 interface MovementDoc {
   _id: { toString: () => string };
   amount: { toString: () => string };
@@ -15,6 +20,7 @@ interface MovementDoc {
   unit?: string;
   quantity?: { toString: () => string };
   unitValue?: { toString: () => string };
+  allocations?: Allocation[];
   [key: string]: unknown;
 }
 
@@ -170,7 +176,17 @@ function buildQuery(searchParams: URLSearchParams): MovementQuery {
   return andConditions.length > 0 ? { $and: andConditions } : {};
 }
 
-function formatMovements(movements: MovementDoc[]) {
+interface FormattedMovement extends Omit<
+  MovementDoc,
+  'amount' | 'quantity' | 'unitValue' | '_id'
+> {
+  _id: string;
+  amount: number;
+  quantity?: number;
+  unitValue?: number;
+}
+
+function formatMovements(movements: MovementDoc[]): FormattedMovement[] {
   return movements.map((m: MovementDoc) => {
     let normalizedType = m.type;
     if (m.type === 'Ingreso') normalizedType = 'INCOME';
@@ -183,8 +199,12 @@ function formatMovements(movements: MovementDoc[]) {
       unit: m.unit,
       quantity: m.quantity ? parseFloat(m.quantity.toString()) : undefined,
       unitValue: m.unitValue ? parseFloat(m.unitValue.toString()) : undefined,
+      allocations: m.allocations?.map((a) => ({
+        ...a,
+        amount: a.amount ? parseFloat(a.amount.toString()) : 0,
+      })),
       _id: m._id.toString(),
-    };
+    } as FormattedMovement;
   });
 }
 
@@ -301,7 +321,43 @@ interface CreateMovementBody {
   salesChannel?: string;
   pointOfSale?: string;
   inventoryMovementId?: string;
+  allocations?: {
+    costCenter: string;
+    amount: number;
+  }[];
   [key: string]: unknown;
+}
+
+// Helper to validate allocations
+function validateAllocations(body: CreateMovementBody, amount: number) {
+  if (!body.allocations || body.allocations.length === 0) return null;
+
+  let sumAllocations = 0;
+  for (const allocation of body.allocations) {
+    if (!allocation.costCenter) {
+      return {
+        error: 'Todas las asignaciones deben tener un centro de costo',
+        status: 400,
+      };
+    }
+    const allocAmount = Number(allocation.amount);
+    if (isNaN(allocAmount) || allocAmount < 0) {
+      return {
+        error: 'Los montos de las asignaciones deben ser números válidos',
+        status: 400,
+      };
+    }
+    sumAllocations += allocAmount;
+  }
+
+  if (Math.abs(amount - sumAllocations) > 0.01) {
+    return {
+      error: `La suma de los detalles (${sumAllocations}) debe ser igual al total del movimiento (${amount})`,
+      status: 400,
+    };
+  }
+
+  return null;
 }
 
 // Helper to validate and sanitize input
@@ -319,6 +375,9 @@ function validateAndSanitize(body: CreateMovementBody) {
   if (isNaN(amount)) {
     return { error: 'El monto debe ser un número válido', status: 400 };
   }
+
+  const allocationError = validateAllocations(body, amount);
+  if (allocationError) return allocationError;
 
   return { amount };
 }
@@ -370,12 +429,18 @@ function buildMovementDoc(
   const movementType =
     type === 'Ingreso' ? 'factura_emitida' : 'factura_recibida';
 
-  const allocations = [
-    {
-      costCenter: body.costCenter || '01T001',
-      amount: amount,
-    },
-  ];
+  let allocations;
+  if (body.allocations && body.allocations.length > 0) {
+    allocations = body.allocations;
+  } else {
+    // Legacy/Simple mode: Single cost center from top-level field
+    allocations = [
+      {
+        costCenter: body.costCenter || '01T001',
+        amount: amount,
+      },
+    ];
+  }
 
   const metadata = {
     source: 'manual',
@@ -423,23 +488,29 @@ async function linkInventoryMovement(
   }
 }
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function formatSingleMovement(movement: any) {
-  const obj = movement.toObject ? movement.toObject() : movement;
+function formatSingleMovement(
+  movement: mongoose.Document & MovementDoc
+): FormattedMovement {
+  const obj = movement.toObject
+    ? (movement.toObject() as MovementDoc)
+    : movement;
   return {
     ...obj,
     amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
-    unit: movement.unit,
+    unit: movement.unit as string | undefined,
     quantity: movement.quantity
       ? parseFloat(movement.quantity.toString())
       : undefined,
     unitValue: movement.unitValue
       ? parseFloat(movement.unitValue.toString())
       : undefined,
+    allocations: obj.allocations?.map((a) => ({
+      ...a,
+      amount: a.amount ? parseFloat(a.amount.toString()) : 0,
+    })),
     _id: movement._id.toString(),
-  };
+  } as FormattedMovement;
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
 
 export async function POST(request: NextRequest) {
   const permissionError = await requirePermission(

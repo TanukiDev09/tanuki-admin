@@ -143,8 +143,31 @@ export default function MovementDetailPage() {
               </p>
             </div>
             <div>
-              <h3 className="movement-detail__label">Centro de Costos</h3>
-              <p>{movement.costCenter || '-'}</p>
+              <h3 className="movement-detail__label">Centro de Costo</h3>
+              {movement.allocations && movement.allocations.length > 1 ? (
+                <div className="movement-detail__allocation-list">
+                  <table className="movement-detail__allocation-table">
+                    <thead>
+                      <tr>
+                        <th>Centro</th>
+                        <th className="text-right">Monto</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {movement.allocations.map((alloc, idx) => (
+                        <tr key={idx}>
+                          <td>{alloc.costCenter}</td>
+                          <td className="movement-detail__allocation-amount">
+                            {formatCurrency(alloc.amount, movement.currency)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p>{movement.costCenter || (movement.allocations?.[0]?.costCenter) || '-'}</p>
+              )}
             </div>
           </div>
 

@@ -51,8 +51,7 @@ export interface UserResponse {
 // Función helper para sanitizar usuario
 export function sanitizeUser(user: IUser): UserResponse {
   const userObj = user.toObject();
-  const { password, ...userWithoutPassword } = userObj;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _ = password;
+  const { password: _password, ...userWithoutPassword } = userObj;
+  void _password; // Explicitly mark as "used" to satisfy linter if needed, though prefix _ usually works.
   return userWithoutPassword as UserResponse;
 }

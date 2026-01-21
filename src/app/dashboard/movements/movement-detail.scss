@@ -90,9 +90,38 @@
     white-space: pre-wrap;
   }
 
-  &__icon {
-    width: 1rem; // w-4
-    height: 1rem; // h-4
-    margin-right: $spacing-xs;
+  &__allocation-list {
+    margin-top: $spacing-xs;
+    background: $background;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    overflow: hidden;
+  }
+
+  &__allocation-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-sm;
+
+    th {
+      background: $muted;
+      color: $muted-foreground;
+      font-weight: $font-weight-medium;
+      text-transform: uppercase;
+      font-size: $font-size-xs;
+      text-align: left;
+      padding: $spacing-xs $spacing-sm;
+    }
+
+    td {
+      padding: $spacing-xs $spacing-sm;
+      border-top: 1px solid $muted;
+    }
+  }
+
+  &__allocation-amount {
+    text-align: right;
+    font-family: $font-family-mono;
+    font-weight: $font-weight-medium;
   }
 }
