@@ -105,3 +105,21 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 - **Validación de Estilos**: Reordenamiento integral de propiedades CSS siguiendo las reglas de `stylelint` para mantener la consistencia del sistema de diseño.
 - **Limpieza de Código**: Corrección de errores de parsing y fragmentos redundantes en componentes React.
 - **Linters & Typecheck**: Verificación completa aprobada (Zero errors).
+
+---
+
+## [1.0.1] - 2026-01-20 (Sesión 5)
+
+### ✨ Dashboard de Categorías: Filtro por Tipo
+
+- **Filtro por Tipo de Categoría**: Implementación de un selector avanzado en el dashboard de categorías para segmentar por:
+  - **Ingreso, Egreso y Ambos**.
+  - **Integración con Búsqueda**: El filtro funciona de forma combinada con la barra de búsqueda global.
+- **Mejoras de UI/UX**:
+  - **Diseño Responsivo**: Reorganización del panel de controles para asegurar una visualización óptima en todos los dispositivos.
+  - **Estandarización Radix UI**: Uso de componentes de selección premium para mantener la consistencia visual con el resto del sistema.
+
+### 🔧 Calidad & Mantenibilidad
+
+- **Linter & Stylelint Clean**: Verificación y corrección de orden de propiedades CSS/SCSS, asegurando un reporte de linters libre de errores.
+- **Type Safety**: Verificación de tipos mediante `tsc` para garantizar la integridad de los datos en el filtrado.

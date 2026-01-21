@@ -31,12 +31,18 @@
 
   &__controls {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: $spacing-sm;
+    gap: $spacing-md;
   }
 
   &__search {
+    flex: 1;
     width: 100%;
     max-width: 400px;
+  }
+
+  &__filter {
+    width: 200px;
   }
 }
