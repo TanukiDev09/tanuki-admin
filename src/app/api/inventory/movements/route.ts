@@ -281,10 +281,22 @@ export async function POST(request: NextRequest) {
     // 6. Update Inventory
     await updateInventory(fromWarehouseId, toWarehouseId, items);
 
+    // 6.5 Calculate Consecutive for REMISION
+    let consecutive: number | undefined;
+    if (type === InventoryMovementType.REMISION) {
+      const lastRemission = await InventoryMovement.findOne({
+        type: InventoryMovementType.REMISION,
+      })
+        .sort({ consecutive: -1 })
+        .limit(1);
+      consecutive = (lastRemission?.consecutive || 0) + 1;
+    }
+
     // 7. Create Record
     const inventoryMovement = await InventoryMovement.create({
       type,
       subType,
+      consecutive,
       date: date || new Date(),
       fromWarehouseId,
       toWarehouseId,
@@ -350,7 +362,7 @@ export async function GET(request: NextRequest) {
         populate: {
           path: 'pointOfSaleId',
           select:
-            'identificationType identificationNumber address city discountPercentage',
+            'name identificationType identificationNumber address city discountPercentage',
         },
       })
       .populate({
@@ -359,7 +371,7 @@ export async function GET(request: NextRequest) {
         populate: {
           path: 'pointOfSaleId',
           select:
-            'identificationType identificationNumber address city discountPercentage',
+            'name identificationType identificationNumber address city discountPercentage',
         },
       })
       .populate('items.bookId', 'title isbn price')

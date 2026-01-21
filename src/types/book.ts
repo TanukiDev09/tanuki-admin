@@ -117,9 +117,8 @@ export interface BookResponse {
 }
 
 // Función helper para sanitizar libro
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function sanitizeBook(book: IBook | Record<string, any>): BookResponse {
+export function sanitizeBook(book: IBook | BookResponse): BookResponse {
   // If it's a mongoose document, convert to object
-  const bookObj = book.toObject ? book.toObject() : book;
+  const bookObj = 'toObject' in book ? book.toObject() : book;
   return bookObj as BookResponse;
 }
