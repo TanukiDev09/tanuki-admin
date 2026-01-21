@@ -42,6 +42,7 @@ export const navItems = [
     icon: Activity,
   },
   { href: '/dashboard/catalog', label: 'Catálogo', icon: BookOpen },
+  { href: '/dashboard/collections', label: 'Colecciones', icon: List },
   { href: '/dashboard/creators', label: 'Creadores', icon: PenTool },
   { href: '/dashboard/points-of-sale', label: 'Puntos de Venta', icon: Store },
   { href: '/dashboard/warehouses', label: 'Bodegas', icon: Warehouse },
@@ -88,28 +89,30 @@ export function NavLinks({
   const canSee = (href: string) => {
     if (href === '/dashboard' || href === '/help' || href === '/settings')
       return true;
-    if (href.startsWith('/dashboard/catalog'))
-      return hasPermission(ModuleName.BOOKS, PermissionAction.READ);
-    if (href.startsWith('/dashboard/creators'))
-      return hasPermission(ModuleName.CREATORS, PermissionAction.READ);
-    if (href.startsWith('/dashboard/points-of-sale'))
-      return hasPermission(ModuleName.POINTS_OF_SALE, PermissionAction.READ);
-    if (href.startsWith('/dashboard/warehouses'))
-      return hasPermission(ModuleName.WAREHOUSES, PermissionAction.READ);
-    if (href.startsWith('/dashboard/agreements'))
-      return hasPermission(ModuleName.AGREEMENTS, PermissionAction.READ);
-    if (href.startsWith('/dashboard/movements'))
-      return hasPermission(ModuleName.FINANCE, PermissionAction.READ);
-    if (href.startsWith('/dashboard/financial-health'))
-      return hasPermission(ModuleName.FINANCE, PermissionAction.READ);
-    if (href.startsWith('/dashboard/inventory'))
-      return hasPermission(ModuleName.INVENTORY, PermissionAction.READ);
-    if (href.startsWith('/dashboard/categories'))
-      return hasPermission(ModuleName.CATEGORIES, PermissionAction.READ);
-    if (href.startsWith('/dashboard/users'))
-      return hasPermission(ModuleName.USERS, PermissionAction.READ);
-    if (href.startsWith('/dashboard/permissions'))
-      return hasPermission(ModuleName.PERMISSIONS, PermissionAction.READ);
+
+    const modulePermissionMap: Record<string, ModuleName> = {
+      '/dashboard/catalog': ModuleName.BOOKS,
+      '/dashboard/creators': ModuleName.CREATORS,
+      '/dashboard/collections': ModuleName.COLLECTIONS,
+      '/dashboard/points-of-sale': ModuleName.POINTS_OF_SALE,
+      '/dashboard/warehouses': ModuleName.WAREHOUSES,
+      '/dashboard/agreements': ModuleName.AGREEMENTS,
+      '/dashboard/movements': ModuleName.FINANCE,
+      '/dashboard/financial-health': ModuleName.FINANCE,
+      '/dashboard/inventory': ModuleName.INVENTORY,
+      '/dashboard/categories': ModuleName.CATEGORIES,
+      '/dashboard/users': ModuleName.USERS,
+      '/dashboard/permissions': ModuleName.PERMISSIONS,
+    };
+
+    const entry = Object.entries(modulePermissionMap).find(([path]) =>
+      href.startsWith(path)
+    );
+
+    if (entry) {
+      return hasPermission(entry[1], PermissionAction.READ);
+    }
+
     return true;
   };
 

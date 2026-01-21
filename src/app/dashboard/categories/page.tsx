@@ -11,7 +11,15 @@ import { Category } from '@/types/category';
 import { Input } from '@/components/ui/Input';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
 import './categories-page.scss';
+
 
 export default function CategoriesPage() {
   const { toast } = useToast();
@@ -29,6 +37,8 @@ export default function CategoriesPage() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(
     null
   );
+  const [typeFilter, setTypeFilter] = useState('all');
+
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -80,12 +90,17 @@ export default function CategoriesPage() {
     }
   };
 
-  const filteredCategories = categories.filter(
-    (c) =>
+  const filteredCategories = categories.filter((c) => {
+    const matchesSearch =
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       (c.description &&
-        c.description.toLowerCase().includes(search.toLowerCase()))
-  );
+        c.description.toLowerCase().includes(search.toLowerCase()));
+
+    const matchesType = typeFilter === 'all' || c.type === typeFilter;
+
+    return matchesSearch && matchesType;
+  });
+
 
   return (
     <div className="categories-page">
@@ -111,7 +126,19 @@ export default function CategoriesPage() {
           onChange={(e) => setSearch(e.target.value)}
           className="categories-page__search"
         />
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="categories-page__filter">
+            <SelectValue placeholder="Filtrar por tipo" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="Ingreso">Ingreso</SelectItem>
+            <SelectItem value="Egreso">Egreso</SelectItem>
+            <SelectItem value="Ambos">Ambos</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
+
 
       <CategoriesTable
         categories={filteredCategories}

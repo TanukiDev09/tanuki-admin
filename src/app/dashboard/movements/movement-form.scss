@@ -123,4 +123,180 @@
     color: $muted-foreground;
     text-align: center;
   }
+
+  // --- Multi-Cost Center Styles ---
+
+  &__toggle-group {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2xs;
+    max-width: fit-content;
+    padding: $spacing-2xs;
+    background-color: $muted;
+    border-radius: $radius-sm;
+
+    &-btn {
+      @include button-reset;
+
+      padding: $spacing-xs $spacing-md;
+      color: $muted-foreground;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      border-radius: $radius-xs;
+      transition: $transition-fast;
+
+      &:hover {
+        color: $foreground;
+      }
+
+      &--active {
+        background-color: $card;
+        color: $foreground;
+        box-shadow: $shadow-sm;
+
+        &.movement-form__toggle-group-btn--multiple {
+          color: $info;
+        }
+      }
+    }
+  }
+
+  &__allocation-container {
+    margin-top: $spacing-sm;
+    background-color: $card;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    overflow: hidden;
+  }
+
+  &__allocation-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-sm;
+
+    th {
+      padding: $spacing-sm $spacing-md;
+      background-color: $muted;
+      color: $muted-foreground;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
+      text-align: left;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: $spacing-sm $spacing-md;
+      border-bottom: 1px solid rgba($border, 0.5);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .cost-center-col {
+      width: 65%;
+    }
+
+    .amount-col {
+      width: 25%;
+    }
+
+    .action-col {
+      width: 10%;
+      text-align: center;
+    }
+  }
+
+  &__remove-allocation {
+    @include button-reset;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: $spacing-xs;
+    color: $muted-foreground;
+    border-radius: $radius-xs;
+    transition: $transition-fast;
+
+    &:hover {
+      background-color: rgba($danger, 0.1);
+      color: $danger;
+    }
+
+    svg {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  &__add-allocation {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-xs;
+    width: 100%;
+    width: calc(100% - #{2 * $spacing-md});
+    margin: $spacing-md;
+    padding: $spacing-sm;
+    background: transparent;
+    color: $info;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    border: 1px dashed $border;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    transition: $transition-fast;
+
+    &:hover {
+      background-color: rgba($info, 0.05);
+      border-color: $info;
+    }
+  }
+
+  &__allocation-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md;
+    background-color: $muted;
+    font-size: $font-size-xs;
+    border-top: 1px solid $border;
+
+    &-label {
+      color: $muted-foreground;
+    }
+
+    &-total {
+      font-family: $font-family-mono;
+      font-weight: $font-weight-bold;
+
+      &--match {
+        color: $success;
+      }
+
+      &--error {
+        color: $danger;
+      }
+    }
+
+    &-status {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-2xs;
+      padding: 2px $spacing-sm;
+      font-weight: $font-weight-medium;
+      border-radius: $radius-full;
+
+      &--success {
+        background-color: rgba($success, 0.1);
+        color: $success;
+      }
+
+      &--warning {
+        background-color: rgba($warning, 0.1);
+        color: $warning;
+      }
+    }
+  }
 }

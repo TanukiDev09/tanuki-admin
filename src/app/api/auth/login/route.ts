@@ -6,6 +6,12 @@ import { generateToken } from '@/lib/jwt';
 import { sanitizeUser } from '@/types/user';
 import { setAuthCookie } from '@/lib/auth-cookies';
 import { createDefaultPermissions } from '@/lib/permissions';
+import rateLimit from '@/lib/rate-limit';
+
+const limiter = rateLimit({
+  interval: 60 * 1000, // 60 seconds
+  uniqueTokenPerInterval: 500, // Max 500 users per second
+});
 
 /**
  * POST /api/auth/login
@@ -13,16 +19,30 @@ import { createDefaultPermissions } from '@/lib/permissions';
  */
 export async function POST(request: NextRequest) {
   try {
-    const conn = await dbConnect();
-    const dbName = conn.connection.db?.databaseName;
+    // Rate Limiting: 5 attempts per minute per IP
+    const ip = request.headers.get('x-forwarded-for') || 'unknown';
+    await limiter.check(5, ip);
+  } catch {
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Demasiados intentos. Por favor intente nuevamente en 1 minuto.',
+      },
+      { status: 429 }
+    );
+  }
 
+  try {
+    await dbConnect();
 
     const body = await request.json();
     const { email, password } = body;
 
+    // Generic error message to prevent enumeration
+    const AUTH_FAILED_MSG = 'Credenciales inválidas';
+
     // Validar campos requeridos
     if (!email || !password) {
-      console.warn('[Login API] Missing email or password');
       return NextResponse.json(
         {
           success: false,
@@ -36,20 +56,12 @@ export async function POST(request: NextRequest) {
     const user = await User.findOne({ email: email.toLowerCase() });
 
     if (!user) {
-      const allUsersCount = await User.countDocuments();
-      console.warn(
-        `[Login API] User not found: "${email}". Total users count in DB: ${allUsersCount}`
-      );
-
-      // Si hay pocos usuarios, podrías querer ver cuáles son (opcional, solo para debug inicial)
-      if (allUsersCount > 0 && allUsersCount < 5) {
-        const users = await User.find({}, 'email');
-      }
-
+      // Simulate password check delay to prevent timing attacks (optional but good practice)
+      // await verifyPassword('dummy', 'dummyhash');
       return NextResponse.json(
         {
           success: false,
-          error: 'Credenciales inválidas',
+          error: AUTH_FAILED_MSG,
         },
         { status: 401 }
       );
@@ -57,11 +69,12 @@ export async function POST(request: NextRequest) {
 
     // Verificar si el usuario está activo
     if (!user.isActive) {
-      console.warn('[Login API] User is inactive:', email);
+      // Intentionally detailed log for admin debug, but generic response for user
+      console.warn(`[Login API] Inactive user login attempt: ${user._id}`);
       return NextResponse.json(
         {
           success: false,
-          error: 'Usuario desactivado',
+          error: 'Cuenta desactivada. Contacte al administrador.',
         },
         { status: 403 }
       );
@@ -71,11 +84,10 @@ export async function POST(request: NextRequest) {
     const isPasswordValid = await verifyPassword(password, user.password);
 
     if (!isPasswordValid) {
-      console.warn('[Login API] Invalid password for user:', email);
       return NextResponse.json(
         {
           success: false,
-          error: 'Credenciales inválidas',
+          error: AUTH_FAILED_MSG,
         },
         { status: 401 }
       );
@@ -105,7 +117,7 @@ export async function POST(request: NextRequest) {
       message: 'Login exitoso',
     });
   } catch (error: unknown) {
-    console.error('[Login API] Critical error during login:', error);
+    console.error('[Login API] Error during login');
     const message =
       error instanceof Error ? error.message : 'Error desconocido';
 
@@ -113,7 +125,7 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error: 'Error al procesar el login',
-        message: message,
+        message: process.env.NODE_ENV === 'development' ? message : undefined,
       },
       { status: 500 }
     );

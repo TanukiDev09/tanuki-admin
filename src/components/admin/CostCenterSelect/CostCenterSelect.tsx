@@ -31,14 +31,22 @@ interface CostCenter {
 
 interface CostCenterSelectProps {
   value?: string;
-  onChange: (value: string) => void;
+  onValueChange: (value: string) => void;
   label?: string;
+  allowNull?: boolean;
+  nullLabel?: string;
+  allowCreation?: boolean;
+  hideLabel?: boolean;
 }
 
 export default function CostCenterSelect({
   value,
-  onChange,
+  onValueChange,
   label = 'Centro de Costo',
+  allowNull = false,
+  nullLabel = 'Sin asignar',
+  allowCreation = true,
+  hideLabel = false,
 }: CostCenterSelectProps) {
   const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,7 +101,7 @@ export default function CostCenterSelect({
       }
 
       setCostCenters([...costCenters, data.data]);
-      onChange(data.data.code);
+      onValueChange(data.data.code);
 
       setShowNewModal(false);
       setNewCode('');
@@ -108,7 +116,9 @@ export default function CostCenterSelect({
 
   return (
     <div className="cost-center-select">
-      <Label className="cost-center-select__label">{label}</Label>
+      {!hideLabel && (
+        <Label className="cost-center-select__label">{label}</Label>
+      )}
 
       <div className="cost-center-select__controls">
         <div className="cost-center-select__select-wrapper">
@@ -118,7 +128,7 @@ export default function CostCenterSelect({
               if (val === 'ADD_NEW') {
                 setShowNewModal(true);
               } else {
-                onChange(val === 'none' ? '' : val);
+                onValueChange(val === 'none' ? '' : val);
               }
             }}
             disabled={loading}
@@ -127,22 +137,28 @@ export default function CostCenterSelect({
               <SelectValue placeholder="Sin asignar" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">Sin asignar</SelectItem>
+              {allowNull && (
+                <SelectItem value="__UNDEFINED__">{nullLabel}</SelectItem>
+              )}
               {costCenters.map((cc) => (
                 <SelectItem key={cc._id} value={cc.code}>
                   {cc.code} - {cc.name}
                 </SelectItem>
               ))}
-              <SelectSeparator />
-              <SelectItem
-                value="ADD_NEW"
-                className="cost-center-select__add-item"
-              >
-                <div className="cost-center-select__add-content">
-                  <Plus className="cost-center-select__add-icon" />
-                  <span>Crear nuevo centro de costo...</span>
-                </div>
-              </SelectItem>
+              {allowCreation && (
+                <>
+                  <SelectSeparator />
+                  <SelectItem
+                    value="ADD_NEW"
+                    className="cost-center-select__add-item"
+                  >
+                    <div className="cost-center-select__add-content">
+                      <Plus className="cost-center-select__add-icon" />
+                      <span>Crear nuevo centro de costo...</span>
+                    </div>
+                  </SelectItem>
+                </>
+              )}
             </SelectContent>
           </Select>
         </div>

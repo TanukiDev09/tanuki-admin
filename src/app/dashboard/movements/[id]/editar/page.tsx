@@ -15,14 +15,17 @@ import {
   SelectValue,
 } from '@/components/ui/Select';
 import { useToast } from '@/components/ui/Toast';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import { UpdateMovementDTO } from '@/types/movement';
 import { CategorySelect } from '@/components/finance/CategorySelect';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
+import { POSSelect } from '@/components/admin/POSSelect/POSSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency } from '@/lib/utils';
+import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import '../../movement-form.scss';
+
 
 export default function EditMovementPage() {
   const router = useRouter();
@@ -31,6 +34,8 @@ export default function EditMovementPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState<Partial<UpdateMovementDTO>>({});
+  const [useMultiCostCenter, setUseMultiCostCenter] = useState(false);
+  const [allocationError, setAllocationError] = useState<string | null>(null);
   const { hasPermission } = usePermission();
   const canUpdate = hasPermission(ModuleName.FINANCE, PermissionAction.UPDATE);
 
@@ -45,18 +50,39 @@ export default function EditMovementPage() {
       return;
     }
 
-    const fetchMovement = async () => {
+    const loadData = async () => {
       try {
         const res = await fetch(`/api/finance/movements/${params.id}`);
         if (!res.ok) throw new Error('No se encontró el movimiento');
         const data = await res.json();
         const m = data.data;
+
+        // Determine if we should start in multi-cost center mode
+        const hasMultipleAllocations = m.allocations && m.allocations.length > 1;
+        setUseMultiCostCenter(hasMultipleAllocations);
+
         setFormData({
           ...m,
           currency: m.currency || 'COP', // Default to COP
           exchangeRate: m.exchangeRate,
           date: m.date ? m.date.split('T')[0] : '', // Format date for input
+          salesChannel: m.salesChannel || 'OTRO',
+          pointOfSale:
+            typeof m.pointOfSale === 'object'
+              ? m.pointOfSale?._id
+              : m.pointOfSale,
+          category:
+            typeof m.category === 'object' ? m.category?._id : m.category,
+          inventoryMovementId:
+            typeof m.inventoryMovementId === 'object'
+              ? m.inventoryMovementId?._id
+              : m.inventoryMovementId,
+          allocations: m.allocations?.map((a: { costCenter: string | { _id: string }; amount: number | string }) => ({
+            costCenter: typeof a.costCenter === 'object' ? a.costCenter?._id : a.costCenter,
+            amount: parseFloat(a.amount?.toString() || '0')
+          })) || []
         });
+
       } catch (error) {
         console.error(error);
         toast({
@@ -70,7 +96,7 @@ export default function EditMovementPage() {
       }
     };
 
-    if (params.id) fetchMovement();
+    if (params.id) loadData();
   }, [params.id, router, toast, canUpdate]);
 
   const handleChange = (
@@ -84,8 +110,84 @@ export default function EditMovementPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleAllocationChange = (
+    index: number,
+    field: 'costCenter' | 'amount',
+    value: string
+  ) => {
+    setFormData((prev) => {
+      const newAllocations = [...(prev.allocations || [])];
+      if (!newAllocations[index]) {
+        newAllocations[index] = { costCenter: '', amount: 0 };
+      }
+
+      if (field === 'amount') {
+        newAllocations[index].amount = parseFloat(value) || 0;
+      } else {
+        newAllocations[index].costCenter = value;
+      }
+      return { ...prev, allocations: newAllocations };
+    });
+  };
+
+  const addAllocation = () => {
+    setFormData((prev) => ({
+      ...prev,
+      allocations: [...(prev.allocations || []), { costCenter: '', amount: 0 }],
+    }));
+  };
+
+  const removeAllocation = (index: number) => {
+    setFormData((prev) => {
+      const newAllocations = (prev.allocations || []).filter((_, i) => i !== index);
+      return { ...prev, allocations: newAllocations };
+    });
+  };
+
+  const validateAllocations = () => {
+    if (!useMultiCostCenter) return true;
+
+    const allocations = formData.allocations || [];
+    if (allocations.length === 0) {
+      setAllocationError('Debe agregar al menos un centro de costo');
+      return false;
+    }
+
+    const totalAllocated = allocations.reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
+    const totalAmount = Number(formData.amount) || 0;
+
+    if (Math.abs(totalAllocated - totalAmount) > 0.01) {
+      setAllocationError(`La suma de asignaciones (${formatCurrency(totalAllocated, formData.currency)}) no coincide con el total (${formatCurrency(totalAmount, formData.currency)})`);
+      return false;
+    }
+
+    for (const alloc of allocations) {
+      if (!alloc.costCenter) {
+        setAllocationError('Cada asignación debe tener un centro de costo');
+        return false;
+      }
+      if (Number(alloc.amount) <= 0) {
+        setAllocationError('El monto de cada asignación debe ser mayor a 0');
+        return false;
+      }
+    }
+
+    setAllocationError(null);
+    return true;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!validateAllocations()) {
+      toast({
+        title: 'Error de Asignación',
+        description: allocationError || 'Revise la distribución de centros de costo',
+        variant: 'destructive'
+      });
+      return;
+    }
+
     setSubmitting(true);
 
     try {
@@ -95,6 +197,15 @@ export default function EditMovementPage() {
         fiscalYear: formData.date
           ? new Date(formData.date).getFullYear()
           : new Date().getFullYear(),
+        allocations: useMultiCostCenter
+          ? formData.allocations
+          : [{
+            costCenter: formData.costCenter || '01T001',
+            amount: Number(formData.amount) || 0
+          }],
+        costCenter: useMultiCostCenter
+          ? (formData.allocations?.[0]?.costCenter || '')
+          : formData.costCenter,
       };
 
       const res = await fetch(`/api/finance/movements/${params.id}`, {
@@ -141,6 +252,183 @@ export default function EditMovementPage() {
     );
   }
 
+  const renderGeneralInfo = () => (
+    <div className="movement-form__section">
+      <h2 className="movement-form__section-title">Información General</h2>
+      <div className="movement-form__grid movement-form__grid--2">
+        <div className="movement-form__field-group">
+          <Label htmlFor="type">Tipo</Label>
+          <Select
+            value={formData.type}
+            onValueChange={(val) => handleSelectChange('type', val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecciona tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="INCOME">Ingreso</SelectItem>
+              <SelectItem value="EXPENSE">Egreso</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="movement-form__field-group">
+          <Label htmlFor="date">Fecha</Label>
+          <Input
+            id="date"
+            name="date"
+            type="date"
+            value={formData.date?.toString().split('T')[0]}
+            onChange={handleChange}
+            required
+          />
+        </div>
+      </div>
+
+      <div className="movement-form__field-group">
+        <Label htmlFor="description">Descripción</Label>
+        <Input
+          id="description"
+          name="description"
+          placeholder="Descripción breve del movimiento"
+          value={formData.description || ''}
+          onChange={handleChange}
+          required
+        />
+      </div>
+    </div>
+  );
+
+  const renderAllocationSection = () => (
+    <>
+      <div className="movement-form__field-group">
+        <Label htmlFor="category">Categoría</Label>
+        <CategorySelect
+          value={formData.category}
+          onValueChange={(val) => handleSelectChange('category', val)}
+          type={formData.type as 'INCOME' | 'EXPENSE'}
+        />
+      </div>
+
+      <div className="flex items-center justify-between mb-2">
+        <Label htmlFor="costCenter">Centro de Costo</Label>
+        <div className="movement-form__toggle-group">
+          <button
+            type="button"
+            onClick={() => setUseMultiCostCenter(false)}
+            className={`movement-form__toggle-group-btn ${!useMultiCostCenter ? 'movement-form__toggle-group-btn--active' : ''}`}
+          >
+            Único
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setUseMultiCostCenter(true);
+              if (!formData.allocations || formData.allocations.length === 0) {
+                setFormData(prev => ({
+                  ...prev,
+                  allocations: [{
+                    costCenter: prev.costCenter || '',
+                    amount: Number(prev.amount) || 0
+                  }]
+                }));
+              }
+            }}
+            className={`movement-form__toggle-group-btn movement-form__toggle-group-btn--multiple ${useMultiCostCenter ? 'movement-form__toggle-group-btn--active' : ''}`}
+          >
+            Múltiple
+          </button>
+        </div>
+      </div>
+
+      {!useMultiCostCenter ? (
+        <CostCenterSelect
+          value={formData.costCenter}
+          onValueChange={(val) => handleSelectChange('costCenter', val)}
+        />
+      ) : (
+        <div className="movement-form__allocation-container">
+          <table className="movement-form__allocation-table">
+            <thead>
+              <tr>
+                <th className="cost-center-col">Centro de Costo</th>
+                <th className="amount-col">Monto</th>
+                <th className="action-col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {formData.allocations?.map((alloc, idx) => (
+                <tr key={idx}>
+                  <td>
+                    <CostCenterSelect
+                      value={alloc.costCenter}
+                      onValueChange={(val) => handleAllocationChange(idx, 'costCenter', val)}
+                    />
+                  </td>
+                  <td>
+                    <NumericInput
+                      value={alloc.amount}
+                      onValueChange={(val) => val !== undefined && handleAllocationChange(idx, 'amount', val.toString())}
+                      placeholder="0.00"
+                    />
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      className="movement-form__remove-allocation"
+                      onClick={() => removeAllocation(idx)}
+                      title="Eliminar asignación"
+                    >
+                      <Trash2 />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <button
+            type="button"
+            className="movement-form__add-allocation"
+            onClick={addAllocation}
+          >
+            <Plus size={14} /> Agregar Asignación
+          </button>
+
+          <div className="movement-form__allocation-summary">
+            <div className="movement-form__allocation-summary-label">
+              Total: <span className="font-semibold">{formatCurrency(Number(formData.amount) || 0, formData.currency)}</span>
+            </div>
+
+            <div className="text-right flex flex-col items-end gap-1">
+              <div className="flex gap-2 items-center">
+                <span>Asignado:</span>
+                <span className={`movement-form__allocation-summary-total ${Math.abs((formData.allocations?.reduce((sum, a) => sum + (Number(a.amount) || 0), 0) || 0) - (Number(formData.amount) || 0)) < 0.01
+                  ? 'movement-form__allocation-summary-total--match'
+                  : 'movement-form__allocation-summary-total--error'
+                  }`}>
+                  {formatCurrency(formData.allocations?.reduce((sum, a) => sum + (Number(a.amount) || 0), 0) || 0, formData.currency)}
+                </span>
+              </div>
+
+              {allocationError ? (
+                <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--warning">
+                  {allocationError}
+                </span>
+              ) : (
+                Math.abs((formData.allocations?.reduce((sum, a) => sum + (Number(a.amount) || 0), 0) || 0) - (Number(formData.amount) || 0)) < 0.01
+                  ? <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--success">✓ Distribuido</span>
+                  : <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--warning">
+                    Falta: {formatCurrency((Number(formData.amount) || 0) - (formData.allocations?.reduce((sum, a) => sum + (Number(a.amount) || 0), 0) || 0), formData.currency)}
+                  </span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+
   if (loading) return <div className="movement-form__loading">Cargando...</div>;
 
   return (
@@ -162,50 +450,7 @@ export default function EditMovementPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="movement-form__container">
-        <div className="movement-form__section">
-          <h2 className="movement-form__section-title">Información General</h2>
-          <div className="movement-form__grid movement-form__grid--2">
-            <div className="movement-form__field-group">
-              <Label htmlFor="type">Tipo</Label>
-              <Select
-                value={formData.type}
-                onValueChange={(val) => handleSelectChange('type', val)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="INCOME">Ingreso</SelectItem>
-                  <SelectItem value="EXPENSE">Egreso</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="movement-form__field-group">
-              <Label htmlFor="date">Fecha</Label>
-              <Input
-                id="date"
-                name="date"
-                type="date"
-                value={formData.date?.toString().split('T')[0]}
-                onChange={handleChange}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="movement-form__field-group">
-            <Label htmlFor="description">Descripción</Label>
-            <Input
-              id="description"
-              name="description"
-              placeholder="Descripción breve del movimiento"
-              value={formData.description || ''}
-              onChange={handleChange}
-              required
-            />
-          </div>
-        </div>
+        {renderGeneralInfo()}
 
         <div className="movement-form__section">
           <h2 className="movement-form__section-title">
@@ -292,12 +537,12 @@ export default function EditMovementPage() {
               <Label>Valor Unitario (Calculado)</Label>
               <div className="movement-form__calculated-value">
                 {formData.amount &&
-                formData.quantity &&
-                Number(formData.quantity) !== 0
+                  formData.quantity &&
+                  Number(formData.quantity) !== 0
                   ? formatCurrency(
-                      Number(formData.amount) / Number(formData.quantity),
-                      formData.currency
-                    )
+                    Number(formData.amount) / Number(formData.quantity),
+                    formData.currency
+                  )
                   : '$ 0'}
               </div>
             </div>
@@ -308,29 +553,39 @@ export default function EditMovementPage() {
           <h2 className="movement-form__section-title">
             Clasificación y Destino
           </h2>
-          <div className="movement-form__grid movement-form__grid--2">
-            <div className="movement-form__field-group">
-              <Label htmlFor="category">Categoría</Label>
-              <CategorySelect
-                value={
-                  typeof formData.category === 'object' &&
-                  formData.category !== null
-                    ? (formData.category as { _id: string })._id
-                    : (formData.category as string)
-                }
-                onChange={(val) => handleSelectChange('category', val)}
-                type={formData.type as 'INCOME' | 'EXPENSE'}
-              />
-            </div>
-            <div className="movement-form__field-group">
-              <CostCenterSelect
-                value={formData.costCenter}
-                onChange={(val) => handleSelectChange('costCenter', val)}
-              />
-            </div>
+
+          <div className="movement-form__field-group">
+            <Label htmlFor="category">Categoría</Label>
+            <CategorySelect
+              value={formData.category}
+              onValueChange={(val) => handleSelectChange('category', val)}
+              type={formData.type as 'INCOME' | 'EXPENSE'}
+            />
+          </div>
+
+          <div className="movement-form__field-group">
+            {renderAllocationSection()}
           </div>
 
           <div className="movement-form__grid movement-form__grid--2">
+            <div className="movement-form__field-group">
+              <Label htmlFor="salesChannel">Canal de Venta</Label>
+              <Select
+                value={formData.salesChannel || 'OTRO'}
+                onValueChange={(val) => handleSelectChange('salesChannel', val)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecciona canal" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="DIRECTA">Venta Directa</SelectItem>
+                  <SelectItem value="LIBRERIA">Librería</SelectItem>
+                  <SelectItem value="FERIA">Feria</SelectItem>
+                  <SelectItem value="OTRO">Otro / No Aplica</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="movement-form__field-group">
               <Label htmlFor="beneficiary">Beneficiario / Pagador</Label>
               <Input
@@ -341,6 +596,24 @@ export default function EditMovementPage() {
                 onChange={handleChange}
               />
             </div>
+          </div>
+
+          <div className="movement-form__grid movement-form__grid--2">
+            {formData.salesChannel === 'LIBRERIA' && (
+              <div className="movement-form__field-group">
+                <POSSelect
+                  value={formData.pointOfSale}
+                  onValueChange={(val, name) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      pointOfSale: val,
+                      beneficiary: name || prev.beneficiary,
+                    }));
+                  }}
+                />
+              </div>
+            )}
+
             <div className="movement-form__field-group">
               <Label htmlFor="paymentChannel">Canal de Pago</Label>
               <Input
@@ -366,7 +639,27 @@ export default function EditMovementPage() {
               onChange={handleChange}
             />
           </div>
+
+          <div className="movement-form__field-group">
+            <Label>Vincular Movimiento de Inventario / Liquidación (Opcional)</Label>
+            <InventoryMovementSearchSelect
+              value={formData.inventoryMovementId as string}
+              onValueChange={(val) =>
+                setFormData(prev => ({ ...prev, inventoryMovementId: val }))
+              }
+              type={formData.type === 'INCOME' ? 'LIQUIDACION' : 'INGRESO'}
+              placeholder={
+                formData.type === 'INCOME'
+                  ? 'Buscar liquidación de venta...'
+                  : 'Buscar compra de libros...'
+              }
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Relacione este pago con un registro de inventario previo.
+            </p>
+          </div>
         </div>
+
 
         <div className="movement-form__footer">
           <Button type="button" variant="outline" onClick={() => router.back()}>

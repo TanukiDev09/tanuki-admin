@@ -84,13 +84,11 @@ Bienvenido a la documentación completa del proyecto Tanuki Admin. Esta guía te
    ```
 
 2. **Entender la Estructura**
-
    - Lee el [README principal](../README.md)
    - Revisa el [Resumen de Reorganización](./reorganization/RESUMEN_REORGANIZACION.md)
    - Familiarízate con el [Sistema de Diseño](./design/design-system.md)
 
 3. **Primeros Pasos en Desarrollo**
-
    - Explora los componentes en `src/components/`
    - Revisa las rutas API en `src/app/api/`
    - Estudia los modelos de datos en `src/models/`

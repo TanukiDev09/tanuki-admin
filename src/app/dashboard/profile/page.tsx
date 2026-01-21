@@ -3,10 +3,13 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { ChangePasswordForm } from '@/components/profile/ChangePasswordForm';
 import { Badge } from '@/components/ui/Badge';
+import EditorialSettingsForm from '@/components/admin/EditorialSettingsForm';
+import { UserRole } from '@/types/user';
 import './profile.scss';
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const isAdmin = user?.role === UserRole.ADMIN;
 
   return (
     <div className="profile-page">
@@ -44,6 +47,12 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
+
+          {isAdmin && (
+            <div className="mt-8">
+              <EditorialSettingsForm />
+            </div>
+          )}
         </div>
 
         <div>

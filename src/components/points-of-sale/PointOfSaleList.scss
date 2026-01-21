@@ -3,6 +3,46 @@
 @use 'sass:color';
 
 .pos-list {
+  &__filters {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    margin-bottom: $spacing-lg;
+
+    @include respond-to-max('md') {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  &__search {
+    position: relative;
+    flex: 1;
+  }
+
+  &__search-icon {
+    position: absolute;
+    top: 50%;
+    left: $spacing-sm;
+    transform: translateY(-50%);
+    width: 1.1rem;
+    height: 1.1rem;
+    color: $muted-foreground;
+    pointer-events: none;
+  }
+
+  &__search-input {
+    padding-left: $spacing-xl + $spacing-xs;
+  }
+
+  &__city-filter {
+    width: 250px;
+
+    @include respond-to-max('md') {
+      width: 100%;
+    }
+  }
+
   &__container {
     border: 1px solid $border;
     border-radius: $radius-md;

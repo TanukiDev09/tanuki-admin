@@ -5,6 +5,145 @@
 .warehouse-list {
   @include card-base;
 
+  &__filter-bar {
+    @include card-base;
+
+    margin-bottom: $spacing-xl;
+    padding: $spacing-md;
+    background: linear-gradient(
+      135deg,
+      rgba($card, 0.95) 0%,
+      rgba($card, 0.85) 100%
+    );
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba($border, 0.6);
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    transition: $transition-base;
+
+    &:hover {
+      border-color: rgba($border, 0.8);
+      box-shadow: $shadow-md;
+    }
+  }
+
+  &__filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-xs;
+    border-bottom: 1px solid rgba($border, 0.2);
+  }
+
+  &__filter-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__filter-icon {
+    width: 14px;
+    height: 14px;
+    color: $primary;
+  }
+
+  &__reset-btn {
+    gap: $spacing-xs;
+    height: 28px;
+    padding: 0 $spacing-sm;
+    color: $danger;
+    font-size: $font-size-xs;
+
+    &:hover {
+      background: rgba($danger, 0.05);
+      color: color.adjust($danger, $lightness: -10%);
+    }
+  }
+
+  &__filters-content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    @media (width >= 1024px) {
+      flex-direction: row;
+      align-items: flex-end;
+    }
+  }
+
+  &__search-wrapper {
+    position: relative;
+    flex: 1;
+    min-width: 300px;
+  }
+
+  &__search-icon {
+    position: absolute;
+    top: 50%;
+    left: $spacing-sm + $spacing-xs;
+    width: 16px;
+    height: 16px;
+    transform: translateY(-50%);
+    color: $muted-foreground;
+    pointer-events: none;
+    transition: $transition-fast;
+  }
+
+  &__search-input {
+    padding-left: $spacing-xl + $spacing-sm;
+    background: rgba($background, 0.5);
+    border-color: rgba($border, 0.4);
+    transition: $transition-base;
+
+    &:focus {
+      background: $card;
+      border-color: $primary;
+      box-shadow: 0 0 0 2px rgba($primary, 0.1);
+
+      + .warehouse-list__search-icon {
+        color: $primary;
+      }
+    }
+  }
+
+  &__dropdowns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+
+    @media (width >= 1024px) {
+      flex-wrap: nowrap;
+    }
+  }
+
+  &__filter-group {
+    flex: 1;
+    min-width: 160px;
+  }
+
+  &__filter-trigger {
+    width: 100%;
+    background: rgba($background, 0.5);
+    border-color: rgba($border, 0.4);
+    transition: $transition-base;
+
+    &:focus {
+      background: $card;
+      border-color: $primary;
+    }
+  }
+
+  &__icon-xs {
+    width: 12px;
+    height: 12px;
+  }
+
   border: 1px solid $border;
   border-radius: $radius-md;
   overflow: hidden;

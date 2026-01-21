@@ -392,7 +392,7 @@ export default function EditBookModal({
 
                 <CostCenterSelect
                   value={formData.costCenter}
-                  onChange={(value) =>
+                  onValueChange={(value) =>
                     setFormData({ ...formData, costCenter: value })
                   }
                 />

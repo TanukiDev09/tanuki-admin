@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { WarehouseStatusBadge } from './WarehouseStatusBadge';
 import { WarehouseTypeBadge } from './WarehouseTypeBadge';
-import { Trash2, Eye, Link as LinkIcon } from 'lucide-react';
+import { Trash2, Eye, Link as LinkIcon, Search, X, Filter } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import Link from 'next/link';
 import {
@@ -27,6 +27,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/Dialog';
+import { Input } from '@/components/ui/Input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
 
 interface Warehouse {
   _id: string;
@@ -66,6 +74,44 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
     PermissionAction.UPDATE
   );
 
+  const [searchQuery, setSearchQuery] = useState('');
+  const [typeFilter, setTypeFilter] = useState('all');
+  const [cityFilter, setCityFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  // Get unique cities for the dropdown
+  const cities = Array.from(
+    new Set(data.map((w) => w.city).filter(Boolean))
+  ) as string[];
+
+  const filteredData = data.filter((warehouse) => {
+    const matchesSearch =
+      warehouse.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      warehouse.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (warehouse.city &&
+        warehouse.city.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesType = typeFilter === 'all' || warehouse.type === typeFilter;
+    const matchesCity = cityFilter === 'all' || warehouse.city === cityFilter;
+    const matchesStatus =
+      statusFilter === 'all' || warehouse.status === statusFilter;
+
+    return matchesSearch && matchesType && matchesCity && matchesStatus;
+  });
+
+  const resetFilters = () => {
+    setSearchQuery('');
+    setTypeFilter('all');
+    setCityFilter('all');
+    setStatusFilter('all');
+  };
+
+  const hasActiveFilters =
+    searchQuery !== '' ||
+    typeFilter !== 'all' ||
+    cityFilter !== 'all' ||
+    statusFilter !== 'all';
+
   const confirmDelete = async () => {
     if (!itemToDelete) return;
 
@@ -102,6 +148,83 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
 
   return (
     <>
+      <div className="warehouse-list__filter-bar">
+        <div className="warehouse-list__filter-header">
+          <div className="warehouse-list__filter-title">
+            <Filter className="warehouse-list__filter-icon" />
+            <span>Filtros de búsqueda</span>
+          </div>
+          {hasActiveFilters && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetFilters}
+              className="warehouse-list__reset-btn"
+            >
+              <X className="warehouse-list__icon-xs" />
+              Limpiar filtros
+            </Button>
+          )}
+        </div>
+
+        <div className="warehouse-list__filters-content">
+          <div className="warehouse-list__search-wrapper">
+            <Search className="warehouse-list__search-icon" />
+            <Input
+              placeholder="Buscar por nombre, código o ciudad..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="warehouse-list__search-input"
+            />
+          </div>
+
+          <div className="warehouse-list__dropdowns">
+            <div className="warehouse-list__filter-group">
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <SelectTrigger className="warehouse-list__filter-trigger">
+                  <SelectValue placeholder="Tipo de bodega" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los tipos</SelectItem>
+                  <SelectItem value="editorial">Editorial</SelectItem>
+                  <SelectItem value="pos">Punto de Venta</SelectItem>
+                  <SelectItem value="general">General</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="warehouse-list__filter-group">
+              <Select value={cityFilter} onValueChange={setCityFilter}>
+                <SelectTrigger className="warehouse-list__filter-trigger">
+                  <SelectValue placeholder="Ciudad" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todas las ciudades</SelectItem>
+                  {cities.sort().map((city) => (
+                    <SelectItem key={city} value={city}>
+                      {city}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="warehouse-list__filter-group">
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="warehouse-list__filter-trigger">
+                  <SelectValue placeholder="Estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los estados</SelectItem>
+                  <SelectItem value="active">Activo</SelectItem>
+                  <SelectItem value="inactive">Inactivo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="warehouse-list">
         <Table>
           <TableHeader>
@@ -118,14 +241,16 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.length === 0 ? (
+            {filteredData.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="warehouse-list__empty">
-                  No hay bodegas registradas.
+                  {data.length === 0
+                    ? 'No hay bodegas registradas.'
+                    : 'No se encontraron resultados para los filtros aplicados.'}
                 </TableCell>
               </TableRow>
             ) : (
-              data.map((warehouse) => (
+              filteredData.map((warehouse) => (
                 <TableRow key={warehouse._id}>
                   <TableCell className="warehouse-list__code">
                     {warehouse.code}
@@ -209,8 +334,7 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
             <DialogTitle>¿Estás seguro?</DialogTitle>
             <DialogDescription>
               Esta acción no se puede deshacer. Se eliminará permanentemente la
-              bodega{' '}
-              {itemToDelete?.name ? `&quot;${itemToDelete.name}&quot;` : ''}.
+              bodega {itemToDelete?.name ? `"${itemToDelete.name}"` : ''}.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

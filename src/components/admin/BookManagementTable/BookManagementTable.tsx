@@ -25,6 +25,13 @@ import {
   TableHead,
   TableCell,
 } from '@/components/ui/Table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
 import './BookManagementTable.scss';
 
 interface BookManagementTableProps {
@@ -46,6 +53,8 @@ export default function BookManagementTable({
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'active' | 'inactive'>('active');
   const [searchTerm, setSearchTerm] = useState('');
+  const [collections, setCollections] = useState<string[]>([]);
+  const [selectedCollection, setSelectedCollection] = useState<string>('all');
 
   const getNames = (items: (string | { name: string })[] | undefined) => {
     if (!items || !Array.isArray(items)) return '';
@@ -54,13 +63,33 @@ export default function BookManagementTable({
       .join(', ');
   };
 
+  const fetchCollections = useCallback(async () => {
+    try {
+      const response = await fetch('/api/books/collections');
+      const data = await response.json();
+      if (data.success) {
+        setCollections(data.data);
+      }
+    } catch (error) {
+      console.error('Error al cargar colecciones:', error);
+    }
+  }, []);
+
   const fetchBooks = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `/api/books?limit=100&includeInventory=true${searchTerm ? `&search=${searchTerm}` : ''}`,
-        { cache: 'no-store' }
-      );
+      const params = new URLSearchParams({
+        limit: '100',
+        includeInventory: 'true',
+      });
+
+      if (searchTerm) params.append('search', searchTerm);
+      if (selectedCollection !== 'all')
+        params.append('collectionName', selectedCollection);
+
+      const response = await fetch(`/api/books?${params.toString()}`, {
+        cache: 'no-store',
+      });
       const data = await response.json();
       if (data.success) {
         setBooks(data.data);
@@ -70,7 +99,11 @@ export default function BookManagementTable({
     } finally {
       setLoading(false);
     }
-  }, [searchTerm]);
+  }, [searchTerm, selectedCollection]);
+
+  useEffect(() => {
+    fetchCollections();
+  }, [fetchCollections]);
 
   useEffect(() => {
     fetchBooks();
@@ -108,6 +141,24 @@ export default function BookManagementTable({
             onChange={(e) => setSearchTerm(e.target.value)}
             className="book-management-table__search-input"
           />
+        </div>
+        <div className="book-management-table__collection-filter-wrapper">
+          <Select
+            value={selectedCollection}
+            onValueChange={setSelectedCollection}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Todas las colecciones" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas las colecciones</SelectItem>
+              {collections.map((col) => (
+                <SelectItem key={col} value={col}>
+                  {col}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="book-management-table__filter-group">
           <Button

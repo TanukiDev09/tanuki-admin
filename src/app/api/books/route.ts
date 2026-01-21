@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
     const genre = searchParams.get('genre');
     const isActive = searchParams.get('isActive');
     const search = searchParams.get('search');
+    const collectionName = searchParams.get('collectionName');
     const creatorId = searchParams.get('creatorId');
     const includeInventory = searchParams.get('includeInventory') === 'true';
 
@@ -35,6 +36,10 @@ export async function GET(request: NextRequest) {
 
     if (genre) {
       filter.genre = genre;
+    }
+
+    if (collectionName) {
+      filter.collectionName = collectionName;
     }
 
     if (isActive !== null && isActive !== undefined) {

@@ -21,10 +21,23 @@ export interface Movement {
   quantity?: number;
   unitValue?: number;
   status: MovementStatus; // Added status as it was in page.tsx but not explicitly in model? Wait, model didn't have status.
+  salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'OTRO';
+  pointOfSale?: string | { _id: string; name: string };
+  inventoryMovementId?: string;
+  allocations?: {
+    costCenter: string;
+    amount: number;
+  }[];
 }
 
-export interface CreateMovementDTO extends Omit<Movement, '_id' | 'status'> {
+export interface CreateMovementDTO extends Omit<
+  Movement,
+  '_id' | 'status' | 'category' | 'pointOfSale' | 'inventoryMovementId'
+> {
+  category: string;
+  pointOfSale?: string;
   status?: MovementStatus;
+  inventoryMovementId?: string;
 }
 
 export type UpdateMovementDTO = Partial<CreateMovementDTO>;
