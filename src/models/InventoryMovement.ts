@@ -21,6 +21,7 @@ export interface IInventoryMovementItem {
 export interface IInventoryMovement extends Document {
   type: InventoryMovementType;
   subType?: InventoryMovementSubType;
+  consecutive?: number;
   date: Date;
   fromWarehouseId?: mongoose.Types.ObjectId;
   toWarehouseId?: mongoose.Types.ObjectId;
@@ -49,6 +50,9 @@ const InventoryMovementSchema = new Schema(
     subType: {
       type: String,
       enum: Object.values(InventoryMovementSubType),
+    },
+    consecutive: {
+      type: Number,
     },
     date: {
       type: Date,

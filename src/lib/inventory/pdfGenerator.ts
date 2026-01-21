@@ -3,6 +3,7 @@ import autoTable from 'jspdf-autotable';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { formatCurrency, formatNumber } from '../utils';
+import { EditorialSettings } from '@/types/settings';
 
 interface MovementItem {
   bookId: {
@@ -19,6 +20,7 @@ interface Warehouse {
   address?: string;
   city?: string;
   pointOfSaleId?: {
+    name?: string;
     identificationType?: string;
     identificationNumber?: string;
     address?: string;
@@ -35,20 +37,31 @@ interface Movement {
   toWarehouseId: Warehouse;
   items: MovementItem[];
   observations?: string;
+  consecutive?: number;
 }
 
-export const generateMovementPDF = (movement: Movement) => {
-  const doc = new jsPDF();
+export const generateMovementPDF = (
+  movement: Movement,
+  editorialSettings?: EditorialSettings
+) => {
+  const doc = new jsPDF({
+    format: 'letter',
+    unit: 'mm',
+  });
   const pageWidth = doc.internal.pageSize.width;
 
-  // Header Colors
-  const primaryColor: [number, number, number] = [41, 128, 185]; // Blue
+  // Header Colors (Grayscale)
+  const primaryColor: [number, number, number] = [40, 40, 40]; // Dark Gray
 
   // Title and Date
   doc.setFontSize(18);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
   doc.setFont('helvetica', 'bold');
-  doc.text(`MOVIMIENTO DE INVENTARIO: ${movement.type}`, 14, 20);
+  const title =
+    movement.type === 'REMISION' && movement.consecutive
+      ? `REMISIÓN N° ${movement.consecutive}`
+      : `MOVIMIENTO DE INVENTARIO: ${movement.type}`;
+  doc.text(title, 14, 20);
 
   doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
@@ -58,22 +71,21 @@ export const generateMovementPDF = (movement: Movement) => {
     14,
     28
   );
-  doc.text(`ID Movimiento: ${movement._id}`, 14, 33);
 
   // Helper to get sender/receiver details
   const getDetails = (wh: Warehouse) => {
     if (wh?.type === 'editorial') {
       return {
-        name: 'EDITORIAL TANUKI SAS',
-        id: 'NIT 901.624.469-6', // Placeholder - actual NIT should be configured
-        address: 'Calle 45 # 21 - 34', // Placeholder
-        city: 'Bogotá',
+        name: (editorialSettings?.name || 'EDITORIAL TANUKI SAS').toUpperCase(),
+        id: `NIT ${editorialSettings?.nit || '901.624.469-6'}`,
+        address: editorialSettings?.address || 'Calle 45 # 21 - 34',
+        city: editorialSettings?.city || 'Bogotá',
         discount: 0,
       };
     }
     const pos = wh?.pointOfSaleId;
     return {
-      name: (wh?.name || 'N/A').toUpperCase(),
+      name: (pos?.name || wh?.name || 'N/A').toUpperCase(),
       id: pos
         ? `${pos.identificationType || ''} ${pos.identificationNumber || ''}`.trim()
         : 'N/A',
@@ -191,8 +203,9 @@ export const generateMovementPDF = (movement: Movement) => {
     body: tableData,
     foot: [
       [
-        { content: 'TOTALES', colSpan: 2, styles: { halign: 'right' } },
-        formatNumber(totalQty),
+        { content: 'TOTALES', styles: { halign: 'right' } },
+        '',
+        { content: formatNumber(totalQty), styles: { halign: 'center' } },
         '',
         '',
         formatCurrency(totalLibOverall),
@@ -244,8 +257,9 @@ export const generateMovementPDF = (movement: Movement) => {
     doc.text(splitText, 14, finalY + 5);
   }
 
-  // Signature lines
-  const signatureY = Math.max(finalY + (movement.observations ? 30 : 15), 250);
+  // Signature lines optimization for Half-Letter
+  // We place them relative to finalY with a reasonable margin, instead of forcing bottom of page
+  const signatureY = finalY + (movement.observations ? 30 : 20);
   doc.line(14, signatureY, 80, signatureY);
   doc.line(pageWidth - 80, signatureY, pageWidth - 14, signatureY);
 

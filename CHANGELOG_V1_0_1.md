@@ -123,3 +123,78 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 
 - **Linter & Stylelint Clean**: Verificación y corrección de orden de propiedades CSS/SCSS, asegurando un reporte de linters libre de errores.
 - **Type Safety**: Verificación de tipos mediante `tsc` para garantizar la integridad de los datos en el filtrado.
+---
+
+## [1.0.1] - 2026-01-21 (Sesión 6)
+
+### ✨ Multiniveles de Costos (Multi-Cost Centers)
+
+- **Soporte Multiasignación**: Implementación de la capacidad de asignar un único movimiento financiero a múltiples centros de costo con montos específicos.
+  - **Validación de Integridad**: El sistema asegura en tiempo real que la suma de las asignaciones coincida exactamente con el monto total del movimiento.
+  - **Interfaz Dinámica**: Tabla interactiva en los formularios de creación y edición para gestionar múltiples centros de costo de forma ágil.
+- **Visualización en Listados**: Se añadió un indicador de "Múltiple (N)" en la tabla principal de movimientos para identificar rápidamente registros con varias asignaciones.
+
+### 🐛 Correcciones Críticas & Estabilidad
+
+- **Persistencia de Montos**: Se resolvió un bug crítico donde los montos de movimientos existentes se cargaban como 0 en el formulario de edición debido a una incompatibilidad con el tipo `Decimal128` de MongoDB.
+- **Runtime TypeError**: Corrección de cierre inesperado en `InventoryMovementModal.tsx` al manejar registros con referencias nulas en `bookId`.
+- **Integridad de Datos**: Normalización automática de asignaciones en las rutas de API (`PUT`/`POST`) para garantizar compatibilidad con registros antiguos y nuevos.
+
+### 🚀 Mejoras de UX/UI Premium
+
+- **Estilizado de Acciones**: Rediseño del botón de eliminación de asignaciones con iconos de `lucide-react` y efectos hover refinados.
+- **Consolidación de Campos**: Optimización de los formularios para agrupar campos relacionados (Beneficiario, POS, Canales) y eliminar redundancias visuales.
+
+### 🔧 Refactorización & Calidad
+
+- **Reducción de Complejidad**: Descomposición de funciones extensas en componentes y helpers más pequeños en `crear/page.tsx`, `editar/page.tsx` y rutas de API, cumpliendo con los estándares de complejidad cognitiva de SonarLint.
+- **Type Safety Total**: Resolución integral de advertencias de linter y errores de TypeScript (eliminación de `any` explícitos, chequeos de nulidad y promesas pendientes).
+- **Build SASS**: Corrección de variables de diseño no definidas que afectaban la compilación de estilos nativos.
+
+---
+
+## [1.0.1] - 2026-01-21 (Sesión 7)
+
+### ✨ Gestión de Datos Editoriales
+
+- **Nuevo Módulo de Configuración**: Implementación de un sistema completo para gestionar los datos de la editorial (Nombre, NIT, Dirección, Contacto) desde el panel de administración.
+- **Integración en Perfil**: Nueva sección "Datos de la Editorial" accesible exclusivamente para administradores dentro de la página de Perfil.
+- **PDFs Dinámicos**: Los reportes de inventario (remisiones y devoluciones) ahora consumen estos datos en tiempo real, eliminando valores hardcodeados.
+- **Consecutivos de Remisión**: Implementación de numeración consecutiva automática para las remisiones, facilitando el control de envíos.
+- **Detalle de Movimientos**: Nueva página dedicada para consultar el detalle completo de cada movimiento de inventario, accesible desde el icono de "ojo" en el historial.
+
+### 🎨 Mejoras Visuales
+
+- **PDF en Escala de Grises**: Rediseño de la hoja de estilos de los PDFs generados para utilizar una paleta profesional en escala de grises, optimizada para impresión y lectura formal.
+- **Identificación en PDF**: Ahora se muestra el nombre del **Punto de Venta** asociado en lugar del nombre de la bodega genérica, facilitando la identificación en documentos físicos.
+- **Estructura de Totales**: Ajuste de la fila de totales en el PDF para alinear correctamente la etiqueta "TOTALES" y el conteo de ejemplares con sus respectivas columnas.
+- **Formato Carta**: El documento ahora se genera en tamaño carta (8.5 x 11 pulgadas).
+- **Limpieza de Cabecera**: Se eliminó el ID interno del movimiento para una presentación más limpia y centrada en la información relevante.
+- **Consecutivos de Remisión**: Las remisiones ahora generan automáticamente un número consecutivo (ej. "REMISIÓN N° 1") que reemplaza al título genérico en el PDF.
+- **Ahorro de Papel**: La sección de firmas ahora es dinámica y sube inmediatamente después del contenido. Si la lista es corta, el documento cabe en media hoja, permitiendo imprimir dos copias en una sola hoja carta.
+
+### 🛠️ Estabilidad & Build
+
+- **Hydration Mismatch Fix**: Resolución definitiva de errores de hidratación en `layout.tsx` causados por atributos inyectados en el cliente.
+- **Build Clean**: Corrección de todas las rutas de importación (`@/lib/auth-middleware` -> `@/lib/apiPermissions`) y dependencias circulares que afectaban el build de producción.
+
+---
+
+## [1.0.1] - 2026-01-21 (Sesión 8)
+
+### 🎨 Rediseño UX/UI de Inventario
+
+- **Detalle de Movimiento Premium**: Transformación total de la vista de detalle (`/dashboard/inventory/[id]`) con un diseño basado en tarjetas y grids.
+  - **Diagrama de Flujo Logístico**: Visualización gráfica de la ruta *Origen -> Destino* con indicadores de tipo de bodega.
+  - **Tabla de Items Limpia**: Diseño simplificado para fácil lectura, con metadatos (ISBN, Precios) jerarquizados.
+  - **Panel de Metadatos**: Barra lateral dedicada para información clave (ID, Factura, Estado) y Observaciones destacados.
+  - **Iconografía Unificada**: Implementación consistente de iconos `lucide-react` para mejorar la escaneabilidad.
+
+### 🛠️ Correcciones Técnicas
+
+- **Estabilidad Frontend**: Resolución de errores de tiempo de ejecución (`ReferenceError`) causados por importaciones faltantes en la refactorización.
+- **Limpieza de Código (Linting)**:
+  - Eliminación de importaciones no utilizadas (`InventoryItem`, etc.).
+  - Corrección de tipado en componentes y rutas de API.
+  - Escape correcto de caracteres especiales en JSX.
+  - Verificación exitosa de `eslint` y `tsc`.

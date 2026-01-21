@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
+import * as mongoose from 'mongoose';
 import Movement from '@/models/Movement';
 import InventoryMovement from '@/models/InventoryMovement';
 
@@ -45,6 +46,10 @@ export async function GET(
       unitValue: movement.unitValue
         ? parseFloat(movement.unitValue.toString())
         : undefined,
+      allocations: (movement.allocations as Allocation[])?.map((a) => ({
+        ...a,
+        amount: a.amount ? parseFloat(a.amount.toString()) : 0,
+      })),
       _id: movement._id.toString(),
     };
 
@@ -66,6 +71,32 @@ interface MovementBody {
   quantity?: number | string;
   unitValue?: number;
   amountInCOP?: number;
+}
+
+interface Allocation {
+  costCenter: string;
+  amount: { toString: () => string } | number;
+}
+
+interface MovementDoc {
+  _id: { toString: () => string };
+  amount: { toString: () => string };
+  type: string;
+  unit?: string;
+  quantity?: { toString: () => string };
+  unitValue?: { toString: () => string };
+  allocations?: Allocation[];
+  [key: string]: unknown;
+}
+
+interface FormattedMovement extends Omit<
+  MovementDoc,
+  'amount' | 'quantity' | 'unitValue' | '_id'
+> {
+  _id: string;
+  amount: number;
+  quantity?: number;
+  unitValue?: number;
 }
 
 const sanitizeBody = (body: MovementBody): MovementBody => {
@@ -123,22 +154,114 @@ const calculateFinancials = (body: MovementBody) => {
   calculateUnitValue(body);
 };
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-function formatMovement(movement: any) {
+function formatMovement(
+  movement: mongoose.Document & MovementDoc
+): FormattedMovement {
+  const obj = movement.toObject
+    ? (movement.toObject() as MovementDoc)
+    : movement;
   return {
-    ...movement.toObject(),
+    ...obj,
     amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
-    unit: movement.unit,
+    unit: movement.unit as string | undefined,
     quantity: movement.quantity
       ? parseFloat(movement.quantity.toString())
       : undefined,
     unitValue: movement.unitValue
       ? parseFloat(movement.unitValue.toString())
       : undefined,
+    allocations: obj.allocations?.map((a) => ({
+      ...a,
+      amount: a.amount ? parseFloat(a.amount.toString()) : 0,
+    })),
     _id: movement._id.toString(),
-  };
+  } as FormattedMovement;
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
+
+function checkAllocations(
+  allocations: { costCenter: string; amount: number }[],
+  totalAmount: number
+) {
+  let sumAllocations = 0;
+  for (const allocation of allocations) {
+    if (!allocation.costCenter) {
+      return {
+        error: 'Cada detalle debe tener un centro de costo',
+        status: 400,
+      };
+    }
+    const allocAmount = Number(allocation.amount);
+    if (isNaN(allocAmount) || allocAmount < 0) {
+      return {
+        error: 'El monto del detalle debe ser un número válido',
+        status: 400,
+      };
+    }
+    sumAllocations += allocAmount;
+  }
+
+  if (Math.abs(totalAmount - sumAllocations) > 0.01) {
+    return {
+      error: `La suma de los detalles (${sumAllocations}) debe ser igual al total del movimiento (${totalAmount})`,
+      status: 400,
+    };
+  }
+  return null;
+}
+
+// Helper to validate and normalize allocations for updates
+function validateAndNormalizeAllocations(
+  body: MovementBody,
+  totalAmount: number
+) {
+  if (
+    body.allocations &&
+    Array.isArray(body.allocations) &&
+    body.allocations.length > 0
+  ) {
+    const error = checkAllocations(
+      body.allocations as { costCenter: string; amount: number }[],
+      totalAmount
+    );
+    if (error) return error;
+  } else {
+    // If allocations missing or empty, create a single one from top-level fields
+    body.allocations = [
+      {
+        costCenter: (body.costCenter as string) || '01T001',
+        amount: totalAmount,
+      },
+    ];
+  }
+
+  // Ensure costCenter is always the first allocation (redundancy for backwards compatibility)
+  if (
+    body.allocations &&
+    Array.isArray(body.allocations) &&
+    body.allocations.length > 0
+  ) {
+    body.costCenter = (
+      body.allocations[0] as { costCenter: string }
+    ).costCenter;
+  }
+
+  return null;
+}
+
+async function updateInventoryMovementLink(
+  body: MovementBody,
+  movementId: string
+) {
+  if (body.inventoryMovementId) {
+    try {
+      await InventoryMovement.findByIdAndUpdate(body.inventoryMovementId, {
+        financialMovementId: movementId,
+      });
+    } catch (linkErr) {
+      console.error('Error linking to inventory movement (PUT):', linkErr);
+    }
+  }
+}
 
 export async function PUT(
   request: NextRequest,
@@ -157,6 +280,16 @@ export async function PUT(
   try {
     const rawBody = await request.json();
     const body = sanitizeBody(rawBody);
+    const totalAmount = Number(body.amount) || 0;
+    body.amount = totalAmount;
+
+    const allocationError = validateAndNormalizeAllocations(body, totalAmount);
+    if (allocationError) {
+      return NextResponse.json(
+        { error: allocationError.error },
+        { status: allocationError.status }
+      );
+    }
 
     calculateFinancials(body);
 
@@ -173,21 +306,10 @@ export async function PUT(
       );
     }
 
-    // 4.1 Update Inventory Movement link if provided/updated
-    if (body.inventoryMovementId) {
-      try {
-        await InventoryMovement.findByIdAndUpdate(body.inventoryMovementId, {
-          financialMovementId: movement._id,
-        });
-      } catch (linkErr) {
-        console.error('Error linking to inventory movement (PUT):', linkErr);
-      }
-    }
-
+    await updateInventoryMovementLink(body, movement._id.toString());
     return NextResponse.json({ data: formatMovement(movement) });
   } catch (err: unknown) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const error = err as any;
+    const error = err as { name?: string; errors?: unknown; message?: string };
     console.error('Update Movement Error:', error);
 
     if (error.name === 'ValidationError') {
@@ -197,8 +319,10 @@ export async function PUT(
       );
     }
 
-    const message = error.message || 'Failed to update movement';
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || 'Failed to update movement' },
+      { status: 500 }
+    );
   }
 }
 
