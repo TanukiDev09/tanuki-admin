@@ -555,15 +555,6 @@ export default function EditMovementPage() {
           </h2>
 
           <div className="movement-form__field-group">
-            <Label htmlFor="category">Categoría</Label>
-            <CategorySelect
-              value={formData.category}
-              onValueChange={(val) => handleSelectChange('category', val)}
-              type={formData.type as 'INCOME' | 'EXPENSE'}
-            />
-          </div>
-
-          <div className="movement-form__field-group">
             {renderAllocationSection()}
           </div>
 
