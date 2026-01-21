@@ -162,6 +162,39 @@ async function updateInventory(
   }
 }
 
+async function linkFinancialMovement(
+  financialMovementId: string,
+  inventoryMovementId: string
+) {
+  try {
+    await Movement.findByIdAndUpdate(financialMovementId, {
+      inventoryMovementId: inventoryMovementId,
+    });
+  } catch (linkErr) {
+    console.error('Error linking to financial movement:', linkErr);
+  }
+}
+
+async function processFinancialMovement(
+  type: string,
+  subType: string,
+  financialMovementData: Record<string, unknown> | undefined,
+  date: string | Date | undefined,
+  existingId?: string
+): Promise<string | undefined> {
+  if (
+    type === InventoryMovementType.INGRESO &&
+    subType === InventoryMovementSubType.PURCHASE &&
+    financialMovementData
+  ) {
+    return await createFinancialMovement(
+      financialMovementData,
+      new Date(date || Date.now())
+    );
+  }
+  return existingId;
+}
+
 export async function POST(request: NextRequest) {
   const permissionError = await requirePermission(
     request,
@@ -228,24 +261,21 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Financial Movement
-    let finalFinancialMovementId = financialMovementId;
-    if (
-      type === InventoryMovementType.INGRESO &&
-      subType === InventoryMovementSubType.PURCHASE &&
-      financialMovementData
-    ) {
-      try {
-        finalFinancialMovementId = await createFinancialMovement(
-          financialMovementData,
-          new Date(date || Date.now())
-        );
-      } catch (e) {
-        const err = e as Error;
-        return NextResponse.json(
-          { success: false, error: err.message },
-          { status: 500 }
-        );
-      }
+    let finalFinancialMovementId;
+    try {
+      finalFinancialMovementId = await processFinancialMovement(
+        type,
+        subType,
+        financialMovementData,
+        date,
+        financialMovementId
+      );
+    } catch (e) {
+      const err = e as Error;
+      return NextResponse.json(
+        { success: false, error: err.message },
+        { status: 500 }
+      );
     }
 
     // 6. Update Inventory
@@ -265,6 +295,14 @@ export async function POST(request: NextRequest) {
       observations,
       createdBy,
     });
+
+    // 8. Update Financial Movement link if provided (Bilateral)
+    if (finalFinancialMovementId) {
+      await linkFinancialMovement(
+        finalFinancialMovementId as string,
+        inventoryMovement._id
+      );
+    }
 
     return NextResponse.json({ success: true, data: inventoryMovement });
   } catch (err) {
