@@ -123,3 +123,28 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 
 - **Linter & Stylelint Clean**: Verificación y corrección de orden de propiedades CSS/SCSS, asegurando un reporte de linters libre de errores.
 - **Type Safety**: Verificación de tipos mediante `tsc` para garantizar la integridad de los datos en el filtrado.
+
+---
+
+## [1.0.1] - 2026-01-21 (Sesión 6)
+
+### 🔗 Vinculación Bilateral Finanzas-Inventario
+
+- **Sincronización Automática**: Implementación de un sistema de enlace bidireccional entre movimientos financieros y de inventario.
+  - Al crear una liquidación de inventario, se puede vincular a un ingreso financiero existente.
+  - Al crear un ingreso financiero, se puede vincular a una liquidación de inventario.
+  - La actualización en un lado se refleja automáticamente en el otro.
+- **Buscadores Avanzados**: Nuevos componentes `MovementSearchSelect` e `InventoryMovementSearchSelect` integrados en los formularios de creación y edición.
+- **Visualización de Enlaces**:
+  - **Finanzas**: Indicador visual (icono de paquete) en la tabla de movimientos para registros con inventario asociado.
+  - **Inventario**: Botón de enlace externo directo al detalle del movimiento financiero.
+
+### 🛠️ Calidad de Código & Refactorización
+
+- **Reducción de Complejidad**: Refactorización profunda de los controladores de API (`/api/finance/movements` y `/api/inventory/movements`) extrayendo lógica de negocio a funciones auxiliares para reducir la complejidad cognitiva.
+- **Type Safety Estricto**: Eliminación sistemática de tipos `any` implícitos y explícitos, asegurando un código más robusto y mantenible.
+- **Limpieza de Código**:
+  - Extracción de la lógica de filtrado de `MovementsPage` a un nuevo componente `MovementFilters`, mejorando la legibilidad.
+  - Eliminación de importaciones y código muerto en múltiples componentes.
+- **Zero Linter Errors**: El proyecto cumple al 100% con las reglas de ESLint, Stylelint y TypeScript.
+
