@@ -274,12 +274,12 @@ export default function CreateMovementPage() {
               <Label>Valor Unitario (Calculado)</Label>
               <div className="movement-form__calculated-value">
                 {formData.amount &&
-                  formData.quantity &&
-                  Number(formData.quantity) !== 0
+                formData.quantity &&
+                Number(formData.quantity) !== 0
                   ? formatCurrency(
-                    Number(formData.amount) / Number(formData.quantity),
-                    formData.currency
-                  )
+                      Number(formData.amount) / Number(formData.quantity),
+                      formData.currency
+                    )
                   : '$ 0'}
               </div>
             </div>

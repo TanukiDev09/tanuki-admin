@@ -41,11 +41,13 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 ## [1.0.1] - 2026-01-19 (Sesión 2)
 
 ### 📱 Diseño Responsivo & Móvil
+
 - **Tabla Stacked Responsive**: La tabla de movimientos ahora se adapta automáticamente a cards apiladas en dispositivos móviles (< 1024px), eliminando el scroll horizontal y mejorando la legibilidad.
 - **Filtros Colapsables**: Optimización masiva del espacio vertical en móviles mediante un sistema de filtros colapsables. Solo la búsqueda es visible por defecto, con un toggle para mostrar las opciones avanzadas.
 - **Mobile-First**: Reescritura de estilos SCSS siguiendo un enfoque mobile-first para asegurar consistencia y rendimiento.
 
 ### ✨ Mejoras Funcionales
+
 - **Paginación Implementada**: Sistema completo de paginación para la lista de movimientos.
   - Controles de navegación (Anterior/Siguiente) y estado visual de página actual.
   - Indicador de metadatos ("Mostrando X de Y resultados").
@@ -53,6 +55,7 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 - **Columnas de Datos**: Se añadieron las columnas "Cantidad" y "Centro Costo" para mayor contexto, reemplazando la columna "Estado" menos relevante.
 
 ### 🔧 Calidad de Código
+
 - **Corrección de Linter SCSS**: Resolución automatizada y manual de errores de estilo CSS (`stylelint`), asegurando el orden correcto de propiedades y espaciado estándar.
 
 ---
@@ -60,21 +63,45 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 ## [1.0.1] - 2026-01-20 (Sesión 3)
 
 ### ✨ Canales de Venta & Puntos de Venta
+
 - **Implementación de Canales de Venta**: Se añadió la clasificación de movimientos por canales:
   - **Venta Directa, Feria y Librería**.
   - **Asociación de Puntos de Venta (POS)**: Integración con el modelo de Puntos de Venta para registrar el origen específico de los ingresos por librería.
 - **Nuevo Componente `POSSelect`**: Selector premium que permite:
   - Búsqueda de puntos de venta activos.
   - Creación rápida de nuevos puntos de venta mediante un modal integrado.
-- **Inteligencia de Formulario**: 
+- **Inteligencia de Formulario**:
   - **Auto-completado de Beneficiario**: Al seleccionar una librería, el sistema sugiere automáticamente el nombre del punto de venta como beneficiario/pagador, optimizando la carga de datos.
   - **Lógica Condicional**: Los campos se adaptan dinámicamente según el canal seleccionado (ej. ocultar Canal de Pago si es una venta por Librería).
 
 ### 🚀 Refinamiento del Listado de Movimientos
+
 - **Columna de Canales**: Nueva columna en la tabla principal que muestra el canal de venta y el punto de venta asociado mediante un sistema de Badges.
 - **Filtrado por Canal**: Integración de un nuevo filtro avanzado para segmentar movimientos por su canal de origen.
 
 ### 🔧 Calidad & Estabilidad
+
 - **Type Safety Robusto**: Corrección integral de errores de tipos en los formularios de creación y edición, asegurando el cumplimiento estricto de los DTOs.
 - **Refactorización de UI**: Extracción del componente `MovementTableRow` para reducir la complejidad cognitiva y mejorar la mantenibilidad del dashboard.
 - **Linter Clean**: Estado final de linters (JS/CSS) totalmente limpio.
+---
+
+## [1.0.1] - 2026-01-20 (Sesión 4)
+
+### ✨ Dashboard de Bodegas: Filtros & UI Premium
+
+- **Sistema de Filtrado Avanzado**: Implementación de una barra de filtros robusta para el listado de bodegas:
+  - **Búsqueda Global**: Filtrado por nombre, código y ciudad directamente desde la barra de búsqueda.
+  - **Filtros por Atributos**: Selectores especializados para filtrar por tipo de bodega (Editorial, POS, General), ciudad (dinámico) y estado de disponibilidad.
+  - **Reset Inteligente**: Botón "Limpiar filtros" que aparece dinámicamente cuando hay filtros activos.
+- **Rediseño UI/UX Premium**:
+  - **Estética Glassmorphism**: Panel de filtros con efectos de transparencia, desenfoque de fondo (blur) y gradientes sutiles.
+  - **Micro-interacciones**: Animaciones fluidas al interactuar con los campos de búsqueda y selectores.
+  - **Layout Responsivo**: Diseño optimizado que se adapta perfectamente a diferentes tamaños de pantalla, manteniendo la elegibilidad y facilidad de uso.
+
+### 🔧 Calidad técnica corregida
+
+- **Compatibilidad de Unidades**: Corrección de error crítico en SASS por mezcla de unidades incompatibles (`rem` + `px`).
+- **Validación de Estilos**: Reordenamiento integral de propiedades CSS siguiendo las reglas de `stylelint` para mantener la consistencia del sistema de diseño.
+- **Limpieza de Código**: Corrección de errores de parsing y fragmentos redundantes en componentes React.
+- **Linters & Typecheck**: Verificación completa aprobada (Zero errors).

@@ -65,7 +65,8 @@ export default function EditCollectionModal({
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.error || 'Error al actualizar colección');
+      if (!res.ok)
+        throw new Error(data.error || 'Error al actualizar colección');
 
       toast({
         title: 'Éxito',
