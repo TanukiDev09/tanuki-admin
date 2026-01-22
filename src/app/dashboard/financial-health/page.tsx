@@ -6,7 +6,13 @@ import dynamic from 'next/dynamic';
 import { RunwayCard } from '@/components/dashboard/RunwayCard';
 import { BurnRateCard } from '@/components/dashboard/BurnRateCard';
 import { HealthScoreCard } from '@/components/dashboard/HealthScoreCard';
-import { ArrowUpRight, ArrowDownRight, Scale, Activity, TrendingUp } from 'lucide-react';
+import {
+  ArrowUpRight,
+  ArrowDownRight,
+  Scale,
+  Activity,
+  TrendingUp,
+} from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { PeriodSelector } from '@/components/dashboard/PeriodSelector';
@@ -16,7 +22,12 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Movement } from '@/types/movement';
 import './financial-health.scss';
 
-function buildSummaryQueryParams(view: string, year: number, month: number | null, page: number = 1): string {
+function buildSummaryQueryParams(
+  view: string,
+  year: number,
+  month: number | null,
+  page: number = 1
+): string {
   const params = new URLSearchParams();
   if (view !== 'global') {
     params.append('year', year.toString());
@@ -60,7 +71,9 @@ const CategoryPieChart = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <div className="chart-loading-placeholder" style={{ height: '300px' }} />,
+    loading: () => (
+      <div className="chart-loading-placeholder" style={{ height: '300px' }} />
+    ),
   }
 );
 
@@ -71,7 +84,9 @@ const CategoryBarChart = dynamic(
     ),
   {
     ssr: false,
-    loading: () => <div className="chart-loading-placeholder" style={{ height: '300px' }} />,
+    loading: () => (
+      <div className="chart-loading-placeholder" style={{ height: '300px' }} />
+    ),
   }
 );
 
@@ -82,7 +97,13 @@ interface FinancialHealthData {
     balance: number;
   };
   monthly: Array<{ month: string; income: number; expenses: number }>;
-  daily?: Array<{ month: string; day: string; date: string; income: number; expenses: number }>;
+  daily?: Array<{
+    month: string;
+    day: string;
+    date: string;
+    income: number;
+    expenses: number;
+  }>;
   categories?: Array<{ name: string; value: number }>;
   categoriesIncome?: Array<{ name: string; value: number }>;
   categoriesExpense?: Array<{ name: string; value: number }>;
@@ -122,7 +143,9 @@ function GlobalView({ data }: ViewProps) {
     <div className="mt-6">
       {/* Global Totals */}
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">Acumulados Históricos</h2>
+        <h2 className="financial-health__section-title">
+          Acumulados Históricos
+        </h2>
         <div className="financial-health__stat-grid">
           <StatCard
             title="Ingresos Históricos"
@@ -150,7 +173,9 @@ function GlobalView({ data }: ViewProps) {
 
       {/* Health Metrics */}
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">Indicadores de Sostenibilidad</h2>
+        <h2 className="financial-health__section-title">
+          Indicadores de Sostenibilidad
+        </h2>
         <div className="financial-health__metrics-grid">
           <RunwayCard runway={data.health.runway} />
           <BurnRateCard
@@ -169,7 +194,9 @@ function GlobalView({ data }: ViewProps) {
 
       {/* Net Income Trend Chart */}
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">Evolución del Resultado</h2>
+        <h2 className="financial-health__section-title">
+          Evolución del Resultado
+        </h2>
         <div className="financial-health__chart-container">
           <RunwayProjectionChart data={data.monthly || []} />
         </div>
@@ -178,7 +205,12 @@ function GlobalView({ data }: ViewProps) {
   );
 }
 
-function MonthlyView({ data, breakdownType, setBreakdownType, onPageChange }: ViewProps) {
+function MonthlyView({
+  data,
+  breakdownType,
+  setBreakdownType,
+  onPageChange,
+}: ViewProps) {
   return (
     <div className="mt-6">
       <section className="financial-health__section">
@@ -205,9 +237,14 @@ function MonthlyView({ data, breakdownType, setBreakdownType, onPageChange }: Vi
       </section>
 
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">Flujo de Efectivo Diario</h2>
+        <h2 className="financial-health__section-title">
+          Flujo de Efectivo Diario
+        </h2>
         <div className="financial-health__chart-container">
-          <ScrollableIncomeExpenseChart data={data.daily || []} variant="daily" />
+          <ScrollableIncomeExpenseChart
+            data={data.daily || []}
+            variant="daily"
+          />
         </div>
       </section>
 
@@ -252,10 +289,21 @@ function MonthlyView({ data, breakdownType, setBreakdownType, onPageChange }: Vi
       </div>
 
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">Movimientos del Periodo</h2>
+        <h2 className="financial-health__section-title">
+          Movimientos del Periodo
+        </h2>
         <FinanceMovementsTable
           movements={data.movements || []}
-          pagination={data.pagination ? { ...data.pagination, hasPrevPage: data.pagination.page > 1, hasNextPage: data.pagination.page < data.pagination.totalPages } : undefined}
+          pagination={
+            data.pagination
+              ? {
+                ...data.pagination,
+                hasPrevPage: data.pagination.page > 1,
+                hasNextPage:
+                  data.pagination.page < data.pagination.totalPages,
+              }
+              : undefined
+          }
           onPageChange={onPageChange}
         />
       </section>
@@ -263,7 +311,12 @@ function MonthlyView({ data, breakdownType, setBreakdownType, onPageChange }: Vi
   );
 }
 
-function AnnualView({ data, breakdownType, setBreakdownType, onPageChange }: ViewProps) {
+function AnnualView({
+  data,
+  breakdownType,
+  setBreakdownType,
+  onPageChange,
+}: ViewProps) {
   return (
     <div className="mt-6">
       <section className="financial-health__section">
@@ -336,12 +389,19 @@ function AnnualView({ data, breakdownType, setBreakdownType, onPageChange }: Vie
       </div>
 
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">
-          Movimientos del Año
-        </h2>
+        <h2 className="financial-health__section-title">Movimientos del Año</h2>
         <FinanceMovementsTable
           movements={data.movements || []}
-          pagination={data.pagination ? { ...data.pagination, hasPrevPage: data.pagination.page > 1, hasNextPage: data.pagination.page < data.pagination.totalPages } : undefined}
+          pagination={
+            data.pagination
+              ? {
+                ...data.pagination,
+                hasPrevPage: data.pagination.page > 1,
+                hasNextPage:
+                  data.pagination.page < data.pagination.totalPages,
+              }
+              : undefined
+          }
           onPageChange={onPageChange}
         />
       </section>
@@ -354,13 +414,21 @@ export default function FinancialHealthPage() {
   const searchParams = useSearchParams();
 
   const view = searchParams.get('view') || 'global';
-  const year = parseInt(searchParams.get('year') || new Date().getFullYear().toString());
-  const month = searchParams.get('month') ? parseInt(searchParams.get('month')!) : (view === 'monthly' ? new Date().getMonth() + 1 : null);
+  const year = parseInt(
+    searchParams.get('year') || new Date().getFullYear().toString()
+  );
+  const month = searchParams.get('month')
+    ? parseInt(searchParams.get('month')!)
+    : view === 'monthly'
+      ? new Date().getMonth() + 1
+      : null;
   const page = parseInt(searchParams.get('page') || '1');
 
   const [data, setData] = useState<FinancialHealthData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [breakdownType, setBreakdownType] = useState<'income' | 'expense'>('expense');
+  const [breakdownType, setBreakdownType] = useState<'income' | 'expense'>(
+    'expense'
+  );
 
   const fetchData = useCallback(async () => {
     try {
@@ -384,30 +452,49 @@ export default function FinancialHealthPage() {
     fetchData();
   }, [fetchData]);
 
-  const updateParams = useCallback((newParams: Record<string, string | null>) => {
-    const current = new URLSearchParams(Array.from(searchParams.entries()));
-    Object.entries(newParams).forEach(([key, value]) => {
-      if (value === null) current.delete(key);
-      else current.set(key, value);
-    });
-    router.replace(`?${current.toString()}`, { scroll: false });
-  }, [searchParams, router]);
+  const updateParams = useCallback(
+    (newParams: Record<string, string | null>) => {
+      const current = new URLSearchParams(Array.from(searchParams.entries()));
+      Object.entries(newParams).forEach(([key, value]) => {
+        if (value === null) current.delete(key);
+        else current.set(key, value);
+      });
+      router.replace(`?${current.toString()}`, { scroll: false });
+    },
+    [searchParams, router]
+  );
 
   const handleTabChange = (val: string) => {
     if (val === 'global') {
       updateParams({ view: 'global', year: null, month: null, page: '1' });
     } else if (val === 'monthly') {
-      updateParams({ view: 'monthly', year: year.toString(), month: (month || new Date().getMonth() + 1).toString(), page: '1' });
+      updateParams({
+        view: 'monthly',
+        year: year.toString(),
+        month: (month || new Date().getMonth() + 1).toString(),
+        page: '1',
+      });
     } else if (val === 'annual') {
-      updateParams({ view: 'annual', year: year.toString(), month: null, page: '1' });
+      updateParams({
+        view: 'annual',
+        year: year.toString(),
+        month: null,
+        page: '1',
+      });
     }
   };
 
   if (loading && !data) {
     return (
       <div className="financial-health__container">
-        <div className="chart-loading-placeholder" style={{ height: '100px', marginTop: '20px' }} />
-        <div className="chart-loading-placeholder" style={{ marginTop: '20px' }} />
+        <div
+          className="chart-loading-placeholder"
+          style={{ height: '100px', marginTop: '20px' }}
+        />
+        <div
+          className="chart-loading-placeholder"
+          style={{ marginTop: '20px' }}
+        />
       </div>
     );
   }
@@ -437,12 +524,18 @@ export default function FinancialHealthPage() {
             year={year}
             month={month}
             onYearChange={(y) => updateParams({ year: y.toString() })}
-            onMonthChange={(m) => updateParams({ month: m ? m.toString() : null })}
+            onMonthChange={(m) =>
+              updateParams({ month: m ? m.toString() : null })
+            }
           />
         )}
       </div>
 
-      <Tabs value={view} onValueChange={handleTabChange} className="financial-health__tabs">
+      <Tabs
+        value={view}
+        onValueChange={handleTabChange}
+        className="financial-health__tabs"
+      >
         <TabsList>
           <TabsTrigger value="global">Global</TabsTrigger>
           <TabsTrigger value="monthly">Mensual</TabsTrigger>

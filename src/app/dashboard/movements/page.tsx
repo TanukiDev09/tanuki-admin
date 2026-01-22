@@ -17,7 +17,6 @@ import {
 import {
   Plus,
   Package,
-
   Eye,
   Pencil,
   Trash2,
@@ -29,7 +28,6 @@ import { Movement } from '@/types/movement';
 import { formatCurrency } from '@/lib/utils';
 import { MovementFilters } from './components/MovementFilters';
 import './movements-list.scss';
-
 
 interface MovementTableRowProps {
   movement: Movement;
@@ -56,10 +54,11 @@ const MovementTableRow = ({
     let channelLabel = '';
     switch (movement.salesChannel) {
       case 'LIBRERIA':
-        channelLabel = `Librería: ${typeof movement.pointOfSale === 'object'
-          ? movement.pointOfSale.name
-          : 'Varios'
-          }`;
+        channelLabel = `Librería: ${
+          typeof movement.pointOfSale === 'object'
+            ? movement.pointOfSale.name
+            : 'Varios'
+        }`;
         break;
       case 'DIRECTA':
         channelLabel = 'Directa';
@@ -113,19 +112,24 @@ const MovementTableRow = ({
         )}
       </TableCell>
       <TableCell data-label="Centro Costo">
-        {movement.allocations && movement.allocations.length > 1
-          ? <Badge variant="secondary" className="opacity-80">Múltiple ({movement.allocations.length})</Badge>
-          : movement.costCenter || movement.allocations?.[0]?.costCenter || (
+        {movement.allocations && movement.allocations.length > 1 ? (
+          <Badge variant="secondary" className="opacity-80">
+            Múltiple ({movement.allocations.length})
+          </Badge>
+        ) : (
+          movement.costCenter ||
+          movement.allocations?.[0]?.costCenter || (
             <span className="movements-list__no-category">Sin definir</span>
           )
-        }
+        )}
       </TableCell>
       <TableCell data-label="Monto">
         <span
-          className={`movements-list__amount ${movement.type === 'INCOME'
-            ? 'movements-list__amount--income'
-            : 'movements-list__amount--expense'
-            }`}
+          className={`movements-list__amount ${
+            movement.type === 'INCOME'
+              ? 'movements-list__amount--income'
+              : 'movements-list__amount--expense'
+          }`}
         >
           {movement.type === 'INCOME' ? '+' : '-'}
           {formatCurrency(movement.amount)}
@@ -452,7 +456,6 @@ export default function MovementsPage() {
           availablePaymentChannels={availablePaymentChannels}
           availableUnits={availableUnits}
         />
-
 
         <div className="movements-list__table-wrapper">
           <Table>

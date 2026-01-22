@@ -24,7 +24,9 @@ export function RunwayCard({ runway, className }: RunwayCardProps) {
   const Icon = status.icon;
   const safeRunway = runway ?? 0;
   const isInfinite = safeRunway === Infinity || safeRunway > 99;
-  const displayValue = isInfinite ? 'Rentable' : formatNumber(safeRunway.toFixed(1));
+  const displayValue = isInfinite
+    ? 'Rentable'
+    : formatNumber(safeRunway.toFixed(1));
 
   return (
     <Card
@@ -38,11 +40,15 @@ export function RunwayCard({ runway, className }: RunwayCardProps) {
         <div className="runway-card__body">
           <div className="runway-card__info">
             <div className="runway-card__value">
-              <span className={isInfinite ? "text-2xl" : ""}>{displayValue}</span>
+              <span className={isInfinite ? 'text-2xl' : ''}>
+                {displayValue}
+              </span>
               {!isInfinite && <span className="runway-card__unit">meses</span>}
             </div>
             <p className="runway-card__description">
-              {isInfinite ? 'Operación autosostenible' : 'Tiempo hasta agotar efectivo'}
+              {isInfinite
+                ? 'Operación autosostenible'
+                : 'Tiempo hasta agotar efectivo'}
             </p>
             <div
               className={`runway-card__status runway-card__status--${status.variant}`}

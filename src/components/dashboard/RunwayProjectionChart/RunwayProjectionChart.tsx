@@ -23,9 +23,9 @@ export function RunwayProjectionChart({
   className,
 }: NetIncomeChartProps) {
   // Calculate Net Income per month
-  const chartData = data.map(d => ({
+  const chartData = data.map((d) => ({
     ...d,
-    netIncome: d.income - d.expenses
+    netIncome: d.income - d.expenses,
   }));
 
   return (
@@ -51,7 +51,13 @@ export function RunwayProjectionChart({
                 margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
               >
                 <defs>
-                  <linearGradient id="netIncomeGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="netIncomeGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
                     <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
@@ -68,9 +74,7 @@ export function RunwayProjectionChart({
                   fontSize={10}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) =>
-                    `$${(value / 1000000).toFixed(1)}M`
-                  }
+                  tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
                 />
                 <Tooltip
                   contentStyle={{
@@ -80,10 +84,16 @@ export function RunwayProjectionChart({
                     fontFamily: 'var(--font-sans)',
                     borderRadius: 'var(--radius)',
                   }}
-                  formatter={(value: number | undefined) => (value !== undefined ? formatCurrency(value) : '')}
+                  formatter={(value: number | undefined) =>
+                    value !== undefined ? formatCurrency(value) : ''
+                  }
                   labelFormatter={(label) => `Mes: ${label}`}
                 />
-                <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" strokeDasharray="3 3" />
+                <ReferenceLine
+                  y={0}
+                  stroke="hsl(var(--muted-foreground))"
+                  strokeDasharray="3 3"
+                />
                 <Area
                   type="monotone"
                   dataKey="netIncome"

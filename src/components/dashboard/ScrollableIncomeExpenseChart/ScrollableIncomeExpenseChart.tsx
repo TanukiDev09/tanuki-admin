@@ -30,7 +30,9 @@ export function ScrollableIncomeExpenseChart({
   const isDaily = variant === 'daily';
 
   return (
-    <Card className={`scrollable-income-expense-chart ${className || ''} ${scrollable ? 'scrollable-income-expense-chart--scrollable' : ''}`}>
+    <Card
+      className={`scrollable-income-expense-chart ${className || ''} ${scrollable ? 'scrollable-income-expense-chart--scrollable' : ''}`}
+    >
       <CardHeader className="scrollable-income-expense-chart__header">
         <CardTitle className="scrollable-income-expense-chart__title">
           {isDaily ? 'Flujo de Efectivo Diario' : 'Flujo de Caja Histórico'}
@@ -40,13 +42,19 @@ export function ScrollableIncomeExpenseChart({
         <div className="scrollable-income-expense-chart__scroll-container">
           <div
             className="scrollable-income-expense-chart__chart-wrapper"
-            style={scrollable ? { width: `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px` } : { width: '100%' }}
+            style={
+              scrollable
+                ? {
+                    width: `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px`,
+                  }
+                : { width: '100%' }
+            }
           >
             <ResponsiveContainer width="100%" height={400}>
               <BarChart
                 data={data}
                 margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
-                barSize={isDaily && !scrollable ? undefined : (isDaily ? 20 : 40)}
+                barSize={isDaily && !scrollable ? undefined : isDaily ? 20 : 40}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -69,7 +77,8 @@ export function ScrollableIncomeExpenseChart({
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) => {
-                    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+                    if (value >= 1000000)
+                      return `$${(value / 1000000).toFixed(1)}M`;
                     if (value >= 1000) return `$${(value / 1000).toFixed(0)}k`;
                     return `$${value}`;
                   }}
@@ -93,7 +102,7 @@ export function ScrollableIncomeExpenseChart({
                   wrapperStyle={{
                     fontFamily: 'var(--font-sans)',
                     fontSize: '12px',
-                    paddingTop: '20px'
+                    paddingTop: '20px',
                   }}
                 />
                 <Bar

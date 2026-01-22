@@ -34,7 +34,10 @@ const COLORS = [
   'var(--color-chart-8)',
 ];
 
-export function CategoryBarChart({ data, title = 'Gastos por Categoría' }: CategoryBarChartProps) {
+export function CategoryBarChart({
+  data,
+  title = 'Gastos por Categoría',
+}: CategoryBarChartProps) {
   const sortedData = (data || [])
     .filter(
       (item) =>
@@ -46,9 +49,7 @@ export function CategoryBarChart({ data, title = 'Gastos por Categoría' }: Cate
   return (
     <Card className="category-bar-chart category-bar-chart--no-border">
       <CardHeader className="category-bar-chart__header">
-        <CardTitle className="category-bar-chart__title">
-          {title}
-        </CardTitle>
+        <CardTitle className="category-bar-chart__title">{title}</CardTitle>
       </CardHeader>
       <CardContent className="category-bar-chart__content">
         <ResponsiveContainer width="100%" height={300}>

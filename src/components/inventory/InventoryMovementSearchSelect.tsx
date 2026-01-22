@@ -47,14 +47,13 @@ export function InventoryMovementSearchSelect({
   const [loading, setLoading] = useState(false);
   const [movements, setMovements] = useState<InventoryMovement[]>([]);
 
-
   useEffect(() => {
     const fetchMovements = async () => {
       setLoading(true);
       try {
         let url = `/api/inventory/movements?limit=20`;
         if (type) url += `&type=${type}`;
-        // Note: Inventory API might not support 'search' directly in the same way, 
+        // Note: Inventory API might not support 'search' directly in the same way,
         // but it's good to keep it consistent if it does or to filter here.
 
         const res = await fetch(url);
@@ -87,8 +86,11 @@ export function InventoryMovementSearchSelect({
         >
           {selectedMovement ? (
             <span className="truncate">
-              {format(new Date(selectedMovement.date), 'dd/MM/yyyy')} - {selectedMovement.type}
-              {selectedMovement.observations ? ` (${selectedMovement.observations})` : ''}
+              {format(new Date(selectedMovement.date), 'dd/MM/yyyy')} -{' '}
+              {selectedMovement.type}
+              {selectedMovement.observations
+                ? ` (${selectedMovement.observations})`
+                : ''}
             </span>
           ) : (
             placeholder
@@ -128,14 +130,23 @@ export function InventoryMovementSearchSelect({
                   />
                   <div className="flex flex-col">
                     <span className="font-medium">
-                      {movement.type} - {format(new Date(movement.date), 'dd/MM/yyyy HH:mm', { locale: es })}
+                      {movement.type} -{' '}
+                      {format(new Date(movement.date), 'dd/MM/yyyy HH:mm', {
+                        locale: es,
+                      })}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {movement.fromWarehouseId ? `De: ${movement.fromWarehouseId.name}` : ''}
-                      {movement.toWarehouseId ? ` A: ${movement.toWarehouseId.name}` : ''}
+                      {movement.fromWarehouseId
+                        ? `De: ${movement.fromWarehouseId.name}`
+                        : ''}
+                      {movement.toWarehouseId
+                        ? ` A: ${movement.toWarehouseId.name}`
+                        : ''}
                     </span>
                     {movement.observations && (
-                      <span className="text-xs italic">{movement.observations}</span>
+                      <span className="text-xs italic">
+                        {movement.observations}
+                      </span>
                     )}
                   </div>
                 </CommandItem>

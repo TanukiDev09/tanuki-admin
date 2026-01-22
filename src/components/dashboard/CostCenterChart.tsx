@@ -8,7 +8,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   Cell,
-  CartesianGrid
+  CartesianGrid,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { formatCurrency } from '@/lib/utils';
@@ -31,7 +31,10 @@ const COLORS = [
   'var(--color-chart-5)',
 ];
 
-export function CostCenterChart({ data, title = 'Gastos por Centro de Costo' }: CostCenterChartProps) {
+export function CostCenterChart({
+  data,
+  title = 'Gastos por Centro de Costo',
+}: CostCenterChartProps) {
   const sortedData = [...(data || [])]
     .sort((a, b) => b.value - a.value)
     .slice(0, 8);
@@ -53,7 +56,12 @@ export function CostCenterChart({ data, title = 'Gastos por Centro de Costo' }: 
               layout="vertical"
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
-              <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--color-border)" />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                horizontal={true}
+                vertical={false}
+                stroke="var(--color-border)"
+              />
               <XAxis
                 type="number"
                 stroke="var(--color-muted-foreground)"
@@ -77,13 +85,14 @@ export function CostCenterChart({ data, title = 'Gastos por Centro de Costo' }: 
                   borderColor: 'var(--color-border)',
                   borderRadius: 'var(--radius-md)',
                 }}
-                formatter={(value) =>
-                  formatCurrency(Number(value))
-                }
+                formatter={(value) => formatCurrency(Number(value))}
               />
               <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                 {sortedData.map((_, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Bar>
             </BarChart>

@@ -26,7 +26,6 @@ import { formatCurrency } from '@/lib/utils';
 import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import '../../movement-form.scss';
 
-
 export default function EditMovementPage() {
   const router = useRouter();
   const params = useParams();
@@ -58,7 +57,8 @@ export default function EditMovementPage() {
         const m = data.data;
 
         // Determine if we should start in multi-cost center mode
-        const hasMultipleAllocations = m.allocations && m.allocations.length > 1;
+        const hasMultipleAllocations =
+          m.allocations && m.allocations.length > 1;
         setUseMultiCostCenter(hasMultipleAllocations);
 
         setFormData({
@@ -77,12 +77,20 @@ export default function EditMovementPage() {
             typeof m.inventoryMovementId === 'object'
               ? m.inventoryMovementId?._id
               : m.inventoryMovementId,
-          allocations: m.allocations?.map((a: { costCenter: string | { _id: string }; amount: number | string }) => ({
-            costCenter: typeof a.costCenter === 'object' ? a.costCenter?._id : a.costCenter,
-            amount: parseFloat(a.amount?.toString() || '0')
-          })) || []
+          allocations:
+            m.allocations?.map(
+              (a: {
+                costCenter: string | { _id: string };
+                amount: number | string;
+              }) => ({
+                costCenter:
+                  typeof a.costCenter === 'object'
+                    ? a.costCenter?._id
+                    : a.costCenter,
+                amount: parseFloat(a.amount?.toString() || '0'),
+              })
+            ) || [],
         });
-
       } catch (error) {
         console.error(error);
         toast({
@@ -139,7 +147,9 @@ export default function EditMovementPage() {
 
   const removeAllocation = (index: number) => {
     setFormData((prev) => {
-      const newAllocations = (prev.allocations || []).filter((_, i) => i !== index);
+      const newAllocations = (prev.allocations || []).filter(
+        (_, i) => i !== index
+      );
       return { ...prev, allocations: newAllocations };
     });
   };
@@ -153,11 +163,16 @@ export default function EditMovementPage() {
       return false;
     }
 
-    const totalAllocated = allocations.reduce((sum, a) => sum + (Number(a.amount) || 0), 0);
+    const totalAllocated = allocations.reduce(
+      (sum, a) => sum + (Number(a.amount) || 0),
+      0
+    );
     const totalAmount = Number(formData.amount) || 0;
 
     if (Math.abs(totalAllocated - totalAmount) > 0.01) {
-      setAllocationError(`La suma de asignaciones (${formatCurrency(totalAllocated, formData.currency)}) no coincide con el total (${formatCurrency(totalAmount, formData.currency)})`);
+      setAllocationError(
+        `La suma de asignaciones (${formatCurrency(totalAllocated, formData.currency)}) no coincide con el total (${formatCurrency(totalAmount, formData.currency)})`
+      );
       return false;
     }
 
@@ -182,8 +197,9 @@ export default function EditMovementPage() {
     if (!validateAllocations()) {
       toast({
         title: 'Error de Asignación',
-        description: allocationError || 'Revise la distribución de centros de costo',
-        variant: 'destructive'
+        description:
+          allocationError || 'Revise la distribución de centros de costo',
+        variant: 'destructive',
       });
       return;
     }
@@ -199,12 +215,14 @@ export default function EditMovementPage() {
           : new Date().getFullYear(),
         allocations: useMultiCostCenter
           ? formData.allocations
-          : [{
-            costCenter: formData.costCenter || '01T001',
-            amount: Number(formData.amount) || 0
-          }],
+          : [
+              {
+                costCenter: formData.costCenter || '01T001',
+                amount: Number(formData.amount) || 0,
+              },
+            ],
         costCenter: useMultiCostCenter
-          ? (formData.allocations?.[0]?.costCenter || '')
+          ? formData.allocations?.[0]?.costCenter || ''
           : formData.costCenter,
       };
 
@@ -325,12 +343,14 @@ export default function EditMovementPage() {
             onClick={() => {
               setUseMultiCostCenter(true);
               if (!formData.allocations || formData.allocations.length === 0) {
-                setFormData(prev => ({
+                setFormData((prev) => ({
                   ...prev,
-                  allocations: [{
-                    costCenter: prev.costCenter || '',
-                    amount: Number(prev.amount) || 0
-                  }]
+                  allocations: [
+                    {
+                      costCenter: prev.costCenter || '',
+                      amount: Number(prev.amount) || 0,
+                    },
+                  ],
                 }));
               }
             }}
@@ -362,13 +382,18 @@ export default function EditMovementPage() {
                   <td>
                     <CostCenterSelect
                       value={alloc.costCenter}
-                      onValueChange={(val) => handleAllocationChange(idx, 'costCenter', val)}
+                      onValueChange={(val) =>
+                        handleAllocationChange(idx, 'costCenter', val)
+                      }
                     />
                   </td>
                   <td>
                     <NumericInput
                       value={alloc.amount}
-                      onValueChange={(val) => val !== undefined && handleAllocationChange(idx, 'amount', val.toString())}
+                      onValueChange={(val) =>
+                        val !== undefined &&
+                        handleAllocationChange(idx, 'amount', val.toString())
+                      }
                       placeholder="0.00"
                     />
                   </td>
@@ -397,17 +422,37 @@ export default function EditMovementPage() {
 
           <div className="movement-form__allocation-summary">
             <div className="movement-form__allocation-summary-label">
-              Total: <span className="font-semibold">{formatCurrency(Number(formData.amount) || 0, formData.currency)}</span>
+              Total:{' '}
+              <span className="font-semibold">
+                {formatCurrency(
+                  Number(formData.amount) || 0,
+                  formData.currency
+                )}
+              </span>
             </div>
 
             <div className="text-right flex flex-col items-end gap-1">
               <div className="flex gap-2 items-center">
                 <span>Asignado:</span>
-                <span className={`movement-form__allocation-summary-total ${Math.abs((formData.allocations?.reduce((sum, a) => sum + (Number(a.amount) || 0), 0) || 0) - (Number(formData.amount) || 0)) < 0.01
-                  ? 'movement-form__allocation-summary-total--match'
-                  : 'movement-form__allocation-summary-total--error'
-                  }`}>
-                  {formatCurrency(formData.allocations?.reduce((sum, a) => sum + (Number(a.amount) || 0), 0) || 0, formData.currency)}
+                <span
+                  className={`movement-form__allocation-summary-total ${
+                    Math.abs(
+                      (formData.allocations?.reduce(
+                        (sum, a) => sum + (Number(a.amount) || 0),
+                        0
+                      ) || 0) - (Number(formData.amount) || 0)
+                    ) < 0.01
+                      ? 'movement-form__allocation-summary-total--match'
+                      : 'movement-form__allocation-summary-total--error'
+                  }`}
+                >
+                  {formatCurrency(
+                    formData.allocations?.reduce(
+                      (sum, a) => sum + (Number(a.amount) || 0),
+                      0
+                    ) || 0,
+                    formData.currency
+                  )}
                 </span>
               </div>
 
@@ -415,12 +460,27 @@ export default function EditMovementPage() {
                 <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--warning">
                   {allocationError}
                 </span>
+              ) : Math.abs(
+                  (formData.allocations?.reduce(
+                    (sum, a) => sum + (Number(a.amount) || 0),
+                    0
+                  ) || 0) - (Number(formData.amount) || 0)
+                ) < 0.01 ? (
+                <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--success">
+                  ✓ Distribuido
+                </span>
               ) : (
-                Math.abs((formData.allocations?.reduce((sum, a) => sum + (Number(a.amount) || 0), 0) || 0) - (Number(formData.amount) || 0)) < 0.01
-                  ? <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--success">✓ Distribuido</span>
-                  : <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--warning">
-                    Falta: {formatCurrency((Number(formData.amount) || 0) - (formData.allocations?.reduce((sum, a) => sum + (Number(a.amount) || 0), 0) || 0), formData.currency)}
-                  </span>
+                <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--warning">
+                  Falta:{' '}
+                  {formatCurrency(
+                    (Number(formData.amount) || 0) -
+                      (formData.allocations?.reduce(
+                        (sum, a) => sum + (Number(a.amount) || 0),
+                        0
+                      ) || 0),
+                    formData.currency
+                  )}
+                </span>
               )}
             </div>
           </div>
@@ -537,12 +597,12 @@ export default function EditMovementPage() {
               <Label>Valor Unitario (Calculado)</Label>
               <div className="movement-form__calculated-value">
                 {formData.amount &&
-                  formData.quantity &&
-                  Number(formData.quantity) !== 0
+                formData.quantity &&
+                Number(formData.quantity) !== 0
                   ? formatCurrency(
-                    Number(formData.amount) / Number(formData.quantity),
-                    formData.currency
-                  )
+                      Number(formData.amount) / Number(formData.quantity),
+                      formData.currency
+                    )
                   : '$ 0'}
               </div>
             </div>
@@ -632,11 +692,13 @@ export default function EditMovementPage() {
           </div>
 
           <div className="movement-form__field-group">
-            <Label>Vincular Movimiento de Inventario / Liquidación (Opcional)</Label>
+            <Label>
+              Vincular Movimiento de Inventario / Liquidación (Opcional)
+            </Label>
             <InventoryMovementSearchSelect
               value={formData.inventoryMovementId as string}
               onValueChange={(val) =>
-                setFormData(prev => ({ ...prev, inventoryMovementId: val }))
+                setFormData((prev) => ({ ...prev, inventoryMovementId: val }))
               }
               type={formData.type === 'INCOME' ? 'LIQUIDACION' : 'INGRESO'}
               placeholder={
@@ -650,7 +712,6 @@ export default function EditMovementPage() {
             </p>
           </div>
         </div>
-
 
         <div className="movement-form__footer">
           <Button type="button" variant="outline" onClick={() => router.back()}>

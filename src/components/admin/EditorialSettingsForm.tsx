@@ -84,7 +84,9 @@ export default function EditorialSettingsForm() {
     <div className="profile-page__info-card">
       <div className="flex items-center gap-2 mb-4">
         <Building2 className="text-primary w-5 h-5" />
-        <h3 className="profile-page__card-title" style={{ margin: 0 }}>Datos de la Editorial</h3>
+        <h3 className="profile-page__card-title" style={{ margin: 0 }}>
+          Datos de la Editorial
+        </h3>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
