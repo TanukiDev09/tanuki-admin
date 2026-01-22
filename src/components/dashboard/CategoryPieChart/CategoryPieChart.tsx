@@ -14,6 +14,7 @@ import './CategoryPieChart.scss';
 
 interface CategoryPieChartProps {
   data: Array<{ name: string; value: number }>;
+  title?: string;
 }
 
 const COLORS = [
@@ -27,18 +28,18 @@ const COLORS = [
   'var(--color-chart-8)',
 ];
 
-export function CategoryPieChart({ data }: CategoryPieChartProps) {
+export function CategoryPieChart({ data, title = 'Gastos por Categoría' }: CategoryPieChartProps) {
   // Sort by value (descending) and take top 5 for better pie visualization
   const sortedData = (data || [])
     .filter((item) => item.value > 0)
     .sort((a, b) => b.value - a.value)
-    .slice(0, 5);
+    .slice(0, 10);
 
   return (
     <Card className="category-pie-chart category-pie-chart--no-border">
       <CardHeader className="category-pie-chart__header">
         <CardTitle className="category-pie-chart__title">
-          Gastos por Categoría
+          {title}
         </CardTitle>
       </CardHeader>
       <CardContent className="category-pie-chart__content">

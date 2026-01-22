@@ -11,18 +11,21 @@
   &__container {
     display: flex;
     flex-direction: column;
-    gap: $spacing-3xl;
+    gap: $spacing-xl; // Reduced from 3xl for mobile
     width: 100%;
     max-width: 1600px;
     min-height: 100vh;
     margin: 0 auto;
-    padding: $spacing-lg;
-    padding-bottom: 150px; // Significantly increased to fully clear mobile bottom menu
+    padding: $spacing-md; // Reduced for mobile
+    padding-bottom: 120px;
 
-    // Subtle background mesh/gradient effect could be added here if not in global body
+    @include md {
+      gap: $spacing-2xl;
+      padding: $spacing-xl;
+    }
 
     @include lg {
-      padding: $spacing-xl; // Reset padding on desktop
+      gap: $spacing-3xl;
     }
   }
 
@@ -31,14 +34,16 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: $spacing-lg; // Increased from md
-    padding-bottom: $spacing-xl; // Increased from lg
+    gap: $spacing-md;
+    padding-bottom: $spacing-lg;
     border-bottom: 1px solid rgba($border, 0.4);
 
     @include md {
       flex-direction: row;
       justify-content: space-between;
       align-items: flex-end;
+      gap: $spacing-lg;
+      padding-bottom: $spacing-xl;
     }
   }
 

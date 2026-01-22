@@ -20,6 +20,7 @@ interface ChartDataEntry {
 
 interface CategoryBarChartProps {
   data: ChartDataEntry[];
+  title?: string;
 }
 
 const COLORS = [
@@ -33,7 +34,7 @@ const COLORS = [
   'var(--color-chart-8)',
 ];
 
-export function CategoryBarChart({ data }: CategoryBarChartProps) {
+export function CategoryBarChart({ data, title = 'Gastos por Categoría' }: CategoryBarChartProps) {
   const sortedData = (data || [])
     .filter(
       (item) =>
@@ -46,7 +47,7 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
     <Card className="category-bar-chart category-bar-chart--no-border">
       <CardHeader className="category-bar-chart__header">
         <CardTitle className="category-bar-chart__title">
-          Gastos por Categoría
+          {title}
         </CardTitle>
       </CardHeader>
       <CardContent className="category-bar-chart__content">

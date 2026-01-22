@@ -11,40 +11,42 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { formatCurrency, formatNumber } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import './ScrollableIncomeExpenseChart.scss';
 
 interface ScrollableIncomeExpenseChartProps {
   data: Array<{ month: string; income: number; expenses: number }>;
   className?: string;
+  scrollable?: boolean;
+  variant?: 'daily' | 'monthly';
 }
 
 export function ScrollableIncomeExpenseChart({
   data,
   className,
+  scrollable = false,
+  variant = 'monthly',
 }: ScrollableIncomeExpenseChartProps) {
-  // Calculate width based on data length to enable scrolling
-  // 100px per data point seems reasonable for readability
-  const minWidth = Math.max(data.length * 80, 800);
+  const isDaily = variant === 'daily';
 
   return (
-    <Card className={`scrollable-income-expense-chart ${className || ''}`}>
+    <Card className={`scrollable-income-expense-chart ${className || ''} ${scrollable ? 'scrollable-income-expense-chart--scrollable' : ''}`}>
       <CardHeader className="scrollable-income-expense-chart__header">
         <CardTitle className="scrollable-income-expense-chart__title">
-          Flujo de Caja Histórico
+          {isDaily ? 'Flujo de Efectivo Diario' : 'Flujo de Caja Histórico'}
         </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="scrollable-income-expense-chart__scroll-container">
           <div
             className="scrollable-income-expense-chart__chart-wrapper"
-            style={{ width: `${minWidth}px` }}
+            style={scrollable ? { width: `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px` } : { width: '100%' }}
           >
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={400}>
               <BarChart
                 data={data}
-                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-                barSize={40}
+                margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
+                barSize={isDaily && !scrollable ? undefined : (isDaily ? 20 : 40)}
               >
                 <CartesianGrid
                   strokeDasharray="3 3"
@@ -54,18 +56,24 @@ export function ScrollableIncomeExpenseChart({
                 <XAxis
                   dataKey="month"
                   stroke="hsl(var(--muted-foreground))"
-                  fontSize={12}
+                  fontSize={10}
                   tickLine={false}
                   axisLine={false}
+                  interval={isDaily && !scrollable ? 2 : 0}
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                  dy={10}
                 />
                 <YAxis
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) =>
-                    `$ ${formatNumber((value / 1000000).toFixed(0))} M`
-                  }
+                  tickFormatter={(value) => {
+                    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
+                    if (value >= 1000) return `$${(value / 1000).toFixed(0)}k`;
+                    return `$${value}`;
+                  }}
+                  tick={{ fill: 'hsl(var(--muted-foreground))' }}
                 />
                 <Tooltip
                   cursor={{ fill: 'hsl(var(--muted)/0.4)' }}
@@ -85,6 +93,7 @@ export function ScrollableIncomeExpenseChart({
                   wrapperStyle={{
                     fontFamily: 'var(--font-sans)',
                     fontSize: '12px',
+                    paddingTop: '20px'
                   }}
                 />
                 <Bar

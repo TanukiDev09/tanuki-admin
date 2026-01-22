@@ -1,0 +1,72 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.period-selector {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-md;
+
+  // Mobile reachability
+  width: 100%;
+  padding: $spacing-sm;
+  background: $card;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+
+  @include md {
+    justify-content: flex-start;
+    width: auto;
+  }
+
+  &__controls {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+    gap: $spacing-sm;
+
+    @include md {
+      flex: none;
+      gap: $spacing-md;
+    }
+  }
+
+  &__selects {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-2xs $spacing-xs;
+    background: $muted;
+    border-radius: $radius-md;
+  }
+
+  &__trigger {
+    background: transparent;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    border: none;
+
+    &:focus {
+      outline: none;
+      box-shadow: none;
+    }
+  }
+
+  &__btn {
+    background: $card;
+    color: $foreground;
+    border-color: $border;
+
+    &:hover {
+      background: $accent;
+      color: $accent-foreground;
+    }
+
+    svg {
+      width: $icon-sm;
+      height: $icon-sm;
+    }
+  }
+}
