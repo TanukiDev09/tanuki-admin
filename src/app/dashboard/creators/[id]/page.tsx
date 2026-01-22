@@ -33,6 +33,7 @@ import {
 import { formatNumber } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 import { TrendingUp } from 'lucide-react';
+import { getBookCoverAlt, getCreatorImageAlt } from '@/lib/accessibility';
 
 import './creator-detail.scss';
 
@@ -162,7 +163,7 @@ export default function CreatorDetailPage(props: {
                 {creator.photo ? (
                   <Image
                     src={`/uploads/creators/${creator.photo}`}
-                    alt={creator.name}
+                    alt={getCreatorImageAlt(creator.name)}
                     fill
                     className="creator-detail__avatar-image"
                     sizes="(max-width: 768px) 192px, 192px"
@@ -254,7 +255,7 @@ export default function CreatorDetailPage(props: {
                                   ? book.coverImage
                                   : `/uploads/covers/${book.coverImage}`
                               }
-                              alt={book.title}
+                              alt={getBookCoverAlt(book.title)}
                               fill
                               className="creator-detail__book-image"
                               sizes="56px"
@@ -274,37 +275,37 @@ export default function CreatorDetailPage(props: {
                                 (typeof a === 'string' ? a : a._id) ===
                                 creator._id
                             ) && (
-                              <Badge
-                                variant="secondary"
-                                className="creator-detail__badge-small"
-                              >
-                                Autor
-                              </Badge>
-                            )}
+                                <Badge
+                                  variant="secondary"
+                                  className="creator-detail__badge-small"
+                                >
+                                  Autor
+                                </Badge>
+                              )}
                             {book.translators?.some(
                               (a) =>
                                 (typeof a === 'string' ? a : a._id) ===
                                 creator._id
                             ) && (
-                              <Badge
-                                variant="secondary"
-                                className="creator-detail__badge-small"
-                              >
-                                Traductor
-                              </Badge>
-                            )}
+                                <Badge
+                                  variant="secondary"
+                                  className="creator-detail__badge-small"
+                                >
+                                  Traductor
+                                </Badge>
+                              )}
                             {book.illustrators?.some(
                               (a) =>
                                 (typeof a === 'string' ? a : a._id) ===
                                 creator._id
                             ) && (
-                              <Badge
-                                variant="secondary"
-                                className="creator-detail__badge-small"
-                              >
-                                Ilustrador
-                              </Badge>
-                            )}
+                                <Badge
+                                  variant="secondary"
+                                  className="creator-detail__badge-small"
+                                >
+                                  Ilustrador
+                                </Badge>
+                              )}
                           </div>
                         </div>
                       </div>
@@ -343,7 +344,7 @@ export default function CreatorDetailPage(props: {
                             <TableCell className="font-medium">
                               {/* Safe cast or check if book is object */}
                               {typeof agreement.book === 'object' &&
-                              agreement.book !== null
+                                agreement.book !== null
                                 ? (agreement.book as { title: string }).title
                                 : 'Libro no disponible'}
                             </TableCell>

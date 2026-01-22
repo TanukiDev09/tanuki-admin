@@ -133,7 +133,7 @@ export default function BookFinancials({
               {formatCurrency(totals.balance)}
             </div>
             <p className="book-financials__subtext">
-              Margen: {formatNumber(health.profitMargin.toFixed(1))}%
+              Margen: {formatNumber((health.profitMargin || 0).toFixed(1))}%
             </p>
           </CardContent>
         </Card>

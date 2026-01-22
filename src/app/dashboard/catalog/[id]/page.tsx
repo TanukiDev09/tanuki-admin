@@ -17,6 +17,7 @@ import BookInventorySummary from '@/components/books/BookInventorySummary';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency, formatNumber } from '@/lib/utils';
+import { getBookCoverAlt } from '@/lib/accessibility';
 import './book-detail.scss';
 
 // Helper to display creators
@@ -140,7 +141,7 @@ export default function BookDetailPage(props: {
                         ? book.coverImage
                         : `/uploads/covers/${book.coverImage}`
                     }
-                    alt={book.title}
+                    alt={getBookCoverAlt(book.title)}
                     fill
                     className="book-detail__cover-image"
                     sizes="(max-width: 768px) 100vw, 33vw"

@@ -16,6 +16,7 @@ import { History, Search } from 'lucide-react';
 import { formatCurrency, formatNumber } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getBookCoverAlt } from '@/lib/accessibility';
 import './InventoryList.scss';
 
 interface Book {
@@ -106,14 +107,14 @@ export function InventoryList({ data, onAdjust }: InventoryListProps) {
                   <TableCell>
                     <div className="inventory-list__cover-container">
                       {item.bookId.coverImage &&
-                      !imageError[item.bookId._id] ? (
+                        !imageError[item.bookId._id] ? (
                         <Image
                           src={
                             item.bookId.coverImage.startsWith('http')
                               ? item.bookId.coverImage
                               : `/uploads/covers/${item.bookId.coverImage}`
                           }
-                          alt={item.bookId.title}
+                          alt={getBookCoverAlt(item.bookId.title)}
                           fill
                           className="inventory-list__cover-image"
                           onError={() =>

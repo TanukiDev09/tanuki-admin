@@ -548,6 +548,7 @@ export async function GET(request: NextRequest) {
           gross: avgMonthlyExpenses,
           net: netBurnRate,
         },
+        profitMargin: grossProfitMargin,
         healthScore,
         runwayProjection,
       };
