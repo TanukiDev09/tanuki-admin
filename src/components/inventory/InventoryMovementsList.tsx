@@ -70,7 +70,6 @@ interface Movement {
   invoiceRef?: string;
 }
 
-
 interface MovementsListProps {
   movements: Movement[];
   isLoading: boolean;
@@ -81,7 +80,9 @@ export function InventoryMovementsList({
   isLoading,
 }: MovementsListProps) {
   const router = useRouter();
-  const [editorialSettings, setEditorialSettings] = useState<EditorialSettings | undefined>(undefined);
+  const [editorialSettings, setEditorialSettings] = useState<
+    EditorialSettings | undefined
+  >(undefined);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -175,7 +176,9 @@ export function InventoryMovementsList({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => router.push(`/dashboard/inventory/${movement._id}`)}
+                  onClick={() =>
+                    router.push(`/dashboard/inventory/${movement._id}`)
+                  }
                   title="Ver Detalles"
                 >
                   <Eye className="inventory-movements-list__icon" />
@@ -207,7 +210,8 @@ export function InventoryMovementsList({
                         typeof movement.financialMovementId === 'object'
                           ? movement.financialMovementId?._id
                           : movement.financialMovementId;
-                      if (id) window.open(`/dashboard/movements/${id}`, '_blank');
+                      if (id)
+                        window.open(`/dashboard/movements/${id}`, '_blank');
                     }}
                     title="Ver Movimiento Financiero"
                   >
@@ -215,7 +219,6 @@ export function InventoryMovementsList({
                   </Button>
                 )}
               </TableCell>
-
             </TableRow>
           ))}
         </TableBody>

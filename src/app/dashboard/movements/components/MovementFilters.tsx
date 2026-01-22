@@ -15,7 +15,6 @@ import { Filter, X } from 'lucide-react';
 import { CategorySelect } from '@/components/finance/CategorySelect';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
 
-
 interface MovementFiltersProps {
   showAdvancedFilters: boolean;
   setShowAdvancedFilters: (show: boolean) => void;
@@ -158,8 +157,9 @@ export function MovementFilters({
             <Label className="movements-list__label">Centro Costos</Label>
             <CostCenterSelect
               value={costCenterFilter === 'ALL' ? '' : costCenterFilter}
-              onValueChange={(val: string | null) => setCostCenterFilter(val || 'ALL')}
-
+              onValueChange={(val: string | null) =>
+                setCostCenterFilter(val || 'ALL')
+              }
               allowNull={true}
               nullLabel="Sin definir"
               allowCreation={false}

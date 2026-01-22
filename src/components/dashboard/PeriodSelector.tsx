@@ -2,7 +2,13 @@
 
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/Select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/Select';
 import './PeriodSelector.scss';
 
 interface PeriodSelectorProps {
@@ -14,14 +20,33 @@ interface PeriodSelectorProps {
 }
 
 const MONTHS = [
-  'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-  'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+  'Enero',
+  'Febrero',
+  'Marzo',
+  'Abril',
+  'Mayo',
+  'Junio',
+  'Julio',
+  'Agosto',
+  'Septiembre',
+  'Octubre',
+  'Noviembre',
+  'Diciembre',
 ];
 
-export function PeriodSelector({ year, month, onYearChange, onMonthChange, type }: PeriodSelectorProps) {
+export function PeriodSelector({
+  year,
+  month,
+  onYearChange,
+  onMonthChange,
+  type,
+}: PeriodSelectorProps) {
   const currentYear = new Date().getFullYear();
   const startYear = 2018;
-  const years = Array.from({ length: currentYear - startYear + 1 }, (_, i) => startYear + i).reverse();
+  const years = Array.from(
+    { length: currentYear - startYear + 1 },
+    (_, i) => startYear + i
+  ).reverse();
 
   const handlePrev = () => {
     if (type === 'monthly' && month !== null) {
@@ -52,7 +77,12 @@ export function PeriodSelector({ year, month, onYearChange, onMonthChange, type 
   return (
     <div className="period-selector">
       <div className="period-selector__controls">
-        <Button variant="outline" size="icon" onClick={handlePrev} className="period-selector__btn">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handlePrev}
+          className="period-selector__btn"
+        >
           <ChevronLeft className="w-4 h-4" />
         </Button>
 
@@ -94,7 +124,12 @@ export function PeriodSelector({ year, month, onYearChange, onMonthChange, type 
           </Select>
         </div>
 
-        <Button variant="outline" size="icon" onClick={handleNext} className="period-selector__btn">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={handleNext}
+          className="period-selector__btn"
+        >
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>

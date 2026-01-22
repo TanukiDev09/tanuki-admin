@@ -20,7 +20,6 @@ import {
 } from '@/components/ui/Select';
 import './categories-page.scss';
 
-
 export default function CategoriesPage() {
   const { toast } = useToast();
   const { hasPermission } = usePermission();
@@ -38,7 +37,6 @@ export default function CategoriesPage() {
     null
   );
   const [typeFilter, setTypeFilter] = useState('all');
-
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -101,7 +99,6 @@ export default function CategoriesPage() {
     return matchesSearch && matchesType;
   });
 
-
   return (
     <div className="categories-page">
       <div className="categories-page__header">
@@ -138,7 +135,6 @@ export default function CategoriesPage() {
           </SelectContent>
         </Select>
       </div>
-
 
       <CategoriesTable
         categories={filteredCategories}

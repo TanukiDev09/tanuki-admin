@@ -28,7 +28,10 @@ const COLORS = [
   'var(--color-chart-8)',
 ];
 
-export function CategoryPieChart({ data, title = 'Gastos por Categoría' }: CategoryPieChartProps) {
+export function CategoryPieChart({
+  data,
+  title = 'Gastos por Categoría',
+}: CategoryPieChartProps) {
   // Sort by value (descending) and take top 5 for better pie visualization
   const sortedData = (data || [])
     .filter((item) => item.value > 0)
@@ -38,9 +41,7 @@ export function CategoryPieChart({ data, title = 'Gastos por Categoría' }: Cate
   return (
     <Card className="category-pie-chart category-pie-chart--no-border">
       <CardHeader className="category-pie-chart__header">
-        <CardTitle className="category-pie-chart__title">
-          {title}
-        </CardTitle>
+        <CardTitle className="category-pie-chart__title">{title}</CardTitle>
       </CardHeader>
       <CardContent className="category-pie-chart__content">
         {sortedData.length === 0 ? (

@@ -77,7 +77,13 @@ export function MovementSearchSelect({
         >
           {selectedMovement ? (
             <span className="truncate">
-              {selectedMovement.date.split('T')[0]} - {selectedMovement.description} ({formatCurrency(selectedMovement.amount, selectedMovement.currency)})
+              {selectedMovement.date.split('T')[0]} -{' '}
+              {selectedMovement.description} (
+              {formatCurrency(
+                selectedMovement.amount,
+                selectedMovement.currency
+              )}
+              )
             </span>
           ) : (
             placeholder
@@ -122,7 +128,8 @@ export function MovementSearchSelect({
                   <div className="flex flex-col">
                     <span className="font-medium">{movement.description}</span>
                     <span className="text-xs text-muted-foreground">
-                      {movement.date.split('T')[0]} • {movement.beneficiary} • {formatCurrency(movement.amount, movement.currency)}
+                      {movement.date.split('T')[0]} • {movement.beneficiary} •{' '}
+                      {formatCurrency(movement.amount, movement.currency)}
                     </span>
                   </div>
                 </CommandItem>

@@ -30,7 +30,7 @@ interface FinanceMovementsTableProps {
 export function FinanceMovementsTable({
   movements,
   pagination,
-  onPageChange
+  onPageChange,
 }: FinanceMovementsTableProps) {
   if (!movements || movements.length === 0) {
     return (
@@ -57,7 +57,9 @@ export function FinanceMovementsTable({
             {movements.map((m, index) => (
               <TableRow key={m._id || index}>
                 <TableCell className="whitespace-nowrap">
-                  {new Date(m.date).toLocaleDateString('es-CO', { timeZone: 'UTC' })}
+                  {new Date(m.date).toLocaleDateString('es-CO', {
+                    timeZone: 'UTC',
+                  })}
                 </TableCell>
                 <TableCell className="font-medium">
                   <Link
@@ -69,7 +71,9 @@ export function FinanceMovementsTable({
                 </TableCell>
                 <TableCell>
                   <Badge variant="outline" className="font-normal">
-                    {m.category && typeof m.category === 'object' ? m.category.name : (m.category || 'Sin categoría')}
+                    {m.category && typeof m.category === 'object'
+                      ? m.category.name
+                      : m.category || 'Sin categoría'}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -77,8 +81,11 @@ export function FinanceMovementsTable({
                     {m.costCenter || 'N/A'}
                   </span>
                 </TableCell>
-                <TableCell className={`text-right font-mono ${m.type === 'INCOME' ? 'text-success' : 'text-danger'}`}>
-                  {m.type === 'INCOME' ? '+' : '-'} {formatCurrency(Number(m.amount || 0))}
+                <TableCell
+                  className={`text-right font-mono ${m.type === 'INCOME' ? 'text-success' : 'text-danger'}`}
+                >
+                  {m.type === 'INCOME' ? '+' : '-'}{' '}
+                  {formatCurrency(Number(m.amount || 0))}
                 </TableCell>
               </TableRow>
             ))}

@@ -26,7 +26,6 @@ import { formatNumber } from '@/lib/utils';
 import { MovementSearchSelect } from '@/components/finance/MovementSearchSelect';
 import './InventoryMovementModal.scss';
 
-
 type MovementType = 'INGRESO' | 'REMISION' | 'DEVOLUCION' | 'LIQUIDACION';
 type SubType = 'INITIAL' | 'UNEXPECTED' | 'PURCHASE';
 
@@ -87,7 +86,6 @@ export function InventoryMovementModal({
   const [financialMovementId, setFinancialMovementId] = useState('');
   const [observations, setObservations] = useState('');
   const [items, setItems] = useState<SelectedItem[]>([]);
-
 
   // Data State
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -157,7 +155,6 @@ export function InventoryMovementModal({
     setFinancialMovementId('');
     setItems([]);
   };
-
 
   const getSourceWarehouseId = () => {
     if (type === 'INGRESO') return null;
@@ -249,7 +246,6 @@ export function InventoryMovementModal({
         observations: observations || undefined,
       };
 
-
       const res = await fetch('/api/inventory/movements', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -316,15 +312,15 @@ export function InventoryMovementModal({
           <SelectContent>
             {(activeWarehouseType === 'editorial' ||
               activeWarehouseType === 'general') && (
-                <>
-                  <SelectItem value="INGRESO">
-                    Ingreso (Compras / Ajuste)
-                  </SelectItem>
-                  <SelectItem value="REMISION">
-                    Remisión (A Punto de Venta)
-                  </SelectItem>
-                </>
-              )}
+              <>
+                <SelectItem value="INGRESO">
+                  Ingreso (Compras / Ajuste)
+                </SelectItem>
+                <SelectItem value="REMISION">
+                  Remisión (A Punto de Venta)
+                </SelectItem>
+              </>
+            )}
             <SelectItem value="LIQUIDACION">Liquidación (Venta)</SelectItem>
             {activeWarehouseType === 'pos' && (
               <SelectItem value="DEVOLUCION">
@@ -397,7 +393,8 @@ export function InventoryMovementModal({
         />
       </div>
 
-      {(type === 'LIQUIDACION' || (type === 'INGRESO' && subType === 'PURCHASE')) && (
+      {(type === 'LIQUIDACION' ||
+        (type === 'INGRESO' && subType === 'PURCHASE')) && (
         <div className="inventory-movement-modal__field">
           <Label>Vincular Movimiento Financiero (Opcional)</Label>
           <MovementSearchSelect
@@ -411,11 +408,11 @@ export function InventoryMovementModal({
             }
           />
           <p className="text-[10px] text-muted-foreground mt-1">
-            Permite relacionar este movimiento de inventario con su registro contable.
+            Permite relacionar este movimiento de inventario con su registro
+            contable.
           </p>
         </div>
       )}
-
 
       <div className="inventory-movement-modal__footer inventory-movement-modal__footer--end">
         <Button
@@ -482,7 +479,10 @@ export function InventoryMovementModal({
           const isAdded = items.some((i) => i.bookId === bookId);
 
           return (
-            <div key={bookId || index} className="inventory-movement-modal__item">
+            <div
+              key={bookId || index}
+              className="inventory-movement-modal__item"
+            >
               <div className="inventory-movement-modal__item-info">
                 <span className="inventory-movement-modal__item-title">
                   {title}

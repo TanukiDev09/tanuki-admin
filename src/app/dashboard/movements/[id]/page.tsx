@@ -166,7 +166,11 @@ export default function MovementDetailPage() {
                   </table>
                 </div>
               ) : (
-                <p>{movement.costCenter || (movement.allocations?.[0]?.costCenter) || '-'}</p>
+                <p>
+                  {movement.costCenter ||
+                    movement.allocations?.[0]?.costCenter ||
+                    '-'}
+                </p>
               )}
             </div>
           </div>
@@ -189,7 +193,6 @@ export default function MovementDetailPage() {
             </p>
           </div>
 
-
           {movement.invoiceRef && (
             <div>
               <h3 className="movement-detail__label">Referencia Factura</h3>
@@ -200,7 +203,8 @@ export default function MovementDetailPage() {
           {movement.inventoryMovementId && (
             <div className="movement-detail__link-section mt-4">
               <h3 className="movement-detail__label flex items-center gap-2">
-                <Package className="w-4 h-4" /> Movimiento de Inventario Vinculado
+                <Package className="w-4 h-4" /> Movimiento de Inventario
+                Vinculado
               </h3>
               <div className="flex items-center gap-4 p-4 bg-muted rounded-lg mt-2">
                 <div className="flex-1 text-sm">
@@ -217,7 +221,6 @@ export default function MovementDetailPage() {
             </div>
           )}
         </CardContent>
-
       </Card>
     </div>
   );

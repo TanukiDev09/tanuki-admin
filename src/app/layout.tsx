@@ -33,7 +33,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es" className={`${workSans.variable} ${montserrat.variable}`} suppressHydrationWarning>
+    <html
+      lang="es"
+      className={`${workSans.variable} ${montserrat.variable}`}
+      suppressHydrationWarning
+    >
       <body className="root-layout" suppressHydrationWarning>
         <AuthProvider>
           <PermissionProvider>
