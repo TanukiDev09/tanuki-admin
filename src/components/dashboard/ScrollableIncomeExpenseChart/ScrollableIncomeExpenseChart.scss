@@ -15,14 +15,19 @@
 
   &__scroll-container {
     width: 100%;
-    overflow-x: auto;
+    max-width: 100%;
     padding-bottom: $spacing-md;
 
-    @include custom-scrollbar;
+    .scrollable-income-expense-chart--scrollable & {
+      overflow-x: auto;
+      padding-bottom: $spacing-xl;
+
+      @include custom-scrollbar;
+    }
   }
 
   &__chart-wrapper {
-    height: 400px;
     min-height: 400px;
+    padding-bottom: $spacing-md;
   }
 }

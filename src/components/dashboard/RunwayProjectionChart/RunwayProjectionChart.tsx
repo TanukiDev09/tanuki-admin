@@ -10,56 +10,50 @@ import {
   ReferenceLine,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { formatCurrency, formatNumber } from '@/lib/utils';
+import { formatCurrency } from '@/lib/utils';
 import './RunwayProjectionChart.scss';
 
-interface RunwayProjectionChartProps {
-  data?: Array<{ month: string; balance: number }>;
+interface NetIncomeChartProps {
+  data?: Array<{ month: string; income: number; expenses: number }>;
   className?: string;
 }
 
 export function RunwayProjectionChart({
   data = [],
   className,
-}: RunwayProjectionChartProps) {
-  // Find zero point
-  const zeroPoint = data.findIndex((d) => d.balance === 0);
-  const hasZeroPoint = zeroPoint !== -1;
+}: NetIncomeChartProps) {
+  // Calculate Net Income per month
+  const chartData = data.map(d => ({
+    ...d,
+    netIncome: d.income - d.expenses
+  }));
 
   return (
     <Card className={`runway-projection-chart ${className || ''}`}>
       <CardHeader className="runway-projection-chart__header">
         <CardTitle className="runway-projection-chart__title">
-          Proyección de Pista
+          Evolución del Resultado
         </CardTitle>
         <p className="runway-projection-chart__subtitle">
-          Estimación de efectivo disponible en los próximos 18 meses
+          Utilidad (o Pérdida) Neta mes a mes
         </p>
       </CardHeader>
       <CardContent className="runway-projection-chart__content">
-        {!data || data.length === 0 ? (
+        {!chartData || chartData.length === 0 ? (
           <div className="runway-projection-chart__empty">
-            <p>No hay datos de proyección disponibles</p>
+            <p>No hay datos históricos disponibles</p>
           </div>
         ) : (
           <div className="runway-projection-chart__chart-container">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart
-                data={data}
+                data={chartData}
                 margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
               >
                 <defs>
-                  <linearGradient id="cashGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="hsl(var(--balance))"
-                      stopOpacity={0.3}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="hsl(var(--balance))"
-                      stopOpacity={0}
-                    />
+                  <linearGradient id="netIncomeGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <XAxis
@@ -75,7 +69,7 @@ export function RunwayProjectionChart({
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(value) =>
-                    `$ ${formatNumber((value / 1000000).toFixed(0))} M`
+                    `$${(value / 1000000).toFixed(1)}M`
                   }
                 />
                 <Tooltip
@@ -86,36 +80,17 @@ export function RunwayProjectionChart({
                     fontFamily: 'var(--font-sans)',
                     borderRadius: 'var(--radius)',
                   }}
-                  formatter={(value: number | undefined) =>
-                    value !== undefined ? formatCurrency(value) : ''
-                  }
+                  formatter={(value: number | undefined) => (value !== undefined ? formatCurrency(value) : '')}
                   labelFormatter={(label) => `Mes: ${label}`}
                 />
-                <ReferenceLine
-                  y={0}
-                  stroke="hsl(var(--ebb))"
-                  strokeDasharray="3 3"
-                />
-                {hasZeroPoint && (
-                  <ReferenceLine
-                    x={data[zeroPoint].month}
-                    stroke="hsl(var(--ebb))"
-                    strokeWidth={2}
-                    label={{
-                      value: 'Advertencia: Se agota efectivo',
-                      position: 'top',
-                      fontSize: 11,
-                      fill: 'hsl(var(--ebb))',
-                    }}
-                  />
-                )}
+                <ReferenceLine y={0} stroke="hsl(var(--muted-foreground))" strokeDasharray="3 3" />
                 <Area
                   type="monotone"
-                  dataKey="balance"
-                  name="Efectivo proyectado"
-                  stroke="hsl(var(--balance))"
+                  dataKey="netIncome"
+                  name="Resultado Neto"
+                  stroke="#10b981"
                   strokeWidth={2}
-                  fill="url(#cashGradient)"
+                  fill="url(#netIncomeGradient)"
                 />
               </AreaChart>
             </ResponsiveContainer>

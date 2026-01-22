@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-01-21
+
+### ✨ Nuevas Características
+
+- **Visualización Financiera Flexible**:
+  - **Toggle Ingresos/Gastos**: Nueva funcionalidad para alternar entre la visualización de repartición de ingresos y gastos en las gráficas de categorías y centros de costo.
+  - **Identificación de Categorías**: Resolución inteligente de IDs de categorías, mostrando nombres legibles o referencias cortas en lugar de hashes largos.
+- **Precisión de Datos**:
+  - **Filtro UTC Estricto**: Corrección en los límites de fechas para evitar la "contaminación" de reportes con movimientos de años adyacentes debido a diferencias horarias.
+
+### 🛠️ Calidad Técnica
+
+- **Mantenimiento de Código**:
+  - **Refactorización Mayor**: Desacople del dashboard financiero en componentes dedicados (`GlobalView`, `MonthlyView`, `AnnualView`) para mejorar la mantenibilidad.
+  - **Complejidad Cognitiva**: Optimización de rutas de API y componentes de React para cumplir con estándares estrictos de complejidad.
+  - **Linting Riguroso**: Corrección total de errores de TypeScript, Stylelint y ESLint, eliminando tipos `any` implícitos y corrigiendo variantes de componentes.
+
+### 🐛 Correcciones
+
+- Arreglado bug donde los nombres de categorías no se mostraban en reportes antiguos (Enero 2019).
+- Corregida la comparación de tipos en la tabla de movimientos financieros.
+- Ajustados estilos SCSS para cumplir con el orden de propiedades estándar.
+
+---
+
 ## [1.0.1] - 2026-01-21
 
 ### ✨ Nuevas Características
