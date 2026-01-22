@@ -16,6 +16,7 @@ import Image from 'next/image';
 import { Search, Loader2, Plus } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { debounce } from 'lodash';
+import { getBookCoverAlt } from '@/lib/accessibility';
 import './AddBookToInventoryModal.scss';
 
 interface Book {
@@ -198,7 +199,7 @@ export function AddBookToInventoryModal({
                               ? book.coverImage!
                               : `/uploads/covers/${book.coverImage}`
                           }
-                          alt={book.title}
+                          alt={getBookCoverAlt(book.title)}
                           fill
                           className="add-book-inventory-modal__cover-image"
                           onError={() =>

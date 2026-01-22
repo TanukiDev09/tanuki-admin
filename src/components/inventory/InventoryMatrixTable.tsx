@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getBookCoverAlt } from '@/lib/accessibility';
 import {
   Table,
   TableBody,
@@ -293,7 +294,7 @@ export function InventoryMatrixTable() {
                                   ? row.coverImage
                                   : `/uploads/covers/${row.coverImage}`
                               }
-                              alt={row.title}
+                              alt={getBookCoverAlt(row.title)}
                               fill
                               sizes="(max-width: 768px) 100px, 30px"
                               className="inventory-matrix__cover-image"

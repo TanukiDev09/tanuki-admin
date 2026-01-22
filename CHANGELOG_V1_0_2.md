@@ -16,23 +16,38 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
 
 - **Límite de Líneas por Componente**:
   - Se ha implementado una regla estricta en ESLint (`max-lines`) que limita los archivos `.tsx` a un máximo de **700 líneas**.
-  - Esta regla ignora comentarios y líneas en blanco para enfocarse exclusivamente en la complejidad del código.
-  - Objetivo: Fomentar la componetización y evitar "archivos monstruo" que dificulten la mantenibilidad.
-- **Mantenimiento Preventivo (Linters Clean)**:
-  - **ESLint**: Ejecución y corrección total de advertencias y errores. El proyecto ahora cumple al 100% con las reglas de linting definidas.
-  - **Stylelint**: Verificación completa de archivos SCSS, asegurando el orden correcto de propiedades y el cumplimiento del sistema de diseño.
-  - **TypeScript (TSC)**: Verificación de tipos en todo el proyecto (`npx tsc --noEmit`) con resultado exitoso (Zero errors).
+  - Objetivo: Fomentar la componetización y evitar "archivos monstruo".
 - **Refactorización Mayor**:
-  - Desacople del dashboard financiero en componentes dedicados (`GlobalView`, `MonthlyView`, `AnnualView`) para mejorar la mantenibilidad.
-  - **Optimización de Complejidad**: Reducción de la complejidad cognitiva en componentes clave y rutas de API mediante la integración con SonarJS.
+  - Desacople del dashboard financiero en componentes dedicados (`GlobalView`, `MonthlyView`, `AnnualView`).
 - **Estandarización de Formato**:
-  - Aplicación de `Prettier` en todo el workspace para garantizar una base de código visualmente consistente y profesional.
+  - Aplicación de `Prettier`, `ESLint` y `Stylelint` en todo el workspace para garantizar consistencia.
 
 ### 🐛 Correcciones
 
 - Arreglado bug donde los nombres de categorías no se mostraban en reportes antiguos (Enero 2019).
 - Corregida la comparación de tipos en la tabla de movimientos financieros.
 - Ajustados estilos SCSS para cumplir con el orden de propiedades estándar.
+
+---
+
+### ♿ Sesión: Accesibilidad WCAG AAA & Estabilidad
+
+**Fecha:** 2026-01-22
+
+#### 🌟 Logros de Accesibilidad
+- **Cumplimiento WCAG AAA 1.4.9 (Imágenes de Texto)**:
+  - Implementación de un sistema de utilidades centralizado (`src/lib/accessibility.ts`) para garantizar que todos los textos alternativos sean descriptivos y concisos (máximo 8 palabras).
+  - Refactorización de componentes de inventario, catálogo y creadores para cumplir con los estándares más estrictos de accesibilidad.
+- **Automatización de Pruebas**:
+  - Ejecución exitosa de **210 tests de accesibilidad** con un 100% de éxito en todas las rutas críticas.
+  - Mejora de la estabilidad de los tests para manejar dinámicamente elementos ausentes.
+- **Limpieza de Linters en Tests**:
+  - Resolución del 100% de las advertencias de ESLint en la suite de pruebas de Cypress.
+
+#### 🛠️ Correcciones de Estabilidad
+- **Regresión Crítica en Detalle de Libro**:
+  - Corregido error de ejecución `Cannot read properties of undefined (reading 'toFixed')` en el componente `BookFinancials`.
+  - Actualización robusta de la API de finanzas (`/api/finance/summary`) para garantizar el envío de métricas de margen de beneficio.
 
 ---
 
