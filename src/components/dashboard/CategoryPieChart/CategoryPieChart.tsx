@@ -13,7 +13,7 @@ import { formatCurrency } from '@/lib/utils';
 import './CategoryPieChart.scss';
 
 interface CategoryPieChartProps {
-  data: Array<{ name: string; value: number }>;
+  data: Array<{ name: string; value: number; color?: string }>;
   title?: string;
 }
 
@@ -64,7 +64,7 @@ export function CategoryPieChart({
                 {sortedData.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
+                    fill={entry.color || COLORS[index % COLORS.length]}
                     strokeWidth={0}
                   />
                 ))}

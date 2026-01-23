@@ -5,6 +5,7 @@ import dbConnect from '@/lib/mongodb';
 import * as mongoose from 'mongoose';
 import Movement from '@/models/Movement';
 import InventoryMovement from '@/models/InventoryMovement';
+import { add, multiply, divide, compare, toNumber, gtZero } from '@/lib/math';
 
 export async function GET(
   request: NextRequest,
@@ -39,16 +40,12 @@ export async function GET(
     const formattedMovement = {
       ...movement,
       type: normalizedType,
-      amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
-      quantity: movement.quantity
-        ? parseFloat(movement.quantity.toString())
-        : undefined,
-      unitValue: movement.unitValue
-        ? parseFloat(movement.unitValue.toString())
-        : undefined,
+      amount: toNumber(movement.amount),
+      quantity: movement.quantity ? toNumber(movement.quantity) : undefined,
+      unitValue: movement.unitValue ? toNumber(movement.unitValue) : undefined,
       allocations: (movement.allocations as Allocation[])?.map((a) => ({
         ...a,
-        amount: a.amount ? parseFloat(a.amount.toString()) : 0,
+        amount: a.amount ? toNumber(a.amount) : 0,
       })),
       _id: movement._id.toString(),
     };
@@ -65,26 +62,26 @@ export async function GET(
 
 interface MovementBody {
   [key: string]: unknown;
-  amount?: number;
+  amount?: number | string;
   currency?: string;
-  exchangeRate?: number;
+  exchangeRate?: number | string;
   quantity?: number | string;
-  unitValue?: number;
-  amountInCOP?: number;
+  unitValue?: number | string;
+  amountInCOP?: number | string;
 }
 
 interface Allocation {
   costCenter: string;
-  amount: { toString: () => string } | number;
+  amount: { toString: () => string } | number | string;
 }
 
 interface MovementDoc {
   _id: { toString: () => string };
-  amount: { toString: () => string };
+  amount: { toString: () => string } | number | string;
   type: string;
   unit?: string;
-  quantity?: { toString: () => string };
-  unitValue?: { toString: () => string };
+  quantity?: { toString: () => string } | number | string;
+  unitValue?: { toString: () => string } | number | string;
   allocations?: Allocation[];
   [key: string]: unknown;
 }
@@ -110,31 +107,31 @@ const sanitizeBody = (body: MovementBody): MovementBody => {
 
 const calculateCurrencyValues = (
   body: MovementBody
-): { exchangeRate: number; amountInCOP: number } => {
+): { exchangeRate: string; amountInCOP: string } => {
   const currency = (body.currency as string) || 'COP';
-  const amount = typeof body.amount === 'number' ? body.amount : 0;
-  const providedRate = body.exchangeRate;
+  const amount = body.amount || '0';
+  const providedRate = body.exchangeRate || '0';
 
-  const exchangeRate = currency === 'COP' ? 1 : Number(providedRate || 0);
+  const exchangeRate = currency === 'COP' ? '1' : providedRate.toString();
 
-  let amountInCOP = 0;
+  let amountInCOP = '0';
   if (currency === 'COP') {
-    amountInCOP = amount;
-  } else if (exchangeRate > 0) {
-    amountInCOP = amount * exchangeRate;
+    amountInCOP = amount.toString();
+  } else if (gtZero(exchangeRate)) {
+    amountInCOP = multiply(amount, exchangeRate);
   }
 
   return { exchangeRate, amountInCOP };
 };
 
 const calculateUnitValue = (body: MovementBody) => {
-  const quantity = Number(body.quantity);
-  const amount = Number(body.amount);
+  const quantity = body.quantity || '0';
+  const amount = body.amount || '0';
 
-  if (body.quantity && quantity !== 0) {
-    body.unitValue = amount / quantity;
-  } else if (quantity === 0) {
-    body.unitValue = 0;
+  if (gtZero(quantity)) {
+    body.unitValue = divide(amount, quantity);
+  } else {
+    body.unitValue = '0';
   }
 };
 
@@ -162,27 +159,23 @@ function formatMovement(
     : movement;
   return {
     ...obj,
-    amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
+    amount: toNumber(movement.amount),
     unit: movement.unit as string | undefined,
-    quantity: movement.quantity
-      ? parseFloat(movement.quantity.toString())
-      : undefined,
-    unitValue: movement.unitValue
-      ? parseFloat(movement.unitValue.toString())
-      : undefined,
+    quantity: movement.quantity ? toNumber(movement.quantity) : undefined,
+    unitValue: movement.unitValue ? toNumber(movement.unitValue) : undefined,
     allocations: obj.allocations?.map((a) => ({
       ...a,
-      amount: a.amount ? parseFloat(a.amount.toString()) : 0,
+      amount: a.amount ? toNumber(a.amount) : 0,
     })),
     _id: movement._id.toString(),
   } as FormattedMovement;
 }
 
 function checkAllocations(
-  allocations: { costCenter: string; amount: number }[],
-  totalAmount: number
+  allocations: { costCenter: string; amount: number | string }[],
+  totalAmount: number | string
 ) {
-  let sumAllocations = 0;
+  let sumAllocations = '0';
   for (const allocation of allocations) {
     if (!allocation.costCenter) {
       return {
@@ -190,17 +183,10 @@ function checkAllocations(
         status: 400,
       };
     }
-    const allocAmount = Number(allocation.amount);
-    if (isNaN(allocAmount) || allocAmount < 0) {
-      return {
-        error: 'El monto del detalle debe ser un número válido',
-        status: 400,
-      };
-    }
-    sumAllocations += allocAmount;
+    sumAllocations = add(sumAllocations, allocation.amount);
   }
 
-  if (Math.abs(totalAmount - sumAllocations) > 0.01) {
+  if (compare(totalAmount, sumAllocations) !== 0) {
     return {
       error: `La suma de los detalles (${sumAllocations}) debe ser igual al total del movimiento (${totalAmount})`,
       status: 400,
@@ -212,7 +198,7 @@ function checkAllocations(
 // Helper to validate and normalize allocations for updates
 function validateAndNormalizeAllocations(
   body: MovementBody,
-  totalAmount: number
+  totalAmount: number | string
 ) {
   if (
     body.allocations &&
@@ -265,8 +251,8 @@ export async function PUT(
   try {
     const rawBody = await request.json();
     const body = sanitizeBody(rawBody);
-    const totalAmount = Number(body.amount) || 0;
-    body.amount = totalAmount;
+    const totalAmount = body.amount || '0';
+    body.amount = totalAmount.toString();
 
     // Normalize type for database storage
     if (body.type === 'INCOME') body.type = 'Ingreso';

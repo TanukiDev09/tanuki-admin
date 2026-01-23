@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/Popover';
 import { cn, formatCurrency } from '@/lib/utils';
 import { Movement } from '@/types/movement';
+import { toNumber } from '@/lib/math';
 
 interface MovementSearchSelectProps {
   value?: string;
@@ -80,8 +81,13 @@ export function MovementSearchSelect({
               {selectedMovement.date.split('T')[0]} -{' '}
               {selectedMovement.description} (
               {formatCurrency(
-                selectedMovement.amount,
-                selectedMovement.currency
+                toNumber(selectedMovement.amountInCOP || selectedMovement.amount),
+                'COP'
+              )}
+              {selectedMovement.currency !== 'COP' && (
+                <span className="text-[10px] opacity-70 ml-1">
+                  ({formatCurrency(toNumber(selectedMovement.amount), selectedMovement.currency)})
+                </span>
               )}
               )
             </span>
@@ -129,7 +135,10 @@ export function MovementSearchSelect({
                     <span className="font-medium">{movement.description}</span>
                     <span className="text-xs text-muted-foreground">
                       {movement.date.split('T')[0]} • {movement.beneficiary} •{' '}
-                      {formatCurrency(movement.amount, movement.currency)}
+                      {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
+                      {movement.currency !== 'COP' && (
+                        ` (${formatCurrency(toNumber(movement.amount), movement.currency).trim()})`
+                      )}
                     </span>
                   </div>
                 </CommandItem>

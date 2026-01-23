@@ -3,6 +3,7 @@
 import AuthGuard from '@/components/auth/AuthGuard';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { MobileNav } from '@/components/layout/MobileNav';
 
 import './dashboard-layout.scss';
 
@@ -18,6 +19,7 @@ export default function DashboardLayout({
         <div className="dashboard-layout__container">
           <AppHeader />
           <main className="dashboard-layout__main">{children}</main>
+          <MobileNav />
         </div>
       </div>
     </AuthGuard>

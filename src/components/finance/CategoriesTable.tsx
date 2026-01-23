@@ -74,13 +74,19 @@ export default function CategoriesTable({
           {categories.map((category) => (
             <TableRow key={category._id}>
               <TableCell className="categories-table__name">
-                <span
-                  onClick={() =>
-                    router.push(`/dashboard/categories/${category._id}`)
-                  }
-                >
-                  {category.name}
-                </span>
+                <div className="categories-table__name-container">
+                  <div
+                    className="categories-table__color-dot"
+                    style={{ backgroundColor: category.color || '#64748b' }}
+                  />
+                  <span
+                    onClick={() =>
+                      router.push(`/dashboard/categories/${category._id}`)
+                    }
+                  >
+                    {category.name}
+                  </span>
+                </div>
               </TableCell>
               <TableCell className="categories-table__amount">
                 {formatCurrency(category.totalAmount || 0)}

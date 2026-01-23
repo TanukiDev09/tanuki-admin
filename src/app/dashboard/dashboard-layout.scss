@@ -11,6 +11,7 @@
     flex: 1;
     flex-direction: column;
     overflow: hidden;
+    height: 100%; // Ensure it fills the parent
   }
 
   &__main {

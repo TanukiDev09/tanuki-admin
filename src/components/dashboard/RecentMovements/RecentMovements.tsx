@@ -11,10 +11,14 @@ interface Movement {
   id?: string;
   date: string;
   description: string;
-  amount: number;
+  amount: number | string;
+  currency?: string;
+  amountInCOP?: number | string;
   type: string;
   category: string | { name: string };
 }
+
+import { toNumber } from '@/lib/math';
 
 interface RecentMovementsProps {
   movements: Movement[];
@@ -74,7 +78,12 @@ export function RecentMovements({ movements }: RecentMovementsProps) {
                     className={`recent-movements__item-amount ${isIncome ? 'recent-movements__item-amount--income' : 'recent-movements__item-amount--expense'}`}
                   >
                     {isIncome ? '+' : '-'}
-                    {formatCurrency(movement.amount)}
+                    {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
+                    {movement.currency && movement.currency !== 'COP' && (
+                      <span className="recent-movements__secondary-amount text-[10px] block opacity-70">
+                        {formatCurrency(toNumber(movement.amount), movement.currency)}
+                      </span>
+                    )}
                   </div>
                 </div>
               </Link>

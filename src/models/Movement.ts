@@ -7,8 +7,8 @@ export interface IMovement extends Document {
   fiscalYear: number;
   amount: mongoose.Types.Decimal128; // Stored as Decimal128
   currency: string;
-  exchangeRate: number;
-  amountInCOP: number;
+  exchangeRate: mongoose.Types.Decimal128;
+  amountInCOP: mongoose.Types.Decimal128;
   type: string; // 'Ingreso' or 'Egreso' (presumably)
   category: mongoose.Types.ObjectId | ICategory; // Populated Category or ObjectId string
   costCenter: string;
@@ -44,8 +44,8 @@ const MovementSchema: Schema = new Schema(
     fiscalYear: { type: Number, required: true },
     amount: { type: Schema.Types.Decimal128 },
     currency: { type: String },
-    exchangeRate: { type: Number, default: 1 },
-    amountInCOP: { type: Number, default: 0 },
+    exchangeRate: { type: Schema.Types.Decimal128, default: 1 },
+    amountInCOP: { type: Schema.Types.Decimal128, default: 0 },
     type: { type: String, required: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category' },
     costCenter: { type: String },

@@ -104,9 +104,9 @@ interface FinancialHealthData {
     income: number;
     expenses: number;
   }>;
-  categories?: Array<{ name: string; value: number }>;
-  categoriesIncome?: Array<{ name: string; value: number }>;
-  categoriesExpense?: Array<{ name: string; value: number }>;
+  categories?: Array<{ name: string; value: number; color?: string }>;
+  categoriesIncome?: Array<{ name: string; value: number; color?: string }>;
+  categoriesExpense?: Array<{ name: string; value: number; color?: string }>;
   costCenters?: Array<{ name: string; value: number }>;
   costCentersIncome?: Array<{ name: string; value: number }>;
   costCentersExpense?: Array<{ name: string; value: number }>;
