@@ -1,0 +1,36 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.color-picker {
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 8px;
+    padding: 8px;
+    background-color: transparent;
+    border-radius: $radius-md;
+  }
+
+  &__swatch {
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: $radius-full;
+    cursor: pointer;
+    box-shadow: $shadow-sm;
+
+    @include transition(all);
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: $shadow-md;
+    }
+
+    &--active {
+      border-color: $primary;
+      transform: scale(1.2);
+      box-shadow: $shadow-lg;
+    }
+  }
+}

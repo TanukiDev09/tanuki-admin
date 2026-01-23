@@ -208,6 +208,7 @@ async function getCategoryBreakdown(
       c.categoryData?.name ||
       (c._id ? `Ref: ${c._id.toString().slice(-6)}` : 'Sin categoría'),
     value: c.value ? Math.abs(parseFloat(c.value.toString())) : 0,
+    color: c.categoryData?.color || '#64748b',
   }));
 }
 

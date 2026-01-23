@@ -54,11 +54,10 @@ const MovementTableRow = ({
     let channelLabel = '';
     switch (movement.salesChannel) {
       case 'LIBRERIA':
-        channelLabel = `Librería: ${
-          typeof movement.pointOfSale === 'object'
+        channelLabel = `Librería: ${typeof movement.pointOfSale === 'object'
             ? movement.pointOfSale.name
             : 'Varios'
-        }`;
+          }`;
         break;
       case 'DIRECTA':
         channelLabel = 'Directa';
@@ -103,9 +102,17 @@ const MovementTableRow = ({
       <TableCell data-label="Categoría">
         {movement.category ? (
           typeof movement.category === 'string' ? (
-            movement.category
+            <Badge>{movement.category}</Badge>
           ) : (
-            movement.category.name
+            <Badge
+              style={{
+                backgroundColor: movement.category.color || '#64748b',
+                color: '#fff',
+                borderColor: 'transparent',
+              }}
+            >
+              {movement.category.name}
+            </Badge>
           )
         ) : (
           <span className="movements-list__no-category">Sin categoría</span>
@@ -125,11 +132,10 @@ const MovementTableRow = ({
       </TableCell>
       <TableCell data-label="Monto">
         <span
-          className={`movements-list__amount ${
-            movement.type === 'INCOME'
+          className={`movements-list__amount ${movement.type === 'INCOME'
               ? 'movements-list__amount--income'
               : 'movements-list__amount--expense'
-          }`}
+            }`}
         >
           {movement.type === 'INCOME' ? '+' : '-'}
           {formatCurrency(movement.amount)}

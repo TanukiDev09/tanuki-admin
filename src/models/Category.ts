@@ -4,6 +4,7 @@ export interface ICategory extends Document {
   name: string;
   description?: string;
   type: string; // 'Ingreso', 'Egreso', 'Ambos'
+  color: string;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -27,6 +28,10 @@ const CategorySchema: Schema = new Schema(
       type: String,
       enum: ['Ingreso', 'Egreso', 'Ambos'],
       default: 'Ambos',
+    },
+    color: {
+      type: String,
+      default: '#64748b',
     },
     isActive: {
       type: Boolean,

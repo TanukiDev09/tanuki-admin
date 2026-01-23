@@ -16,6 +16,7 @@ import './CategoryBarChart.scss';
 interface ChartDataEntry {
   name: string;
   value: number;
+  color?: string;
 }
 
 interface CategoryBarChartProps {
@@ -94,7 +95,7 @@ export function CategoryBarChart({
               {sortedData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={entry.color || COLORS[index % COLORS.length]}
                 />
               ))}
             </Bar>

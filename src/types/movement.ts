@@ -10,7 +10,7 @@ export interface Movement {
   exchangeRate?: number;
   amountInCOP?: number;
   type: MovementType;
-  category: string | { _id: string; name: string };
+  category: string | { _id: string; name: string; color?: string };
   costCenter: string;
   beneficiary: string;
   paymentChannel: string;

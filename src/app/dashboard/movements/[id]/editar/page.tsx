@@ -216,11 +216,11 @@ export default function EditMovementPage() {
         allocations: useMultiCostCenter
           ? formData.allocations
           : [
-              {
-                costCenter: formData.costCenter || '01T001',
-                amount: Number(formData.amount) || 0,
-              },
-            ],
+            {
+              costCenter: formData.costCenter || '01T001',
+              amount: Number(formData.amount) || 0,
+            },
+          ],
         costCenter: useMultiCostCenter
           ? formData.allocations?.[0]?.costCenter || ''
           : formData.costCenter,
@@ -250,7 +250,7 @@ export default function EditMovementPage() {
         title: 'Éxito',
         description: 'Movimiento actualizado correctamente',
       });
-      router.push('/dashboard/movements');
+      router.back();
     } catch (err) {
       console.error(err);
       const error = err as Error;
@@ -435,16 +435,15 @@ export default function EditMovementPage() {
               <div className="flex gap-2 items-center">
                 <span>Asignado:</span>
                 <span
-                  className={`movement-form__allocation-summary-total ${
-                    Math.abs(
-                      (formData.allocations?.reduce(
-                        (sum, a) => sum + (Number(a.amount) || 0),
-                        0
-                      ) || 0) - (Number(formData.amount) || 0)
-                    ) < 0.01
+                  className={`movement-form__allocation-summary-total ${Math.abs(
+                    (formData.allocations?.reduce(
+                      (sum, a) => sum + (Number(a.amount) || 0),
+                      0
+                    ) || 0) - (Number(formData.amount) || 0)
+                  ) < 0.01
                       ? 'movement-form__allocation-summary-total--match'
                       : 'movement-form__allocation-summary-total--error'
-                  }`}
+                    }`}
                 >
                   {formatCurrency(
                     formData.allocations?.reduce(
@@ -461,11 +460,11 @@ export default function EditMovementPage() {
                   {allocationError}
                 </span>
               ) : Math.abs(
-                  (formData.allocations?.reduce(
-                    (sum, a) => sum + (Number(a.amount) || 0),
-                    0
-                  ) || 0) - (Number(formData.amount) || 0)
-                ) < 0.01 ? (
+                (formData.allocations?.reduce(
+                  (sum, a) => sum + (Number(a.amount) || 0),
+                  0
+                ) || 0) - (Number(formData.amount) || 0)
+              ) < 0.01 ? (
                 <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--success">
                   ✓ Distribuido
                 </span>
@@ -474,10 +473,10 @@ export default function EditMovementPage() {
                   Falta:{' '}
                   {formatCurrency(
                     (Number(formData.amount) || 0) -
-                      (formData.allocations?.reduce(
-                        (sum, a) => sum + (Number(a.amount) || 0),
-                        0
-                      ) || 0),
+                    (formData.allocations?.reduce(
+                      (sum, a) => sum + (Number(a.amount) || 0),
+                      0
+                    ) || 0),
                     formData.currency
                   )}
                 </span>
@@ -597,12 +596,12 @@ export default function EditMovementPage() {
               <Label>Valor Unitario (Calculado)</Label>
               <div className="movement-form__calculated-value">
                 {formData.amount &&
-                formData.quantity &&
-                Number(formData.quantity) !== 0
+                  formData.quantity &&
+                  Number(formData.quantity) !== 0
                   ? formatCurrency(
-                      Number(formData.amount) / Number(formData.quantity),
-                      formData.currency
-                    )
+                    Number(formData.amount) / Number(formData.quantity),
+                    formData.currency
+                  )
                   : '$ 0'}
               </div>
             </div>

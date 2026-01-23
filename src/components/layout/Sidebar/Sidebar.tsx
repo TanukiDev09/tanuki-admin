@@ -97,14 +97,6 @@ export function Sidebar() {
         )}
       </aside>
 
-      {/* Mobile Navigation (Bottom Bar) */}
-      <nav
-        className="mobile-nav"
-        role="navigation"
-        aria-label="Navegación móvil"
-      >
-        <NavLinks currentPath={pathname} variant="mobile" />
-      </nav>
     </>
   );
 }

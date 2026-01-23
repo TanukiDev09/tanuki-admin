@@ -114,6 +114,7 @@ export function CategorySelect({
           name: newCategoryName,
           type: newCategoryType,
           description: newCategoryDescription,
+          color: '#64748b',
           isActive: true,
         }),
       });
@@ -168,7 +169,13 @@ export function CategorySelect({
           )}
           {categories.map((cat) => (
             <SelectItem key={cat._id} value={cat._id}>
-              {cat.name}
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-2 h-2 rounded-full shrink-0"
+                  style={{ backgroundColor: cat.color || '#64748b' }}
+                />
+                <span>{cat.name}</span>
+              </div>
             </SelectItem>
           ))}
           {categories.length === 0 && !loading && (
