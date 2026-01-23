@@ -129,6 +129,10 @@ interface FinancialHealthData {
     healthScore?: number;
     runwayProjection?: Array<{ month: string; balance: number }>;
   };
+  balances?: {
+    previousMonth: number;
+    currentMonth: number;
+  };
 }
 
 interface ViewProps {
@@ -213,8 +217,27 @@ function MonthlyView({
 }: ViewProps) {
   return (
     <div className="mt-6">
+      {/* Balance Indicators - Compact */}
+      <section className="financial-health__balance-bar">
+        <div className="balance-indicator">
+          <Scale className="balance-indicator__icon" size={16} />
+          <div className="balance-indicator__content">
+            <span className="balance-indicator__label">Saldo Mes Anterior</span>
+            <span className="balance-indicator__value">{formatCurrency(data.balances?.previousMonth || 0)}</span>
+          </div>
+        </div>
+        <div className="balance-indicator">
+          <Scale className="balance-indicator__icon" size={16} />
+          <div className="balance-indicator__content">
+            <span className="balance-indicator__label">Nuevo Saldo</span>
+            <span className="balance-indicator__value">{formatCurrency(data.balances?.currentMonth || 0)}</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Statistics */}
       <section className="financial-health__section">
-        <div className="financial-health__stat-grid">
+        <div className="financial-health__stat-grid financial-health__stat-grid--triple">
           <StatCard
             title="Ingresos del Mes"
             value={formatCurrency(data.totals.income)}
@@ -244,6 +267,7 @@ function MonthlyView({
           <ScrollableIncomeExpenseChart
             data={data.daily || []}
             variant="daily"
+            initialBalance={data.balances?.previousMonth || 0}
           />
         </div>
       </section>

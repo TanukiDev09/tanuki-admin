@@ -268,6 +268,10 @@ export async function PUT(
     const totalAmount = Number(body.amount) || 0;
     body.amount = totalAmount;
 
+    // Normalize type for database storage
+    if (body.type === 'INCOME') body.type = 'Ingreso';
+    else if (body.type === 'EXPENSE') body.type = 'Egreso';
+
     const allocationError = validateAndNormalizeAllocations(body, totalAmount);
     if (allocationError) {
       return NextResponse.json(
