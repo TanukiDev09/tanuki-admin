@@ -70,11 +70,23 @@ export function FinanceMovementsTable({
                   </Link>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline" className="font-normal">
-                    {m.category && typeof m.category === 'object'
-                      ? m.category.name
-                      : m.category || 'Sin categoría'}
-                  </Badge>
+                  {m.category ? (
+                    typeof m.category === 'string' ? (
+                      <Badge variant="outline">{m.category}</Badge>
+                    ) : (
+                      <Badge
+                        style={{
+                          backgroundColor: m.category.color || '#64748b',
+                          color: '#fff',
+                          borderColor: 'transparent',
+                        }}
+                      >
+                        {m.category.name}
+                      </Badge>
+                    )
+                  ) : (
+                    <Badge variant="outline">Sin categoría</Badge>
+                  )}
                 </TableCell>
                 <TableCell>
                   <span className="text-muted-foreground text-sm">
@@ -84,8 +96,17 @@ export function FinanceMovementsTable({
                 <TableCell
                   className={`text-right font-mono ${m.type === 'INCOME' ? 'text-success' : 'text-danger'}`}
                 >
-                  {m.type === 'INCOME' ? '+' : '-'}{' '}
-                  {formatCurrency(Number(m.amount || 0))}
+                  <div className="flex flex-col items-end">
+                    <span>
+                      {m.type === 'INCOME' ? '+' : '-'}{' '}
+                      {formatCurrency(Number(m.amountInCOP || m.amount || 0), 'COP')}
+                    </span>
+                    {m.currency && m.currency !== 'COP' && (
+                      <span className="text-[10px] opacity-70">
+                        {" ("}{formatCurrency(Number(m.amount || 0), m.currency).trim()}{")"}
+                      </span>
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

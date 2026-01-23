@@ -5,10 +5,10 @@ export interface Movement {
   _id: string;
   date: string; // ISO string
   fiscalYear: number;
-  amount: number;
+  amount: number | string;
   currency: string;
-  exchangeRate?: number;
-  amountInCOP?: number;
+  exchangeRate?: number | string;
+  amountInCOP?: number | string;
   type: MovementType;
   category: string | { _id: string; name: string; color?: string };
   costCenter: string;
@@ -18,15 +18,15 @@ export interface Movement {
   description: string;
   notes?: string;
   unit?: string;
-  quantity?: number;
-  unitValue?: number;
-  status: MovementStatus; // Added status as it was in page.tsx but not explicitly in model? Wait, model didn't have status.
+  quantity?: number | string;
+  unitValue?: number | string;
+  status: MovementStatus;
   salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'OTRO';
   pointOfSale?: string | { _id: string; name: string };
   inventoryMovementId?: string;
   allocations?: {
     costCenter: string;
-    amount: number;
+    amount: number | string;
   }[];
 }
 

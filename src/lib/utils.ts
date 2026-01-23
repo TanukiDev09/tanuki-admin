@@ -5,11 +5,12 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number, currency: string = 'COP') {
-  return new Intl.NumberFormat('es-CO', {
+  const locale = currency === 'JPY' ? 'ja-JP' : 'es-CO';
+  return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    minimumFractionDigits: currency === 'JPY' ? 0 : 0,
+    maximumFractionDigits: currency === 'JPY' ? 0 : 0,
   })
     .formatToParts(amount)
     .map((part) => (part.type === 'group' ? '\u00A0' : part.value))

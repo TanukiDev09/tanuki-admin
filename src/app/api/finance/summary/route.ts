@@ -5,6 +5,8 @@ import CostCenter from '@/models/CostCenter';
 import Book from '@/models/Book';
 import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
+import { getSemanticCategoryColor } from '@/styles/category-utils';
+import { add, subtract, multiply, divide, toNumber, gtZero } from '@/lib/math';
 
 interface MonthlyData {
   month: string;
@@ -18,13 +20,11 @@ function calculateHealthScore(
   formattedMonthlyData: MonthlyData[]
 ) {
   // Runway Score (Max 40 points)
-  // If runway is infinite (profitable), full points.
-  // Otherwise, 12 months = 40 points.
   let runwayScore = 0;
   if (cashRunway === Infinity || cashRunway >= 18) {
     runwayScore = 40;
   } else {
-    runwayScore = Math.min(40, (cashRunway / 12) * 40);
+    runwayScore = Math.min(40, toNumber(multiply(divide(cashRunway, 12), 40)));
   }
 
   // Profit Margin Score (Max 30 points)
@@ -32,39 +32,41 @@ function calculateHealthScore(
     grossProfitMargin >= 50
       ? 30
       : grossProfitMargin >= 0
-        ? 15 + (grossProfitMargin / 50) * 15
+        ? toNumber(add(15, multiply(divide(grossProfitMargin, 50), 15)))
         : 0;
 
   // Cash Flow Trend (Max 30 points)
-  // Compare last 3 months avg net income vs previous 3 months
   const last3Months = formattedMonthlyData.slice(-3);
   const prev3Months = formattedMonthlyData.slice(-6, -3);
 
-  const getAvgNet = (data: MonthlyData[]) =>
-    data.length > 0
-      ? data.reduce((sum, m) => sum + (m.income - m.expenses), 0) / data.length
-      : 0;
+  const getAvgNet = (data: MonthlyData[]) => {
+    if (data.length === 0) return '0';
+    const totalNet = data.reduce(
+      (sum, m) => add(sum, subtract(m.income, m.expenses)),
+      '0'
+    );
+    return divide(totalNet, data.length);
+  };
 
   const last3Net = getAvgNet(last3Months);
   const prev3Net = getAvgNet(prev3Months);
 
-  const trendScore = last3Net >= prev3Net ? 30 : 15;
+  const trendScore = toNumber(last3Net) >= toNumber(prev3Net) ? 30 : 15;
 
   return Math.round(runwayScore + marginScore + trendScore);
 }
 
-function generateRunwayProjection(netBalance: number, netBurnRate: number) {
+function generateRunwayProjection(netBalance: string, netBurnRate: string) {
   const projection = [];
-  // If netBurnRate is negative, it means we are profitable (gaining cash)
-  // If positive, we are burning cash.
-
   for (let month = 0; month <= 18; month++) {
     // projected = current - (burn * month)
-    // If burn is negative (profit), we add profit * month
-    const projectedCash = Math.max(0, netBalance - netBurnRate * month);
+    const projectedCash = subtract(netBalance, multiply(netBurnRate, month));
+    const finalProjected =
+      toNumber(projectedCash) < 0 ? 0 : toNumber(projectedCash);
+
     projection.push({
       month: month === 0 ? 'Hoy' : `Mes ${month}`,
-      balance: projectedCash,
+      balance: finalProjected,
     });
   }
   return projection;
@@ -76,24 +78,25 @@ async function getTotals(matchStage: Record<string, unknown>) {
     {
       $group: {
         _id: '$type',
-        total: { $sum: '$amount' },
+        total: { $sum: { $ifNull: ['$amountInCOP', '$amount'] } },
       },
     },
   ]);
 
-  let totalIncome = 0;
-  let totalExpenses = 0;
+  let totalIncome = '0';
+  let totalExpenses = '0';
 
   totalsResponse.forEach((t) => {
-    const val = t.total ? parseFloat(t.total.toString()) : 0;
-    if (t._id === 'Ingreso' || t._id === 'INCOME') totalIncome += val;
-    else totalExpenses += val;
+    const val = t.total ? t.total.toString() : '0';
+    if (t._id === 'Ingreso' || t._id === 'INCOME')
+      totalIncome = add(totalIncome, val);
+    else totalExpenses = add(totalExpenses, val);
   });
 
   return {
     totalIncome,
     totalExpenses,
-    netBalance: totalIncome - totalExpenses,
+    netBalance: subtract(totalIncome, totalExpenses),
   };
 }
 
@@ -105,14 +108,18 @@ async function getMonthlyData(matchStage: Record<string, unknown>) {
         _id: { year: { $year: '$date' }, month: { $month: '$date' } },
         income: {
           $sum: {
-            $cond: [{ $in: ['$type', ['Ingreso', 'INCOME']] }, '$amount', 0],
+            $cond: [
+              { $in: ['$type', ['Ingreso', 'INCOME']] },
+              { $ifNull: ['$amountInCOP', '$amount'] },
+              0,
+            ],
           },
         },
         expense: {
           $sum: {
             $cond: [
               { $not: { $in: ['$type', ['Ingreso', 'INCOME']] } },
-              '$amount',
+              { $ifNull: ['$amountInCOP', '$amount'] },
               0,
             ],
           },
@@ -124,8 +131,8 @@ async function getMonthlyData(matchStage: Record<string, unknown>) {
 
   const formattedMonthlyData = monthlyData.map((d) => ({
     month: `${d._id.year}-${String(d._id.month).padStart(2, '0')}`,
-    income: d.income ? parseFloat(d.income.toString()) : 0,
-    expenses: d.expense ? parseFloat(d.expense.toString()) : 0,
+    income: toNumber(d.income),
+    expenses: toNumber(d.expense),
   }));
 
   return { monthlyData, formattedMonthlyData };
@@ -155,7 +162,7 @@ async function getCategoryBreakdown(
     {
       $group: {
         _id: '$category',
-        value: { $sum: '$amount' },
+        value: { $sum: { $ifNull: ['$amountInCOP', '$amount'] } },
       },
     },
     {
@@ -207,8 +214,12 @@ async function getCategoryBreakdown(
     name:
       c.categoryData?.name ||
       (c._id ? `Ref: ${c._id.toString().slice(-6)}` : 'Sin categoría'),
-    value: c.value ? Math.abs(parseFloat(c.value.toString())) : 0,
-    color: c.categoryData?.color || '#64748b',
+    value: toNumber(c.value),
+    color: getSemanticCategoryColor(
+      isIncome ? 'Ingreso' : 'Egreso',
+      c.categoryData?.color,
+      c.categoryData?._id?.toString() || c.name || c._id?.toString()
+    ),
   }));
 }
 
@@ -236,7 +247,7 @@ async function getCostCenterBreakdown(
     {
       $group: {
         _id: { $ifNull: ['$costCenter', 'Sin definir'] },
-        value: { $sum: '$amount' },
+        value: { $sum: { $ifNull: ['$amountInCOP', '$amount'] } },
       },
     },
     { $sort: { value: isIncome ? -1 : 1 } }, // Expenses are usually positive in this view if they are 'amount', but let's check
@@ -245,7 +256,7 @@ async function getCostCenterBreakdown(
 
   return breakdown.map((cc) => ({
     name: cc._id,
-    value: Math.abs(cc.value ? parseFloat(cc.value.toString()) : 0),
+    value: toNumber(cc.value),
   }));
 }
 
@@ -269,14 +280,18 @@ async function getDailyData(
         },
         income: {
           $sum: {
-            $cond: [{ $in: ['$type', ['Ingreso', 'INCOME']] }, '$amount', 0],
+            $cond: [
+              { $in: ['$type', ['Ingreso', 'INCOME']] },
+              { $ifNull: ['$amountInCOP', '$amount'] },
+              0,
+            ],
           },
         },
         expense: {
           $sum: {
             $cond: [
               { $not: { $in: ['$type', ['Ingreso', 'INCOME']] } },
-              '$amount',
+              { $ifNull: ['$amountInCOP', '$amount'] },
               0,
             ],
           },
@@ -299,14 +314,8 @@ async function getDailyData(
       date: `${year}-${String(month + 1).padStart(2, '0')}-${dayStr}`,
       day: i,
       month: dayStr, // Keep for chart dataKey
-      income:
-        found && !isNaN(parseFloat(found.income))
-          ? parseFloat(found.income.toString())
-          : 0,
-      expenses:
-        found && !isNaN(parseFloat(found.expense))
-          ? parseFloat(found.expense.toString())
-          : 0,
+      income: toNumber(found?.income || 0),
+      expenses: toNumber(found?.expense || 0),
     });
   }
   return formattedDailyData;
@@ -331,19 +340,20 @@ async function handleBookGroupBy(creatorId: string) {
       const stats = await getTotals({ costCenter: book.costCenter });
 
       // Only include if there's activity
-      if (stats.totalIncome === 0 && stats.totalExpenses === 0) return null;
-
-      return {
-        id: book._id,
-        title: book.title,
-        income: stats.totalIncome,
-        expenses: stats.totalExpenses,
-        profit: stats.totalIncome - stats.totalExpenses,
-      };
+      if (gtZero(stats.totalIncome) || gtZero(stats.totalExpenses)) {
+        return {
+          id: book._id,
+          title: book.title,
+          income: toNumber(stats.totalIncome),
+          expenses: toNumber(stats.totalExpenses),
+          profit: toNumber(subtract(stats.totalIncome, stats.totalExpenses)),
+        };
+      }
+      return null;
     })
   );
 
-  // Filter out nulls (books with no cost center or no activity)
+  // Filter out nulls
   const validStats = bookStats.filter(
     (s): s is NonNullable<typeof s> => s !== null
   );
@@ -504,7 +514,18 @@ export async function GET(request: NextRequest) {
           ...plain,
           _id: plain._id.toString(),
           type: normalizedType,
-          amount: plain.amount ? parseFloat(plain.amount.toString()) : 0,
+          amount: toNumber(plain.amount),
+          category:
+            plain.category && typeof plain.category === 'object'
+              ? {
+                  ...plain.category,
+                  color: getSemanticCategoryColor(
+                    plain.type, // 'Ingreso' or 'Egreso'
+                    plain.category.color,
+                    plain.category._id.toString()
+                  ),
+                }
+              : plain.category,
         };
       });
 
@@ -541,33 +562,43 @@ export async function GET(request: NextRequest) {
         });
 
         balanceData = {
-          previousMonth: previousMonthTotals.netBalance,
-          currentMonth: currentMonthTotals.netBalance,
+          previousMonth: toNumber(previousMonthTotals.netBalance),
+          currentMonth: toNumber(currentMonthTotals.netBalance),
         };
       }
 
       // 8. Calculate Health Metrics with 3-month Rolling Average
-      const last3Months = formattedMonthlyData.slice(-3);
+      const last3MonthsMetrics = formattedMonthlyData.slice(-3);
       const avgMonthlyExpenses =
-        last3Months.length > 0
-          ? last3Months.reduce((sum, m) => sum + m.expenses, 0) /
-            last3Months.length
-          : totalExpenses / (formattedMonthlyData.length || 1);
+        last3MonthsMetrics.length > 0
+          ? divide(
+              last3MonthsMetrics.reduce((sum, m) => add(sum, m.expenses), '0'),
+              last3MonthsMetrics.length
+            )
+          : divide(totalExpenses, formattedMonthlyData.length || 1);
 
       const avgMonthlyIncome =
-        last3Months.length > 0
-          ? last3Months.reduce((sum, m) => sum + m.income, 0) /
-            last3Months.length
-          : totalIncome / (formattedMonthlyData.length || 1);
+        last3MonthsMetrics.length > 0
+          ? divide(
+              last3MonthsMetrics.reduce((sum, m) => add(sum, m.income), '0'),
+              last3MonthsMetrics.length
+            )
+          : divide(totalIncome, formattedMonthlyData.length || 1);
 
-      const netBurnRate = avgMonthlyExpenses - avgMonthlyIncome;
+      const netBurnRate = subtract(avgMonthlyExpenses, avgMonthlyIncome);
 
-      const cashRunway = netBurnRate > 0 ? netBalance / netBurnRate : Infinity;
+      const cashRunway = gtZero(netBurnRate)
+        ? toNumber(divide(netBalance, netBurnRate))
+        : Infinity;
 
-      const grossProfitMargin =
-        totalIncome > 0
-          ? ((totalIncome - totalExpenses) / totalIncome) * 100
-          : 0;
+      const grossProfitMargin = gtZero(totalIncome)
+        ? toNumber(
+            multiply(
+              divide(subtract(totalIncome, totalExpenses), totalIncome),
+              100
+            )
+          )
+        : 0;
 
       const healthScore = calculateHealthScore(
         cashRunway,
@@ -583,19 +614,21 @@ export async function GET(request: NextRequest) {
       const healthData = {
         runway: cashRunway,
         burnRate: {
-          gross: avgMonthlyExpenses,
-          net: netBurnRate,
+          gross: toNumber(avgMonthlyExpenses),
+          net: toNumber(netBurnRate),
         },
         profitMargin: grossProfitMargin,
+        avgMonthlyIncome: toNumber(avgMonthlyIncome),
+        avgMonthlyExpense: toNumber(avgMonthlyExpenses),
         healthScore,
         runwayProjection,
       };
 
       return {
         totals: {
-          income: totalIncome,
-          expenses: totalExpenses,
-          balance: netBalance,
+          income: toNumber(totalIncome),
+          expenses: toNumber(totalExpenses),
+          balance: toNumber(netBalance),
         },
         period: {
           year: yearParam ? parseInt(yearParam) : now.getFullYear(),

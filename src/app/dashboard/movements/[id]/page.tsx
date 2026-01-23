@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency, formatNumber } from '@/lib/utils';
+import { toNumber } from '@/lib/math';
 import '../movement-detail.scss';
 
 export default function MovementDetailPage() {
@@ -105,10 +106,16 @@ export default function MovementDetailPage() {
               </p>
             </div>
             <div>
-              <h3 className="movement-detail__label">Monto</h3>
+              <h3 className="movement-detail__label">Monto (COP)</h3>
               <p className="movement-detail__value--xl">
-                {formatCurrency(movement.amount)}
+                {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
               </p>
+              {movement.currency !== 'COP' && (
+                <p className="movement-detail__amount-hint">
+                  Original: {formatCurrency(toNumber(movement.amount), movement.currency)}
+                  {movement.exchangeRate ? ` @ TRM ${formatNumber(toNumber(movement.exchangeRate))}` : ''}
+                </p>
+              )}
             </div>
           </div>
 
@@ -119,13 +126,13 @@ export default function MovementDetailPage() {
             </div>
             <div>
               <h3 className="movement-detail__label">Cantidad</h3>
-              <p>{movement.quantity ? formatNumber(movement.quantity) : '-'}</p>
+              <p>{movement.quantity ? formatNumber(toNumber(movement.quantity)) : '-'}</p>
             </div>
             <div>
               <h3 className="movement-detail__label">Valor Unitario</h3>
               <p>
                 {movement.unitValue
-                  ? formatCurrency(Number(movement.unitValue))
+                  ? formatCurrency(toNumber(movement.unitValue), movement.currency)
                   : '-'}
               </p>
             </div>
@@ -158,7 +165,7 @@ export default function MovementDetailPage() {
                         <tr key={idx}>
                           <td>{alloc.costCenter}</td>
                           <td className="movement-detail__allocation-amount">
-                            {formatCurrency(alloc.amount, movement.currency)}
+                            {formatCurrency(toNumber(alloc.amount), movement.currency)}
                           </td>
                         </tr>
                       ))}

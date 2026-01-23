@@ -26,7 +26,9 @@ import {
 import { useToast } from '@/components/ui/Toast';
 import { Movement } from '@/types/movement';
 import { formatCurrency } from '@/lib/utils';
+import { toNumber } from '@/lib/math';
 import { MovementFilters } from './components/MovementFilters';
+import { getSemanticCategoryColor } from '@/styles/category-utils';
 import './movements-list.scss';
 
 interface MovementTableRowProps {
@@ -55,8 +57,8 @@ const MovementTableRow = ({
     switch (movement.salesChannel) {
       case 'LIBRERIA':
         channelLabel = `Librería: ${typeof movement.pointOfSale === 'object'
-            ? movement.pointOfSale.name
-            : 'Varios'
+          ? movement.pointOfSale.name
+          : 'Varios'
           }`;
         break;
       case 'DIRECTA':
@@ -106,7 +108,11 @@ const MovementTableRow = ({
           ) : (
             <Badge
               style={{
-                backgroundColor: movement.category.color || '#64748b',
+                backgroundColor: getSemanticCategoryColor(
+                  movement.type,
+                  movement.category.color,
+                  movement.category._id
+                ),
                 color: '#fff',
                 borderColor: 'transparent',
               }}
@@ -131,15 +137,22 @@ const MovementTableRow = ({
         )}
       </TableCell>
       <TableCell data-label="Monto">
-        <span
-          className={`movements-list__amount ${movement.type === 'INCOME'
+        <div className="flex flex-col items-end">
+          <span
+            className={`movements-list__amount ${movement.type === 'INCOME'
               ? 'movements-list__amount--income'
               : 'movements-list__amount--expense'
-            }`}
-        >
-          {movement.type === 'INCOME' ? '+' : '-'}
-          {formatCurrency(movement.amount)}
-        </span>
+              }`}
+          >
+            {movement.type === 'INCOME' ? '+' : '-'}
+            {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
+          </span>
+          {movement.currency !== 'COP' && (
+            <span className="movements-list__secondary-amount">
+              {" ("}{formatCurrency(toNumber(movement.amount), movement.currency).trim()}{")"}
+            </span>
+          )}
+        </div>
       </TableCell>
       <TableCell data-label="Canal">{renderSalesChannel()}</TableCell>
       <TableCell data-label="Cantidad">

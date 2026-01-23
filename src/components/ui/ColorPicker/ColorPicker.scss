@@ -2,13 +2,27 @@
 @use '../../../styles/mixins' as *;
 
 .color-picker {
+  &__section {
+    &:not(:last-child) {
+      margin-bottom: 12px;
+    }
+  }
+
+  &__label {
+    display: block;
+    margin-bottom: 6px;
+    color: $muted-foreground;
+    font-size: 11px;
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
   &__grid {
     display: grid;
     grid-template-columns: repeat(9, 1fr);
     gap: 8px;
-    padding: 8px;
-    background-color: transparent;
-    border-radius: $radius-md;
+    padding: 2px;
   }
 
   &__swatch {

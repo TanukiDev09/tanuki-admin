@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/Select';
 import { useToast } from '@/components/ui/Toast';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { CreateMovementDTO } from '@/types/movement';
 import { CategorySelect } from '@/components/finance/CategorySelect';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
@@ -23,7 +23,9 @@ import { POSSelect } from '@/components/admin/POSSelect/POSSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency } from '@/lib/utils';
+import { multiply, divide, gtZero, add, toNumber, compare } from '@/lib/math';
 import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
+import { AllocationTable } from '@/components/finance/AllocationTable';
 import '../movement-form.scss';
 
 export default function CreateMovementPage() {
@@ -80,11 +82,11 @@ export default function CreateMovementPage() {
     setFormData((prev) => {
       const newAllocations = [...(prev.allocations || [])];
       if (!newAllocations[index]) {
-        newAllocations[index] = { costCenter: '', amount: 0 };
+        newAllocations[index] = { costCenter: '', amount: '0' };
       }
 
       if (field === 'amount') {
-        newAllocations[index].amount = parseFloat(value) || 0;
+        newAllocations[index].amount = value;
       } else {
         newAllocations[index].costCenter = value;
       }
@@ -95,7 +97,7 @@ export default function CreateMovementPage() {
   const addAllocation = () => {
     setFormData((prev) => ({
       ...prev,
-      allocations: [...(prev.allocations || []), { costCenter: '', amount: 0 }],
+      allocations: [...(prev.allocations || []), { costCenter: '', amount: '0' }],
     }));
   };
 
@@ -116,20 +118,19 @@ export default function CreateMovementPage() {
     }
 
     const totalAllocated = allocations.reduce(
-      (sum, a) => sum + (Number(a.amount) || 0),
-      0
+      (sum, a) => add(sum, a.amount || '0'),
+      '0'
     );
-    const totalAmount = Number(formData.amount) || 0;
+    const totalAmount = formData.amount || '0';
 
-    // Use small epsilon for float comparison
-    if (Math.abs(totalAllocated - totalAmount) > 0.01) {
+    if (compare(totalAllocated, totalAmount) !== 0) {
       setAllocationError(
-        `La suma de las asignaciones (${formatCurrency(totalAllocated, formData.currency)}) no coincide con el total (${formatCurrency(totalAmount, formData.currency)})`
+        `La suma de las asignaciones (${formatCurrency(toNumber(totalAllocated), formData.currency)}) no coincide con el total (${formatCurrency(toNumber(totalAmount), formData.currency)})`
       );
       return false;
     }
 
-    if (allocations.some((a) => !a.costCenter || Number(a.amount) <= 0)) {
+    if (allocations.some((a) => !a.costCenter || !gtZero(a.amount))) {
       setAllocationError(
         'Todos los campos de asignación son obligatorios y mayores a 0'
       );
@@ -280,7 +281,7 @@ export default function CreateMovementPage() {
                   allocations: [
                     {
                       costCenter: prev.costCenter || '',
-                      amount: Number(prev.amount) || 0,
+                      amount: prev.amount || 0,
                     },
                   ],
                 }));
@@ -299,124 +300,15 @@ export default function CreateMovementPage() {
           onValueChange={(val) => handleSelectChange('costCenter', val)}
         />
       ) : (
-        <div className="movement-form__allocation-container">
-          <table className="movement-form__allocation-table">
-            <thead>
-              <tr>
-                <th className="cost-center-col">Centro de Costo</th>
-                <th className="amount-col">Monto</th>
-                <th className="action-col"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {formData.allocations?.map((alloc, idx) => (
-                <tr key={idx}>
-                  <td>
-                    <CostCenterSelect
-                      value={alloc.costCenter}
-                      onValueChange={(val) =>
-                        handleAllocationChange(idx, 'costCenter', val)
-                      }
-                    />
-                  </td>
-                  <td>
-                    <NumericInput
-                      value={alloc.amount}
-                      onValueChange={(val) =>
-                        val !== undefined &&
-                        handleAllocationChange(idx, 'amount', val.toString())
-                      }
-                      placeholder="0.00"
-                    />
-                  </td>
-                  <td>
-                    <button
-                      type="button"
-                      className="movement-form__remove-allocation"
-                      onClick={() => removeAllocation(idx)}
-                      title="Eliminar asignación"
-                    >
-                      <Trash2 />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <button
-            type="button"
-            className="movement-form__add-allocation"
-            onClick={addAllocation}
-          >
-            <Plus size={14} /> Agregar Asignación
-          </button>
-
-          <div className="movement-form__allocation-summary">
-            <div className="movement-form__allocation-summary-label">
-              Total:{' '}
-              <span className="font-semibold">
-                {formatCurrency(
-                  Number(formData.amount) || 0,
-                  formData.currency
-                )}
-              </span>
-            </div>
-
-            <div className="text-right flex flex-col items-end gap-1">
-              <div className="flex gap-2 items-center">
-                <span>Asignado:</span>
-                <span
-                  className={`movement-form__allocation-summary-total ${
-                    Math.abs(
-                      (formData.allocations?.reduce(
-                        (sum, a) => sum + (Number(a.amount) || 0),
-                        0
-                      ) || 0) - (Number(formData.amount) || 0)
-                    ) < 0.01
-                      ? 'movement-form__allocation-summary-total--match'
-                      : 'movement-form__allocation-summary-total--error'
-                  }`}
-                >
-                  {formatCurrency(
-                    formData.allocations?.reduce(
-                      (sum, a) => sum + (Number(a.amount) || 0),
-                      0
-                    ) || 0,
-                    formData.currency
-                  )}
-                </span>
-              </div>
-
-              {allocationError ? (
-                <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--warning">
-                  {allocationError}
-                </span>
-              ) : Math.abs(
-                  (formData.allocations?.reduce(
-                    (sum, a) => sum + (Number(a.amount) || 0),
-                    0
-                  ) || 0) - (Number(formData.amount) || 0)
-                ) < 0.01 ? (
-                <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--success">
-                  ✓ Distribuido
-                </span>
-              ) : (
-                <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--warning">
-                  Falta:{' '}
-                  {formatCurrency(
-                    (Number(formData.amount) || 0) -
-                      (formData.allocations?.reduce(
-                        (sum, a) => sum + (Number(a.amount) || 0),
-                        0
-                      ) || 0),
-                    formData.currency
-                  )}
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
+        <AllocationTable
+          allocations={formData.allocations || []}
+          totalAmount={formData.amount || '0'}
+          currency={formData.currency || 'COP'}
+          onAllocationChange={handleAllocationChange}
+          onAddAllocation={addAllocation}
+          onRemoveAllocation={removeAllocation}
+          error={allocationError}
+        />
       )}
     </>
   );
@@ -455,7 +347,27 @@ export default function CreateMovementPage() {
                 placeholder="0.00"
                 value={formData.amount}
                 onValueChange={(val) =>
-                  setFormData((prev) => ({ ...prev, amount: val }))
+                  setFormData((prev) => {
+                    const amount = val;
+                    const rate = prev.exchangeRate;
+                    const cop = prev.amountInCOP;
+
+                    let nextCOP = prev.amountInCOP;
+                    let nextRate = prev.exchangeRate;
+
+                    if (gtZero(rate)) {
+                      nextCOP = multiply(amount, rate);
+                    } else if (gtZero(cop) && gtZero(amount)) {
+                      nextRate = divide(cop, amount);
+                    }
+
+                    return {
+                      ...prev,
+                      amount: val,
+                      amountInCOP: nextCOP,
+                      exchangeRate: nextRate,
+                    };
+                  })
                 }
               />
             </div>
@@ -473,6 +385,7 @@ export default function CreateMovementPage() {
                   <SelectItem value="COP">Peso Colombiano (COP)</SelectItem>
                   <SelectItem value="USD">Dólar (USD)</SelectItem>
                   <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                  <SelectItem value="JPY">Yen Japonés (JPY)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -485,15 +398,72 @@ export default function CreateMovementPage() {
                     id="exchangeRate"
                     name="exchangeRate"
                     value={formData.exchangeRate}
-                    onValueChange={(val) =>
-                      setFormData((prev) => ({ ...prev, exchangeRate: val }))
-                    }
+                    onValueChange={(val) => {
+                      setFormData((prev) => {
+                        const rate = val;
+                        const amount = prev.amount;
+                        const cop = prev.amountInCOP;
+
+                        let nextCOP = prev.amountInCOP;
+                        let nextAmount = prev.amount;
+
+                        if (gtZero(amount)) {
+                          nextCOP = multiply(amount, rate);
+                        } else if (gtZero(cop) && gtZero(rate)) {
+                          nextAmount = divide(cop, rate);
+                        }
+
+                        return {
+                          ...prev,
+                          exchangeRate: val,
+                          amountInCOP: nextCOP,
+                          amount: nextAmount,
+                        };
+                      });
+                    }}
                     placeholder="Ej: 4 000"
                   />
                 </>
               )}
             </div>
           </div>
+
+          {formData.currency !== 'COP' && (
+            <div className="movement-form__grid movement-form__grid--3 mt-4">
+              <div className="movement-form__field-group">
+                <Label htmlFor="amountInCOP">Equivalente en COP</Label>
+                <NumericInput
+                  id="amountInCOP"
+                  name="amountInCOP"
+                  placeholder="0.00"
+                  value={formData.amountInCOP}
+                  onValueChange={(val) => {
+                    setFormData((prev) => {
+                      const cop = val;
+                      const amount = prev.amount;
+                      const rate = prev.exchangeRate;
+
+                      let nextAmount = prev.amount;
+                      let nextRate = prev.exchangeRate;
+
+                      if (gtZero(amount)) {
+                        nextRate = divide(cop, amount);
+                      } else if (gtZero(rate)) {
+                        nextAmount = divide(cop, rate);
+                      }
+
+                      return {
+                        ...prev,
+                        amountInCOP: val,
+                        exchangeRate: nextRate,
+                        amount: nextAmount,
+                      };
+                    });
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="movement-form__section">
@@ -526,13 +496,11 @@ export default function CreateMovementPage() {
             <div className="movement-form__field-group">
               <Label>Valor Unitario (Calculado)</Label>
               <div className="movement-form__calculated-value">
-                {formData.amount &&
-                formData.quantity &&
-                Number(formData.quantity) !== 0
+                {gtZero(formData.amount) && gtZero(formData.quantity)
                   ? formatCurrency(
-                      Number(formData.amount) / Number(formData.quantity),
-                      formData.currency
-                    )
+                    toNumber(divide(formData.amount, formData.quantity)),
+                    formData.currency
+                  )
                   : '$ 0'}
               </div>
             </div>

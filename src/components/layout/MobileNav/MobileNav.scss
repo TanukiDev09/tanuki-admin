@@ -3,11 +3,11 @@
 
 .mobile-nav {
   display: block;
+  width: 100%;
+  padding-bottom: env(safe-area-inset-bottom); // Support for notched iPhones
   background-color: $background;
   border-top: 1px solid rgba($border, 0.5);
   flex-shrink: 0;
-  width: 100%;
-  padding-bottom: env(safe-area-inset-bottom); // Support for notched iPhones
 
   @include respond-to('lg') {
     display: none; // Hide on desktop
