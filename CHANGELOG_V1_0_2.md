@@ -68,9 +68,11 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
 - **Normalización de Tipos de Movimiento**:
   - Implementación de una capa de normalización en el API de finanzas (`/api/finance/summary`) para convertir tipos de base de datos (`Ingreso`/`Egreso`) a constantes de frontend (`INCOME`/`EXPENSE`).
   - Asegurada la consistencia en la actualización de movimientos (API `PUT`) para mantener el formato de base de datos estandarizado.
-- **Limpieza de Linters**:
+- **Limpieza de Linters & Build**:
   - Resolución de errores de inmutabilidad en React (reemplazo de reasignaciones en `map` por `reduce`).
+  - **Corrección de Error de Compilación**: Ajustada la definición del `formatter` del Tooltip en Recharts para aceptar parámetros opcionales, solucionando el fallo en el despliegue de Vercel.
   - Resolución de advertencias de Stylelint sobre orden de propiedades y formato de colores en SCSS.
+- **Orden Cronológico**: Se cambió el orden predeterminado en la tabla de movimientos del dashboard a cronológico (más antiguo a más reciente), facilitando el seguimiento secuencial del flujo de caja.
 - **Corrección de Cálculos Históricos**:
   - Arreglado bug crítico en el cálculo del balance inicial que utilizaba `month - 2` en lugar de `month - 1`.
   - Verificada la consistencia de datos entre Mayo y Junio 2018 (Balance Final Mayo == Balance Inicial Junio).

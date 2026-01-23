@@ -487,7 +487,7 @@ export async function GET(request: NextRequest) {
       const [movements, totalMovements] = await Promise.all([
         Movement.find(movementQuery)
           .populate('category')
-          .sort({ date: -1 })
+          .sort({ date: 1 })
           .skip(skip)
           .limit(limit),
         Movement.countDocuments(movementQuery),

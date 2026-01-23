@@ -121,14 +121,12 @@ export function ScrollableIncomeExpenseChart({
                     boxShadow: '0 4px 12px rgba(6, 182, 212, 0.25)',
                   }}
                   itemStyle={{ color: 'hsl(var(--foreground))' }}
-                  formatter={(value: number | string | undefined, name: string) => {
+                  formatter={(value: number | string | undefined, name?: string) => {
+                    const formattedValue = value !== undefined ? formatCurrency(Number(value)) : '';
                     if (name === 'balance') {
-                      return [
-                        value !== undefined ? formatCurrency(Number(value)) : '',
-                        'Saldo en Caja',
-                      ];
+                      return [formattedValue, 'Saldo en Caja'];
                     }
-                    return value !== undefined ? formatCurrency(Number(value)) : '';
+                    return formattedValue;
                   }}
                 />
                 <ReferenceLine y={0} stroke="hsl(var(--border))" strokeWidth={2} strokeDasharray="5 5" opacity={0.5} />
