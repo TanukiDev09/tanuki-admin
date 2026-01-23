@@ -46,6 +46,23 @@
       grid-template-columns: repeat(3, 1fr);
       gap: $spacing-md;
     }
+
+    &--triple {
+      @include md {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  }
+
+  &__balance-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    margin-bottom: $spacing-lg;
+    padding: $spacing-md;
+    background: rgb(var(--color-primary-rgb), 0.03);
+    border: 1px solid rgb(var(--color-primary-rgb), 0.1);
+    border-radius: $radius-md;
   }
 
   &__metrics-grid {
@@ -101,5 +118,38 @@
 
     padding: $spacing-lg;
     background: var(--color-card);
+  }
+}
+
+.balance-indicator {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: $spacing-sm;
+  min-width: 200px;
+
+  &__icon {
+    flex-shrink: 0;
+    color: rgb(var(--color-primary-rgb), 0.6);
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__value {
+    color: $foreground;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
   }
 }

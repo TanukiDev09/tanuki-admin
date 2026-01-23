@@ -430,6 +430,7 @@ export async function GET(request: NextRequest) {
 
     async function getFinancialReport(
       matchStage: Record<string, unknown>,
+      baseMatchStage: Record<string, unknown>,
       startDate: Date | undefined,
       endDate: Date | undefined,
       yearParam: string | null,
@@ -494,9 +495,14 @@ export async function GET(request: NextRequest) {
 
       const formattedMovements = movements.map((m) => {
         const plain = m.toObject();
+        let normalizedType = plain.type;
+        if (plain.type === 'Ingreso') normalizedType = 'INCOME';
+        else if (plain.type === 'Egreso') normalizedType = 'EXPENSE';
+
         return {
           ...plain,
           _id: plain._id.toString(),
+          type: normalizedType,
           amount: plain.amount ? parseFloat(plain.amount.toString()) : 0,
         };
       });
@@ -508,7 +514,38 @@ export async function GET(request: NextRequest) {
       // but simpler to just return the response structure with pagination
 
       // ... Health Logic ...
-      // 7. Calculate Health Metrics with 3-month Rolling Average
+      // 7. Calculate Balance History (for monthly view)
+      let balanceData = undefined;
+      if (yearParam && monthParam && startDate && endDate) {
+        const year = parseInt(yearParam);
+        const month = parseInt(monthParam);
+
+        // Calculate the last moment of the previous month
+        // For June (month=6), we want May 31st 23:59:59.999
+        // Date.UTC(year, month-1, 0) gives us the last day of the previous month
+        const prevMonthEnd = new Date(
+          Date.UTC(year, month - 1, 0, 23, 59, 59, 999)
+        );
+
+        // Use baseMatchStage without date restrictions, then add date filter
+        const previousMonthTotals = await getTotals({
+          ...baseMatchStage,
+          date: { $lte: prevMonthEnd },
+        });
+
+        // Calculate current month balance (end of current month)
+        const currentMonthTotals = await getTotals({
+          ...baseMatchStage,
+          date: { $lte: endDate },
+        });
+
+        balanceData = {
+          previousMonth: previousMonthTotals.netBalance,
+          currentMonth: currentMonthTotals.netBalance,
+        };
+      }
+
+      // 8. Calculate Health Metrics with 3-month Rolling Average
       const last3Months = formattedMonthlyData.slice(-3);
       const avgMonthlyExpenses =
         last3Months.length > 0
@@ -581,6 +618,7 @@ export async function GET(request: NextRequest) {
         costCentersIncome,
         movements: formattedMovements,
         health: healthData,
+        balances: balanceData,
       };
     }
 
@@ -603,6 +641,7 @@ export async function GET(request: NextRequest) {
     // Generate Report
     const reportData = await getFinancialReport(
       matchStage,
+      baseMatchStage,
       startDate,
       endDate,
       yearParam,

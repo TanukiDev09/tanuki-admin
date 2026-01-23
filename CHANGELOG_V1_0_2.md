@@ -51,4 +51,35 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
 
 ---
 
+### 📊 Sesión: Dashboard Financiero & Normalización de Datos
+
+**Fecha:** 2026-01-23
+
+#### 🌟 Nuevas Características
+- **Control de Saldo Mensual**:
+  - Implementación de bloques de **Saldo Mes Anterior** y **Nuevo Saldo** en el dashboard financiero.
+  - Ahora es posible visualizar con cuánto dinero arrancó la editorial el mes y cuál es el saldo proyectado al final del periodo.
+- **Gráfico de Flujo de Caja Acumulado**:
+  - Cambio de visualización de balance neto diario a **saldo en caja acumulado**.
+  - Mejora estética radical con gradientes cyan/teal, puntos de datos resaltados y Tooltips interactivos con el "Saldo en Caja".
+  - Ajuste de escala Y proporcional partiendo desde $0 para evitar distorsiones visuales.
+
+#### 🛠️ Calidad Técnica & Correctividad
+- **Normalización de Tipos de Movimiento**:
+  - Implementación de una capa de normalización en el API de finanzas (`/api/finance/summary`) para convertir tipos de base de datos (`Ingreso`/`Egreso`) a constantes de frontend (`INCOME`/`EXPENSE`).
+  - Asegurada la consistencia en la actualización de movimientos (API `PUT`) para mantener el formato de base de datos estandarizado.
+- **Limpieza de Linters**:
+  - Resolución de errores de inmutabilidad en React (reemplazo de reasignaciones en `map` por `reduce`).
+  - Resolución de advertencias de Stylelint sobre orden de propiedades y formato de colores en SCSS.
+- **Corrección de Cálculos Históricos**:
+  - Arreglado bug crítico en el cálculo del balance inicial que utilizaba `month - 2` en lugar de `month - 1`.
+  - Verificada la consistencia de datos entre Mayo y Junio 2018 (Balance Final Mayo == Balance Inicial Junio).
+
+#### 🎨 UX/UI
+- **Simplificación de StatCards**:
+  - Reducción del peso visual general: padding ajustado, tipografía optimizada e iconos más discretos.
+  - Eliminación de efectos "glassmorphism" excesivos, sombras pesadas y animaciones distractores para un enfoque profesional en los datos.
+
+---
+
 *Nota: Esta versión asegura una base sólida y estandarizada para el crecimiento futuro de Tanuki Admin.*
