@@ -14,6 +14,7 @@ import { Movement } from '@/types/movement';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { toNumber } from '@/lib/math';
 import './FinanceMovementsTable.scss';
 
 interface FinanceMovementsTableProps {
@@ -99,11 +100,11 @@ export function FinanceMovementsTable({
                   <div className="flex flex-col items-end">
                     <span>
                       {m.type === 'INCOME' ? '+' : '-'}{' '}
-                      {formatCurrency(Number(m.amountInCOP || m.amount || 0), 'COP')}
+                      {formatCurrency(toNumber(m.amountInCOP || m.amount || 0), 'COP')}
                     </span>
                     {m.currency && m.currency !== 'COP' && (
                       <span className="text-[10px] opacity-70">
-                        {" ("}{formatCurrency(Number(m.amount || 0), m.currency).trim()}{")"}
+                        {" ("}{formatCurrency(toNumber(m.amount || 0), m.currency).trim()}{")"}
                       </span>
                     )}
                   </div>
