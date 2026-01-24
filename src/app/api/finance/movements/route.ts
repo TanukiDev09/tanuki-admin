@@ -17,6 +17,8 @@ interface Allocation {
 interface MovementDoc {
   _id: { toString: () => string };
   amount: { toString: () => string };
+  amountInCOP?: { toString: () => string };
+  exchangeRate?: { toString: () => string };
   type: string;
   unit?: string;
   quantity?: { toString: () => string };
@@ -197,6 +199,8 @@ function formatMovements(movements: MovementDoc[]): FormattedMovement[] {
       ...m,
       type: normalizedType,
       amount: toNumber(m.amount),
+      amountInCOP: toNumber(m.amountInCOP),
+      exchangeRate: toNumber(m.exchangeRate),
       unit: m.unit,
       quantity: m.quantity ? toNumber(m.quantity) : undefined,
       unitValue: m.unitValue ? toNumber(m.unitValue) : undefined,
@@ -492,6 +496,8 @@ function formatSingleMovement(
   return {
     ...obj,
     amount: toNumber(movement.amount),
+    amountInCOP: toNumber(movement.amountInCOP),
+    exchangeRate: toNumber(movement.exchangeRate),
     unit: movement.unit as string | undefined,
     quantity: movement.quantity ? toNumber(movement.quantity) : undefined,
     unitValue: movement.unitValue ? toNumber(movement.unitValue) : undefined,

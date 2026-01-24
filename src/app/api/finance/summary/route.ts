@@ -515,6 +515,10 @@ export async function GET(request: NextRequest) {
           _id: plain._id.toString(),
           type: normalizedType,
           amount: toNumber(plain.amount),
+          amountInCOP: toNumber(plain.amountInCOP),
+          exchangeRate: toNumber(plain.exchangeRate),
+          quantity: plain.quantity ? toNumber(plain.quantity) : undefined,
+          unitValue: plain.unitValue ? toNumber(plain.unitValue) : undefined,
           category:
             plain.category && typeof plain.category === 'object'
               ? {
