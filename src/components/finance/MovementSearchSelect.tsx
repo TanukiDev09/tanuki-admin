@@ -11,14 +11,11 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/Command';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/Popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
 import { cn, formatCurrency } from '@/lib/utils';
 import { Movement } from '@/types/movement';
 import { toNumber } from '@/lib/math';
+import './MovementSearchSelect.scss';
 
 interface MovementSearchSelectProps {
   value?: string;
@@ -74,7 +71,7 @@ export function MovementSearchSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="movement-search-select__trigger"
         >
           {selectedMovement ? (
             <span className="truncate">
@@ -94,10 +91,10 @@ export function MovementSearchSelect({
           ) : (
             placeholder
           )}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <ChevronsUpDown className="movement-search-select__icon" style={{ opacity: 0.5, height: '1rem', width: '1rem' }} />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0" align="start">
+      <PopoverContent className="movement-search-select__content" align="start">
         <Command shouldFilter={false}>
           <CommandInput
             placeholder="Buscar por descripción o beneficiario..."
@@ -106,8 +103,8 @@ export function MovementSearchSelect({
           />
           <CommandEmpty>
             {loading ? (
-              <div className="flex items-center justify-center p-4">
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              <div className="movement-search-select__loading">
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Buscando...
               </div>
             ) : (
@@ -127,13 +124,13 @@ export function MovementSearchSelect({
                 >
                   <Check
                     className={cn(
-                      'mr-2 h-4 w-4',
+                      'movement-search-select__check-icon',
                       value === movement._id ? 'opacity-100' : 'opacity-0'
                     )}
                   />
-                  <div className="flex flex-col">
-                    <span className="font-medium">{movement.description}</span>
-                    <span className="text-xs text-muted-foreground">
+                  <div className="movement-search-select__item">
+                    <span className="movement-search-select__item-description">{movement.description}</span>
+                    <span className="movement-search-select__item-details">
                       {movement.date.split('T')[0]} • {movement.beneficiary} •{' '}
                       {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
                       {movement.currency !== 'COP' && (

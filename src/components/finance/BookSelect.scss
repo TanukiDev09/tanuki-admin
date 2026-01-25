@@ -1,0 +1,70 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.book-select {
+  &__trigger {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: $spacing-xs;
+    width: 100%;
+    height: auto;
+    min-height: 2.25rem;
+    padding: $spacing-xs $spacing-sm;
+    font-size: $font-size-sm;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+
+    span {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    margin-left: $spacing-xs;
+    opacity: 0.5;
+  }
+
+  &__content {
+    width: var(--radix-popover-trigger-width);
+    padding: 0;
+  }
+
+  &__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: $spacing-xs;
+    padding: $spacing-md;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__check-icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: $spacing-xs;
+    flex-shrink: 0;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: $spacing-2xs 0;
+  }
+
+  &__item-title {
+    color: $foreground;
+    font-weight: $font-weight-medium;
+  }
+
+  &__item-details {
+    color: $muted-foreground;
+    font-size: 10px;
+  }
+}

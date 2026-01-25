@@ -9,7 +9,7 @@
 // - Los componentes deben importar este archivo, no al revés
 // ============================================
 
-@use './variables' as *;
+@use '@/styles/variables' as *;
 
 // --- RESPONSIVE BREAKPOINTS (MOBILE-FIRST) ---
 // Usar min-width para mobile-first approach

@@ -1,0 +1,239 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.invoice-detail {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xl;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: $spacing-xl;
+
+  &__loading,
+  &__not-found {
+    padding: $spacing-2xl;
+    color: $muted-foreground;
+    text-align: center;
+  }
+
+  &__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__header-actions {
+    display: flex;
+    gap: $spacing-sm;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
+
+    @include lg {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  &__info-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__info-title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__info-date {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__status-badge {
+    padding: $spacing-xs $spacing-lg;
+    font-size: $font-size-lg;
+  }
+
+  &__customer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+    margin-bottom: $spacing-xl;
+
+    @include sm {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  &__field-label {
+    margin-bottom: $spacing-xs;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+
+  &__field-value {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__field-subtext {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__cost-centers {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-top: $spacing-xs;
+  }
+
+  &__table-wrapper {
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    overflow: hidden;
+  }
+
+  &__table {
+    width: 100%;
+    font-size: $font-size-sm;
+    border-collapse: collapse;
+
+    th {
+      padding: $spacing-md;
+      background-color: $muted;
+      font-weight: $font-weight-semibold;
+      text-align: left;
+
+      &--right {
+        text-align: right;
+      }
+    }
+
+    td {
+      padding: $spacing-md;
+      border-top: 1px solid $border;
+
+      &--right {
+        text-align: right;
+      }
+
+      &--bold {
+        font-weight: $font-weight-medium;
+      }
+    }
+  }
+
+  &__summary-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: $spacing-lg;
+    text-align: right;
+  }
+
+  &__summary {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    width: 12rem;
+  }
+
+  &__summary-row {
+    display: flex;
+    justify-content: space-between;
+
+    &--total {
+      padding-top: $spacing-sm;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      border-top: 1px solid $border;
+    }
+  }
+
+  &__notes {
+    margin-top: $spacing-xl;
+    padding: $spacing-lg;
+    background-color: rgba($muted, 0.3);
+    border-radius: $radius-md;
+  }
+
+  &__notes-title {
+    margin-bottom: $spacing-xs;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  &__movements-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__movement-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-sm;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba($muted, 0.5);
+    }
+  }
+
+  &__movement-info {
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  &__movement-desc {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    @include text-truncate;
+  }
+
+  &__movement-date {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__movement-amount {
+    color: #16a34a; // Green
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__movement-actions {
+    display: flex;
+    gap: $spacing-xs;
+  }
+
+  &__inventory-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-sm;
+    border: 1px solid $border;
+    border-radius: $radius-md;
+  }
+}
