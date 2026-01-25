@@ -8,14 +8,13 @@
 
   &__header {
     @include flex-between;
-
     margin-bottom: $spacing-md;
   }
 
   &__title {
-    color: $foreground;
     font-size: $font-size-xl;
     font-weight: 600;
+    color: $foreground;
   }
 
   &__list {
@@ -25,15 +24,15 @@
   &__empty {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    gap: $spacing-md;
+    justify-content: center;
     padding: $spacing-3xl;
     background-color: rgba(#fff, 0.02);
-    color: $muted-foreground;
-    text-align: center;
     border: 1px dashed $border;
     border-radius: $radius-lg;
+    color: $muted-foreground;
+    text-align: center;
+    gap: $spacing-md;
   }
 
   &__empty-icon {
@@ -75,10 +74,9 @@
 
   &__card-header {
     @include flex-between;
-
     align-items: flex-start;
-    gap: $spacing-sm;
     margin-bottom: $spacing-md;
+    gap: $spacing-sm;
   }
 
   &__card-info {
@@ -88,18 +86,18 @@
   }
 
   &__contact-name {
-    color: $foreground;
-    font-size: $font-size-lg;
     font-weight: 600;
+    font-size: $font-size-lg;
+    color: $foreground;
   }
 
   &__contact-position {
-    width: fit-content;
-    padding: 2px $spacing-xs;
-    background-color: $muted;
-    color: $muted-foreground;
     font-size: $font-size-xs;
+    color: $muted-foreground;
+    background-color: $muted;
+    padding: 2px $spacing-xs;
     border-radius: $radius-sm;
+    width: fit-content;
   }
 
   &__card-actions {
@@ -108,20 +106,20 @@
   }
 
   &__action-btn {
-    width: 2rem;
     height: 2rem;
+    width: 2rem;
     padding: 0;
     color: $muted-foreground;
 
     &:hover {
-      background-color: rgba($primary, 0.1);
       color: $primary;
+      background-color: rgba($primary, 0.1);
     }
 
     &--delete {
       &:hover {
-        background-color: rgba($danger, 0.1);
         color: $danger;
+        background-color: rgba($danger, 0.1);
       }
     }
   }
@@ -139,8 +137,8 @@
     display: flex;
     align-items: center;
     gap: $spacing-sm;
-    color: $foreground;
     font-size: $font-size-sm;
+    color: $foreground;
   }
 
   &__item-icon {
@@ -164,8 +162,8 @@
 
   &__form-footer {
     display: flex;
-    justify-content: flex-end;
     gap: $spacing-sm;
+    justify-content: flex-end;
     margin-top: $spacing-md;
   }
 
