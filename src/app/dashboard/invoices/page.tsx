@@ -95,7 +95,7 @@ export default function InvoicesPage() {
       if (!res.ok) throw new Error("Error al eliminar");
       toast({ title: "Éxito", description: "Factura eliminada correctamente" });
       fetchInvoices();
-    } catch (_error) {
+    } catch {
       toast({
         title: "Error",
         description: "No se pudo eliminar la factura",

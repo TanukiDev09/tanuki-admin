@@ -110,4 +110,29 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
 
 ---
 
+### 📦 Sesión: Desglose de Inventario & Consistencia de Datos
+
+**Fecha:** 2026-01-25
+
+#### 🌟 Nuevas Características
+- **Desglose de Stock por Bodega**:
+  - Implementación de visualización discriminada de unidades en el dashboard de inventario.
+  - Nuevas tarjetas de estadísticas para **Bodega Editorial** (oficina central) y **Otras Bodegas** (puntos de venta y terceros).
+  - Rediseño de la sección de estadísticas a una cuadrícula de 2x3 para acomodar los nuevos totales sin perder claridad.
+
+#### 🛠️ Calidad Técnica & Correctividad
+- **Robustez en Cálculo de "Sin Stock"**:
+  - Refactorización completa del API de estadísticas de inventario (`/api/inventory/stats`) para utilizar una única agregación basada en el catálogo de libros activos.
+  - Se corrigió el error donde libros inactivos afectaban los contadores de stock bajo/nulo.
+  - Sincronización de la lógica entre las tarjetas de resumen y la Matriz de Inventario para garantizar consistencia total de datos.
+- **Filtro de Catálogo Activo**:
+  - Actualización del API de la matriz de inventario para filtrar automáticamente por libros activos, eliminando ruido visual de productos obsoletos.
+
+#### 🎨 UX/UI
+- **Corrección de Recorte en Movimientos**:
+  - Resolución de bug visual en la lista de últimos movimientos donde los items se cortaban debido a un `max-height` restrictivo.
+  - Optimización del espaciado y alineación vertical en las tablas de movimientos para mejorar la legibilidad de traslados con múltiples libros.
+
+---
+
 *Nota: Esta versión asegura una base sólida y estandarizada para el crecimiento futuro de Tanuki Admin.*

@@ -21,7 +21,7 @@ import { Card, CardContent } from "@/components/ui/Card";
 import CostCenterSelect from "@/components/admin/CostCenterSelect/CostCenterSelect";
 import { BookSelect } from "@/components/finance/BookSelect";
 import InventorySettlementSelect from "@/components/finance/InventorySettlementSelect";
-import { Trash2, Plus, Save, ArrowLeft, Book, Settings } from "lucide-react";
+import { Trash2, Plus, Save, Book, Settings } from "lucide-react";
 import { NumericInput } from "@/components/ui/Input/NumericInput";
 import { cn, formatCurrency } from "@/lib/utils";
 import { BookResponse } from "@/types/book";
@@ -73,7 +73,7 @@ export default function InvoiceForm({
   const [loading, setLoading] = useState(false);
 
   const form = useForm<InvoiceFormValues>({
-    resolver: zodResolver(invoiceSchema) as any,
+    resolver: zodResolver(invoiceSchema),
     defaultValues: {
       number: initialData?.number || "",
       date: initialData?.date || new Date().toISOString().split("T")[0],
