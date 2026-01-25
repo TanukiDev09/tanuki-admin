@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { Separator } from '@/components/ui/Separator';
 import { PointOfSaleForm } from '@/components/points-of-sale/PointOfSaleForm';
 import { PointOfSaleStock } from '@/components/points-of-sale/PointOfSaleStock';
+import { POSContactsAgenda } from '@/components/points-of-sale/POSContactsAgenda';
 import dbConnect from '@/lib/mongodb';
 import PointOfSale from '@/models/PointOfSale';
 import { Types } from 'mongoose';
@@ -31,6 +32,13 @@ interface LeanPointOfSale {
   city?: string;
   department?: string;
   discountPercentage?: number;
+  contacts?: Array<{
+    _id: Types.ObjectId;
+    name: string;
+    email?: string;
+    phone?: string;
+    position?: string;
+  }>;
 }
 
 export async function generateMetadata({
@@ -64,6 +72,12 @@ async function getPointOfSale(id: string) {
     warehouseId: doc.warehouseId ? doc.warehouseId.toString() : null,
     createdAt: doc.createdAt?.toISOString(),
     updatedAt: doc.updatedAt?.toISOString(),
+    contacts: doc.contacts
+      ? doc.contacts.map((c) => ({
+        ...c,
+        _id: c._id.toString(),
+      }))
+      : [],
   };
 }
 
@@ -94,6 +108,7 @@ export default async function PointOfSaleDetailPage({ params }: PageProps) {
       <Tabs defaultValue="info" className="space-y-4">
         <TabsList>
           <TabsTrigger value="info">Información</TabsTrigger>
+          <TabsTrigger value="contacts">Contactos</TabsTrigger>
           <TabsTrigger value="stock">Inventario</TabsTrigger>
           <TabsTrigger value="sales" disabled>
             Ventas (Próximamente)
@@ -105,6 +120,14 @@ export default async function PointOfSaleDetailPage({ params }: PageProps) {
               <h3 className="pos-detail__section-title">Editar Detalles</h3>
               <PointOfSaleForm initialData={pos} />
             </div>
+          </div>
+        </TabsContent>
+        <TabsContent value="contacts" className="space-y-4">
+          <div className="pos-detail__card">
+            <POSContactsAgenda
+              posId={pos._id}
+              initialContacts={pos.contacts || []}
+            />
           </div>
         </TabsContent>
         <TabsContent value="stock" className="space-y-4">
