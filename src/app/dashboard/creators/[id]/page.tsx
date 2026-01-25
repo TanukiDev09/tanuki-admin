@@ -45,7 +45,7 @@ const BookProfitabilityChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="h-[400px] w-full bg-muted/10 animate-pulse rounded-lg" />
+      <div className="creator-detail__chart-skeleton" />
     ),
   }
 );
@@ -219,11 +219,11 @@ export default function CreatorDetailPage(props: {
                       <TrendingUp className="creator-detail__icon-lg" />
                       Rentabilidad por Libro (Histórico)
                     </h2>
-                    <div className="bg-white p-4 rounded-xl border shadow-sm">
+                    <div className="creator-detail__chart-container">
                       <BookProfitabilityChart data={financialData} />
                     </div>
                   </div>
-                  <Separator className="my-6" />
+                  <Separator className="creator-detail__separator" />
                 </>
               )}
 
@@ -314,7 +314,7 @@ export default function CreatorDetailPage(props: {
                 )}
               </div>
 
-              <Separator className="my-6" />
+              <Separator className="creator-detail__separator" />
 
               <div>
                 <h2 className="creator-detail__section-title">
@@ -327,7 +327,7 @@ export default function CreatorDetailPage(props: {
                     No hay contratos registrados.
                   </p>
                 ) : (
-                  <div className="border rounded-md">
+                  <div className="creator-detail__agreement-table-wrapper">
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -341,7 +341,7 @@ export default function CreatorDetailPage(props: {
                       <TableBody>
                         {agreements.map((agreement) => (
                           <TableRow key={agreement._id}>
-                            <TableCell className="font-medium">
+                            <TableCell>
                               {/* Safe cast or check if book is object */}
                               {typeof agreement.book === 'object' &&
                                 agreement.book !== null
@@ -383,12 +383,12 @@ export default function CreatorDetailPage(props: {
                                   href={`/uploads/contracts/${agreement.signedContractUrl}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-1 text-primary hover:underline"
+                                  className="creator-detail__link creator-detail__link--pdf"
                                 >
                                   <FileText size={14} /> PDF
                                 </a>
                               ) : (
-                                <span className="text-muted-foreground">-</span>
+                                <span className="creator-detail__text-muted">-</span>
                               )}
                             </TableCell>
                           </TableRow>

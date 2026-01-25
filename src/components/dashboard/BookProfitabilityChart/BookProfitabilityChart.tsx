@@ -12,7 +12,8 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { formatCurrency } from '@/lib/utils'; // Assuming this utility exists
+import { formatCurrency } from '@/lib/utils';
+import './BookProfitabilityChart.scss';
 
 interface BookProfitability {
   id: string;
@@ -34,19 +35,19 @@ export function BookProfitabilityChart({ data }: BookProfitabilityChartProps) {
 
   if (!sortedData || sortedData.length === 0) {
     return (
-      <Card className="h-[400px] flex items-center justify-center text-muted-foreground">
+      <Card className="book-profitability-chart__empty">
         No hay datos financieros disponibles para sus libros.
       </Card>
     );
   }
 
   return (
-    <Card className="shadow-sm">
+    <Card className="book-profitability-chart">
       <CardHeader>
         <CardTitle>Rentabilidad por Libro</CardTitle>
       </CardHeader>
-      <CardContent className="pl-0">
-        <div className="h-[400px] w-full">
+      <CardContent className="book-profitability-chart__content">
+        <div className="book-profitability-chart__chart-wrapper">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               layout="vertical"

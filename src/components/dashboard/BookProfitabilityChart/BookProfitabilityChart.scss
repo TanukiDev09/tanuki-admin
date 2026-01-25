@@ -1,1 +1,25 @@
-/* No specific SCSS needed for now as we use generic cards and tailwind classes */
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.book-profitability-chart {
+  @include card-base;
+
+  box-shadow: $shadow-sm;
+
+  &__content {
+    padding-left: 0;
+  }
+
+  &__chart-wrapper {
+    width: 100%;
+    height: 400px;
+  }
+
+  &__empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 400px;
+    color: $muted-foreground;
+  }
+}

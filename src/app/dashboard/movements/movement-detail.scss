@@ -100,8 +100,8 @@
 
   &__allocation-table {
     width: 100%;
-    border-collapse: collapse;
     font-size: $font-size-sm;
+    border-collapse: collapse;
 
     th {
       padding: $spacing-xs $spacing-sm;
@@ -111,6 +111,10 @@
       font-weight: $font-weight-medium;
       text-align: left;
       text-transform: uppercase;
+
+      &.text-right {
+        text-align: right;
+      }
     }
 
     td {
@@ -123,5 +127,30 @@
     font-family: $font-family-mono;
     font-weight: $font-weight-medium;
     text-align: right;
+  }
+
+  &__link-section {
+    margin-top: $spacing-xl;
+  }
+
+  &__link-title {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__link-card {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    margin-top: $spacing-xs;
+    padding: $spacing-md;
+    background-color: $muted;
+    border-radius: $radius-lg;
+  }
+
+  &__link-text {
+    flex: 1;
+    font-size: $font-size-sm;
   }
 }

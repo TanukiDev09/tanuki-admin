@@ -20,6 +20,7 @@ import {
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import './InventoryMovementSearchSelect.scss';
 
 interface InventoryMovement {
   _id: string;
@@ -82,7 +83,7 @@ export function InventoryMovementSearchSelect({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className="inventory-movement-search-select__trigger"
         >
           {selectedMovement ? (
             <span className="truncate">
@@ -98,12 +99,12 @@ export function InventoryMovementSearchSelect({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[400px] p-0" align="start">
+      <PopoverContent className="inventory-movement-search-select__content" align="start">
         <Command>
           <CommandInput placeholder="Buscar por observaciones..." />
           <CommandEmpty>
             {loading ? (
-              <div className="flex items-center justify-center p-4">
+              <div className="inventory-movement-search-select__loading">
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
                 Buscando...
               </div>
@@ -124,18 +125,18 @@ export function InventoryMovementSearchSelect({
                 >
                   <Check
                     className={cn(
-                      'mr-2 h-4 w-4',
+                      'inventory-movement-search-select__check-icon',
                       value === movement._id ? 'opacity-100' : 'opacity-0'
                     )}
                   />
-                  <div className="flex flex-col">
-                    <span className="font-medium">
+                  <div className="inventory-movement-search-select__item">
+                    <span className="inventory-movement-search-select__item-header">
                       {movement.type} -{' '}
                       {format(new Date(movement.date), 'dd/MM/yyyy HH:mm', {
                         locale: es,
                       })}
                     </span>
-                    <span className="text-xs text-muted-foreground">
+                    <span className="inventory-movement-search-select__item-warehouses">
                       {movement.fromWarehouseId
                         ? `De: ${movement.fromWarehouseId.name}`
                         : ''}
@@ -144,7 +145,7 @@ export function InventoryMovementSearchSelect({
                         : ''}
                     </span>
                     {movement.observations && (
-                      <span className="text-xs italic">
+                      <span className="inventory-movement-search-select__item-observations">
                         {movement.observations}
                       </span>
                     )}

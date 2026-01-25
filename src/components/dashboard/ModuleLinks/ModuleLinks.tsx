@@ -15,6 +15,7 @@ import {
   Shield,
   Calculator,
   LucideIcon,
+  Receipt,
 } from 'lucide-react';
 import {
   ModuleName,
@@ -38,6 +39,7 @@ const MODULE_ICONS: Record<ModuleName, LucideIcon> = {
   [ModuleName.USERS]: UserCog,
   [ModuleName.PERMISSIONS]: Shield,
   [ModuleName.COST_CENTERS]: Calculator,
+  [ModuleName.INVOICES]: Receipt,
 };
 
 // Map module names to routes
@@ -54,6 +56,7 @@ const MODULE_ROUTES: Record<ModuleName, string> = {
   [ModuleName.USERS]: '/dashboard/users',
   [ModuleName.PERMISSIONS]: '/dashboard/permissions',
   [ModuleName.COST_CENTERS]: '/dashboard/cost-centers',
+  [ModuleName.INVOICES]: '/dashboard/invoices',
 };
 
 export function ModuleLinks() {

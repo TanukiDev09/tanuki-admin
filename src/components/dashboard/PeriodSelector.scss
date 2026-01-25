@@ -42,11 +42,25 @@
     border-radius: $radius-md;
   }
 
+  &__icon {
+    width: $icon-sm;
+    height: $icon-sm;
+    color: $muted-foreground;
+  }
+
   &__trigger {
     background: transparent;
     font-size: $font-size-sm;
     font-weight: $font-weight-medium;
     border: none;
+
+    &--month {
+      width: 130px;
+    }
+
+    &--year {
+      width: 100px;
+    }
 
     &:focus {
       outline: none;
@@ -62,11 +76,6 @@
     &:hover {
       background: $accent;
       color: $accent-foreground;
-    }
-
-    svg {
-      width: $icon-sm;
-      height: $icon-sm;
     }
   }
 }

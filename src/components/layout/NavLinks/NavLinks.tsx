@@ -20,6 +20,7 @@ import {
   MoreHorizontal,
   User,
   LogOut,
+  Receipt,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePermission } from '@/hooks/usePermissions';
@@ -47,6 +48,7 @@ export const navItems = [
   { href: '/dashboard/points-of-sale', label: 'Puntos de Venta', icon: Store },
   { href: '/dashboard/warehouses', label: 'Bodegas', icon: Warehouse },
   { href: '/dashboard/agreements', label: 'Contratos', icon: FileText },
+  { href: '/dashboard/invoices', label: 'Facturas', icon: Receipt },
   { href: '/dashboard/movements', label: 'Movimientos', icon: List },
   { href: '/dashboard/inventory', label: 'Inventario', icon: Package },
   { href: '/dashboard/categories', label: 'Categorías', icon: Tag },
@@ -103,6 +105,7 @@ export function NavLinks({
       '/dashboard/categories': ModuleName.CATEGORIES,
       '/dashboard/users': ModuleName.USERS,
       '/dashboard/permissions': ModuleName.PERMISSIONS,
+      '/dashboard/invoices': ModuleName.INVOICES,
     };
 
     const entry = Object.entries(modulePermissionMap).find(([path]) =>

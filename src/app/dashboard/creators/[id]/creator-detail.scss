@@ -116,6 +116,33 @@
     gap: $spacing-2xl;
   }
 
+  &__chart-container {
+    padding: $spacing-md;
+    background-color: $card;
+    border: 1px solid $border;
+    border-radius: $radius-xl;
+    box-shadow: $shadow-sm;
+  }
+
+  &__chart-skeleton {
+    width: 100%;
+    height: 400px;
+    background-color: rgba($muted, 0.1);
+    border-radius: $radius-lg;
+    animation: animate-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  &__agreement-table-wrapper {
+    border: 1px solid $border;
+    border-radius: $radius-md;
+    overflow: hidden;
+  }
+
+  &__separator {
+    margin-top: $spacing-xl;
+    margin-bottom: $spacing-xl;
+  }
+
   &__name {
     margin-bottom: $spacing-xs;
     font-size: $font-size-2xl;
