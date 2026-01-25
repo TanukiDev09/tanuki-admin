@@ -1,6 +1,13 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import './Warehouse';
 
+export interface IPOSContact {
+  name: string;
+  email?: string;
+  phone?: string;
+  position?: string;
+}
+
 export interface IPointOfSale extends Document {
   name: string;
   code: string;
@@ -11,6 +18,7 @@ export interface IPointOfSale extends Document {
   phones: string[];
   emails: string[];
   managers: string[];
+  contacts: IPOSContact[];
   warehouseId?: mongoose.Types.ObjectId;
   status: 'active' | 'inactive';
   type: 'physical' | 'online' | 'event';
@@ -60,6 +68,17 @@ const PointOfSaleSchema: Schema = new Schema(
     },
     managers: {
       type: [String],
+      default: [],
+    },
+    contacts: {
+      type: [
+        {
+          name: { type: String, required: true },
+          email: { type: String },
+          phone: { type: String },
+          position: { type: String },
+        },
+      ],
       default: [],
     },
     warehouseId: {

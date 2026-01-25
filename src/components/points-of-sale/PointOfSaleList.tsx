@@ -188,6 +188,7 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
               <TableHead>Descuento</TableHead>
               <TableHead>Encargado</TableHead>
               <TableHead>Teléfono</TableHead>
+              <TableHead>Correo</TableHead>
               <TableHead>Estado</TableHead>
               <TableHead className="pos-list__actions-cell">Acciones</TableHead>
             </TableRow>
@@ -227,6 +228,7 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
                   </TableCell>
                   <TableCell>{renderArrayCell(pos.managers)}</TableCell>
                   <TableCell>{renderArrayCell(pos.phones)}</TableCell>
+                  <TableCell>{renderArrayCell(pos.emails)}</TableCell>
                   <TableCell>
                     <PointOfSaleStatusBadge status={pos.status} />
                   </TableCell>
