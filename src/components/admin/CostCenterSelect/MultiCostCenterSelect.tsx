@@ -39,8 +39,8 @@ export function MultiCostCenterSelect({
         if (data.success) {
           setCostCenters(data.data);
         }
-      } catch (error) {
-        console.error("Error loading cost centers", error);
+      } catch {
+        console.error("Error loading cost centers");
       } finally {
         setLoading(false);
       }
@@ -70,6 +70,8 @@ export function MultiCostCenterSelect({
           <div
             role="combobox"
             aria-expanded={open}
+            aria-haspopup="listbox"
+            aria-controls="cost-center-listbox"
             className={cn(
               "multi-cost-center-select",
               open && "multi-cost-center-select--open"
@@ -91,7 +93,7 @@ export function MultiCostCenterSelect({
         >
           <Command>
             <CommandInput placeholder="Buscar por código o nombre..." className="multi-cost-center-select__input" />
-            <CommandList>
+            <CommandList id="cost-center-listbox">
               {loading && <div className="multi-cost-center-select__loading">Cargando...</div>}
 
               {!loading && (

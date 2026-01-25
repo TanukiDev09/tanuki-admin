@@ -58,7 +58,7 @@ export default function InvoiceDetailPage() {
       if (!res.ok) throw new Error("Error loading invoice");
       const data = await res.json();
       setInvoice(data);
-    } catch (_error) {
+    } catch {
       toast({
         title: "Error",
         description: "No se pudo cargar la factura",
@@ -94,7 +94,7 @@ export default function InvoiceDetailPage() {
       toast({ title: "Éxito", description: "Pago asociado correctamente" });
       setIsLinking(false);
       fetchInvoice();
-    } catch (_error) {
+    } catch {
       toast({
         title: "Error",
         description: "No se pudo asociar el pago",
@@ -119,7 +119,7 @@ export default function InvoiceDetailPage() {
 
       toast({ title: "Éxito", description: "Pago desvinculado" });
       fetchInvoice();
-    } catch (_error) {
+    } catch {
       toast({
         title: "Error",
         description: "No se pudo desvincular el pago",

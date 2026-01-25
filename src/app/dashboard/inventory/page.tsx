@@ -23,6 +23,8 @@ export default function InventoryPage() {
     totalValue: 0,
     lowStockCount: 0,
     outOfStockCount: 0,
+    editorialUnits: 0,
+    otherUnits: 0,
   });
   const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(true);
