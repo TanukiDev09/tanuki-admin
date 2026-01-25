@@ -110,4 +110,29 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
 
 ---
 
+### 🧾 Sesión: Gestión de Facturación & Documentación Digital
+
+**Fecha:** 2026-01-25
+
+#### 🌟 Nuevas Características
+- **Carga de Documentos Digitales**:
+  - Implementación de un sistema de carga de archivos (PDF, PNG, JPG) para facturas.
+  - Integración con **Vercel Blob Storage** para almacenamiento en la nube.
+  - Nuevo componente `DocumentUploader` con soporte para drag-and-drop y previsualizaciones inteligentes.
+  - Acceso directo a documentos desde la vista de detalle de la factura ("Ver Documento").
+- **Interfaz de Ítems de Alta Precisión**:
+  - Re-ingeniería completa de la tabla de ítems usando **anchos fijos en píxeles** para garantizar 0 solapamiento de datos.
+  - **Modo Spreadsheet**: Implementación de campos de entrada minimalistas que resaltan al interactuar (border-on-hover), eliminando el ruido visual de "múltiples cuadros".
+  - **Segmented Control**: Nuevo selector estético para alternar entre "Libro" y "Servicio", mejorando la semántica visual.
+
+#### 🛠️ Calidad Técnica & Estabilidad
+- **Eliminación de Deuda Técnica (Styles)**:
+  - Resolución del 100% de los errores de `stylelint` en los componentes de facturación internos.
+  - Aplicación de un sistema robusto de espaciado en selectores dinámicos (`BookSelect`, `CostCenterSelect`) para evitar colisiones de iconos.
+- **Corrección de Build**:
+  - Resolución de error crítico de compilación en SCSS debido a mixins de truncado mal referenciados (`truncate` vs `text-truncate`).
+  - Estandarización de las dimensiones de "table-mode" para que todos los controles de fila tengan una altura idéntica (2.25rem).
+
+---
+
 *Nota: Esta versión asegura una base sólida y estandarizada para el crecimiento futuro de Tanuki Admin.*
