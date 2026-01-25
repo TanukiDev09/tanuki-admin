@@ -10,6 +10,12 @@
 
   &__table {
     width: 100%;
+
+    td {
+      vertical-align: top;
+      padding-top: $spacing-md;
+      padding-bottom: $spacing-md;
+    }
   }
 
   &__date {
@@ -20,7 +26,7 @@
   &__route {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: $spacing-xs;
     font-size: $font-size-xs;
 
     &-from {
@@ -36,12 +42,9 @@
   &__items-list {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    max-height: 80px;
+    gap: $spacing-xs;
+    padding: $spacing-xs 0;
     font-size: $font-size-sm;
-    overflow-y: auto;
-
-    @include custom-scrollbar;
   }
 
   &__item {

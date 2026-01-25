@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
       .sort({ name: 1 });
 
     // 2. Build query for books
-    const query: Record<string, unknown> = {};
+    const query: Record<string, unknown> = { isActive: true };
     if (search) {
       query.$or = [
         { title: { $regex: search, $options: 'i' } },

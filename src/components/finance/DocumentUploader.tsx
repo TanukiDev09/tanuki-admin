@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Upload, X, FileText, File as FileIcon, Loader2 } from 'lucide-react';
+import { Upload, X, FileText, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
