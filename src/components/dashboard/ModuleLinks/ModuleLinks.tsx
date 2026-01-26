@@ -100,7 +100,7 @@ export function ModuleLinks() {
     <div className="module-links">
       {accessibleModules.map((moduleName) => {
         const metadata = MODULE_METADATA[moduleName];
-        const Icon = MODULE_ICONS[moduleName] || Book; // Fallback icon
+        const Icon = MODULE_ICONS[moduleName] || BookOpen; // Fallback icon
         const route = MODULE_ROUTES[moduleName] || '/dashboard';
 
         return (
