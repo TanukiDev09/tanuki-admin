@@ -97,7 +97,10 @@ export default function CreateMovementPage() {
   const addAllocation = () => {
     setFormData((prev) => ({
       ...prev,
-      allocations: [...(prev.allocations || []), { costCenter: '', amount: '0' }],
+      allocations: [
+        ...(prev.allocations || []),
+        { costCenter: '', amount: '0' },
+      ],
     }));
   };
 
@@ -498,9 +501,9 @@ export default function CreateMovementPage() {
               <div className="movement-form__calculated-value">
                 {gtZero(formData.amount) && gtZero(formData.quantity)
                   ? formatCurrency(
-                    toNumber(divide(formData.amount, formData.quantity)),
-                    formData.currency
-                  )
+                      toNumber(divide(formData.amount, formData.quantity)),
+                      formData.currency
+                    )
                   : '$ 0'}
               </div>
             </div>

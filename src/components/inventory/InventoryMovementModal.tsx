@@ -232,6 +232,12 @@ export function InventoryMovementModal({
     setItems(items.filter((i) => i.bookId !== bookId));
   };
 
+  const totalTitles = items.length;
+  const totalCopies = items.reduce(
+    (acc, current) => acc + (current.quantity || 0),
+    0
+  );
+
   const handleSubmit = async () => {
     setLoading(true);
     try {
@@ -509,7 +515,27 @@ export function InventoryMovementModal({
       <Separator />
 
       <div className="inventory-movement-modal__selected-section">
-        <Label>Items Seleccionados ({formatNumber(items.length)})</Label>
+        <div className="inventory-movement-modal__selected-header">
+          <Label>Items Seleccionados ({formatNumber(totalTitles)})</Label>
+          <div className="inventory-movement-modal__summary">
+            <div className="inventory-movement-modal__summary-item">
+              <span className="inventory-movement-modal__summary-label">
+                Total Títulos:
+              </span>
+              <span className="inventory-movement-modal__summary-value">
+                {formatNumber(totalTitles)}
+              </span>
+            </div>
+            <div className="inventory-movement-modal__summary-item">
+              <span className="inventory-movement-modal__summary-label">
+                Total Ejemplares:
+              </span>
+              <span className="inventory-movement-modal__summary-value">
+                {formatNumber(totalCopies)}
+              </span>
+            </div>
+          </div>
+        </div>
         <div className="inventory-movement-modal__selected-list">
           {items.map((item) => (
             <div

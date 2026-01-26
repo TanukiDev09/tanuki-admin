@@ -1,53 +1,53 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
-import { Label } from "@/components/ui/Label";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Label } from '@/components/ui/Label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/Select";
-import { Textarea } from "@/components/ui/Textarea";
-import { useToast } from "@/components/ui/Toast";
-import { Card, CardContent } from "@/components/ui/Card";
-import CostCenterSelect from "@/components/admin/CostCenterSelect/CostCenterSelect";
-import { BookSelect } from "@/components/finance/BookSelect";
-import InventorySettlementSelect from "@/components/finance/InventorySettlementSelect";
-import { Trash2, Plus, Save, Book, Settings } from "lucide-react";
-import { NumericInput } from "@/components/ui/Input/NumericInput";
-import { cn, formatCurrency } from "@/lib/utils";
-import { BookResponse } from "@/types/book";
-import DocumentUploader from "./DocumentUploader";
-import "./InvoiceForm.scss";
+} from '@/components/ui/Select';
+import { Textarea } from '@/components/ui/Textarea';
+import { useToast } from '@/components/ui/Toast';
+import { Card, CardContent } from '@/components/ui/Card';
+import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
+import { BookSelect } from '@/components/finance/BookSelect';
+import InventorySettlementSelect from '@/components/finance/InventorySettlementSelect';
+import { Trash2, Plus, Save, Book, Settings } from 'lucide-react';
+import { NumericInput } from '@/components/ui/Input/NumericInput';
+import { cn, formatCurrency } from '@/lib/utils';
+import { BookResponse } from '@/types/book';
+import DocumentUploader from './DocumentUploader';
+import './InvoiceForm.scss';
 
 const invoiceSchema = z.object({
-  number: z.string().min(1, "El número es requerido"),
-  date: z.string().min(1, "La fecha es requerida"),
+  number: z.string().min(1, 'El número es requerido'),
+  date: z.string().min(1, 'La fecha es requerida'),
   dueDate: z.string().optional(),
-  customerName: z.string().min(1, "El cliente es requerido"),
+  customerName: z.string().min(1, 'El cliente es requerido'),
   customerTaxId: z.string().optional(),
   items: z
     .array(
       z.object({
-        type: z.enum(["libro", "servicio"]),
-        description: z.string().min(1, "Descripción requerida"),
-        quantity: z.number().min(0, "Cantidad inválida"),
-        unitPrice: z.number().min(0, "Precio inválido"),
+        type: z.enum(['libro', 'servicio']),
+        description: z.string().min(1, 'Descripción requerida'),
+        quantity: z.number().min(0, 'Cantidad inválida'),
+        unitPrice: z.number().min(0, 'Precio inválido'),
         total: z.number(),
         bookId: z.string().optional(),
-        costCenter: z.string().min(1, "Centro de costo requerido"),
+        costCenter: z.string().min(1, 'Centro de costo requerido'),
       })
     )
-    .min(1, "Debe agregar al menos un ítem"),
-  status: z.enum(["Draft", "Sent", "Paid", "Partial", "Cancelled"]),
+    .min(1, 'Debe agregar al menos un ítem'),
+  status: z.enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled']),
   costCenters: z.array(z.string()).optional(),
   inventoryMovement: z.string().optional(),
   notes: z.string().optional(),
@@ -75,48 +75,62 @@ export default function InvoiceForm({
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
-      number: initialData?.number || "",
-      date: initialData?.date || new Date().toISOString().split("T")[0],
-      dueDate: initialData?.dueDate || "",
-      customerName: initialData?.customerName || "",
-      customerTaxId: initialData?.customerTaxId || "",
+      number: initialData?.number || '',
+      date: initialData?.date || new Date().toISOString().split('T')[0],
+      dueDate: initialData?.dueDate || '',
+      customerName: initialData?.customerName || '',
+      customerTaxId: initialData?.customerTaxId || '',
       items: initialData?.items || [
-        { type: "servicio", description: "", quantity: 1, unitPrice: 0, total: 0, costCenter: "" }
+        {
+          type: 'servicio',
+          description: '',
+          quantity: 1,
+          unitPrice: 0,
+          total: 0,
+          costCenter: '',
+        },
       ],
-      status: initialData?.status || "Draft",
+      status: initialData?.status || 'Draft',
       costCenters: initialData?.costCenters || [],
-      inventoryMovement: initialData?.inventoryMovement || "",
-      notes: initialData?.notes || "",
+      inventoryMovement: initialData?.inventoryMovement || '',
+      notes: initialData?.notes || '',
       subtotal: initialData?.subtotal || 0,
       tax: initialData?.tax || 0,
       total: initialData?.total || 0,
-      fileUrl: initialData?.fileUrl || "",
+      fileUrl: initialData?.fileUrl || '',
     },
   });
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: "items",
+    name: 'items',
   });
 
-  const watchItems = form.watch("items");
+  const watchItems = form.watch('items');
 
   // Calculate totals whenever items change
   useEffect(() => {
-    const subtotal = watchItems.reduce((acc, item) => acc + (item.total || 0), 0);
+    const subtotal = watchItems.reduce(
+      (acc, item) => acc + (item.total || 0),
+      0
+    );
     const tax = 0; // Implement tax logic if needed, for now 0
     const total = subtotal + tax;
 
-    form.setValue("subtotal", subtotal);
-    form.setValue("tax", tax);
-    form.setValue("total", total);
+    form.setValue('subtotal', subtotal);
+    form.setValue('tax', tax);
+    form.setValue('total', total);
   }, [watchItems, form]);
 
   // Recalculate item total when quantity or price changes
-  const handleItemChange = (index: number, field: "quantity" | "unitPrice", value: number) => {
+  const handleItemChange = (
+    index: number,
+    field: 'quantity' | 'unitPrice',
+    value: number
+  ) => {
     const currentItem = form.getValues(`items.${index}`);
-    const quantity = field === "quantity" ? value : currentItem.quantity;
-    const unitPrice = field === "unitPrice" ? value : currentItem.unitPrice;
+    const quantity = field === 'quantity' ? value : currentItem.quantity;
+    const unitPrice = field === 'unitPrice' ? value : currentItem.unitPrice;
 
     form.setValue(`items.${index}.${field}`, value);
     form.setValue(`items.${index}.total`, quantity * unitPrice);
@@ -126,7 +140,7 @@ export default function InvoiceForm({
     form.setValue(`items.${index}.bookId`, book._id);
     form.setValue(`items.${index}.description`, book.title);
     form.setValue(`items.${index}.unitPrice`, book.price);
-    form.setValue(`items.${index}.costCenter`, book.costCenter || "");
+    form.setValue(`items.${index}.costCenter`, book.costCenter || '');
 
     // Trigger recalculation of total
     const quantity = form.getValues(`items.${index}.quantity`);
@@ -136,35 +150,36 @@ export default function InvoiceForm({
   const onSubmit = async (data: InvoiceFormValues) => {
     setLoading(true);
     try {
-      const url = isEditing && initialData?._id
-        ? `/api/invoices/${initialData._id}`
-        : "/api/invoices";
-      const method = isEditing ? "PATCH" : "POST";
+      const url =
+        isEditing && initialData?._id
+          ? `/api/invoices/${initialData._id}`
+          : '/api/invoices';
+      const method = isEditing ? 'PATCH' : 'POST';
 
       const res = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
 
       if (!res.ok) {
         const errorData = await res.json();
-        throw new Error(errorData.error || "Error al guardar");
+        throw new Error(errorData.error || 'Error al guardar');
       }
 
       toast({
-        title: "Éxito",
-        description: isEditing ? "Factura actualizada" : "Factura creada",
+        title: 'Éxito',
+        description: isEditing ? 'Factura actualizada' : 'Factura creada',
       });
-      router.push("/dashboard/invoices");
+      router.push('/dashboard/invoices');
       router.refresh();
     } catch (error: unknown) {
       const errorMessage =
-        error instanceof Error ? error.message : "Error desconocido";
+        error instanceof Error ? error.message : 'Error desconocido';
       toast({
-        title: "Error",
+        title: 'Error',
         description: errorMessage,
-        variant: "destructive",
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -173,27 +188,32 @@ export default function InvoiceForm({
 
   return (
     <form onSubmit={form.handleSubmit(onSubmit)} className="invoice-form">
-
       {/* General Information Card */}
       <Card>
         <CardContent className="pt-6">
           <div className="invoice-form__grid-3">
             <div className="invoice-form__field">
               <Label>Número de Factura</Label>
-              <Input {...form.register("number")} placeholder="FAC-001" disabled={isEditing} />
+              <Input
+                {...form.register('number')}
+                placeholder="FAC-001"
+                disabled={isEditing}
+              />
               {form.formState.errors.number && (
-                <p className="invoice-form__error">{form.formState.errors.number.message}</p>
+                <p className="invoice-form__error">
+                  {form.formState.errors.number.message}
+                </p>
               )}
             </div>
 
             <div className="invoice-form__field">
               <Label>Fecha Emisión</Label>
-              <Input type="date" {...form.register("date")} />
+              <Input type="date" {...form.register('date')} />
             </div>
 
             <div className="invoice-form__field">
               <Label>Fecha Vencimiento</Label>
-              <Input type="date" {...form.register("dueDate")} />
+              <Input type="date" {...form.register('dueDate')} />
             </div>
           </div>
         </CardContent>
@@ -205,15 +225,23 @@ export default function InvoiceForm({
           <div className="invoice-form__grid-2">
             <div className="invoice-form__field">
               <Label>Cliente</Label>
-              <Input {...form.register("customerName")} placeholder="Nombre del cliente" />
+              <Input
+                {...form.register('customerName')}
+                placeholder="Nombre del cliente"
+              />
               {form.formState.errors.customerName && (
-                <p className="invoice-form__error">{form.formState.errors.customerName.message}</p>
+                <p className="invoice-form__error">
+                  {form.formState.errors.customerName.message}
+                </p>
               )}
             </div>
 
             <div className="invoice-form__field">
               <Label>NIT / CC</Label>
-              <Input {...form.register("customerTaxId")} placeholder="Documento de identidad" />
+              <Input
+                {...form.register('customerTaxId')}
+                placeholder="Documento de identidad"
+              />
             </div>
           </div>
 
@@ -246,7 +274,10 @@ export default function InvoiceForm({
                 control={form.control}
                 name="inventoryMovement"
                 render={({ field }) => (
-                  <InventorySettlementSelect value={field.value} onValueChange={field.onChange} />
+                  <InventorySettlementSelect
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  />
                 )}
               />
             </div>
@@ -260,7 +291,7 @@ export default function InvoiceForm({
                 <DocumentUploader
                   value={field.value}
                   onChange={field.onChange}
-                  onRemove={() => field.onChange("")}
+                  onRemove={() => field.onChange('')}
                 />
               )}
             />
@@ -280,7 +311,9 @@ export default function InvoiceForm({
                   <th>Libro o Descripción</th>
                   <th style={{ width: '140px' }}>Centro de Costo</th>
                   <th style={{ width: '70px', textAlign: 'right' }}>Cant.</th>
-                  <th style={{ width: '120px', textAlign: 'right' }}>Vr. Unitario</th>
+                  <th style={{ width: '120px', textAlign: 'right' }}>
+                    Vr. Unitario
+                  </th>
                   <th style={{ width: '100px', textAlign: 'right' }}>Total</th>
                   <th style={{ width: '50px' }}></th>
                 </tr>
@@ -298,10 +331,11 @@ export default function InvoiceForm({
                             <div className="invoice-form__type-toggle">
                               <button
                                 type="button"
-                                onClick={() => typeField.onChange("libro")}
+                                onClick={() => typeField.onChange('libro')}
                                 className={cn(
-                                  "invoice-form__type-btn",
-                                  typeField.value === "libro" && "invoice-form__type-btn--active"
+                                  'invoice-form__type-btn',
+                                  typeField.value === 'libro' &&
+                                    'invoice-form__type-btn--active'
                                 )}
                                 title="Libro"
                               >
@@ -309,10 +343,11 @@ export default function InvoiceForm({
                               </button>
                               <button
                                 type="button"
-                                onClick={() => typeField.onChange("servicio")}
+                                onClick={() => typeField.onChange('servicio')}
                                 className={cn(
-                                  "invoice-form__type-btn",
-                                  typeField.value === "servicio" && "invoice-form__type-btn--active"
+                                  'invoice-form__type-btn',
+                                  typeField.value === 'servicio' &&
+                                    'invoice-form__type-btn--active'
                                 )}
                                 title="Servicio"
                               >
@@ -323,26 +358,35 @@ export default function InvoiceForm({
                         />
                       </td>
                       <td className="align-top">
-                        {itemType === "libro" ? (
+                        {itemType === 'libro' ? (
                           <Controller
                             control={form.control}
                             name={`items.${index}.bookId` as const}
                             render={({ field: bookIdField }) => (
                               <BookSelect
                                 value={bookIdField.value}
-                                onSelect={(book) => handleBookSelect(index, book)}
+                                onSelect={(book) =>
+                                  handleBookSelect(index, book)
+                                }
                               />
                             )}
                           />
                         ) : (
                           <Input
-                            {...form.register(`items.${index}.description` as const)}
+                            {...form.register(
+                              `items.${index}.description` as const
+                            )}
                             className="invoice-form__table-input"
                             placeholder="Descripción del servicio..."
                           />
                         )}
                         {form.formState.errors.items?.[index]?.description && (
-                          <p className="invoice-form__error invoice-form__error--xs px-2">{form.formState.errors.items[index]?.description?.message}</p>
+                          <p className="invoice-form__error invoice-form__error--xs px-2">
+                            {
+                              form.formState.errors.items[index]?.description
+                                ?.message
+                            }
+                          </p>
                         )}
                       </td>
                       <td className="align-top">
@@ -359,7 +403,12 @@ export default function InvoiceForm({
                           )}
                         />
                         {form.formState.errors.items?.[index]?.costCenter && (
-                          <p className="invoice-form__error invoice-form__error--xs px-2">{form.formState.errors.items[index]?.costCenter?.message}</p>
+                          <p className="invoice-form__error invoice-form__error--xs px-2">
+                            {
+                              form.formState.errors.items[index]?.costCenter
+                                ?.message
+                            }
+                          </p>
                         )}
                       </td>
                       <td className="align-top">
@@ -369,7 +418,9 @@ export default function InvoiceForm({
                           render={({ field: qField }) => (
                             <NumericInput
                               value={qField.value}
-                              onValueChange={(val) => handleItemChange(index, "quantity", Number(val))}
+                              onValueChange={(val) =>
+                                handleItemChange(index, 'quantity', Number(val))
+                              }
                               className="invoice-form__table-input-right"
                             />
                           )}
@@ -382,7 +433,13 @@ export default function InvoiceForm({
                           render={({ field: pField }) => (
                             <NumericInput
                               value={pField.value}
-                              onValueChange={(val) => handleItemChange(index, "unitPrice", Number(val))}
+                              onValueChange={(val) =>
+                                handleItemChange(
+                                  index,
+                                  'unitPrice',
+                                  Number(val)
+                                )
+                              }
                               className="invoice-form__table-input-right"
                             />
                           )}
@@ -390,7 +447,7 @@ export default function InvoiceForm({
                       </td>
                       <td className="align-top pt-2 text-right">
                         <span className="text-xs font-medium text-muted-foreground whitespace-nowrap">
-                          {formatCurrency(watchItems[index]?.total || 0, "COP")}
+                          {formatCurrency(watchItems[index]?.total || 0, 'COP')}
                         </span>
                       </td>
                       <td className="align-top text-center">
@@ -414,7 +471,16 @@ export default function InvoiceForm({
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => append({ type: "servicio", description: "", quantity: 1, unitPrice: 0, total: 0, costCenter: "" })}
+                onClick={() =>
+                  append({
+                    type: 'servicio',
+                    description: '',
+                    quantity: 1,
+                    unitPrice: 0,
+                    total: 0,
+                    costCenter: '',
+                  })
+                }
               >
                 <Plus className="invoice-form__btn-icon" /> Agregar Ítem
               </Button>
@@ -428,7 +494,7 @@ export default function InvoiceForm({
         <div className="invoice-form__notes">
           <Label>Notas Adicionales</Label>
           <Textarea
-            {...form.register("notes")}
+            {...form.register('notes')}
             placeholder="Observaciones, condiciones de pago, etc..."
           />
         </div>
@@ -438,16 +504,20 @@ export default function InvoiceForm({
             <CardContent className="p-6 space-y-4">
               <div className="invoice-form__summary-row">
                 <span>Subtotal:</span>
-                <span className="font-medium text-foreground">{formatCurrency(form.watch("subtotal"), "COP")}</span>
+                <span className="font-medium text-foreground">
+                  {formatCurrency(form.watch('subtotal'), 'COP')}
+                </span>
               </div>
               <div className="invoice-form__summary-row">
                 <span>Impuestos (0%):</span>
-                <span className="font-medium text-foreground">{formatCurrency(form.watch("tax"), "COP")}</span>
+                <span className="font-medium text-foreground">
+                  {formatCurrency(form.watch('tax'), 'COP')}
+                </span>
               </div>
 
               <div className="invoice-form__summary-row invoice-form__summary-row--total">
                 <span>Total:</span>
-                <span>{formatCurrency(form.watch("total"), "COP")}</span>
+                <span>{formatCurrency(form.watch('total'), 'COP')}</span>
               </div>
 
               <div className="invoice-form__actions">
@@ -456,11 +526,16 @@ export default function InvoiceForm({
                     <span>Guardando...</span>
                   ) : (
                     <>
-                      <Save className="w-4 h-4 mr-2" /> {isEditing ? "Actualizar Factura" : "Guardar Factura"}
+                      <Save className="w-4 h-4 mr-2" />{' '}
+                      {isEditing ? 'Actualizar Factura' : 'Guardar Factura'}
                     </>
                   )}
                 </Button>
-                <Button variant="outline" type="button" onClick={() => router.back()}>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => router.back()}
+                >
                   Cancelar
                 </Button>
               </div>

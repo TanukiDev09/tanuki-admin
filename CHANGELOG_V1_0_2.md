@@ -35,6 +35,7 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
 **Fecha:** 2026-01-22
 
 #### 🌟 Logros de Accesibilidad
+
 - **Cumplimiento WCAG AAA 1.4.9 (Imágenes de Texto)**:
   - Implementación de un sistema de utilidades centralizado (`src/lib/accessibility.ts`) para garantizar que todos los textos alternativos sean descriptivos y concisos (máximo 8 palabras).
   - Refactorización de componentes de inventario, catálogo y creadores para cumplir con los estándares más estrictos de accesibilidad.
@@ -45,6 +46,7 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
   - Resolución del 100% de las advertencias de ESLint en la suite de pruebas de Cypress.
 
 #### 🛠️ Correcciones de Estabilidad
+
 - **Regresión Crítica en Detalle de Libro**:
   - Corregido error de ejecución `Cannot read properties of undefined (reading 'toFixed')` en el componente `BookFinancials`.
   - Actualización robusta de la API de finanzas (`/api/finance/summary`) para garantizar el envío de métricas de margen de beneficio.
@@ -56,6 +58,7 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
 **Fecha:** 2026-01-23
 
 #### 🌟 Nuevas Características
+
 - **Control de Saldo Mensual**:
   - Implementación de bloques de **Saldo Mes Anterior** y **Nuevo Saldo** en el dashboard financiero.
   - Ahora es posible visualizar con cuánto dinero arrancó la editorial el mes y cuál es el saldo proyectado al final del periodo.
@@ -65,6 +68,7 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
   - Ajuste de escala Y proporcional partiendo desde $0 para evitar distorsiones visuales.
 
 #### 🛠️ Calidad Técnica & Correctividad
+
 - **Normalización de Tipos de Movimiento**:
   - Implementación de una capa de normalización en el API de finanzas (`/api/finance/summary`) para convertir tipos de base de datos (`Ingreso`/`Egreso`) a constantes de frontend (`INCOME`/`EXPENSE`).
   - Asegurada la consistencia en la actualización de movimientos (API `PUT`) para mantener el formato de base de datos estandarizado.
@@ -78,6 +82,7 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
   - Verificada la consistencia de datos entre Mayo y Junio 2018 (Balance Final Mayo == Balance Inicial Junio).
 
 #### 🎨 UX/UI
+
 - **Simplificación de StatCards**:
   - Reducción del peso visual general: padding ajustado, tipografía optimizada e iconos más discretos.
   - Eliminación de efectos "glassmorphism" excesivos, sombras pesadas y animaciones distractores para un enfoque profesional en los datos.
@@ -89,6 +94,7 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
 **Fecha:** 2026-01-23
 
 #### 🌟 Logros de Precisión & Fiabilidad
+
 - **Aritmética de Alta Precisión**:
   - Implementación de `big.js` (vía `src/lib/math.ts`) para todos los cálculos financieros del sistema, eliminando errores de redondeo de punto flotante.
   - Actualización del modelo de MongoDB `Movement` para utilizar `Decimal128` en campos críticos (`amount`, `exchangeRate`, `amountInCOP`, `quantity`, `unitValue`).
@@ -99,7 +105,8 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
   - Resolución del 100% de los errores de tipos introducidos por el cambio a strings numéricos de alta precisión, garantizando un build estable.
 
 #### 🎨 UX/UI & Pulido Visual
-- **Formateo de Divisas**: 
+
+- **Formateo de Divisas**:
   - Ajuste en la visualización de montos secundarios (ej: `$ 1 637 580 (¥ 59 500)`) añadiendo un espacio antes del paréntesis para mejorar la partición de palabras y el ajuste de texto en dispositivos móviles.
 - **Sistema de Colores de Categoría**:
   - Implementación de paletas curadas (`WARM_COLORS`, `COLD_COLORS`, `NEUTRAL_COLORS`) para una organización visual coherente.
@@ -111,11 +118,13 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
 ---
 
 ### 🧾 Sesión: Gestión de Facturación & Documentación Digital
+
 ### 📦 Sesión: Desglose de Inventario & Consistencia de Datos
 
 **Fecha:** 2026-01-25
 
 #### 🌟 Nuevas Características
+
 - **Carga de Documentos Digitales**:
   - Implementación de un sistema de carga de archivos (PDF, PNG, JPG) para facturas.
   - Integración con **Vercel Blob Storage** para almacenamiento en la nube.
@@ -127,6 +136,7 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
   - **Segmented Control**: Nuevo selector estético para alternar entre "Libro" y "Servicio", mejorando la semántica visual.
 
 #### 🛠️ Calidad Técnica & Estabilidad
+
 - **Eliminación de Deuda Técnica (Styles)**:
   - Resolución del 100% de los errores de `stylelint` en los componentes de facturación internos.
   - Aplicación de un sistema robusto de espaciado en selectores dinámicos (`BookSelect`, `CostCenterSelect`) para evitar colisiones de iconos.
@@ -139,6 +149,7 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
   - Rediseño de la sección de estadísticas a una cuadrícula de 2x3 para acomodar los nuevos totales sin perder claridad.
 
 #### 🛠️ Calidad Técnica & Correctividad
+
 - **Robustez en Cálculo de "Sin Stock"**:
   - Refactorización completa del API de estadísticas de inventario (`/api/inventory/stats`) para utilizar una única agregación basada en el catálogo de libros activos.
   - Se corrigió el error donde libros inactivos afectaban los contadores de stock bajo/nulo.
@@ -147,10 +158,34 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
   - Actualización del API de la matriz de inventario para filtrar automáticamente por libros activos, eliminando ruido visual de productos obsoletos.
 
 #### 🎨 UX/UI
+
 - **Corrección de Recorte en Movimientos**:
   - Resolución de bug visual en la lista de últimos movimientos donde los items se cortaban debido a un `max-height` restrictivo.
   - Optimización del espaciado y alineación vertical en las tablas de movimientos para mejorar la legibilidad de traslados con múltiples libros.
 
 ---
 
-*Nota: Esta versión asegura una base sólida y estandarizada para el crecimiento futuro de Tanuki Admin.*
+### 📦 Sesión: Optimizaciones en Movimientos de Inventario
+
+**Fecha:** 2026-01-25
+
+#### 🌟 Nuevas Características
+
+- **Totalizador de Movimientos en Tiempo Real**:
+  - Implementación de un resumen dinámico en el modal de movimientos de inventario.
+  - Visualización instantánea del **Total de Títulos** (libros distintos) y **Total de Ejemplares** (suma de cantidades).
+  - Diseño premium tipo "dashed box" integrado en la cabecera de la selección de ítems para un control preciso antes de finalizar el movimiento.
+
+#### 🛠️ Correcciones & Optimización
+
+- **Búsqueda Avanzada en Bodegas**:
+  - Resolución de bug crítico donde el motor de búsqueda ignoraba el término ingresado al filtrar por inventario de bodegas.
+  - Implementación de agregaciones MongoDB en `/api/inventory/warehouse/[id]` para permitir búsquedas dinámicas por **Título** o **ISBN**.
+  - Estandarización del ordenamiento alfabético en todos los resultados de inventario por bodega.
+- **Estabilidad de Build (SCSS)**:
+  - Corrección de error de compilación por uso de variables de color inexistentes.
+  - Unificación del sistema de estilos del modal con las variables globales del proyecto (`$flow`, `$primary`).
+
+---
+
+_Nota: Esta versión asegura una base sólida y estandarizada para el crecimiento futuro de Tanuki Admin._

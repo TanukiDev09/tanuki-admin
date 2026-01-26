@@ -11,7 +11,11 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/Command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/Popover';
 import { cn, formatCurrency } from '@/lib/utils';
 import { BookResponse } from '@/types/book';
 import './BookSelect.scss';
@@ -120,9 +124,12 @@ export function BookSelect({
                     )}
                   />
                   <div className="book-select__item">
-                    <span className="book-select__item-title">{book.title}</span>
+                    <span className="book-select__item-title">
+                      {book.title}
+                    </span>
                     <span className="book-select__item-details">
-                      ISBN: {book.isbn} • {formatCurrency(book.price)} • CC: {book.costCenter || 'Sin asignar'}
+                      ISBN: {book.isbn} • {formatCurrency(book.price)} • CC:{' '}
+                      {book.costCenter || 'Sin asignar'}
                     </span>
                   </div>
                 </CommandItem>

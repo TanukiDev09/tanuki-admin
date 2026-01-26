@@ -107,7 +107,7 @@ export function InventoryList({ data, onAdjust }: InventoryListProps) {
                   <TableCell>
                     <div className="inventory-list__cover-container">
                       {item.bookId.coverImage &&
-                        !imageError[item.bookId._id] ? (
+                      !imageError[item.bookId._id] ? (
                         <Image
                           src={
                             item.bookId.coverImage.startsWith('http')

@@ -74,9 +74,9 @@ async function getPointOfSale(id: string) {
     updatedAt: doc.updatedAt?.toISOString(),
     contacts: doc.contacts
       ? doc.contacts.map((c) => ({
-        ...c,
-        _id: c._id.toString(),
-      }))
+          ...c,
+          _id: c._id.toString(),
+        }))
       : [],
   };
 }

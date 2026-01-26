@@ -7,6 +7,7 @@ This directory contains comprehensive accessibility testing documentation and gu
 ### [WCAG AAA Coverage Matrix](./wcag-aaa-coverage.md)
 
 Complete mapping of all WCAG 2.2 Level AAA success criteria to our testing coverage, including:
+
 - **100 total WCAG criteria** (A, AA, and AAA levels)
 - **45 AAA-specific criteria**
 - Status of each criterion (Automated, Manual, Partial, N/A)
@@ -16,6 +17,7 @@ Complete mapping of all WCAG 2.2 Level AAA success criteria to our testing cover
 ### [Manual Testing Guide](./manual-testing-guide.md)
 
 Detailed procedures for criteria that require human evaluation:
+
 - Screen reader testing procedures
 - Content quality assessment
 - Visual presentation verification
@@ -27,13 +29,13 @@ Detailed procedures for criteria that require human evaluation:
 
 Our Cypress test suite includes:
 
-| Test File | Focus Area | WCAG Criteria |
-|-----------|-----------|---------------|
-| `accessibility.cy.ts` | Core axe-core checks | 13+ criteria including contrast, ARIA, structure |
-| `a11y-keyboard-navigation.cy.ts` | Keyboard accessibility | 2.1.1, 2.1.2, 2.1.3, 2.4.3, 2.4.7 |
-| `a11y-target-size.cy.ts` | Touch target sizes | 2.5.5 (AAA), 2.5.8 |
-| `a11y-text-spacing.cy.ts` | Text presentation | 1.4.4, 1.4.8, 1.4.10, 1.4.12 |
-| `a11y-forms-enhanced.cy.ts` | Form accessibility | 3.3.1-3.3.5, 4.1.3 |
+| Test File                        | Focus Area             | WCAG Criteria                                    |
+| -------------------------------- | ---------------------- | ------------------------------------------------ |
+| `accessibility.cy.ts`            | Core axe-core checks   | 13+ criteria including contrast, ARIA, structure |
+| `a11y-keyboard-navigation.cy.ts` | Keyboard accessibility | 2.1.1, 2.1.2, 2.1.3, 2.4.3, 2.4.7                |
+| `a11y-target-size.cy.ts`         | Touch target sizes     | 2.5.5 (AAA), 2.5.8                               |
+| `a11y-text-spacing.cy.ts`        | Text presentation      | 1.4.4, 1.4.8, 1.4.10, 1.4.12                     |
+| `a11y-forms-enhanced.cy.ts`      | Form accessibility     | 3.3.1-3.3.5, 4.1.3                               |
 
 ## 🚀 Running Tests
 
@@ -130,11 +132,12 @@ When adding new features:
 ## 📞 Support
 
 For questions about accessibility:
+
 - Review this documentation
 - Check WCAG official resources
 - Consult with UX/accessibility team
 
 ---
 
-*Last Updated: 2026-01-22*  
-*WCAG Version: 2.2 Level AAA*
+_Last Updated: 2026-01-22_  
+_WCAG Version: 2.2 Level AAA_

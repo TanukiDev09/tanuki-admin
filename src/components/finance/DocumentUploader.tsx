@@ -28,14 +28,18 @@ export default function DocumentUploader({
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isPDF = value?.toLowerCase().endsWith('.pdf') || value?.includes('blob.vercel-storage.com') && value.toLowerCase().includes('.pdf');
-  const isImage = value && !isPDF && (
-    value.toLowerCase().includes('.png') ||
-    value.toLowerCase().includes('.jpg') ||
-    value.toLowerCase().includes('.jpeg') ||
-    value.toLowerCase().includes('.webp') ||
-    value.includes('blob.vercel-storage.com')
-  );
+  const isPDF =
+    value?.toLowerCase().endsWith('.pdf') ||
+    (value?.includes('blob.vercel-storage.com') &&
+      value.toLowerCase().includes('.pdf'));
+  const isImage =
+    value &&
+    !isPDF &&
+    (value.toLowerCase().includes('.png') ||
+      value.toLowerCase().includes('.jpg') ||
+      value.toLowerCase().includes('.jpeg') ||
+      value.toLowerCase().includes('.webp') ||
+      value.includes('blob.vercel-storage.com'));
 
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
@@ -73,9 +77,16 @@ export default function DocumentUploader({
   };
 
   const uploadFile = async (file: File) => {
-    const validTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+    const validTypes = [
+      'application/pdf',
+      'image/jpeg',
+      'image/png',
+      'image/webp',
+    ];
     if (!validTypes.includes(file.type)) {
-      setError('Por favor selecciona un PDF o una imagen válida (JPG, PNG, WEBP)');
+      setError(
+        'Por favor selecciona un PDF o una imagen válida (JPG, PNG, WEBP)'
+      );
       return;
     }
 
@@ -119,7 +130,7 @@ export default function DocumentUploader({
   };
 
   return (
-    <div className={cn("document-uploader", className)}>
+    <div className={cn('document-uploader', className)}>
       <Label className="document-uploader__label">{label}</Label>
 
       {value ? (
@@ -137,8 +148,15 @@ export default function DocumentUploader({
             <div className="document-uploader__file-info">
               <FileText className="document-uploader__file-icon" />
               <div className="document-uploader__file-details">
-                <span className="document-uploader__file-name">Documento PDF</span>
-                <a href={value} target="_blank" rel="noopener noreferrer" className="document-uploader__view-link">
+                <span className="document-uploader__file-name">
+                  Documento PDF
+                </span>
+                <a
+                  href={value}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="document-uploader__view-link"
+                >
                   Ver documento
                 </a>
               </div>
@@ -162,8 +180,8 @@ export default function DocumentUploader({
           onDrop={handleDrop}
           onClick={() => fileInputRef.current?.click()}
           className={cn(
-            "document-uploader__dropzone",
-            isDragging && "document-uploader__dropzone--dragging"
+            'document-uploader__dropzone',
+            isDragging && 'document-uploader__dropzone--dragging'
           )}
         >
           <input
@@ -188,7 +206,9 @@ export default function DocumentUploader({
                 <p className="document-uploader__text">
                   Arrastra un PDF o imagen aquí o haz clic
                 </p>
-                <p className="document-uploader__hint">Hasta 10MB (PDF, PNG, JPG)</p>
+                <p className="document-uploader__hint">
+                  Hasta 10MB (PDF, PNG, JPG)
+                </p>
               </div>
             </div>
           )}

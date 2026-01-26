@@ -15,7 +15,11 @@ interface AllocationTableProps {
   allocations: Allocation[];
   totalAmount: number | string;
   currency: string;
-  onAllocationChange: (index: number, field: 'costCenter' | 'amount', value: string) => void;
+  onAllocationChange: (
+    index: number,
+    field: 'costCenter' | 'amount',
+    value: string
+  ) => void;
   onAddAllocation: () => void;
   onRemoveAllocation: (index: number) => void;
   error?: string | null;
@@ -103,10 +107,11 @@ export function AllocationTable({
           <div className="flex gap-2 items-center">
             <span>Asignado:</span>
             <span
-              className={`movement-form__allocation-summary-total ${isMatched
-                ? 'movement-form__allocation-summary-total--match'
-                : 'movement-form__allocation-summary-total--error'
-                }`}
+              className={`movement-form__allocation-summary-total ${
+                isMatched
+                  ? 'movement-form__allocation-summary-total--match'
+                  : 'movement-form__allocation-summary-total--error'
+              }`}
             >
               {formatCurrency(toNumber(sumAllocations), currency)}
             </span>

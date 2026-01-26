@@ -1,11 +1,22 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { X, Check, ChevronsUpDown } from "lucide-react";
-import { Command, CommandGroup, CommandItem, CommandList, CommandEmpty, CommandInput } from "@/components/ui/Command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/Popover";
-import { cn } from "@/lib/utils";
-import "./MultiCostCenterSelect.scss";
+import * as React from 'react';
+import { X, Check, ChevronsUpDown } from 'lucide-react';
+import {
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  CommandEmpty,
+  CommandInput,
+} from '@/components/ui/Command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/Popover';
+import { cn } from '@/lib/utils';
+import './MultiCostCenterSelect.scss';
 
 interface CostCenter {
   _id: string;
@@ -23,7 +34,7 @@ interface MultiCostCenterSelectProps {
 export function MultiCostCenterSelect({
   value = [],
   onValueChange,
-  placeholder = "Seleccionar centros de costo...",
+  placeholder = 'Seleccionar centros de costo...',
   className,
 }: MultiCostCenterSelectProps) {
   const [open, setOpen] = React.useState(false);
@@ -34,13 +45,13 @@ export function MultiCostCenterSelect({
   React.useEffect(() => {
     const fetchCostCenters = async () => {
       try {
-        const response = await fetch("/api/costcenters");
+        const response = await fetch('/api/costcenters');
         const data = await response.json();
         if (data.success) {
           setCostCenters(data.data);
         }
       } catch {
-        console.error("Error loading cost centers");
+        console.error('Error loading cost centers');
       } finally {
         setLoading(false);
       }
@@ -61,10 +72,12 @@ export function MultiCostCenterSelect({
   };
 
   // Helper to get selected objects
-  const selectedCostCenters = costCenters.filter((cc) => value.includes(cc._id));
+  const selectedCostCenters = costCenters.filter((cc) =>
+    value.includes(cc._id)
+  );
 
   return (
-    <div className={cn("multi-cost-center-select-wrapper", className)}>
+    <div className={cn('multi-cost-center-select-wrapper', className)}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <div
@@ -73,16 +86,19 @@ export function MultiCostCenterSelect({
             aria-haspopup="listbox"
             aria-controls="cost-center-listbox"
             className={cn(
-              "multi-cost-center-select",
-              open && "multi-cost-center-select--open"
+              'multi-cost-center-select',
+              open && 'multi-cost-center-select--open'
             )}
           >
             {value.length > 0 ? (
               <span className="multi-cost-center-select__value">
-                {value.length} {value.length === 1 ? 'seleccionado' : 'seleccionados'}
+                {value.length}{' '}
+                {value.length === 1 ? 'seleccionado' : 'seleccionados'}
               </span>
             ) : (
-              <span className="multi-cost-center-select__placeholder">{placeholder}</span>
+              <span className="multi-cost-center-select__placeholder">
+                {placeholder}
+              </span>
             )}
             <ChevronsUpDown className="multi-cost-center-select__icon" />
           </div>
@@ -92,9 +108,16 @@ export function MultiCostCenterSelect({
           align="start"
         >
           <Command>
-            <CommandInput placeholder="Buscar por código o nombre..." className="multi-cost-center-select__input" />
+            <CommandInput
+              placeholder="Buscar por código o nombre..."
+              className="multi-cost-center-select__input"
+            />
             <CommandList id="cost-center-listbox">
-              {loading && <div className="multi-cost-center-select__loading">Cargando...</div>}
+              {loading && (
+                <div className="multi-cost-center-select__loading">
+                  Cargando...
+                </div>
+              )}
 
               {!loading && (
                 <>
@@ -106,11 +129,17 @@ export function MultiCostCenterSelect({
                         value={`${cc.code} ${cc.name}`}
                         onSelect={() => handleSelect(cc._id)}
                       >
-                        <div className={cn(
-                          "command-item-check",
-                          value.includes(cc._id) ? "command-item-check--active" : "command-item-check--inactive"
-                        )}>
-                          {value.includes(cc._id) && <Check className="command-item-check__icon" />}
+                        <div
+                          className={cn(
+                            'command-item-check',
+                            value.includes(cc._id)
+                              ? 'command-item-check--active'
+                              : 'command-item-check--inactive'
+                          )}
+                        >
+                          {value.includes(cc._id) && (
+                            <Check className="command-item-check__icon" />
+                          )}
                         </div>
                         <div className="item-label">
                           <span className="item-label__code">{cc.code}</span>

@@ -33,15 +33,27 @@ export function ScrollableIncomeExpenseChart({
   const isDaily = variant === 'daily';
 
   // Calculate cumulative balance for each data point, starting from initial balance
-  const dataWithBalance = data.reduce((acc: Array<{ month: string; income: number; expenses: number; balance: number }>, item) => {
-    const prevBalance = acc.length > 0 ? acc[acc.length - 1].balance : initialBalance;
-    const dailyBalance = item.income - item.expenses;
-    acc.push({
-      ...item,
-      balance: prevBalance + dailyBalance,
-    });
-    return acc;
-  }, []);
+  const dataWithBalance = data.reduce(
+    (
+      acc: Array<{
+        month: string;
+        income: number;
+        expenses: number;
+        balance: number;
+      }>,
+      item
+    ) => {
+      const prevBalance =
+        acc.length > 0 ? acc[acc.length - 1].balance : initialBalance;
+      const dailyBalance = item.income - item.expenses;
+      acc.push({
+        ...item,
+        balance: prevBalance + dailyBalance,
+      });
+      return acc;
+    },
+    []
+  );
 
   return (
     <Card
@@ -59,8 +71,8 @@ export function ScrollableIncomeExpenseChart({
             style={
               scrollable
                 ? {
-                  width: `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px`,
-                }
+                    width: `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px`,
+                  }
                 : { width: '100%' }
             }
           >
@@ -70,10 +82,20 @@ export function ScrollableIncomeExpenseChart({
                 margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
               >
                 <defs>
-                  <linearGradient id="balanceGradient" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient
+                    id="balanceGradient"
+                    x1="0"
+                    y1="0"
+                    x2="0"
+                    y2="1"
+                  >
                     <stop offset="0%" stopColor="#06b6d4" stopOpacity={0.5} />
                     <stop offset="50%" stopColor="#06b6d4" stopOpacity={0.25} />
-                    <stop offset="100%" stopColor="#06b6d4" stopOpacity={0.05} />
+                    <stop
+                      offset="100%"
+                      stopColor="#06b6d4"
+                      stopOpacity={0.05}
+                    />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
@@ -110,7 +132,11 @@ export function ScrollableIncomeExpenseChart({
                   tick={{ fill: 'hsl(var(--muted-foreground))' }}
                 />
                 <Tooltip
-                  cursor={{ strokeDasharray: '3 3', stroke: '#06b6d4', strokeWidth: 2 }}
+                  cursor={{
+                    strokeDasharray: '3 3',
+                    stroke: '#06b6d4',
+                    strokeWidth: 2,
+                  }}
                   contentStyle={{
                     backgroundColor: 'hsl(var(--popover))',
                     borderColor: '#06b6d4',
@@ -121,15 +147,25 @@ export function ScrollableIncomeExpenseChart({
                     boxShadow: '0 4px 12px rgba(6, 182, 212, 0.25)',
                   }}
                   itemStyle={{ color: 'hsl(var(--foreground))' }}
-                  formatter={(value: number | string | undefined, name?: string) => {
-                    const formattedValue = value !== undefined ? formatCurrency(Number(value)) : '';
+                  formatter={(
+                    value: number | string | undefined,
+                    name?: string
+                  ) => {
+                    const formattedValue =
+                      value !== undefined ? formatCurrency(Number(value)) : '';
                     if (name === 'balance') {
                       return [formattedValue, 'Saldo en Caja'];
                     }
                     return formattedValue;
                   }}
                 />
-                <ReferenceLine y={0} stroke="hsl(var(--border))" strokeWidth={2} strokeDasharray="5 5" opacity={0.5} />
+                <ReferenceLine
+                  y={0}
+                  stroke="hsl(var(--border))"
+                  strokeWidth={2}
+                  strokeDasharray="5 5"
+                  opacity={0.5}
+                />
                 <Area
                   type="monotone"
                   dataKey="balance"
@@ -146,7 +182,7 @@ export function ScrollableIncomeExpenseChart({
                     fill: '#06b6d4',
                     stroke: 'hsl(var(--background))',
                     strokeWidth: 2,
-                    r: 5
+                    r: 5,
                   }}
                   activeDot={{
                     r: 8,

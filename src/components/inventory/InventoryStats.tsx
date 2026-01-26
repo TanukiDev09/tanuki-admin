@@ -1,7 +1,14 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Package, DollarSign, AlertTriangle, XCircle, Building2, Boxes } from 'lucide-react';
+import {
+  Package,
+  DollarSign,
+  AlertTriangle,
+  XCircle,
+  Building2,
+  Boxes,
+} from 'lucide-react';
 import { formatCurrency, formatNumber } from '@/lib/utils';
 import './InventoryStats.scss';
 
@@ -63,7 +70,9 @@ export function InventoryStats({ stats, isLoading }: StatsProps) {
           <div className="inventory-stats__value">
             {formatNumber(stats.editorialUnits)}
           </div>
-          <p className="inventory-stats__description">Stock en oficina central</p>
+          <p className="inventory-stats__description">
+            Stock en oficina central
+          </p>
         </CardContent>
       </Card>
 
@@ -78,7 +87,9 @@ export function InventoryStats({ stats, isLoading }: StatsProps) {
           <div className="inventory-stats__value">
             {formatNumber(stats.otherUnits)}
           </div>
-          <p className="inventory-stats__description">Puntos de venta y terceros</p>
+          <p className="inventory-stats__description">
+            Puntos de venta y terceros
+          </p>
         </CardContent>
       </Card>
 

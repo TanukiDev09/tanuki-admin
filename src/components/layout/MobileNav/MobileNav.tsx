@@ -8,11 +8,7 @@ export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav
-      className="mobile-nav"
-      role="navigation"
-      aria-label="Navegación móvil"
-    >
+    <nav className="mobile-nav" role="navigation" aria-label="Navegación móvil">
       <NavLinks currentPath={pathname} variant="mobile" />
     </nav>
   );

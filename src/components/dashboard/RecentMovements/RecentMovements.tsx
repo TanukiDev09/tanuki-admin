@@ -78,10 +78,16 @@ export function RecentMovements({ movements }: RecentMovementsProps) {
                     className={`recent-movements__item-amount ${isIncome ? 'recent-movements__item-amount--income' : 'recent-movements__item-amount--expense'}`}
                   >
                     {isIncome ? '+' : '-'}
-                    {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
+                    {formatCurrency(
+                      toNumber(movement.amountInCOP || movement.amount),
+                      'COP'
+                    )}
                     {movement.currency && movement.currency !== 'COP' && (
                       <span className="recent-movements__secondary-amount text-[10px] block opacity-70">
-                        {formatCurrency(toNumber(movement.amount), movement.currency)}
+                        {formatCurrency(
+                          toNumber(movement.amount),
+                          movement.currency
+                        )}
                       </span>
                     )}
                   </div>

@@ -56,10 +56,11 @@ const MovementTableRow = ({
     let channelLabel = '';
     switch (movement.salesChannel) {
       case 'LIBRERIA':
-        channelLabel = `Librería: ${typeof movement.pointOfSale === 'object'
-          ? movement.pointOfSale.name
-          : 'Varios'
-          }`;
+        channelLabel = `Librería: ${
+          typeof movement.pointOfSale === 'object'
+            ? movement.pointOfSale.name
+            : 'Varios'
+        }`;
         break;
       case 'DIRECTA':
         channelLabel = 'Directa';
@@ -139,17 +140,26 @@ const MovementTableRow = ({
       <TableCell data-label="Monto">
         <div className="flex flex-col items-end">
           <span
-            className={`movements-list__amount ${movement.type === 'INCOME'
-              ? 'movements-list__amount--income'
-              : 'movements-list__amount--expense'
-              }`}
+            className={`movements-list__amount ${
+              movement.type === 'INCOME'
+                ? 'movements-list__amount--income'
+                : 'movements-list__amount--expense'
+            }`}
           >
             {movement.type === 'INCOME' ? '+' : '-'}
-            {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
+            {formatCurrency(
+              toNumber(movement.amountInCOP || movement.amount),
+              'COP'
+            )}
           </span>
           {movement.currency !== 'COP' && (
             <span className="movements-list__secondary-amount">
-              {" ("}{formatCurrency(toNumber(movement.amount), movement.currency).trim()}{")"}
+              {' ('}
+              {formatCurrency(
+                toNumber(movement.amount),
+                movement.currency
+              ).trim()}
+              {')'}
             </span>
           )}
         </div>

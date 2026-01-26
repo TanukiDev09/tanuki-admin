@@ -103,6 +103,41 @@
     gap: $spacing-sm;
   }
 
+  &__selected-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-xs;
+  }
+
+  &__summary {
+    display: flex;
+    gap: $spacing-md;
+    padding: $spacing-xs $spacing-sm;
+    background-color: $flow-bg;
+    border: 1px dashed rgba($flow, 0.4);
+    border-radius: $radius-md;
+
+    &-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+    }
+
+    &-label {
+      color: $flow;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+    }
+
+    &-value {
+      color: $primary;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+      font-family: $font-family-mono;
+    }
+  }
+
   &__selected-list {
     display: flex;
     flex-direction: column;

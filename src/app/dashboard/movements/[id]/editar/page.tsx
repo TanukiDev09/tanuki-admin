@@ -143,7 +143,10 @@ export default function EditMovementPage() {
   const addAllocation = () => {
     setFormData((prev) => ({
       ...prev,
-      allocations: [...(prev.allocations || []), { costCenter: '', amount: '0' }],
+      allocations: [
+        ...(prev.allocations || []),
+        { costCenter: '', amount: '0' },
+      ],
     }));
   };
 
@@ -218,11 +221,11 @@ export default function EditMovementPage() {
         allocations: useMultiCostCenter
           ? formData.allocations
           : [
-            {
-              costCenter: formData.costCenter || '01T001',
-              amount: Number(formData.amount) || 0,
-            },
-          ],
+              {
+                costCenter: formData.costCenter || '01T001',
+                amount: Number(formData.amount) || 0,
+              },
+            ],
         costCenter: useMultiCostCenter
           ? formData.allocations?.[0]?.costCenter || ''
           : formData.costCenter,
@@ -569,9 +572,9 @@ export default function EditMovementPage() {
               <div className="movement-form__calculated-value">
                 {gtZero(formData.amount) && gtZero(formData.quantity)
                   ? formatCurrency(
-                    toNumber(divide(formData.amount, formData.quantity)),
-                    formData.currency
-                  )
+                      toNumber(divide(formData.amount, formData.quantity)),
+                      formData.currency
+                    )
                   : '$ 0'}
               </div>
             </div>

@@ -2,7 +2,14 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Plus, Mail, Phone, User as UserIcon, Trash2, Edit2 } from 'lucide-react';
+import {
+  Plus,
+  Mail,
+  Phone,
+  User as UserIcon,
+  Trash2,
+  Edit2,
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -181,7 +188,8 @@ export function POSContactsAgenda({
         <h3 className="pos-agenda__title">Agenda de Contactos</h3>
         {!readOnly && (
           <Button onClick={onOpenAdd} className="pos-agenda__add-btn">
-            <Plus className="pos-agenda__icon-sm pos-agenda__icon--mr" /> Agregar Contacto
+            <Plus className="pos-agenda__icon-sm pos-agenda__icon--mr" />{' '}
+            Agregar Contacto
           </Button>
         )}
       </div>
@@ -200,7 +208,9 @@ export function POSContactsAgenda({
                   <div className="pos-agenda__card-info">
                     <h4 className="pos-agenda__contact-name">{contact.name}</h4>
                     {contact.position && (
-                      <span className="pos-agenda__contact-position">{contact.position}</span>
+                      <span className="pos-agenda__contact-position">
+                        {contact.position}
+                      </span>
                     )}
                   </div>
                   {!readOnly && (
@@ -235,7 +245,9 @@ export function POSContactsAgenda({
                   {contact.email && (
                     <div className="pos-agenda__contact-item">
                       <Mail className="pos-agenda__item-icon" />
-                      <span className="pos-agenda__email-text">{contact.email}</span>
+                      <span className="pos-agenda__email-text">
+                        {contact.email}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -254,7 +266,10 @@ export function POSContactsAgenda({
           </DialogHeader>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="pos-agenda__form">
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="pos-agenda__form"
+            >
               <FormField
                 control={form.control}
                 name="name"
@@ -309,7 +324,11 @@ export function POSContactsAgenda({
               />
 
               <DialogFooter className="pos-agenda__form-footer">
-                <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
+                <Button
+                  variant="outline"
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                >
                   Cancelar
                 </Button>
                 <Button type="submit" disabled={loading}>
