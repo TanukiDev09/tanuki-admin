@@ -11,7 +11,11 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/Command';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/Popover';
 import { cn, formatCurrency } from '@/lib/utils';
 import { Movement } from '@/types/movement';
 import { toNumber } from '@/lib/math';
@@ -78,12 +82,19 @@ export function MovementSearchSelect({
               {selectedMovement.date.split('T')[0]} -{' '}
               {selectedMovement.description} (
               {formatCurrency(
-                toNumber(selectedMovement.amountInCOP || selectedMovement.amount),
+                toNumber(
+                  selectedMovement.amountInCOP || selectedMovement.amount
+                ),
                 'COP'
               )}
               {selectedMovement.currency !== 'COP' && (
                 <span className="text-[10px] opacity-70 ml-1">
-                  ({formatCurrency(toNumber(selectedMovement.amount), selectedMovement.currency)})
+                  (
+                  {formatCurrency(
+                    toNumber(selectedMovement.amount),
+                    selectedMovement.currency
+                  )}
+                  )
                 </span>
               )}
               )
@@ -91,7 +102,10 @@ export function MovementSearchSelect({
           ) : (
             placeholder
           )}
-          <ChevronsUpDown className="movement-search-select__icon" style={{ opacity: 0.5, height: '1rem', width: '1rem' }} />
+          <ChevronsUpDown
+            className="movement-search-select__icon"
+            style={{ opacity: 0.5, height: '1rem', width: '1rem' }}
+          />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="movement-search-select__content" align="start">
@@ -129,13 +143,17 @@ export function MovementSearchSelect({
                     )}
                   />
                   <div className="movement-search-select__item">
-                    <span className="movement-search-select__item-description">{movement.description}</span>
+                    <span className="movement-search-select__item-description">
+                      {movement.description}
+                    </span>
                     <span className="movement-search-select__item-details">
                       {movement.date.split('T')[0]} • {movement.beneficiary} •{' '}
-                      {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
-                      {movement.currency !== 'COP' && (
-                        ` (${formatCurrency(toNumber(movement.amount), movement.currency).trim()})`
+                      {formatCurrency(
+                        toNumber(movement.amountInCOP || movement.amount),
+                        'COP'
                       )}
+                      {movement.currency !== 'COP' &&
+                        ` (${formatCurrency(toNumber(movement.amount), movement.currency).trim()})`}
                     </span>
                   </div>
                 </CommandItem>

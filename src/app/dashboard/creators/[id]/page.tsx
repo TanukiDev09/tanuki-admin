@@ -44,9 +44,7 @@ const BookProfitabilityChart = dynamic(
     ),
   {
     ssr: false,
-    loading: () => (
-      <div className="creator-detail__chart-skeleton" />
-    ),
+    loading: () => <div className="creator-detail__chart-skeleton" />,
   }
 );
 
@@ -275,37 +273,37 @@ export default function CreatorDetailPage(props: {
                                 (typeof a === 'string' ? a : a._id) ===
                                 creator._id
                             ) && (
-                                <Badge
-                                  variant="secondary"
-                                  className="creator-detail__badge-small"
-                                >
-                                  Autor
-                                </Badge>
-                              )}
+                              <Badge
+                                variant="secondary"
+                                className="creator-detail__badge-small"
+                              >
+                                Autor
+                              </Badge>
+                            )}
                             {book.translators?.some(
                               (a) =>
                                 (typeof a === 'string' ? a : a._id) ===
                                 creator._id
                             ) && (
-                                <Badge
-                                  variant="secondary"
-                                  className="creator-detail__badge-small"
-                                >
-                                  Traductor
-                                </Badge>
-                              )}
+                              <Badge
+                                variant="secondary"
+                                className="creator-detail__badge-small"
+                              >
+                                Traductor
+                              </Badge>
+                            )}
                             {book.illustrators?.some(
                               (a) =>
                                 (typeof a === 'string' ? a : a._id) ===
                                 creator._id
                             ) && (
-                                <Badge
-                                  variant="secondary"
-                                  className="creator-detail__badge-small"
-                                >
-                                  Ilustrador
-                                </Badge>
-                              )}
+                              <Badge
+                                variant="secondary"
+                                className="creator-detail__badge-small"
+                              >
+                                Ilustrador
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -344,7 +342,7 @@ export default function CreatorDetailPage(props: {
                             <TableCell>
                               {/* Safe cast or check if book is object */}
                               {typeof agreement.book === 'object' &&
-                                agreement.book !== null
+                              agreement.book !== null
                                 ? (agreement.book as { title: string }).title
                                 : 'Libro no disponible'}
                             </TableCell>
@@ -388,7 +386,9 @@ export default function CreatorDetailPage(props: {
                                   <FileText size={14} /> PDF
                                 </a>
                               ) : (
-                                <span className="creator-detail__text-muted">-</span>
+                                <span className="creator-detail__text-muted">
+                                  -
+                                </span>
                               )}
                             </TableCell>
                           </TableRow>

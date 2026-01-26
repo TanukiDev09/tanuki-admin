@@ -100,11 +100,19 @@ export function FinanceMovementsTable({
                   <div className="flex flex-col items-end">
                     <span>
                       {m.type === 'INCOME' ? '+' : '-'}{' '}
-                      {formatCurrency(toNumber(m.amountInCOP || m.amount || 0), 'COP')}
+                      {formatCurrency(
+                        toNumber(m.amountInCOP || m.amount || 0),
+                        'COP'
+                      )}
                     </span>
                     {m.currency && m.currency !== 'COP' && (
                       <span className="text-[10px] opacity-70">
-                        {" ("}{formatCurrency(toNumber(m.amount || 0), m.currency).trim()}{")"}
+                        {' ('}
+                        {formatCurrency(
+                          toNumber(m.amount || 0),
+                          m.currency
+                        ).trim()}
+                        {')'}
                       </span>
                     )}
                   </div>

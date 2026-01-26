@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/Table";
+} from '@/components/ui/Table';
 import {
   Plus,
   Eye,
@@ -20,18 +20,18 @@ import {
   ChevronLeft,
   ChevronRight,
   Search,
-} from "lucide-react";
-import { Input } from "@/components/ui/Input";
+} from 'lucide-react';
+import { Input } from '@/components/ui/Input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/Select";
-import { useToast } from "@/components/ui/Toast";
-import { formatCurrency } from "@/lib/utils";
-import "./invoices-list.scss";
+} from '@/components/ui/Select';
+import { useToast } from '@/components/ui/Toast';
+import { formatCurrency } from '@/lib/utils';
+import './invoices-list.scss';
 
 interface Invoice {
   _id: string;
@@ -47,8 +47,8 @@ export default function InvoicesPage() {
   const { toast } = useToast();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('ALL');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
@@ -58,13 +58,14 @@ export default function InvoicesPage() {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (search) params.append("search", search);
-      if (statusFilter && statusFilter !== "ALL") params.append("status", statusFilter);
-      params.append("page", page.toString());
-      params.append("limit", limit.toString());
+      if (search) params.append('search', search);
+      if (statusFilter && statusFilter !== 'ALL')
+        params.append('status', statusFilter);
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
 
       const res = await fetch(`/api/invoices?${params.toString()}`);
-      if (!res.ok) throw new Error("Error al cargar facturas");
+      if (!res.ok) throw new Error('Error al cargar facturas');
       const data = await res.json();
       setInvoices(data.data || []);
       setTotalPages(data.pagination?.pages || 1);
@@ -72,9 +73,9 @@ export default function InvoicesPage() {
     } catch (error) {
       console.error(error);
       toast({
-        title: "Error",
-        description: "No se pudieron cargar las facturas",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudieron cargar las facturas',
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -89,37 +90,44 @@ export default function InvoicesPage() {
   }, [fetchInvoices]);
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm("¿Estás seguro de eliminar esta factura?")) return;
+    if (!window.confirm('¿Estás seguro de eliminar esta factura?')) return;
     try {
-      const res = await fetch(`/api/invoices/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Error al eliminar");
-      toast({ title: "Éxito", description: "Factura eliminada correctamente" });
+      const res = await fetch(`/api/invoices/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Error al eliminar');
+      toast({ title: 'Éxito', description: 'Factura eliminada correctamente' });
       fetchInvoices();
     } catch {
       toast({
-        title: "Error",
-        description: "No se pudo eliminar la factura",
-        variant: "destructive",
+        title: 'Error',
+        description: 'No se pudo eliminar la factura',
+        variant: 'destructive',
       });
     }
   };
 
   const getStatusBadge = (status: string) => {
-    const map: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      Draft: "secondary",
-      Sent: "outline",
-      Paid: "default",
-      Partial: "outline",
-      Cancelled: "destructive",
+    const map: Record<
+      string,
+      'default' | 'secondary' | 'destructive' | 'outline'
+    > = {
+      Draft: 'secondary',
+      Sent: 'outline',
+      Paid: 'default',
+      Partial: 'outline',
+      Cancelled: 'destructive',
     };
     const labels: Record<string, string> = {
-      Draft: "Borrador",
-      Sent: "Enviada",
-      Paid: "Pagada",
-      Partial: "Parcial",
-      Cancelled: "Anulada",
+      Draft: 'Borrador',
+      Sent: 'Enviada',
+      Paid: 'Pagada',
+      Partial: 'Parcial',
+      Cancelled: 'Anulada',
     };
-    return <Badge variant={map[status] || "outline"}>{labels[status] || status}</Badge>;
+    return (
+      <Badge variant={map[status] || 'outline'}>
+        {labels[status] || status}
+      </Badge>
+    );
   };
 
   return (
@@ -127,7 +135,7 @@ export default function InvoicesPage() {
       <div className="invoices-list__container">
         <div className="invoices-list__header">
           <h1 className="invoices-list__title">Facturas</h1>
-          <Button onClick={() => router.push("/dashboard/invoices/crear")}>
+          <Button onClick={() => router.push('/dashboard/invoices/crear')}>
             <Plus className="invoices-list__icon" /> Nueva Factura
           </Button>
         </div>
@@ -186,14 +194,19 @@ export default function InvoicesPage() {
                 invoices.map((invoice) => (
                   <TableRow key={invoice._id}>
                     <TableCell className="font-medium">
-                      <a href={`/dashboard/invoices/${invoice._id}`} className="invoices-list__link">
+                      <a
+                        href={`/dashboard/invoices/${invoice._id}`}
+                        className="invoices-list__link"
+                      >
                         {invoice.number}
                       </a>
                     </TableCell>
-                    <TableCell>{new Date(invoice.date).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      {new Date(invoice.date).toLocaleDateString()}
+                    </TableCell>
                     <TableCell>{invoice.customerName}</TableCell>
                     <TableCell className="invoices-list__amount">
-                      {formatCurrency(invoice.total, "COP")}
+                      {formatCurrency(invoice.total, 'COP')}
                     </TableCell>
                     <TableCell>{getStatusBadge(invoice.status)}</TableCell>
                     <TableCell className="invoices-list__actions-cell">
@@ -201,14 +214,20 @@ export default function InvoicesPage() {
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => router.push(`/dashboard/invoices/${invoice._id}`)}
+                          onClick={() =>
+                            router.push(`/dashboard/invoices/${invoice._id}`)
+                          }
                         >
                           <Eye className="invoices-list__icon-sm" />
                         </Button>
                         <Button
                           variant="ghost"
                           size="icon"
-                          onClick={() => router.push(`/dashboard/invoices/${invoice._id}/editar`)}
+                          onClick={() =>
+                            router.push(
+                              `/dashboard/invoices/${invoice._id}/editar`
+                            )
+                          }
                         >
                           <Pencil className="invoices-list__icon-sm" />
                         </Button>
@@ -231,7 +250,8 @@ export default function InvoicesPage() {
 
         <div className="invoices-list__pagination">
           <div className="invoices-list__pagination-info">
-            Mostrando <strong>{invoices.length}</strong> de <strong>{totalResults}</strong> resultados
+            Mostrando <strong>{invoices.length}</strong> de{' '}
+            <strong>{totalResults}</strong> resultados
           </div>
           <div className="invoices-list__pagination-controls">
             <Button

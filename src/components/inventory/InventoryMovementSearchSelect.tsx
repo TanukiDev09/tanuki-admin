@@ -99,7 +99,10 @@ export function InventoryMovementSearchSelect({
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="inventory-movement-search-select__content" align="start">
+      <PopoverContent
+        className="inventory-movement-search-select__content"
+        align="start"
+      >
         <Command>
           <CommandInput placeholder="Buscar por observaciones..." />
           <CommandEmpty>

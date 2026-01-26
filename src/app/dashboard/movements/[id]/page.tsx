@@ -108,12 +108,18 @@ export default function MovementDetailPage() {
             <div>
               <h3 className="movement-detail__label">Monto (COP)</h3>
               <p className="movement-detail__value--xl">
-                {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
+                {formatCurrency(
+                  toNumber(movement.amountInCOP || movement.amount),
+                  'COP'
+                )}
               </p>
               {movement.currency !== 'COP' && (
                 <p className="movement-detail__amount-hint">
-                  Original: {formatCurrency(toNumber(movement.amount), movement.currency)}
-                  {movement.exchangeRate ? ` @ TRM ${formatNumber(toNumber(movement.exchangeRate))}` : ''}
+                  Original:{' '}
+                  {formatCurrency(toNumber(movement.amount), movement.currency)}
+                  {movement.exchangeRate
+                    ? ` @ TRM ${formatNumber(toNumber(movement.exchangeRate))}`
+                    : ''}
                 </p>
               )}
             </div>
@@ -126,13 +132,20 @@ export default function MovementDetailPage() {
             </div>
             <div>
               <h3 className="movement-detail__label">Cantidad</h3>
-              <p>{movement.quantity ? formatNumber(toNumber(movement.quantity)) : '-'}</p>
+              <p>
+                {movement.quantity
+                  ? formatNumber(toNumber(movement.quantity))
+                  : '-'}
+              </p>
             </div>
             <div>
               <h3 className="movement-detail__label">Valor Unitario</h3>
               <p>
                 {movement.unitValue
-                  ? formatCurrency(toNumber(movement.unitValue), movement.currency)
+                  ? formatCurrency(
+                      toNumber(movement.unitValue),
+                      movement.currency
+                    )
                   : '-'}
               </p>
             </div>
@@ -165,7 +178,10 @@ export default function MovementDetailPage() {
                         <tr key={idx}>
                           <td>{alloc.costCenter}</td>
                           <td className="movement-detail__allocation-amount">
-                            {formatCurrency(toNumber(alloc.amount), movement.currency)}
+                            {formatCurrency(
+                              toNumber(alloc.amount),
+                              movement.currency
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -210,8 +226,8 @@ export default function MovementDetailPage() {
           {movement.inventoryMovementId && (
             <div className="movement-detail__link-section">
               <h3 className="movement-detail__link-title">
-                <Package className="movement-detail__icon" /> Movimiento de Inventario
-                Vinculado
+                <Package className="movement-detail__icon" /> Movimiento de
+                Inventario Vinculado
               </h3>
               <div className="movement-detail__link-card">
                 <div className="movement-detail__link-text">
@@ -222,7 +238,8 @@ export default function MovementDetailPage() {
                   size="sm"
                   onClick={() => router.push('/dashboard/inventory')}
                 >
-                  <ExternalLink className="movement-detail__icon" /> Ir a Inventario
+                  <ExternalLink className="movement-detail__icon" /> Ir a
+                  Inventario
                 </Button>
               </div>
             </div>

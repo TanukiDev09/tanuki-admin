@@ -1,7 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { WARM_COLORS, COLD_COLORS, NEUTRAL_COLORS, CATEGORY_COLORS } from '@/styles/category-colors';
+import {
+  WARM_COLORS,
+  COLD_COLORS,
+  NEUTRAL_COLORS,
+  CATEGORY_COLORS,
+} from '@/styles/category-colors';
 import './ColorPicker.scss';
 
 export { CATEGORY_COLORS };

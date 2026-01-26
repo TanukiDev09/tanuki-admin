@@ -223,14 +223,18 @@ function MonthlyView({
           <Scale className="balance-indicator__icon" size={16} />
           <div className="balance-indicator__content">
             <span className="balance-indicator__label">Saldo Mes Anterior</span>
-            <span className="balance-indicator__value">{formatCurrency(data.balances?.previousMonth || 0)}</span>
+            <span className="balance-indicator__value">
+              {formatCurrency(data.balances?.previousMonth || 0)}
+            </span>
           </div>
         </div>
         <div className="balance-indicator">
           <Scale className="balance-indicator__icon" size={16} />
           <div className="balance-indicator__content">
             <span className="balance-indicator__label">Nuevo Saldo</span>
-            <span className="balance-indicator__value">{formatCurrency(data.balances?.currentMonth || 0)}</span>
+            <span className="balance-indicator__value">
+              {formatCurrency(data.balances?.currentMonth || 0)}
+            </span>
           </div>
         </div>
       </section>
@@ -321,11 +325,11 @@ function MonthlyView({
           pagination={
             data.pagination
               ? {
-                ...data.pagination,
-                hasPrevPage: data.pagination.page > 1,
-                hasNextPage:
-                  data.pagination.page < data.pagination.totalPages,
-              }
+                  ...data.pagination,
+                  hasPrevPage: data.pagination.page > 1,
+                  hasNextPage:
+                    data.pagination.page < data.pagination.totalPages,
+                }
               : undefined
           }
           onPageChange={onPageChange}
@@ -419,11 +423,11 @@ function AnnualView({
           pagination={
             data.pagination
               ? {
-                ...data.pagination,
-                hasPrevPage: data.pagination.page > 1,
-                hasNextPage:
-                  data.pagination.page < data.pagination.totalPages,
-              }
+                  ...data.pagination,
+                  hasPrevPage: data.pagination.page > 1,
+                  hasNextPage:
+                    data.pagination.page < data.pagination.totalPages,
+                }
               : undefined
           }
           onPageChange={onPageChange}

@@ -270,18 +270,18 @@ export default function BookManagementTable({
                       </div>
                       {((book.translators?.length ?? 0) > 0 ||
                         (book.illustrators?.length ?? 0) > 0) && (
-                          <div className="book-management-table__extra-credits">
-                            {(book.translators?.length ?? 0) > 0 && (
-                              <span>Trad: {book.translators!.length}</span>
-                            )}
-                            {(book.translators?.length ?? 0) > 0 &&
-                              (book.illustrators?.length ?? 0) > 0 &&
-                              ' • '}
-                            {(book.illustrators?.length ?? 0) > 0 && (
-                              <span>Ilust: {book.illustrators!.length}</span>
-                            )}
-                          </div>
-                        )}
+                        <div className="book-management-table__extra-credits">
+                          {(book.translators?.length ?? 0) > 0 && (
+                            <span>Trad: {book.translators!.length}</span>
+                          )}
+                          {(book.translators?.length ?? 0) > 0 &&
+                            (book.illustrators?.length ?? 0) > 0 &&
+                            ' • '}
+                          {(book.illustrators?.length ?? 0) > 0 && (
+                            <span>Ilust: {book.illustrators!.length}</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell className="book-management-table__hide-on-tablet">
@@ -300,10 +300,11 @@ export default function BookManagementTable({
                   <TableCell>
                     <div className="book-management-table__stock-info">
                       <span
-                        className={`book-management-table__stock-count ${(book.totalStock ?? book.stock) > 0
+                        className={`book-management-table__stock-count ${
+                          (book.totalStock ?? book.stock) > 0
                             ? 'book-management-table__stock-count--in-stock'
                             : 'book-management-table__stock-count--out-of-stock'
-                          }`}
+                        }`}
                       >
                         {formatNumber(book.totalStock ?? book.stock)}
                       </span>

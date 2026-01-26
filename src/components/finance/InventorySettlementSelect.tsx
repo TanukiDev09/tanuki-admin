@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { useState, useEffect } from 'react';
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
 import {
   Command,
   CommandEmpty,
@@ -10,13 +10,13 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/Command";
+} from '@/components/ui/Command';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/Popover";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/Popover';
+import { cn } from '@/lib/utils';
 
 interface InventorySettlementSelectProps {
   value?: string;
@@ -36,7 +36,7 @@ interface InventoryMovement {
 export default function InventorySettlementSelect({
   value,
   onValueChange,
-  placeholder = "Seleccionar liquidación...",
+  placeholder = 'Seleccionar liquidación...',
 }: InventorySettlementSelectProps) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -46,13 +46,15 @@ export default function InventorySettlementSelect({
     const fetchMovements = async () => {
       setLoading(true);
       try {
-        const res = await fetch("/api/inventory/movements?limit=50&type=LIQUIDACION");
+        const res = await fetch(
+          '/api/inventory/movements?limit=50&type=LIQUIDACION'
+        );
         if (res.ok) {
           const data = await res.json();
           setMovements(data.success ? data.data : []);
         }
       } catch (error) {
-        console.error("Error fetching inventory movements:", error);
+        console.error('Error fetching inventory movements:', error);
       } finally {
         setLoading(false);
       }
@@ -64,7 +66,7 @@ export default function InventorySettlementSelect({
   }, [open]);
 
   const selectedMovement = movements.find((m) => m._id === value);
-  // If value exists but wasn't loaded (e.g. initial load), we might show just the ID or "Cargando..." 
+  // If value exists but wasn't loaded (e.g. initial load), we might show just the ID or "Cargando..."
   // Ideally we would fetch the single item if not in list, but for now we assume it's in the recent list or we just show "Seleccionado" in a real app.
   // A better approach for initial values is to pass the selected object or fetch it if missing.
   // For simplicity, we just check the list.
@@ -80,7 +82,10 @@ export default function InventorySettlementSelect({
         >
           {value ? (
             selectedMovement ? (
-              <span>Liquidación #{selectedMovement.consecutive} - {new Date(selectedMovement.date).toLocaleDateString()}</span>
+              <span>
+                Liquidación #{selectedMovement.consecutive} -{' '}
+                {new Date(selectedMovement.date).toLocaleDateString()}
+              </span>
             ) : (
               <span>Liquidación ID: {value}</span> // Fallback
             )
@@ -100,7 +105,7 @@ export default function InventorySettlementSelect({
                 Cargando...
               </div>
             ) : (
-              "No se encontraron liquidaciones."
+              'No se encontraron liquidaciones.'
             )}
           </CommandEmpty>
           <CommandList>
@@ -110,20 +115,23 @@ export default function InventorySettlementSelect({
                   key={movement._id}
                   value={movement._id}
                   onSelect={() => {
-                    onValueChange(movement._id === value ? "" : movement._id);
+                    onValueChange(movement._id === value ? '' : movement._id);
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4",
-                      value === movement._id ? "opacity-100" : "opacity-0"
+                      'mr-2 h-4 w-4',
+                      value === movement._id ? 'opacity-100' : 'opacity-0'
                     )}
                   />
                   <div className="flex flex-col">
-                    <span className="font-medium">Liquidación #{movement.consecutive}</span>
+                    <span className="font-medium">
+                      Liquidación #{movement.consecutive}
+                    </span>
                     <span className="text-xs text-muted-foreground">
-                      {new Date(movement.date).toLocaleDateString()} • {movement.fromWarehouseId?.name || 'S/N'}
+                      {new Date(movement.date).toLocaleDateString()} •{' '}
+                      {movement.fromWarehouseId?.name || 'S/N'}
                     </span>
                   </div>
                 </CommandItem>

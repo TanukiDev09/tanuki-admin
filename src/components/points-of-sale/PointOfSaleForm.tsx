@@ -590,7 +590,7 @@ export function PointOfSaleForm({
             </Button>
           )}
         </div>
-      </form >
-    </Form >
+      </form>
+    </Form>
   );
 }
