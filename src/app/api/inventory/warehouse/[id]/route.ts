@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, { params }: Params) {
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search');
 
-    const pipeline: any[] = [
+    const pipeline: mongoose.PipelineStage[] = [
       { $match: { warehouseId: new mongoose.Types.ObjectId(id) } },
       {
         $lookup: {

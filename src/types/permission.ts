@@ -3,18 +3,18 @@ import { Document } from 'mongoose';
 // Enum para nombres de módulos del sistema
 export enum ModuleName {
   BOOKS = 'books',
-  CREATORS = 'creators',
   COLLECTIONS = 'collections',
-  WAREHOUSES = 'warehouses',
+  CREATORS = 'creators',
   INVENTORY = 'inventory',
-  POINTS_OF_SALE = 'points-of-sale',
   FINANCE = 'finance',
-  CATEGORIES = 'categories',
-  AGREEMENTS = 'agreements',
-  USERS = 'users',
-  COST_CENTERS = 'costcenters',
-  PERMISSIONS = 'permissions',
   INVOICES = 'invoices',
+  POINTS_OF_SALE = 'points-of-sale',
+  WAREHOUSES = 'warehouses',
+  AGREEMENTS = 'agreements',
+  CATEGORIES = 'categories',
+  COST_CENTERS = 'costcenters',
+  USERS = 'users',
+  PERMISSIONS = 'permissions',
 }
 
 // Enum para acciones CRUD
@@ -89,53 +89,53 @@ export const MODULE_METADATA: Record<
     label: 'Catálogo',
     description: 'Gestión de catálogo de libros',
   },
-  [ModuleName.CREATORS]: {
-    label: 'Creadores',
-    description: 'Gestión de autores e ilustradores',
-  },
   [ModuleName.COLLECTIONS]: {
     label: 'Colecciones',
     description: 'Gestión de colecciones de libros',
   },
-  [ModuleName.WAREHOUSES]: {
-    label: 'Bodegas',
-    description: 'Gestión de bodegas y almacenes',
+  [ModuleName.CREATORS]: {
+    label: 'Creadores',
+    description: 'Gestión de autores e ilustradores',
   },
   [ModuleName.INVENTORY]: {
     label: 'Inventario',
     description: 'Gestión de inventario y movimientos',
   },
-  [ModuleName.POINTS_OF_SALE]: {
-    label: 'Puntos de Venta',
-    description: 'Gestión de puntos de venta',
-  },
   [ModuleName.FINANCE]: {
     label: 'Movimientos',
     description: 'Gestión de movimientos financieros',
   },
-  [ModuleName.CATEGORIES]: {
-    label: 'Categorías',
-    description: 'Gestión de categorías financieras',
+  [ModuleName.INVOICES]: {
+    label: 'Facturas',
+    description: 'Gestión de facturación',
+  },
+  [ModuleName.POINTS_OF_SALE]: {
+    label: 'Puntos de Venta',
+    description: 'Gestión de puntos de venta',
+  },
+  [ModuleName.WAREHOUSES]: {
+    label: 'Bodegas',
+    description: 'Gestión de bodegas y almacenes',
   },
   [ModuleName.AGREEMENTS]: {
     label: 'Contratos',
     description: 'Gestión de acuerdos y contratos',
   },
-  [ModuleName.USERS]: {
-    label: 'Usuarios',
-    description: 'Gestión de usuarios del sistema',
+  [ModuleName.CATEGORIES]: {
+    label: 'Categorías',
+    description: 'Gestión de categorías financieras',
   },
   [ModuleName.COST_CENTERS]: {
     label: 'Centros de Costo',
     description: 'Gestión de centros de costo',
   },
+  [ModuleName.USERS]: {
+    label: 'Usuarios',
+    description: 'Gestión de usuarios del sistema',
+  },
   [ModuleName.PERMISSIONS]: {
     label: 'Permisos',
     description: 'Gestión de permisos de usuarios',
-  },
-  [ModuleName.INVOICES]: {
-    label: 'Facturas',
-    description: 'Gestión de facturación',
   },
 };
 
