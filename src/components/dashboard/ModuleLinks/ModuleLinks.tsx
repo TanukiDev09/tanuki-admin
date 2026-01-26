@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import {
-  Book,
-  Users,
+  BookOpen,
   Library,
   Warehouse,
   Package,
@@ -16,6 +15,7 @@ import {
   Calculator,
   LucideIcon,
   Receipt,
+  PenTool,
 } from 'lucide-react';
 import {
   ModuleName,
@@ -27,36 +27,36 @@ import './ModuleLinks.scss';
 
 // Map module names to icons
 const MODULE_ICONS: Record<ModuleName, LucideIcon> = {
-  [ModuleName.BOOKS]: Book,
-  [ModuleName.CREATORS]: Users,
+  [ModuleName.BOOKS]: BookOpen,
   [ModuleName.COLLECTIONS]: Library,
-  [ModuleName.WAREHOUSES]: Warehouse,
+  [ModuleName.CREATORS]: PenTool,
   [ModuleName.INVENTORY]: Package,
-  [ModuleName.POINTS_OF_SALE]: Store,
   [ModuleName.FINANCE]: DollarSign,
-  [ModuleName.CATEGORIES]: Tags,
+  [ModuleName.INVOICES]: Receipt,
+  [ModuleName.POINTS_OF_SALE]: Store,
+  [ModuleName.WAREHOUSES]: Warehouse,
   [ModuleName.AGREEMENTS]: FileText,
+  [ModuleName.CATEGORIES]: Tags,
+  [ModuleName.COST_CENTERS]: Calculator,
   [ModuleName.USERS]: UserCog,
   [ModuleName.PERMISSIONS]: Shield,
-  [ModuleName.COST_CENTERS]: Calculator,
-  [ModuleName.INVOICES]: Receipt,
 };
 
 // Map module names to routes
 const MODULE_ROUTES: Record<ModuleName, string> = {
   [ModuleName.BOOKS]: '/dashboard/catalog',
-  [ModuleName.CREATORS]: '/dashboard/creators',
   [ModuleName.COLLECTIONS]: '/dashboard/collections',
-  [ModuleName.WAREHOUSES]: '/dashboard/warehouses',
+  [ModuleName.CREATORS]: '/dashboard/creators',
   [ModuleName.INVENTORY]: '/dashboard/inventory',
-  [ModuleName.POINTS_OF_SALE]: '/dashboard/points-of-sale',
   [ModuleName.FINANCE]: '/dashboard/movements',
-  [ModuleName.CATEGORIES]: '/dashboard/categories',
+  [ModuleName.INVOICES]: '/dashboard/invoices',
+  [ModuleName.POINTS_OF_SALE]: '/dashboard/points-of-sale',
+  [ModuleName.WAREHOUSES]: '/dashboard/warehouses',
   [ModuleName.AGREEMENTS]: '/dashboard/agreements',
+  [ModuleName.CATEGORIES]: '/dashboard/categories',
+  [ModuleName.COST_CENTERS]: '/dashboard/cost-centers',
   [ModuleName.USERS]: '/dashboard/users',
   [ModuleName.PERMISSIONS]: '/dashboard/permissions',
-  [ModuleName.COST_CENTERS]: '/dashboard/cost-centers',
-  [ModuleName.INVOICES]: '/dashboard/invoices',
 };
 
 export function ModuleLinks() {
