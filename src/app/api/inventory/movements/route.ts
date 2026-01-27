@@ -94,36 +94,49 @@ function validateRules(type: string, source: WarehouseDoc, dest: WarehouseDoc) {
   return null;
 }
 
+// Helper: Get constituent books for a book (handling bundles)
+async function getConstituentBooks(bookId: string, quantity: number) {
+  const book = await Book.findById(bookId);
+  if (!book) throw new Error(`Libro no encontrado ID: ${bookId}`);
+
+  const constituents: Array<{ id: string; qty: number; title: string }> = [];
+  if (book.isBundle && book.bundleBooks && book.bundleBooks.length > 0) {
+    for (const volumeId of book.bundleBooks) {
+      constituents.push({
+        id: volumeId.toString(),
+        qty: quantity,
+        title: `Tomo de ${book.title}`,
+      });
+    }
+  } else {
+    constituents.push({ id: bookId, qty: quantity, title: book.title });
+  }
+  return constituents;
+}
+
 // Helper: Check Stock
 async function checkStock(
   fromId: string,
   items: Array<{ bookId: string; quantity: number }>
 ) {
   for (const item of items) {
-    const book = await Book.findById(item.bookId);
-    if (!book) return `Libro no encontrado ID: ${item.bookId}`;
-
-    if (book.isBundle && book.bundleBooks && book.bundleBooks.length > 0) {
-      // Check stock for each volume in the bundle
-      for (const volumeId of book.bundleBooks) {
+    try {
+      const constituents = await getConstituentBooks(
+        item.bookId,
+        item.quantity
+      );
+      for (const part of constituents) {
         const sourceItem = await InventoryItem.findOne({
           warehouseId: fromId,
-          bookId: volumeId,
+          bookId: part.id,
         });
-        const requiredQty = item.quantity; // 1 per bundle * bundle quantity
-        if (!sourceItem || sourceItem.quantity < requiredQty) {
-          return `Stock insuficiente para el tomo del bundle. Tomo ID: ${volumeId}`;
+        if (!sourceItem || sourceItem.quantity < part.qty) {
+          return `Stock insuficiente para el libro: ${part.title}`;
         }
       }
-    } else {
-      // Normal book
-      const sourceItem = await InventoryItem.findOne({
-        warehouseId: fromId,
-        bookId: item.bookId,
-      });
-      if (!sourceItem || sourceItem.quantity < item.quantity) {
-        return `Stock insuficiente para el libro: ${book.title}`;
-      }
+    } catch (e: unknown) {
+      const error = e as Error;
+      return error.message;
     }
   }
   return null;
@@ -154,46 +167,29 @@ async function updateInventory(
   items: Array<{ bookId: string; quantity: number }>
 ) {
   for (const item of items) {
-    const book = await Book.findById(item.bookId);
-    if (!book) continue;
+    try {
+      const constituents = await getConstituentBooks(
+        item.bookId,
+        item.quantity
+      );
 
-    const booksToUpdate = [];
-
-    if (book.isBundle && book.bundleBooks && book.bundleBooks.length > 0) {
-      // For bundles, we ONLY update the constituent volumes
-      for (const volumeId of book.bundleBooks) {
-        booksToUpdate.push({ id: volumeId.toString(), qty: item.quantity });
-      }
-    } else {
-      // For normal books, we update the book itself
-      booksToUpdate.push({ id: item.bookId, qty: item.quantity });
-    }
-
-    for (const update of booksToUpdate) {
-      if (fromId) {
-        await InventoryItem.updateOne(
-          { warehouseId: fromId, bookId: update.id },
-          { $inc: { quantity: -update.qty } }
-        );
-      }
-      if (toId) {
-        const exists = await InventoryItem.findOne({
-          warehouseId: toId,
-          bookId: update.id,
-        });
-        if (exists) {
+      for (const part of constituents) {
+        if (fromId) {
           await InventoryItem.updateOne(
-            { warehouseId: toId, bookId: update.id },
-            { $inc: { quantity: update.qty } }
+            { warehouseId: fromId, bookId: part.id },
+            { $inc: { quantity: -part.qty } }
           );
-        } else {
-          await InventoryItem.create({
-            warehouseId: toId,
-            bookId: update.id,
-            quantity: update.qty,
-          });
+        }
+        if (toId) {
+          await InventoryItem.updateOne(
+            { warehouseId: toId, bookId: part.id },
+            { $inc: { quantity: part.qty } },
+            { upsert: true }
+          );
         }
       }
+    } catch (e) {
+      console.error('Error updating inventory for item:', e);
     }
   }
 }

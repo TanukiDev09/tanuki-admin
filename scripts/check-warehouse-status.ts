@@ -1,11 +1,10 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-const dbConnect = require('../src/lib/mongodb').default;
-const Warehouse = require('../src/models/Warehouse').default;
-const InventoryItem = require('../src/models/InventoryItem').default;
-const InventoryMovement = require('../src/models/InventoryMovement').default;
-import mongoose from 'mongoose';
+import dbConnect from '../src/lib/mongodb';
+import Warehouse from '../src/models/Warehouse';
+import InventoryItem from '../src/models/InventoryItem';
+import InventoryMovement from '../src/models/InventoryMovement';
 
 async function checkWarehouse() {
   await dbConnect();

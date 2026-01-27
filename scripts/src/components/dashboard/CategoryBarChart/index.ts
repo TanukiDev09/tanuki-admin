@@ -1,1 +1,0 @@
-export { CategoryBarChart } from './CategoryBarChart';

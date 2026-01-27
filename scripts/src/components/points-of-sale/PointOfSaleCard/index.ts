@@ -1,1 +1,0 @@
-export { PointOfSaleCard } from './PointOfSaleCard';

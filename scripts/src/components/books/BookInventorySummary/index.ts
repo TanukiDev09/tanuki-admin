@@ -1,1 +1,0 @@
-export { BookInventorySummary } from './BookInventorySummary';

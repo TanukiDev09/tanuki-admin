@@ -264,7 +264,7 @@ export default function BookDetailPage(props: {
                 <div className="book-detail__bundle-volumes">
                   <h2 className="book-detail__section-title--small">Contenido de la Obra</h2>
                   <div className="book-detail__volumes-list">
-                    {book.bundleBooks.map((vol: any) => (
+                    {(book.bundleBooks as BookResponse[]).map((vol) => (
                       <a
                         key={vol._id}
                         href={`/dashboard/catalog/${vol._id}`}

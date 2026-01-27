@@ -4,7 +4,7 @@ import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import InventoryItem from '@/models/InventoryItem';
 import mongoose from 'mongoose';
-import '@/models/Book'; // Ensure Book model is registered
+import Book from '@/models/Book';
 
 interface Params {
   params: Promise<{ id: string }>;
@@ -53,7 +53,10 @@ export async function GET(request: NextRequest, { params }: Params) {
     const items = await InventoryItem.aggregate(pipeline);
 
     // Also fetch bundles to include them as virtual inventory if they have stock
-    const bundleFilter: any = { isBundle: true, isActive: true };
+    const bundleFilter: Record<string, unknown> = {
+      isBundle: true,
+      isActive: true,
+    };
     if (search) {
       bundleFilter.$or = [
         { title: { $regex: search, $options: 'i' } },
@@ -75,8 +78,8 @@ export async function GET(request: NextRequest, { params }: Params) {
 
       const bundleItems = bundles
         .map((bundle) => {
-          const volumeIds = (bundle.bundleBooks || []).map((v: any) =>
-            v.toString()
+          const volumeIds = (bundle.bundleBooks || []).map(
+            (v: mongoose.Types.ObjectId | string) => v.toString()
           );
           if (volumeIds.length === 0) return null;
 

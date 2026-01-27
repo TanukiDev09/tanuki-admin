@@ -1,1 +1,0 @@
-export { BurnRateCard } from './BurnRateCard';

@@ -5,20 +5,15 @@ import { Search, Plus, Trash2, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/Label';
+import { BookResponse } from '@/types/book';
 import './BookSearchMultiSelect.scss';
-
-interface Book {
-  _id: string;
-  title: string;
-  isbn: string;
-}
 
 interface BookSearchMultiSelectProps {
   label: string;
   selectedBookIds: string[];
-  onAdd: (book: Book) => void;
+  onAdd: (book: BookResponse) => void;
   onRemove: (bookId: string) => void;
-  selectedBooksData: Book[];
+  selectedBooksData: BookResponse[];
 }
 
 export default function BookSearchMultiSelect({
@@ -29,7 +24,7 @@ export default function BookSearchMultiSelect({
   selectedBooksData,
 }: BookSearchMultiSelectProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [searchResults, setSearchResults] = useState<Book[]>([]);
+  const [searchResults, setSearchResults] = useState<BookResponse[]>([]);
   const [searching, setSearching] = useState(false);
 
   const searchBooks = async () => {
@@ -39,7 +34,7 @@ export default function BookSearchMultiSelect({
       const response = await fetch(`/api/books?search=${encodeURIComponent(searchTerm)}&limit=5&isActive=true`);
       const data = await response.json();
       if (data.success) {
-        setSearchResults(data.data as Book[]);
+        setSearchResults(data.data as BookResponse[]);
       }
     } catch (error) {
       console.error('Search error:', error);

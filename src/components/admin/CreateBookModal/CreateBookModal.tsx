@@ -27,6 +27,7 @@ import CostCenterSelect from '../CostCenterSelect/CostCenterSelect';
 import CollectionSelect from '../CollectionSelect/CollectionSelect';
 import MonthYearSelect from '../MonthYearSelect/MonthYearSelect';
 import BookSearchMultiSelect from '../BookSearchMultiSelect/BookSearchMultiSelect';
+import { BookResponse } from '@/types/book';
 import { Checkbox } from '@/components/ui/Checkbox';
 import './CreateBookModal.scss';
 
@@ -62,7 +63,7 @@ export default function CreateBookModal({
     isBundle: false,
     bundleBooks: [] as string[],
   });
-  const [bundleBooksData, setBundleBooksData] = useState<any[]>([]);
+  const [bundleBooksData, setBundleBooksData] = useState<BookResponse[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -286,7 +287,7 @@ export default function CreateBookModal({
                   label="Asociar Volúmenes"
                   selectedBookIds={formData.bundleBooks}
                   selectedBooksData={bundleBooksData}
-                  onAdd={(book: any) => {
+                  onAdd={(book: BookResponse) => {
                     setFormData({
                       ...formData,
                       bundleBooks: [...formData.bundleBooks, book._id],

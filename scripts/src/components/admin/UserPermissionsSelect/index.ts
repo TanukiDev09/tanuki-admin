@@ -1,1 +1,0 @@
-export { UserPermissionsSelect } from './UserPermissionsSelect';

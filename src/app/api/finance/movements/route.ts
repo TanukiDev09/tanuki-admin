@@ -504,9 +504,7 @@ function formatSingleMovement(
   return {
     ...obj,
     amount: toNumber(movement.amount),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     amountInCOP: toNumber(movement.amountInCOP as DecimalValue),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     exchangeRate: toNumber(movement.exchangeRate as DecimalValue),
     unit: movement.unit as string | undefined,
     quantity: movement.quantity ? toNumber(movement.quantity) : undefined,
