@@ -22,6 +22,7 @@ import { Textarea } from '@/components/ui/Textarea';
 import { useToast } from '@/components/ui/Toast';
 import { Category } from '@/types/category';
 import { Checkbox } from '@/components/ui/Checkbox';
+import { ColorPicker } from '@/components/ui/ColorPicker';
 import './CategoryModal.scss';
 
 interface EditCategoryModalProps {
@@ -43,6 +44,7 @@ export default function EditCategoryModal({
     name: '',
     description: '',
     type: 'Ambos',
+    color: '#64748b',
     isActive: true,
   });
 
@@ -52,6 +54,7 @@ export default function EditCategoryModal({
         name: category.name,
         description: category.description || '',
         type: category.type as 'Ingreso' | 'Egreso' | 'Ambos',
+        color: category.color || '#64748b',
         isActive: category.isActive,
       });
     }
@@ -130,6 +133,13 @@ export default function EditCategoryModal({
                 <SelectItem value="Ambos">Ambos</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="category-modal__field-group">
+            <Label>Color de Categoría</Label>
+            <ColorPicker
+              value={formData.color}
+              onChange={(color) => setFormData({ ...formData, color })}
+            />
           </div>
           <div className="category-modal__field-group">
             <Label htmlFor="edit-description">Descripción</Label>

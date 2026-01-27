@@ -5,10 +5,8 @@ import Link from 'next/link';
 import {
   Home,
   List,
-  Tag,
   HelpCircle,
   Settings,
-  Users,
   BookOpen,
   PenTool,
   FileText,
@@ -20,6 +18,12 @@ import {
   MoreHorizontal,
   User,
   LogOut,
+  Receipt,
+  Library,
+  DollarSign,
+  Tags,
+  Calculator,
+  UserCog,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePermission } from '@/hooks/usePermissions';
@@ -36,35 +40,40 @@ import './NavLinks.scss';
 
 export const navItems = [
   { href: '/dashboard', label: 'Inicio', icon: Home },
+  { href: '/dashboard/catalog', label: 'Catálogo', icon: BookOpen },
+  { href: '/dashboard/collections', label: 'Colecciones', icon: Library },
+  { href: '/dashboard/creators', label: 'Creadores', icon: PenTool },
+  { href: '/dashboard/inventory', label: 'Inventario', icon: Package },
+  { href: '/dashboard/movements', label: 'Movimientos', icon: DollarSign },
+  { href: '/dashboard/invoices', label: 'Facturas', icon: Receipt },
+  { href: '/dashboard/points-of-sale', label: 'Puntos de Venta', icon: Store },
+  { href: '/dashboard/warehouses', label: 'Bodegas', icon: Warehouse },
+  { href: '/dashboard/agreements', label: 'Contratos', icon: FileText },
+  { href: '/dashboard/categories', label: 'Categorías', icon: Tags },
   {
     href: '/dashboard/financial-health',
     label: 'Salud Financiera',
     icon: Activity,
   },
-  { href: '/dashboard/catalog', label: 'Catálogo', icon: BookOpen },
-  { href: '/dashboard/collections', label: 'Colecciones', icon: List },
-  { href: '/dashboard/creators', label: 'Creadores', icon: PenTool },
-  { href: '/dashboard/points-of-sale', label: 'Puntos de Venta', icon: Store },
-  { href: '/dashboard/warehouses', label: 'Bodegas', icon: Warehouse },
-  { href: '/dashboard/agreements', label: 'Contratos', icon: FileText },
-  { href: '/dashboard/movements', label: 'Movimientos', icon: List },
-  { href: '/dashboard/inventory', label: 'Inventario', icon: Package },
-  { href: '/dashboard/categories', label: 'Categorías', icon: Tag },
-  { href: '/help', label: 'Ayuda', icon: HelpCircle },
+  {
+    href: '/dashboard/cost-centers',
+    label: 'Centros de Costo',
+    icon: Calculator,
+  },
   { href: '/settings', label: 'Configuración', icon: Settings },
+  { href: '/help', label: 'Ayuda', icon: HelpCircle },
 ] as const;
 
 const adminNavItems = [
-  { href: '/dashboard/users', label: 'Usuarios', icon: Users },
+  { href: '/dashboard/users', label: 'Usuarios', icon: UserCog },
   { href: '/dashboard/permissions', label: 'Permisos', icon: Shield },
 ] as const;
 
 const mobileNavItems = [
   { href: '/dashboard', label: 'Inicio', icon: Home },
-  { href: '/dashboard/financial-health', label: 'Salud', icon: Activity },
   { href: '/dashboard/catalog', label: 'Catálogo', icon: BookOpen },
-  { href: '/dashboard/movements', label: 'Movimientos', icon: List },
   { href: '/dashboard/inventory', label: 'Inventario', icon: Package },
+  { href: '/dashboard/movements', label: 'Movimientos', icon: List },
 ] as const;
 
 interface NavLinksProps {
@@ -103,6 +112,7 @@ export function NavLinks({
       '/dashboard/categories': ModuleName.CATEGORIES,
       '/dashboard/users': ModuleName.USERS,
       '/dashboard/permissions': ModuleName.PERMISSIONS,
+      '/dashboard/invoices': ModuleName.INVOICES,
     };
 
     const entry = Object.entries(modulePermissionMap).find(([path]) =>
@@ -153,7 +163,9 @@ export function NavLinks({
               className={`nav-links__mobile-item ${active ? 'nav-links__mobile-item--active' : ''}`}
               aria-current={active ? 'page' : undefined}
             >
-              <Icon className="nav-links__mobile-icon" aria-hidden="true" />
+              <div className="nav-links__mobile-icon-wrapper">
+                <Icon className="nav-links__mobile-icon" aria-hidden="true" />
+              </div>
               <span className="nav-links__mobile-label">{label}</span>
             </Link>
           );
@@ -166,10 +178,12 @@ export function NavLinks({
               className="nav-links__mobile-item nav-links__mobile-item--more"
               aria-label="Más opciones"
             >
-              <MoreHorizontal
-                className="nav-links__mobile-icon"
-                aria-hidden="true"
-              />
+              <div className="nav-links__mobile-icon-wrapper">
+                <MoreHorizontal
+                  className="nav-links__mobile-icon"
+                  aria-hidden="true"
+                />
+              </div>
               <span className="nav-links__mobile-label">Más</span>
             </button>
           </DropdownMenuTrigger>

@@ -17,6 +17,7 @@ import BookInventorySummary from '@/components/books/BookInventorySummary';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency, formatNumber } from '@/lib/utils';
+import { getBookCoverAlt } from '@/lib/accessibility';
 import './book-detail.scss';
 
 // Helper to display creators
@@ -67,14 +68,20 @@ export default function BookDetailPage(props: {
         headers: {
           Pragma: 'no-cache',
           'Cache-Control': 'no-cache',
+          'Content-Type': 'application/json',
         },
       });
-      if (!res.ok) throw new Error('Libro no encontrado');
+
       const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || `Error ${res.status}: ${res.statusText}`);
+      }
+
       if (data.success) {
         setBook(data.data);
       } else {
-        throw new Error(data.error);
+        throw new Error(data.error || 'Libro no encontrado');
       }
     } catch (error) {
       console.error(error);
@@ -140,7 +147,7 @@ export default function BookDetailPage(props: {
                         ? book.coverImage
                         : `/uploads/covers/${book.coverImage}`
                     }
-                    alt={book.title}
+                    alt={getBookCoverAlt(book.title)}
                     fill
                     className="book-detail__cover-image"
                     sizes="(max-width: 768px) 100vw, 33vw"
@@ -162,9 +169,14 @@ export default function BookDetailPage(props: {
                 <Separator />
                 <div className="book-detail__info-row">
                   <span className="book-detail__label">Stock</span>
-                  <span className="book-detail__value book-detail__value--medium">
-                    {formatNumber(book.stock)} unidades
-                  </span>
+                  <div className="book-detail__stock-display">
+                    <span className={`book-detail__value book-detail__value--medium ${book.isBundle ? 'book-detail__value--bundle' : ''}`}>
+                      {formatNumber(book.totalStock ?? book.stock)} unidades
+                    </span>
+                    {book.isBundle && (
+                      <Badge variant="secondary" className="book-detail__virtual-badge">Virtual</Badge>
+                    )}
+                  </div>
                 </div>
                 <Separator />
                 <div className="book-detail__info-row">
@@ -179,11 +191,26 @@ export default function BookDetailPage(props: {
             {/* Right Column: Title, Description & Metadata */}
             <div className="book-detail__main-content">
               <div className="book-detail__title-section">
-                <h1 className="book-detail__title">{book.title}</h1>
+                <div className="book-detail__title-row">
+                  <h1 className="book-detail__title">{book.title}</h1>
+                  {book.isBundle && (
+                    <Badge variant="secondary" className="book-detail__bundle-badge">
+                      Obra Completa
+                    </Badge>
+                  )}
+                </div>
                 <div className="book-detail__isbn">
                   ISBN:{' '}
                   <span className="book-detail__isbn-value">{book.isbn}</span>
                 </div>
+                {book.isBundle && (
+                  <div className="book-detail__bundle-notice">
+                    <p>
+                      <strong>Nota de Inventario:</strong> Este es un artículo virtual. Su stock se calcula
+                      automáticamente basándose en la disponibilidad mínima de sus volúmenes individuales.
+                    </p>
+                  </div>
+                )}
                 <p className="book-detail__description">
                   {book.description || 'Sin descripción disponible.'}
                 </p>
@@ -232,6 +259,25 @@ export default function BookDetailPage(props: {
                   />
                 </div>
               </div>
+
+              {book.isBundle && book.bundleBooks && book.bundleBooks.length > 0 && (
+                <div className="book-detail__bundle-volumes">
+                  <h2 className="book-detail__section-title--small">Contenido de la Obra</h2>
+                  <div className="book-detail__volumes-list">
+                    {(book.bundleBooks as BookResponse[]).map((vol) => (
+                      <a
+                        key={vol._id}
+                        href={`/dashboard/catalog/${vol._id}`}
+                        className="book-detail__volume-item"
+                      >
+                        <div className="book-detail__volume-dot" />
+                        <span className="book-detail__volume-title">{vol.title}</span>
+                        <span className="book-detail__volume-isbn">{vol.isbn}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

@@ -23,6 +23,8 @@ export default function InventoryPage() {
     totalValue: 0,
     lowStockCount: 0,
     outOfStockCount: 0,
+    editorialUnits: 0,
+    otherUnits: 0,
   });
   const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -91,7 +93,11 @@ export default function InventoryPage() {
 
         <div className="inventory-page__section">
           <h2 className="inventory-page__section-title">Últimos Movimientos</h2>
-          <InventoryMovementsList movements={movements} isLoading={loading} />
+          <InventoryMovementsList
+            movements={movements}
+            isLoading={loading}
+            onRefresh={fetchData}
+          />
         </div>
       </div>
 

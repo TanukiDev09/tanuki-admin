@@ -1,3 +1,4 @@
+/* stylelint-disable order/properties-order */
 @use '../../../../styles/variables' as *;
 @use '../../../../styles/mixins' as *;
 @use 'sass:color';
@@ -104,6 +105,26 @@
       font-size: $font-size-base;
       font-weight: $font-weight-medium;
     }
+
+    &--bundle {
+      color: $primary;
+      font-style: italic;
+    }
+  }
+
+  &__stock-display {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__virtual-badge {
+    font-size: 10px;
+    height: 18px;
+    padding: 0 4px;
+    background-color: rgba($primary, 0.1);
+    color: $primary;
+    border: none;
   }
 
   &__main-content {
@@ -121,10 +142,39 @@
     flex-direction: column;
   }
 
-  &__title {
+  &__title-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
     margin-bottom: $spacing-xs;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    margin-bottom: 0;
     font-size: $font-size-2xl;
     font-weight: $font-weight-bold;
+  }
+
+  &__bundle-badge {
+    background-color: rgba($secondary, 0.1);
+    color: $secondary-foreground;
+    font-size: $font-size-xs;
+    padding: 0.25rem 0.5rem;
+  }
+
+  &__bundle-notice {
+    margin: $spacing-md 0;
+    padding: $spacing-md;
+    background-color: rgba($primary, 0.05);
+    border-left: 4px solid $primary;
+    border-radius: $radius-sm;
+    font-size: $font-size-sm;
+    color: $primary;
+
+    strong {
+      font-weight: $font-weight-bold;
+    }
   }
 
   &__isbn {
@@ -216,5 +266,64 @@
     margin-bottom: $spacing-md;
     font-size: $font-size-xl;
     font-weight: $font-weight-semibold;
+
+    &--small {
+      margin-bottom: $spacing-md;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $muted-foreground;
+    }
+  }
+
+  &__bundle-volumes {
+    margin-top: $spacing-2xl;
+    padding-top: $spacing-xl;
+    border-top: 1px solid $border;
+  }
+
+  &__volumes-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__volume-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    padding: $spacing-sm;
+    background-color: rgba($muted, 0.3);
+    border-radius: $radius-md;
+    text-decoration: none;
+
+    @include transition(background-color);
+
+    &:hover {
+      background-color: rgba($muted, 0.6);
+
+      .book-detail__volume-title {
+        color: $primary;
+      }
+    }
+  }
+
+  &__volume-dot {
+    width: 8px;
+    height: 8px;
+    background-color: $primary;
+    border-radius: 50%;
+  }
+
+  &__volume-title {
+    flex: 1;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $foreground;
+  }
+
+  &__volume-isbn {
+    font-family: monospace;
+    font-size: $font-size-xs;
+    color: $muted-foreground;
   }
 }

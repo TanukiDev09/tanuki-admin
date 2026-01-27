@@ -131,6 +131,7 @@ function getModuleLabel(module: ModuleName): string {
     [ModuleName.USERS]: 'usuarios',
     [ModuleName.COST_CENTERS]: 'centros de costo',
     [ModuleName.PERMISSIONS]: 'permisos',
+    [ModuleName.INVOICES]: 'facturas',
   };
   return labels[module] || module;
 }

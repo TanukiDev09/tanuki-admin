@@ -1,0 +1,18 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.mobile-nav {
+  display: block;
+  position: relative;
+  z-index: 50;
+  width: 100%;
+  padding-bottom: env(safe-area-inset-bottom, $spacing-sm);
+  background-color: $background;
+  border-top: 1px solid rgba($border, 0.8);
+  box-shadow: 0 -4px 12px -2px rgb(0 0 0 / 5%);
+  flex-shrink: 0;
+
+  @include respond-to('lg') {
+    display: none;
+  }
+}

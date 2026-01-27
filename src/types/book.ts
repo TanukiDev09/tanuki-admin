@@ -23,6 +23,8 @@ export interface IBook extends Document {
   collectionName?: string;
   costCenter?: string;
   isActive: boolean;
+  isBundle?: boolean;
+  bundleBooks?: string[] | IBook[]; // IDs or Populated
   createdAt: Date;
   updatedAt: Date;
 }
@@ -48,6 +50,8 @@ export interface CreateBookDTO {
   coverImage?: string;
   collectionName?: string;
   costCenter?: string;
+  isBundle?: boolean;
+  bundleBooks?: string[]; // IDs
 }
 
 // DTO para actualizar libro
@@ -72,6 +76,8 @@ export interface UpdateBookDTO {
   collectionName?: string;
   costCenter?: string;
   isActive?: boolean;
+  isBundle?: boolean;
+  bundleBooks?: string[];
 }
 
 // Inventory details by warehouse
@@ -109,6 +115,8 @@ export interface BookResponse {
   collectionName?: string;
   costCenter?: string;
   isActive: boolean;
+  isBundle?: boolean;
+  bundleBooks?: (BookResponse | string)[];
   createdAt: Date;
   updatedAt: Date;
   // Inventory integration fields

@@ -3,6 +3,7 @@ export interface Category {
   name: string;
   description?: string;
   type: 'Ingreso' | 'Egreso' | 'Ambos';
+  color: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

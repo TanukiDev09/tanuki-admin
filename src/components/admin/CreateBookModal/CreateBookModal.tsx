@@ -26,6 +26,9 @@ import ImageUploader from '../ImageUploader/ImageUploader';
 import CostCenterSelect from '../CostCenterSelect/CostCenterSelect';
 import CollectionSelect from '../CollectionSelect/CollectionSelect';
 import MonthYearSelect from '../MonthYearSelect/MonthYearSelect';
+import BookSearchMultiSelect from '../BookSearchMultiSelect/BookSearchMultiSelect';
+import { BookResponse } from '@/types/book';
+import { Checkbox } from '@/components/ui/Checkbox';
 import './CreateBookModal.scss';
 
 interface CreateBookModalProps {
@@ -57,7 +60,10 @@ export default function CreateBookModal({
     coverImage: '',
     collectionName: '',
     costCenter: '',
+    isBundle: false,
+    bundleBooks: [] as string[],
   });
+  const [bundleBooksData, setBundleBooksData] = useState<BookResponse[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -88,6 +94,8 @@ export default function CreateBookModal({
         coverImage: formData.coverImage,
         collectionName: formData.collectionName,
         costCenter: formData.costCenter,
+        isBundle: formData.isBundle,
+        bundleBooks: formData.bundleBooks,
       };
 
       const response = await fetch('/api/books', {
@@ -119,7 +127,10 @@ export default function CreateBookModal({
         coverImage: '',
         collectionName: '',
         costCenter: '',
+        isBundle: false,
+        bundleBooks: [],
       });
+      setBundleBooksData([]);
 
       onSuccess();
       onClose();
@@ -254,6 +265,47 @@ export default function CreateBookModal({
                 }
               />
             </div>
+
+            <div className="create-book-modal__field create-book-modal__field--checkbox">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="isBundle"
+                  checked={formData.isBundle}
+                  onCheckedChange={(checked) =>
+                    setFormData({ ...formData, isBundle: !!checked })
+                  }
+                />
+                <Label htmlFor="isBundle" className="cursor-pointer">
+                  Es una Obra Completa (Asocia volúmenes)
+                </Label>
+              </div>
+            </div>
+
+            {formData.isBundle && (
+              <div className="create-book-modal__bundle-section">
+                <BookSearchMultiSelect
+                  label="Asociar Volúmenes"
+                  selectedBookIds={formData.bundleBooks}
+                  selectedBooksData={bundleBooksData}
+                  onAdd={(book: BookResponse) => {
+                    setFormData({
+                      ...formData,
+                      bundleBooks: [...formData.bundleBooks, book._id],
+                    });
+                    setBundleBooksData([...bundleBooksData, book]);
+                  }}
+                  onRemove={(bookId: string) => {
+                    setFormData({
+                      ...formData,
+                      bundleBooks: formData.bundleBooks.filter((id) => id !== bookId),
+                    });
+                    setBundleBooksData(
+                      bundleBooksData.filter((b) => b._id !== bookId)
+                    );
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           {/* SECTION: Physical Details */}

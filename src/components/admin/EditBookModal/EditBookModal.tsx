@@ -7,6 +7,8 @@ import ImageUploader from '../ImageUploader';
 import CostCenterSelect from '../CostCenterSelect';
 import CollectionSelect from '../CollectionSelect';
 import MonthYearSelect from '../MonthYearSelect';
+import BookSearchMultiSelect from '../BookSearchMultiSelect/BookSearchMultiSelect';
+import { Checkbox } from '@/components/ui/Checkbox';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import {
   Dialog,
@@ -61,7 +63,10 @@ export default function EditBookModal({
     coverImage: '',
     collectionName: '',
     costCenter: '',
+    isBundle: false,
+    bundleBooks: [] as string[],
   });
+  const [bundleBooksData, setBundleBooksData] = useState<BookResponse[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -89,7 +94,12 @@ export default function EditBookModal({
         coverImage: book.coverImage || '',
         collectionName: book.collectionName || '',
         costCenter: book.costCenter || '',
+        isBundle: book.isBundle || false,
+        bundleBooks: (book.bundleBooks || []).map((b: string | BookResponse) =>
+          typeof b === 'string' ? b : b._id
+        ),
       });
+      setBundleBooksData((book.bundleBooks || []).filter((b: string | BookResponse) => typeof b !== 'string') as BookResponse[]);
     }
   }, [book]);
 
@@ -120,6 +130,8 @@ export default function EditBookModal({
         coverImage: formData.coverImage,
         collectionName: formData.collectionName,
         costCenter: formData.costCenter,
+        isBundle: formData.isBundle,
+        bundleBooks: formData.bundleBooks,
       };
 
       const response = await fetch(`/api/books/${book._id}`, {
@@ -389,6 +401,49 @@ export default function EditBookModal({
                     setFormData({ ...formData, collectionName: value })
                   }
                 />
+
+                <div className="edit-book-modal__field edit-book-modal__field--checkbox">
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="edit-isBundle"
+                      checked={formData.isBundle}
+                      onCheckedChange={(checked) =>
+                        setFormData({ ...formData, isBundle: !!checked })
+                      }
+                    />
+                    <Label htmlFor="edit-isBundle" className="cursor-pointer">
+                      Es una Obra Completa (Asocia volúmenes)
+                    </Label>
+                  </div>
+                </div>
+
+                {formData.isBundle && (
+                  <div className="edit-book-modal__bundle-section">
+                    <BookSearchMultiSelect
+                      label="Asociar Volúmenes"
+                      selectedBookIds={formData.bundleBooks}
+                      selectedBooksData={bundleBooksData}
+                      onAdd={(book: BookResponse) => {
+                        setFormData({
+                          ...formData,
+                          bundleBooks: [...formData.bundleBooks, book._id],
+                        });
+                        setBundleBooksData([...bundleBooksData, book]);
+                      }}
+                      onRemove={(bookId: string) => {
+                        setFormData({
+                          ...formData,
+                          bundleBooks: formData.bundleBooks.filter(
+                            (id) => id !== bookId
+                          ),
+                        });
+                        setBundleBooksData(
+                          bundleBooksData.filter((b) => b._id !== bookId)
+                        );
+                      }}
+                    />
+                  </div>
+                )}
 
                 <CostCenterSelect
                   value={formData.costCenter}

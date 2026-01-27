@@ -1,1 +1,0 @@
-export { GlobalAgreementList } from './GlobalAgreementList';

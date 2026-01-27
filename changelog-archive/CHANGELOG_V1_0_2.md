@@ -1,0 +1,229 @@
+# Changelog - Versión 1.0.2 (Tanuki Admin)
+
+Esta versión se enfoca en el fortalecimiento de la calidad del código, la mantenibilidad a largo plazo, la estandarización de las reglas de desarrollo y mejoras en la visualización financiera.
+
+## [1.0.2] - 2026-01-22
+
+### ✨ Nuevas Características
+
+- **Visualización Financiera Flexible**:
+  - **Toggle Ingresos/Gastos**: Nueva funcionalidad para alternar entre la visualización de repartición de ingresos y gastos en las gráficas de categorías y centros de costo.
+  - **Identificación de Categorías**: Resolución inteligente de IDs de categorías, mostrando nombres legibles o referencias cortas en lugar de hashes largos.
+- **Precisión de Datos**:
+  - **Filtro UTC Estricto**: Corrección en los límites de fechas para evitar la "contaminación" de reportes con movimientos de años adyacentes debido a diferencias horarias.
+
+### 🛠️ Calidad Técnica & Estándares de Código
+
+- **Límite de Líneas por Componente**:
+  - Se ha implementado una regla estricta en ESLint (`max-lines`) que limita los archivos `.tsx` a un máximo de **700 líneas**.
+  - Objetivo: Fomentar la componetización y evitar "archivos monstruo".
+- **Refactorización Mayor**:
+  - Desacople del dashboard financiero en componentes dedicados (`GlobalView`, `MonthlyView`, `AnnualView`).
+- **Estandarización de Formato**:
+  - Aplicación de `Prettier`, `ESLint` y `Stylelint` en todo el workspace para garantizar consistencia.
+
+### 🐛 Correcciones
+
+- Arreglado bug donde los nombres de categorías no se mostraban en reportes antiguos (Enero 2019).
+- Corregida la comparación de tipos en la tabla de movimientos financieros.
+- Ajustados estilos SCSS para cumplir con el orden de propiedades estándar.
+
+---
+
+### ♿ Sesión: Accesibilidad WCAG AAA & Estabilidad
+
+**Fecha:** 2026-01-22
+
+#### 🌟 Logros de Accesibilidad
+
+- **Cumplimiento WCAG AAA 1.4.9 (Imágenes de Texto)**:
+  - Implementación de un sistema de utilidades centralizado (`src/lib/accessibility.ts`) para garantizar que todos los textos alternativos sean descriptivos y concisos (máximo 8 palabras).
+  - Refactorización de componentes de inventario, catálogo y creadores para cumplir con los estándares más estrictos de accesibilidad.
+- **Automatización de Pruebas**:
+  - Ejecución exitosa de **210 tests de accesibilidad** con un 100% de éxito en todas las rutas críticas.
+  - Mejora de la estabilidad de los tests para manejar dinámicamente elementos ausentes.
+- **Limpieza de Linters en Tests**:
+  - Resolución del 100% de las advertencias de ESLint en la suite de pruebas de Cypress.
+
+#### 🛠️ Correcciones de Estabilidad
+
+- **Regresión Crítica en Detalle de Libro**:
+  - Corregido error de ejecución `Cannot read properties of undefined (reading 'toFixed')` en el componente `BookFinancials`.
+  - Actualización robusta de la API de finanzas (`/api/finance/summary`) para garantizar el envío de métricas de margen de beneficio.
+
+---
+
+### 📊 Sesión: Dashboard Financiero & Normalización de Datos
+
+**Fecha:** 2026-01-23
+
+#### 🌟 Nuevas Características
+
+- **Control de Saldo Mensual**:
+  - Implementación de bloques de **Saldo Mes Anterior** y **Nuevo Saldo** en el dashboard financiero.
+  - Ahora es posible visualizar con cuánto dinero arrancó la editorial el mes y cuál es el saldo proyectado al final del periodo.
+- **Gráfico de Flujo de Caja Acumulado**:
+  - Cambio de visualización de balance neto diario a **saldo en caja acumulado**.
+  - Mejora estética radical con gradientes cyan/teal, puntos de datos resaltados y Tooltips interactivos con el "Saldo en Caja".
+  - Ajuste de escala Y proporcional partiendo desde $0 para evitar distorsiones visuales.
+
+#### 🛠️ Calidad Técnica & Correctividad
+
+- **Normalización de Tipos de Movimiento**:
+  - Implementación de una capa de normalización en el API de finanzas (`/api/finance/summary`) para convertir tipos de base de datos (`Ingreso`/`Egreso`) a constantes de frontend (`INCOME`/`EXPENSE`).
+  - Asegurada la consistencia en la actualización de movimientos (API `PUT`) para mantener el formato de base de datos estandarizado.
+- **Limpieza de Linters & Build**:
+  - Resolución de errores de inmutabilidad en React (reemplazo de reasignaciones en `map` por `reduce`).
+  - **Corrección de Error de Compilación**: Ajustada la definición del `formatter` del Tooltip en Recharts para aceptar parámetros opcionales, solucionando el fallo en el despliegue de Vercel.
+  - Resolución de advertencias de Stylelint sobre orden de propiedades y formato de colores en SCSS.
+- **Orden Cronológico**: Se cambió el orden predeterminado en la tabla de movimientos del dashboard a cronológico (más antiguo a más reciente), facilitando el seguimiento secuencial del flujo de caja.
+- **Corrección de Cálculos Históricos**:
+  - Arreglado bug crítico en el cálculo del balance inicial que utilizaba `month - 2` en lugar de `month - 1`.
+  - Verificada la consistencia de datos entre Mayo y Junio 2018 (Balance Final Mayo == Balance Inicial Junio).
+
+#### 🎨 UX/UI
+
+- **Simplificación de StatCards**:
+  - Reducción del peso visual general: padding ajustado, tipografía optimizada e iconos más discretos.
+  - Eliminación de efectos "glassmorphism" excesivos, sombras pesadas y animaciones distractores para un enfoque profesional en los datos.
+
+---
+
+### 🧮 Sesión: Precisión Financiera & Pulido de Interfaz
+
+**Fecha:** 2026-01-23
+
+#### 🌟 Logros de Precisión & Fiabilidad
+
+- **Aritmética de Alta Precisión**:
+  - Implementación de `big.js` (vía `src/lib/math.ts`) para todos los cálculos financieros del sistema, eliminando errores de redondeo de punto flotante.
+  - Actualización del modelo de MongoDB `Movement` para utilizar `Decimal128` en campos críticos (`amount`, `exchangeRate`, `amountInCOP`, `quantity`, `unitValue`).
+- **Estabilidad del API de Resumen**:
+  - Resolución de errores 500 y referencias nulas en el API de Salud Financiera.
+  - Optimización de agregaciones diarias y proyecciones de caja con validaciones matemáticas robustas.
+- **Seguridad de Tipos (TypeScript)**:
+  - Resolución del 100% de los errores de tipos introducidos por el cambio a strings numéricos de alta precisión, garantizando un build estable.
+
+#### 🎨 UX/UI & Pulido Visual
+
+- **Formateo de Divisas**:
+  - Ajuste en la visualización de montos secundarios (ej: `$ 1 637 580 (¥ 59 500)`) añadiendo un espacio antes del paréntesis para mejorar la partición de palabras y el ajuste de texto en dispositivos móviles.
+- **Sistema de Colores de Categoría**:
+  - Implementación de paletas curadas (`WARM_COLORS`, `COLD_COLORS`, `NEUTRAL_COLORS`) para una organización visual coherente.
+  - Integración de Selector de Color en los modales de creación/edición de categorías.
+  - Unificación visual en tablas, badges y gráficos de finanzas siguiendo los colores semánticos asignados.
+- **Mejora en Flujo de Edición**:
+  - Cambio en la redirección post-edición de movimientos a `router.back()`, permitiendo al usuario regresar contextualmente a su vista previa.
+
+---
+
+### 🧾 Sesión: Gestión de Facturación & Documentación Digital
+
+### 📦 Sesión: Desglose de Inventario & Consistencia de Datos
+
+**Fecha:** 2026-01-25
+
+#### 🌟 Nuevas Características
+
+- **Carga de Documentos Digitales**:
+  - Implementación de un sistema de carga de archivos (PDF, PNG, JPG) para facturas.
+  - Integración con **Vercel Blob Storage** para almacenamiento en la nube.
+  - Nuevo componente `DocumentUploader` con soporte para drag-and-drop y previsualizaciones inteligentes.
+  - Acceso directo a documentos desde la vista de detalle de la factura ("Ver Documento").
+- **Interfaz de Ítems de Alta Precisión**:
+  - Re-ingeniería completa de la tabla de ítems usando **anchos fijos en píxeles** para garantizar 0 solapamiento de datos.
+  - **Modo Spreadsheet**: Implementación de campos de entrada minimalistas que resaltan al interactuar (border-on-hover), eliminando el ruido visual de "múltiples cuadros".
+  - **Segmented Control**: Nuevo selector estético para alternar entre "Libro" y "Servicio", mejorando la semántica visual.
+
+#### 🛠️ Calidad Técnica & Estabilidad
+
+- **Eliminación de Deuda Técnica (Styles)**:
+  - Resolución del 100% de los errores de `stylelint` en los componentes de facturación internos.
+  - Aplicación de un sistema robusto de espaciado en selectores dinámicos (`BookSelect`, `CostCenterSelect`) para evitar colisiones de iconos.
+- **Corrección de Build**:
+  - Resolución de error crítico de compilación en SCSS debido a mixins de truncado mal referenciados (`truncate` vs `text-truncate`).
+  - Estandarización de las dimensiones de "table-mode" para que todos los controles de fila tengan una altura idéntica (2.25rem).
+- **Desglose de Stock por Bodega**:
+  - Implementación de visualización discriminada de unidades en el dashboard de inventario.
+  - Nuevas tarjetas de estadísticas para **Bodega Editorial** (oficina central) y **Otras Bodegas** (puntos de venta y terceros).
+  - Rediseño de la sección de estadísticas a una cuadrícula de 2x3 para acomodar los nuevos totales sin perder claridad.
+
+#### 🛠️ Calidad Técnica & Correctividad
+
+- **Robustez en Cálculo de "Sin Stock"**:
+  - Refactorización completa del API de estadísticas de inventario (`/api/inventory/stats`) para utilizar una única agregación basada en el catálogo de libros activos.
+  - Se corrigió el error donde libros inactivos afectaban los contadores de stock bajo/nulo.
+  - Sincronización de la lógica entre las tarjetas de resumen y la Matriz de Inventario para garantizar consistencia total de datos.
+- **Filtro de Catálogo Activo**:
+  - Actualización del API de la matriz de inventario para filtrar automáticamente por libros activos, eliminando ruido visual de productos obsoletos.
+
+#### 🎨 UX/UI
+
+- **Corrección de Recorte en Movimientos**:
+  - Resolución de bug visual en la lista de últimos movimientos donde los items se cortaban debido a un `max-height` restrictivo.
+  - Optimización del espaciado y alineación vertical en las tablas de movimientos para mejorar la legibilidad de traslados con múltiples libros.
+
+---
+
+### 📦 Sesión: Optimizaciones en Movimientos de Inventario
+
+**Fecha:** 2026-01-25
+
+#### 🌟 Nuevas Características
+
+- **Totalizador de Movimientos en Tiempo Real**:
+  - Implementación de un resumen dinámico en el modal de movimientos de inventario.
+  - Visualización instantánea del **Total de Títulos** (libros distintos) y **Total de Ejemplares** (suma de cantidades).
+  - Diseño premium tipo "dashed box" integrado en la cabecera de la selección de ítems para un control preciso antes de finalizar el movimiento.
+
+#### 🛠️ Correcciones & Optimización
+
+- **Búsqueda Avanzada en Bodegas**:
+  - Resolución de bug crítico donde el motor de búsqueda ignoraba el término ingresado al filtrar por inventario de bodegas.
+  - Implementación de agregaciones MongoDB en `/api/inventory/warehouse/[id]` para permitir búsquedas dinámicas por **Título** o **ISBN**.
+  - Estandarización del ordenamiento alfabético en todos los resultados de inventario por bodega.
+- **Estabilidad de Build (SCSS)**:
+  - Corrección de error de compilación por uso de variables de color inexistentes.
+  - Unificación del sistema de estilos del modal con las variables globales del proyecto (`$flow`, `$primary`).
+
+---
+
+### 🎨 Sesión: Reorganización UX de Navegación & Unificación de Iconos
+
+**Fecha:** 2026-01-26
+
+#### 🌟 Logros de Diseño & UX
+
+- **Navegación Lógica Unificada**:
+  - Reorganización integral de la barra lateral (Sidebar), barra inferior móvil y tarjetas del Dashboard bajo un flujo de negocio coherente: **Catálogo** → **Logística** → **Finanzas** → **Administración**.
+  - Garantizada la consistencia total: los elementos aparecen en el mismo orden exacto independientemente del dispositivo o vista.
+- **Consistencia Visual (Iconos)**:
+  - Sincronización de iconos de Lucide en todos los componentes de navegación.
+  - Estandarización: `BookOpen` (Catálogo), `Library` (Colecciones), `PenTool` (Creadores), `DollarSign` (Movimientos), `Tags` (Categorías), `Calculator` (Centros de Costo) y `UserCog` (Usuarios).
+- **Optimización Móvil**:
+  - Simplificación de la barra inferior para mostrar solo los 4 módulos de mayor frecuencia de uso, moviendo el resto al menú extendido ("Más") manteniendo el orden lógico.
+
+#### 🛠️ Calidad Técnica & Limpieza
+
+- **Zero Lint Policy**:
+  - Resolución del último error de linter preexistente en la API de inventario por bodega (`/api/inventory/warehouse/[id]`), eliminando el uso de `any` en favor de `mongoose.PipelineStage[]`.
+  - El proyecto ahora cuenta con **0 errores de linter** en todo el codebase.
+- **Optimización de Bundles**:
+  - Limpieza de importaciones de iconos duplicadas y no utilizadas en `NavLinks` y `ModuleLinks`.
+
+---
+
+### 🧮 Sesión: Precisión en Detalles Financieros & Robustez de Datos
+
+**Fecha:** 2026-01-26
+
+#### 🛠️ Correcciones & Calidad Técnica
+
+- **Capa de Robustez Matemática**:
+  - Actualización de la utilidad `toNumber` para manejar el formato nativo `Decimal128` de MongoDB (`$numberDecimal`).
+  - Resolución de bug crítico en los detalles de movimientos financieros donde el monto aparecía como cero en el frontend debido a una conversión de tipos incompleta en el API.
+  - Sincronización de formatos entre las acciones de consulta (`GET`) y actualización (`PUT`) para garantizar la persistencia de datos normalizados.
+
+---
+
+_Nota: Esta versión asegura una base sólida y estandarizada para el crecimiento futuro de Tanuki Admin._

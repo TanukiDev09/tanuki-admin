@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency, formatNumber } from '@/lib/utils';
+import { toNumber } from '@/lib/math';
 import '../movement-detail.scss';
 
 export default function MovementDetailPage() {
@@ -105,10 +106,22 @@ export default function MovementDetailPage() {
               </p>
             </div>
             <div>
-              <h3 className="movement-detail__label">Monto</h3>
+              <h3 className="movement-detail__label">Monto (COP)</h3>
               <p className="movement-detail__value--xl">
-                {formatCurrency(movement.amount)}
+                {formatCurrency(
+                  toNumber(movement.amountInCOP || movement.amount),
+                  'COP'
+                )}
               </p>
+              {movement.currency !== 'COP' && (
+                <p className="movement-detail__amount-hint">
+                  Original:{' '}
+                  {formatCurrency(toNumber(movement.amount), movement.currency)}
+                  {movement.exchangeRate
+                    ? ` @ TRM ${formatNumber(toNumber(movement.exchangeRate))}`
+                    : ''}
+                </p>
+              )}
             </div>
           </div>
 
@@ -119,13 +132,20 @@ export default function MovementDetailPage() {
             </div>
             <div>
               <h3 className="movement-detail__label">Cantidad</h3>
-              <p>{movement.quantity ? formatNumber(movement.quantity) : '-'}</p>
+              <p>
+                {movement.quantity
+                  ? formatNumber(toNumber(movement.quantity))
+                  : '-'}
+              </p>
             </div>
             <div>
               <h3 className="movement-detail__label">Valor Unitario</h3>
               <p>
                 {movement.unitValue
-                  ? formatCurrency(Number(movement.unitValue))
+                  ? formatCurrency(
+                      toNumber(movement.unitValue),
+                      movement.currency
+                    )
                   : '-'}
               </p>
             </div>
@@ -158,7 +178,10 @@ export default function MovementDetailPage() {
                         <tr key={idx}>
                           <td>{alloc.costCenter}</td>
                           <td className="movement-detail__allocation-amount">
-                            {formatCurrency(alloc.amount, movement.currency)}
+                            {formatCurrency(
+                              toNumber(alloc.amount),
+                              movement.currency
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -166,7 +189,11 @@ export default function MovementDetailPage() {
                   </table>
                 </div>
               ) : (
-                <p>{movement.costCenter || (movement.allocations?.[0]?.costCenter) || '-'}</p>
+                <p>
+                  {movement.costCenter ||
+                    movement.allocations?.[0]?.costCenter ||
+                    '-'}
+                </p>
               )}
             </div>
           </div>
@@ -189,7 +216,6 @@ export default function MovementDetailPage() {
             </p>
           </div>
 
-
           {movement.invoiceRef && (
             <div>
               <h3 className="movement-detail__label">Referencia Factura</h3>
@@ -198,12 +224,13 @@ export default function MovementDetailPage() {
           )}
 
           {movement.inventoryMovementId && (
-            <div className="movement-detail__link-section mt-4">
-              <h3 className="movement-detail__label flex items-center gap-2">
-                <Package className="w-4 h-4" /> Movimiento de Inventario Vinculado
+            <div className="movement-detail__link-section">
+              <h3 className="movement-detail__link-title">
+                <Package className="movement-detail__icon" /> Movimiento de
+                Inventario Vinculado
               </h3>
-              <div className="flex items-center gap-4 p-4 bg-muted rounded-lg mt-2">
-                <div className="flex-1 text-sm">
+              <div className="movement-detail__link-card">
+                <div className="movement-detail__link-text">
                   <strong>Relacionado con Control de Stock</strong>
                 </div>
                 <Button
@@ -211,13 +238,13 @@ export default function MovementDetailPage() {
                   size="sm"
                   onClick={() => router.push('/dashboard/inventory')}
                 >
-                  <ExternalLink className="w-4 h-4 mr-2" /> Ir a Inventario
+                  <ExternalLink className="movement-detail__icon" /> Ir a
+                  Inventario
                 </Button>
               </div>
             </div>
           )}
         </CardContent>
-
       </Card>
     </div>
   );

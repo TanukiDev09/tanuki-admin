@@ -1,1 +1,0 @@
-export { InventoryAdjustModal } from './InventoryAdjustModal';

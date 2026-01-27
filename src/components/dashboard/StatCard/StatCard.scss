@@ -9,96 +9,55 @@
 
 .stat-card {
   position: relative;
-  padding: $spacing-xl;
-  background: rgba($card, 0.7);
-  border: 1px solid rgba($border, 0.4);
-  border-radius: $radius-xl;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(12px);
-  box-shadow:
-    0 4px 6px -1px rgb(0 0 0 / 2%),
-    0 2px 4px -1px rgb(0 0 0 / 2%);
+  padding: $spacing-md $spacing-lg;
+  background: $card;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  transition: border-color 0.2s ease;
   overflow: hidden;
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow:
-      0 12px 24px -10px rgb(0 0 0 / 8%),
-      0 4px 10px -5px rgb(0 0 0 / 4%);
-    border-color: rgba($primary, 0.2);
-
-    .stat-card__icon {
-      transform: scale(1.1) rotate(5deg);
-    }
+    border-color: rgba($primary, 0.3);
   }
 
   // --- VARIANTS ---
 
   &--flow,
   &--success {
-    background: linear-gradient(
-      145deg,
-      rgba($background, 0.9) 0%,
-      rgba($success, 0.08) 100%
-    );
     border-bottom: 2px solid rgba($success, 0.3);
 
     .stat-card__icon {
-      background: linear-gradient(
-        135deg,
-        rgba($success, 0.2),
-        rgba($success, 0.1)
-      );
-      color: color.adjust($success, $lightness: -5%);
-      box-shadow: 0 4px 12px rgba($success, 0.15);
+      color: $success;
     }
 
     .stat-card__value {
-      color: color.adjust($success, $lightness: -10%);
+      color: $success;
     }
   }
 
   &--ebb,
   &--danger {
-    background: linear-gradient(
-      145deg,
-      rgba($background, 0.9) 0%,
-      rgba($danger, 0.08) 100%
-    );
     border-bottom: 2px solid rgba($danger, 0.3);
 
     .stat-card__icon {
-      background: linear-gradient(
-        135deg,
-        rgba($danger, 0.2),
-        rgba($danger, 0.1)
-      );
-      color: color.adjust($danger, $lightness: -5%);
-      box-shadow: 0 4px 12px rgba($danger, 0.15);
+      color: $danger;
     }
 
     .stat-card__value {
-      color: color.adjust($danger, $lightness: -10%);
+      color: $danger;
     }
   }
 
   &--balance,
   &--info {
-    background: linear-gradient(
-      145deg,
-      rgba($background, 0.9) 0%,
-      rgba($info, 0.08) 100%
-    );
     border-bottom: 2px solid rgba($info, 0.3);
 
     .stat-card__icon {
-      background: linear-gradient(135deg, rgba($info, 0.2), rgba($info, 0.1));
-      color: color.adjust($info, $lightness: -5%);
-      box-shadow: 0 4px 12px rgba($info, 0.15);
+      color: $info;
     }
 
     .stat-card__value {
-      color: color.adjust($info, $lightness: -10%);
+      color: $info;
     }
   }
 
@@ -113,7 +72,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: $spacing-lg;
+    margin-bottom: $spacing-md;
   }
 
   &__title {
@@ -129,11 +88,10 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 42px;
-    height: 42px;
-    padding: 10px;
-    border-radius: 12px;
-    transition: transform 0.3s ease;
+    width: 20px;
+    height: 20px;
+    color: $muted-foreground;
+    opacity: 0.6;
   }
 
   &__content {
@@ -155,13 +113,10 @@
 
   &__value {
     color: $foreground;
-    font-size: 2.25rem;
-    font-weight: 800;
-    line-height: 1.1;
-    letter-spacing: -0.03em;
-
-    // Gradient text for value
-    // @include text-gradient-primary; // If available, otherwise cleanup
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
   }
 
   &__subtext {

@@ -16,10 +16,12 @@ import './CategoryBarChart.scss';
 interface ChartDataEntry {
   name: string;
   value: number;
+  color?: string;
 }
 
 interface CategoryBarChartProps {
   data: ChartDataEntry[];
+  title?: string;
 }
 
 const COLORS = [
@@ -33,7 +35,10 @@ const COLORS = [
   'var(--color-chart-8)',
 ];
 
-export function CategoryBarChart({ data }: CategoryBarChartProps) {
+export function CategoryBarChart({
+  data,
+  title = 'Gastos por Categoría',
+}: CategoryBarChartProps) {
   const sortedData = (data || [])
     .filter(
       (item) =>
@@ -45,9 +50,7 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
   return (
     <Card className="category-bar-chart category-bar-chart--no-border">
       <CardHeader className="category-bar-chart__header">
-        <CardTitle className="category-bar-chart__title">
-          Gastos por Categoría
-        </CardTitle>
+        <CardTitle className="category-bar-chart__title">{title}</CardTitle>
       </CardHeader>
       <CardContent className="category-bar-chart__content">
         <ResponsiveContainer width="100%" height={300}>
@@ -92,7 +95,7 @@ export function CategoryBarChart({ data }: CategoryBarChartProps) {
               {sortedData.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  fill={entry.color || COLORS[index % COLORS.length]}
                 />
               ))}
             </Bar>

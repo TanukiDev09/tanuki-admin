@@ -1,1 +1,0 @@
-export { BookFinancials } from './BookFinancials';

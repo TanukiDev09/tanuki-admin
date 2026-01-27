@@ -5,23 +5,6 @@
 // SIDEBAR & MOBILE NAV (MOBILE-FIRST)
 // ============================================
 
-// --- MOBILE NAVIGATION (BOTTOM BAR) ---
-.mobile-nav {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 50;
-  display: block;
-  padding-bottom: env(safe-area-inset-bottom); // Support for notched iPhones
-  background-color: $background;
-  border-top: 1px solid rgba($border, 0.5);
-
-  @include respond-to('lg') {
-    display: none; // Hide on desktop
-  }
-}
-
 // --- DESKTOP SIDEBAR ---
 .sidebar {
   position: relative;

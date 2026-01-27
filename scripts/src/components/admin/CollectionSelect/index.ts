@@ -1,1 +1,0 @@
-export { CollectionSelect } from './CollectionSelect';

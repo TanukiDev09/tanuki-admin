@@ -63,13 +63,9 @@
   }
 
   &__user-menu {
-    display: none; // Profile/Logout will go into mobile menu later or stay in top header
-
-    @include respond-to('lg') {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   &__action-button {

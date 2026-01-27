@@ -6,6 +6,11 @@
   @extend %dashboard-base;
 
   &__header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $spacing-md;
     margin-bottom: $spacing-xl;
   }
 
@@ -21,23 +26,130 @@
     color: $muted-foreground;
   }
 
+  &__chart-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 480px; // Ensure there's enough space for the scrollable chart + gap
+  }
+
+  &__tabs {
+    width: 100%;
+  }
+
+  &__stat-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-sm; // Reduced for mobile
+
+    @include md {
+      grid-template-columns: repeat(3, 1fr);
+      gap: $spacing-md;
+    }
+
+    &--triple {
+      @include md {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  }
+
+  &__balance-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    margin-bottom: $spacing-lg;
+    padding: $spacing-md;
+    background: rgb(var(--color-primary-rgb), 0.03);
+    border: 1px solid rgb(var(--color-primary-rgb), 0.1);
+    border-radius: $radius-md;
+  }
+
   &__metrics-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: $spacing-md;
+    gap: $spacing-sm;
 
-    @include respond-to('sm') {
+    @include md {
+      grid-template-columns: repeat(2, 1fr);
+      gap: $spacing-md;
+    }
+
+    @include lg {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  &__section {
+    width: 100%;
+    margin-bottom: $spacing-2xl;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__grid-breakdown {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
+    margin-bottom: $spacing-2xl;
+
+    @include lg {
       grid-template-columns: repeat(2, 1fr);
     }
+  }
 
-    @include respond-to('lg') {
-      grid-template-columns: repeat(4, 1fr);
-    }
+  &__section-title {
+    margin-bottom: $spacing-md;
+    color: $foreground;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
   }
 
   &__projection-wrapper {
     @include card-base;
 
     padding: $spacing-lg;
+  }
+
+  .chart-wrapper {
+    @include card-base;
+
+    padding: $spacing-lg;
+    background: var(--color-card);
+  }
+}
+
+.balance-indicator {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: $spacing-sm;
+  min-width: 200px;
+
+  &__icon {
+    flex-shrink: 0;
+    color: rgb(var(--color-primary-rgb), 0.6);
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  &__label {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__value {
+    color: $foreground;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
   }
 }

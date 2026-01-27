@@ -16,6 +16,15 @@ const eslintConfig = [
     },
   },
   {
+    files: ['**/*.tsx'],
+    rules: {
+      'max-lines': [
+        'error',
+        { max: 700, skipBlankLines: true, skipComments: true },
+      ],
+    },
+  },
+  {
     ignores: [
       // Default ignores of eslint-config-next:
       '.next/**',

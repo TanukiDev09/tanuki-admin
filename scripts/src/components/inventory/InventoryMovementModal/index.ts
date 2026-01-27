@@ -1,1 +1,0 @@
-export { InventoryMovementModal } from './InventoryMovementModal';

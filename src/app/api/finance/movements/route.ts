@@ -5,6 +5,15 @@ import dbConnect from '@/lib/mongodb';
 import * as mongoose from 'mongoose';
 import Movement from '@/models/Movement';
 import InventoryMovement from '@/models/InventoryMovement';
+import {
+  add,
+  multiply,
+  divide,
+  compare,
+  toNumber,
+  gtZero,
+  DecimalValue,
+} from '@/lib/math';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +25,8 @@ interface Allocation {
 interface MovementDoc {
   _id: { toString: () => string };
   amount: { toString: () => string };
+  amountInCOP?: { toString: () => string };
+  exchangeRate?: { toString: () => string };
   type: string;
   unit?: string;
   quantity?: { toString: () => string };
@@ -195,13 +206,15 @@ function formatMovements(movements: MovementDoc[]): FormattedMovement[] {
     return {
       ...m,
       type: normalizedType,
-      amount: m.amount ? parseFloat(m.amount.toString()) : 0,
+      amount: toNumber(m.amount),
+      amountInCOP: toNumber(m.amountInCOP),
+      exchangeRate: toNumber(m.exchangeRate),
       unit: m.unit,
-      quantity: m.quantity ? parseFloat(m.quantity.toString()) : undefined,
-      unitValue: m.unitValue ? parseFloat(m.unitValue.toString()) : undefined,
+      quantity: m.quantity ? toNumber(m.quantity) : undefined,
+      unitValue: m.unitValue ? toNumber(m.unitValue) : undefined,
       allocations: m.allocations?.map((a) => ({
         ...a,
-        amount: a.amount ? parseFloat(a.amount.toString()) : 0,
+        amount: a.amount ? toNumber(a.amount) : 0,
       })),
       _id: m._id.toString(),
     } as FormattedMovement;
@@ -323,16 +336,19 @@ interface CreateMovementBody {
   inventoryMovementId?: string;
   allocations?: {
     costCenter: string;
-    amount: number;
+    amount: number | string;
   }[];
   [key: string]: unknown;
 }
 
 // Helper to validate allocations
-function validateAllocations(body: CreateMovementBody, amount: number) {
+function validateAllocations(
+  body: CreateMovementBody,
+  amount: string | number
+) {
   if (!body.allocations || body.allocations.length === 0) return null;
 
-  let sumAllocations = 0;
+  let sumAllocations = '0';
   for (const allocation of body.allocations) {
     if (!allocation.costCenter) {
       return {
@@ -340,17 +356,11 @@ function validateAllocations(body: CreateMovementBody, amount: number) {
         status: 400,
       };
     }
-    const allocAmount = Number(allocation.amount);
-    if (isNaN(allocAmount) || allocAmount < 0) {
-      return {
-        error: 'Los montos de las asignaciones deben ser números válidos',
-        status: 400,
-      };
-    }
-    sumAllocations += allocAmount;
+    const allocAmount = allocation.amount;
+    sumAllocations = add(sumAllocations, allocAmount);
   }
 
-  if (Math.abs(amount - sumAllocations) > 0.01) {
+  if (compare(amount, sumAllocations) !== 0) {
     return {
       error: `La suma de los detalles (${sumAllocations}) debe ser igual al total del movimiento (${amount})`,
       status: 400,
@@ -370,20 +380,17 @@ function validateAndSanitize(body: CreateMovementBody) {
     };
   }
 
-  // Ensure amount is numeric if present, else 0
-  const amount = body.amount ? Number(body.amount) : 0;
-  if (isNaN(amount)) {
-    return { error: 'El monto debe ser un número válido', status: 400 };
-  }
+  // Ensure amount is string/number, math.ts toBig will handle it
+  const amount = body.amount || '0';
 
   const allocationError = validateAllocations(body, amount);
   if (allocationError) return allocationError;
 
-  return { amount };
+  return { amount: amount.toString() };
 }
 
 // Helper to calculate derived financial values
-function calculateFinancials(body: CreateMovementBody, amount: number) {
+function calculateFinancials(body: CreateMovementBody, amount: string) {
   // Normalize type
   let type: string = body.type || 'Ingreso';
   if (type === 'INCOME') type = 'Ingreso';
@@ -395,15 +402,15 @@ function calculateFinancials(body: CreateMovementBody, amount: number) {
 
   // Exchange Rate & Amount in COP
   const exchangeRate =
-    body.currency === 'COP' ? 1 : Number(body.exchangeRate || 1);
+    body.currency === 'COP' ? '1' : body.exchangeRate?.toString() || '1';
   const amountInCOP =
-    body.currency === 'COP' ? amount : amount * exchangeRate || 0;
+    body.currency === 'COP' ? amount : multiply(amount, exchangeRate);
 
   // Unit Value
-  let unitValue = 0;
-  const quantity = body.quantity ? Number(body.quantity) : 0;
-  if (quantity !== 0) {
-    unitValue = amount / quantity;
+  let unitValue = '0';
+  const quantity = body.quantity?.toString() || '0';
+  if (gtZero(quantity)) {
+    unitValue = divide(amount, quantity);
   }
 
   return { type, fiscalYear, amountInCOP, unitValue, quantity };
@@ -413,15 +420,15 @@ function calculateFinancials(body: CreateMovementBody, amount: number) {
 interface Financials {
   type: string;
   fiscalYear: number;
-  amountInCOP: number;
-  unitValue: number;
-  quantity: number;
+  amountInCOP: number | string;
+  unitValue: number | string;
+  quantity: number | string;
 }
 
 function buildMovementDoc(
   body: CreateMovementBody,
   financials: Financials,
-  amount: number
+  amount: string
 ) {
   const { type, fiscalYear, amountInCOP, unitValue, quantity } = financials;
 
@@ -496,17 +503,15 @@ function formatSingleMovement(
     : movement;
   return {
     ...obj,
-    amount: movement.amount ? parseFloat(movement.amount.toString()) : 0,
+    amount: toNumber(movement.amount),
+    amountInCOP: toNumber(movement.amountInCOP as DecimalValue),
+    exchangeRate: toNumber(movement.exchangeRate as DecimalValue),
     unit: movement.unit as string | undefined,
-    quantity: movement.quantity
-      ? parseFloat(movement.quantity.toString())
-      : undefined,
-    unitValue: movement.unitValue
-      ? parseFloat(movement.unitValue.toString())
-      : undefined,
+    quantity: movement.quantity ? toNumber(movement.quantity) : undefined,
+    unitValue: movement.unitValue ? toNumber(movement.unitValue) : undefined,
     allocations: obj.allocations?.map((a) => ({
       ...a,
-      amount: a.amount ? parseFloat(a.amount.toString()) : 0,
+      amount: a.amount ? toNumber(a.amount) : 0,
     })),
     _id: movement._id.toString(),
   } as FormattedMovement;

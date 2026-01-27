@@ -42,6 +42,16 @@ const formSchema = z.object({
     .array(z.string().email('Email inválido').or(z.literal('')))
     .default([]),
   managers: z.array(z.string()).default([]),
+  contacts: z
+    .array(
+      z.object({
+        name: z.string().min(1, 'El nombre es requerido'),
+        email: z.string().email('Email inválido').or(z.literal('')).optional(),
+        phone: z.string().optional(),
+        position: z.string().optional(),
+      })
+    )
+    .default([]),
   status: z.enum(['active', 'inactive']),
   type: z.enum(['physical', 'online', 'event']),
   discountPercentage: z.coerce.number().min(0).max(100).default(0),
@@ -119,6 +129,7 @@ export function PointOfSaleForm({
       phones: defaultPhones,
       emails: defaultEmails,
       managers: defaultManagers,
+      contacts: (initialData?.contacts as FormValues['contacts']) || [],
       status: (initialData?.status as 'active' | 'inactive') || 'active',
       type:
         (initialData?.type as 'physical' | 'online' | 'event') || 'physical',
@@ -143,6 +154,7 @@ export function PointOfSaleForm({
         phones: phones,
         emails: emails,
         managers: managers,
+        contacts: (initialData.contacts as FormValues['contacts']) || [],
         status: (initialData.status as 'active' | 'inactive') || 'active',
         type:
           (initialData.type as 'physical' | 'online' | 'event') || 'physical',
@@ -191,6 +203,7 @@ export function PointOfSaleForm({
         phones: data.phones.filter((p) => p.trim() !== ''),
         emails: data.emails.filter((e) => e.trim() !== ''),
         managers: data.managers.filter((m) => m.trim() !== ''),
+        contacts: data.contacts.filter((c) => c.name.trim() !== ''),
       };
 
       const url = initialData?._id

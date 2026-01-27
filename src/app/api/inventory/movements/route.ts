@@ -9,6 +9,7 @@ import InventoryMovement, {
 import InventoryItem from '@/models/InventoryItem';
 import Warehouse from '@/models/Warehouse';
 import Movement from '@/models/Movement';
+import Book from '@/models/Book';
 
 interface BodyWithItems {
   type: string;
@@ -93,18 +94,49 @@ function validateRules(type: string, source: WarehouseDoc, dest: WarehouseDoc) {
   return null;
 }
 
+// Helper: Get constituent books for a book (handling bundles)
+async function getConstituentBooks(bookId: string, quantity: number) {
+  const book = await Book.findById(bookId);
+  if (!book) throw new Error(`Libro no encontrado ID: ${bookId}`);
+
+  const constituents: Array<{ id: string; qty: number; title: string }> = [];
+  if (book.isBundle && book.bundleBooks && book.bundleBooks.length > 0) {
+    for (const volumeId of book.bundleBooks) {
+      constituents.push({
+        id: volumeId.toString(),
+        qty: quantity,
+        title: `Tomo de ${book.title}`,
+      });
+    }
+  } else {
+    constituents.push({ id: bookId, qty: quantity, title: book.title });
+  }
+  return constituents;
+}
+
 // Helper: Check Stock
 async function checkStock(
   fromId: string,
   items: Array<{ bookId: string; quantity: number }>
 ) {
   for (const item of items) {
-    const sourceItem = await InventoryItem.findOne({
-      warehouseId: fromId,
-      bookId: item.bookId,
-    });
-    if (!sourceItem || sourceItem.quantity < item.quantity) {
-      return `Stock insuficiente para el libro ID: ${item.bookId}`;
+    try {
+      const constituents = await getConstituentBooks(
+        item.bookId,
+        item.quantity
+      );
+      for (const part of constituents) {
+        const sourceItem = await InventoryItem.findOne({
+          warehouseId: fromId,
+          bookId: part.id,
+        });
+        if (!sourceItem || sourceItem.quantity < part.qty) {
+          return `Stock insuficiente para el libro: ${part.title}`;
+        }
+      }
+    } catch (e: unknown) {
+      const error = e as Error;
+      return error.message;
     }
   }
   return null;
@@ -135,29 +167,29 @@ async function updateInventory(
   items: Array<{ bookId: string; quantity: number }>
 ) {
   for (const item of items) {
-    if (fromId) {
-      await InventoryItem.updateOne(
-        { warehouseId: fromId, bookId: item.bookId },
-        { $inc: { quantity: -item.quantity } }
+    try {
+      const constituents = await getConstituentBooks(
+        item.bookId,
+        item.quantity
       );
-    }
-    if (toId) {
-      const exists = await InventoryItem.findOne({
-        warehouseId: toId,
-        bookId: item.bookId,
-      });
-      if (exists) {
-        await InventoryItem.updateOne(
-          { warehouseId: toId, bookId: item.bookId },
-          { $inc: { quantity: item.quantity } }
-        );
-      } else {
-        await InventoryItem.create({
-          warehouseId: toId,
-          bookId: item.bookId,
-          quantity: item.quantity,
-        });
+
+      for (const part of constituents) {
+        if (fromId) {
+          await InventoryItem.updateOne(
+            { warehouseId: fromId, bookId: part.id },
+            { $inc: { quantity: -part.qty } }
+          );
+        }
+        if (toId) {
+          await InventoryItem.updateOne(
+            { warehouseId: toId, bookId: part.id },
+            { $inc: { quantity: part.qty } },
+            { upsert: true }
+          );
+        }
       }
+    } catch (e) {
+      console.error('Error updating inventory for item:', e);
     }
   }
 }

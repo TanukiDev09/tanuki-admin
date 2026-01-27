@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/Button';
-import { FileText, ExternalLink, Eye } from 'lucide-react';
+import { FileText, ExternalLink, Eye, Trash2 } from 'lucide-react';
 import { generateMovementPDF } from '@/lib/inventory/pdfGenerator';
 import { EditorialSettings } from '@/types/settings';
 
@@ -70,18 +70,22 @@ interface Movement {
   invoiceRef?: string;
 }
 
-
 interface MovementsListProps {
   movements: Movement[];
   isLoading: boolean;
+  onRefresh?: () => void;
 }
 
 export function InventoryMovementsList({
   movements,
   isLoading,
+  onRefresh,
 }: MovementsListProps) {
   const router = useRouter();
-  const [editorialSettings, setEditorialSettings] = useState<EditorialSettings | undefined>(undefined);
+  const [editorialSettings, setEditorialSettings] = useState<
+    EditorialSettings | undefined
+  >(undefined);
+  const [isDeleting, setIsDeleting] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -97,6 +101,36 @@ export function InventoryMovementsList({
     };
     fetchSettings();
   }, []);
+
+  const handleDelete = async (id: string) => {
+    if (
+      !confirm(
+        '¿Estás seguro de eliminar este movimiento? El stock se revertirá automáticamente.'
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setIsDeleting(id);
+      const res = await fetch(`/api/inventory/movements/${id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        if (onRefresh) onRefresh();
+      } else {
+        alert(data.error || 'Error al eliminar el movimiento');
+      }
+    } catch (error) {
+      console.error('Error deleting movement:', error);
+      alert('Error en la conexión al eliminar el movimiento');
+    } finally {
+      setIsDeleting(null);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -175,7 +209,9 @@ export function InventoryMovementsList({
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => router.push(`/dashboard/inventory/${movement._id}`)}
+                  onClick={() =>
+                    router.push(`/dashboard/inventory/${movement._id}`)
+                  }
                   title="Ver Detalles"
                 >
                   <Eye className="inventory-movements-list__icon" />
@@ -207,19 +243,29 @@ export function InventoryMovementsList({
                         typeof movement.financialMovementId === 'object'
                           ? movement.financialMovementId?._id
                           : movement.financialMovementId;
-                      if (id) window.open(`/dashboard/movements/${id}`, '_blank');
+                      if (id)
+                        window.open(`/dashboard/movements/${id}`, '_blank');
                     }}
                     title="Ver Movimiento Financiero"
                   >
                     <ExternalLink className="inventory-movements-list__icon text-primary" />
                   </Button>
                 )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                  onClick={() => handleDelete(movement._id)}
+                  disabled={isDeleting === movement._id}
+                  title="Eliminar Movimiento"
+                >
+                  <Trash2 className="inventory-movements-list__icon" />
+                </Button>
               </TableCell>
-
             </TableRow>
           ))}
         </TableBody>
       </Table>
-    </div>
+    </div >
   );
 }

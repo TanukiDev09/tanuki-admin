@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/Select';
 import { Textarea } from '@/components/ui/Textarea';
 import { useToast } from '@/components/ui/Toast';
+import { ColorPicker } from '@/components/ui/ColorPicker';
 import './CategoryModal.scss';
 
 interface CreateCategoryModalProps {
@@ -39,6 +40,7 @@ export default function CreateCategoryModal({
     name: '',
     description: '',
     type: 'Ambos',
+    color: '#64748b',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,7 +66,12 @@ export default function CreateCategoryModal({
       });
       onSuccess();
       onClose();
-      setFormData({ name: '', description: '', type: 'Ambos' });
+      setFormData({
+        name: '',
+        description: '',
+        type: 'Ambos',
+        color: '#64748b',
+      });
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error('Error desconocido');
       toast({
@@ -113,6 +120,13 @@ export default function CreateCategoryModal({
                 <SelectItem value="Ambos">Ambos</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          <div className="category-modal__field-group">
+            <Label>Color de Categoría</Label>
+            <ColorPicker
+              value={formData.color}
+              onChange={(color) => setFormData({ ...formData, color })}
+            />
           </div>
           <div className="category-modal__field-group">
             <Label htmlFor="description">Descripción</Label>

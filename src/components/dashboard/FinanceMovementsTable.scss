@@ -1,0 +1,26 @@
+.finance-movements-table {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+
+  &__empty {
+    padding: 3rem;
+    background: var(--color-muted);
+    color: var(--color-muted-foreground);
+    text-align: center;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+  }
+
+  .text-success {
+    color: #10b981;
+    font-weight: 600;
+  }
+
+  .text-destructive {
+    color: #ef4444;
+    font-weight: 600;
+  }
+}

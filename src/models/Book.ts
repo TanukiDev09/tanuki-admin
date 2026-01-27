@@ -98,6 +98,14 @@ const BookSchema: Schema = new Schema(
       type: Boolean,
       default: true,
     },
+    isBundle: {
+      type: Boolean,
+      default: false,
+    },
+    bundleBooks: {
+      type: [{ type: Schema.Types.ObjectId, ref: 'Book' }],
+      default: [],
+    },
   },
   {
     timestamps: true, // Agrega createdAt y updatedAt automáticamente

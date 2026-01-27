@@ -133,7 +133,7 @@ export default function CostCenterSelect({
             }}
             disabled={loading}
           >
-            <SelectTrigger>
+            <SelectTrigger className="cost-center-select__trigger">
               <SelectValue placeholder="Sin asignar" />
             </SelectTrigger>
             <SelectContent>

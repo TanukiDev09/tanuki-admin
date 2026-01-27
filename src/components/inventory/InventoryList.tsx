@@ -16,6 +16,7 @@ import { History, Search } from 'lucide-react';
 import { formatCurrency, formatNumber } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
+import { getBookCoverAlt } from '@/lib/accessibility';
 import './InventoryList.scss';
 
 interface Book {
@@ -113,7 +114,7 @@ export function InventoryList({ data, onAdjust }: InventoryListProps) {
                               ? item.bookId.coverImage
                               : `/uploads/covers/${item.bookId.coverImage}`
                           }
-                          alt={item.bookId.title}
+                          alt={getBookCoverAlt(item.bookId.title)}
                           fill
                           className="inventory-list__cover-image"
                           onError={() =>

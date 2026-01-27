@@ -61,13 +61,30 @@ export async function GET(
           as: 'illustrators',
         },
       },
-      // Lookup inventory items
+      {
+        $lookup: {
+          from: 'books',
+          localField: 'bundleBooks',
+          foreignField: '_id',
+          as: 'bundleBooks',
+        },
+      },
+      // Lookup inventory items for the book itself
       {
         $lookup: {
           from: 'inventoryitems',
           localField: '_id',
           foreignField: 'bookId',
           as: 'inventoryItems',
+        },
+      },
+      // Lookup inventory items for ALL constituent volumes if it's a bundle
+      {
+        $lookup: {
+          from: 'inventoryitems',
+          localField: 'bundleBooks._id',
+          foreignField: 'bookId',
+          as: 'volumesInventory',
         },
       },
       // Lookup ALL active warehouses
@@ -86,7 +103,7 @@ export async function GET(
         $addFields: {
           inventoryDetails: {
             $map: {
-              input: '$allWarehouses',
+              input: { $ifNull: ['$allWarehouses', []] },
               as: 'warehouse',
               in: {
                 $let: {
@@ -111,10 +128,91 @@ export async function GET(
                     warehouseName: '$$warehouse.name',
                     warehouseCode: '$$warehouse.code',
                     warehouseType: '$$warehouse.type',
-                    quantity: { $ifNull: ['$$matchedItem.quantity', 0] },
-                    minStock: { $ifNull: ['$$matchedItem.minStock', 0] },
-                    maxStock: { $ifNull: ['$$matchedItem.maxStock', 0] },
-                    inventoryItemId: { $ifNull: ['$$matchedItem._id', null] },
+                    quantity: {
+                      $cond: {
+                        if: { $eq: ['$isBundle', true] },
+                        then: {
+                          $let: {
+                            vars: {
+                              warehouseVolumeStocks: {
+                                $map: {
+                                  input: { $ifNull: ['$bundleBooks', []] },
+                                  as: 'vol',
+                                  in: {
+                                    $let: {
+                                      vars: {
+                                        vItem: {
+                                          $arrayElemAt: [
+                                            {
+                                              $filter: {
+                                                input: '$volumesInventory',
+                                                as: 'vInv',
+                                                cond: {
+                                                  $and: [
+                                                    {
+                                                      $eq: [
+                                                        '$$vInv.warehouseId',
+                                                        '$$warehouse._id',
+                                                      ],
+                                                    },
+                                                    {
+                                                      $eq: [
+                                                        '$$vInv.bookId',
+                                                        '$$vol._id',
+                                                      ],
+                                                    },
+                                                  ],
+                                                },
+                                              },
+                                            },
+                                            0,
+                                          ],
+                                        },
+                                      },
+                                      in: { $ifNull: ['$$vItem.quantity', 0] },
+                                    },
+                                  },
+                                },
+                              },
+                            },
+                            in: {
+                              $cond: {
+                                if: {
+                                  $gt: [
+                                    { $size: '$$warehouseVolumeStocks' },
+                                    0,
+                                  ],
+                                },
+                                then: { $min: '$$warehouseVolumeStocks' },
+                                else: 0,
+                              },
+                            },
+                          },
+                        },
+                        else: { $ifNull: ['$$matchedItem.quantity', 0] },
+                      },
+                    },
+                    minStock: {
+                      $cond: {
+                        if: { $eq: ['$isBundle', true] },
+                        then: 0,
+                        else: { $ifNull: ['$$matchedItem.minStock', 0] },
+                      },
+                    },
+                    maxStock: {
+                      $cond: {
+                        if: { $eq: ['$isBundle', true] },
+                        then: 0,
+                        else: { $ifNull: ['$$matchedItem.maxStock', 0] },
+                      },
+                    },
+                    inventoryItemId: {
+                      $cond: {
+                        if: { $eq: ['$isBundle', true] },
+                        then: null,
+                        else: { $ifNull: ['$$matchedItem._id', null] },
+                      },
+                    },
                   },
                 },
               },
@@ -130,16 +228,32 @@ export async function GET(
       {
         $project: {
           inventoryItems: 0,
+          volumesInventory: 0,
           allWarehouses: 0,
         },
       },
     ]);
 
+    // Log the aggregation result length for debugging
     if (!bookResult || bookResult.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Libro no encontrado' },
-        { status: 404 }
-      );
+      // Fallback: Check if the book actually exists without aggregation
+      const book = await Book.findById(id)
+        .populate('authors illustrators translators')
+        .lean();
+
+      if (!book) {
+        return NextResponse.json(
+          { success: false, error: 'Libro no encontrado' },
+          { status: 404 }
+        );
+      }
+
+      const response = NextResponse.json({
+        success: true,
+        data: book,
+      });
+      response.headers.set('Cache-Control', 'no-store, no-cache');
+      return response;
     }
 
     const book = bookResult[0];

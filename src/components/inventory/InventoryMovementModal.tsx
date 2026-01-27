@@ -26,7 +26,6 @@ import { formatNumber } from '@/lib/utils';
 import { MovementSearchSelect } from '@/components/finance/MovementSearchSelect';
 import './InventoryMovementModal.scss';
 
-
 type MovementType = 'INGRESO' | 'REMISION' | 'DEVOLUCION' | 'LIQUIDACION';
 type SubType = 'INITIAL' | 'UNEXPECTED' | 'PURCHASE';
 
@@ -40,6 +39,7 @@ interface Book {
   _id: string;
   title: string;
   isbn: string;
+  isBundle?: boolean;
 }
 
 interface InventoryItem {
@@ -47,6 +47,7 @@ interface InventoryItem {
     _id: string;
     title: string;
     isbn: string;
+    isBundle?: boolean;
   };
   quantity: number;
 }
@@ -87,7 +88,6 @@ export function InventoryMovementModal({
   const [financialMovementId, setFinancialMovementId] = useState('');
   const [observations, setObservations] = useState('');
   const [items, setItems] = useState<SelectedItem[]>([]);
-
 
   // Data State
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
@@ -158,7 +158,6 @@ export function InventoryMovementModal({
     setItems([]);
   };
 
-
   const getSourceWarehouseId = () => {
     if (type === 'INGRESO') return null;
     if (type === 'REMISION' || type === 'DEVOLUCION' || type === 'LIQUIDACION')
@@ -222,6 +221,14 @@ export function InventoryMovementModal({
     }
 
     if (items.find((i) => i.bookId === bookId)) return;
+
+    // Defensive check
+    if (!bookId || !title) {
+      console.error('Invalid search result:', item);
+      toast({ title: 'Error al agregar', description: 'Datos del libro incompletos', variant: 'destructive' });
+      return;
+    }
+
     setItems([...items, { bookId, title, quantity: 1, maxQuantity: maxQty }]);
   };
 
@@ -234,6 +241,12 @@ export function InventoryMovementModal({
   const removeItem = (bookId: string) => {
     setItems(items.filter((i) => i.bookId !== bookId));
   };
+
+  const totalTitles = items.length;
+  const totalCopies = items.reduce(
+    (acc, current) => acc + (current.quantity || 0),
+    0
+  );
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -248,7 +261,6 @@ export function InventoryMovementModal({
         financialMovementId: financialMovementId || undefined,
         observations: observations || undefined,
       };
-
 
       const res = await fetch('/api/inventory/movements', {
         method: 'POST',
@@ -397,25 +409,26 @@ export function InventoryMovementModal({
         />
       </div>
 
-      {(type === 'LIQUIDACION' || (type === 'INGRESO' && subType === 'PURCHASE')) && (
-        <div className="inventory-movement-modal__field">
-          <Label>Vincular Movimiento Financiero (Opcional)</Label>
-          <MovementSearchSelect
-            value={financialMovementId}
-            onValueChange={setFinancialMovementId}
-            type={type === 'LIQUIDACION' ? 'INCOME' : 'EXPENSE'}
-            placeholder={
-              type === 'LIQUIDACION'
-                ? 'Buscar pago/ingreso...'
-                : 'Buscar factura/egreso...'
-            }
-          />
-          <p className="text-[10px] text-muted-foreground mt-1">
-            Permite relacionar este movimiento de inventario con su registro contable.
-          </p>
-        </div>
-      )}
-
+      {(type === 'LIQUIDACION' ||
+        (type === 'INGRESO' && subType === 'PURCHASE')) && (
+          <div className="inventory-movement-modal__field">
+            <Label>Vincular Movimiento Financiero (Opcional)</Label>
+            <MovementSearchSelect
+              value={financialMovementId}
+              onValueChange={setFinancialMovementId}
+              type={type === 'LIQUIDACION' ? 'INCOME' : 'EXPENSE'}
+              placeholder={
+                type === 'LIQUIDACION'
+                  ? 'Buscar pago/ingreso...'
+                  : 'Buscar factura/egreso...'
+              }
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Permite relacionar este movimiento de inventario con su registro
+              contable.
+            </p>
+          </div>
+        )}
 
       <div className="inventory-movement-modal__footer inventory-movement-modal__footer--end">
         <Button
@@ -482,10 +495,23 @@ export function InventoryMovementModal({
           const isAdded = items.some((i) => i.bookId === bookId);
 
           return (
-            <div key={bookId || index} className="inventory-movement-modal__item">
+            <div
+              key={bookId || index}
+              className="inventory-movement-modal__item"
+            >
               <div className="inventory-movement-modal__item-info">
                 <span className="inventory-movement-modal__item-title">
                   {title}
+                  {item && 'isBundle' in item && (item as Book).isBundle && (
+                    <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">
+                      Obra Completa
+                    </span>
+                  )}
+                  {item && 'bookId' in item && (item as InventoryItem).bookId.isBundle && (
+                    <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">
+                      Obra Completa
+                    </span>
+                  )}
                 </span>
                 {type !== 'INGRESO' && (
                   <span className="inventory-movement-modal__item-meta">
@@ -509,7 +535,27 @@ export function InventoryMovementModal({
       <Separator />
 
       <div className="inventory-movement-modal__selected-section">
-        <Label>Items Seleccionados ({formatNumber(items.length)})</Label>
+        <div className="inventory-movement-modal__selected-header">
+          <Label>Items Seleccionados ({formatNumber(totalTitles)})</Label>
+          <div className="inventory-movement-modal__summary">
+            <div className="inventory-movement-modal__summary-item">
+              <span className="inventory-movement-modal__summary-label">
+                Total Títulos:
+              </span>
+              <span className="inventory-movement-modal__summary-value">
+                {formatNumber(totalTitles)}
+              </span>
+            </div>
+            <div className="inventory-movement-modal__summary-item">
+              <span className="inventory-movement-modal__summary-label">
+                Total Ejemplares:
+              </span>
+              <span className="inventory-movement-modal__summary-value">
+                {formatNumber(totalCopies)}
+              </span>
+            </div>
+          </div>
+        </div>
         <div className="inventory-movement-modal__selected-list">
           {items.map((item) => (
             <div
