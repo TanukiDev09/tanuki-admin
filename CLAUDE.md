@@ -29,7 +29,12 @@ This document provides essential instructions for Claude and other AI assistants
 - **Components**: Group by domain in `src/components/` (e.g., `dashboard/`, `catalog/`, `ui/`).
 - **Models**: Unified Mongoose schemas in `src/models/`.
 - **Scripts**: Utility scripts are located in `scripts/` (reorganized by category: `db/`, `dev/`, `testing/`).
-- **Config**: Root config files are pointers to `config/` directory.
+- **Config**: Root config files are pointers to `@config/` directory.
+- **Logs**: Use `logs/` for temporary tool outputs, diagnostic reports, or audit results.
+- **Documentation**: 
+  - Root `README.md`: User-focused overview.
+  - Root `DEVELOPER.md`: Developer entry point and quick start.
+  - `docs/DEVELOPER.md`: Deep technical documentation and module details.
 
 ## ✅ Task Completion Definition
 

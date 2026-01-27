@@ -1,55 +1,50 @@
-# Tanuki Admin – Gestión Editorial Inteligente
+# 🐾 Tanuki Admin – Gestión Editorial Profesional
 
-**Tanuki Admin** es una plataforma integral diseñada para centralizar y optimizar la administración de editoriales y distribuidoras. Desde el control de inventario multialmacén hasta el seguimiento detallado de la salud financiera, Tanuki proporciona las herramientas necesarias para tomar decisiones informadas y escalar tu negocio editorial.
-
-## 🌟 Funciones Principales
-
-### 📈 Panel de Control (Dashboard)
-
-Visualiza en tiempo real la salud de tu empresa. Accede a indicadores clave (KPIs) de ingresos, gastos y rentabilidad acumulada. Gráficos interactivos te permiten analizar el rendimiento financiero histórico y proyectar el crecimiento de tu catálogo.
-
-### 📚 Gestión de Catálogo y Creadores
-
-Administra todo tu catálogo de libros de forma centralizada.
-
-- **Libros y Colecciones**: Control total de metadatos, ISBN, géneros y portadas.
-- **Directorio de Creadores**: Gestiona perfiles de autores, ilustradores y colaboradores.
-- **Categorización Avanzada**: Organiza tus títulos por categorías personalizadas para una mejor segmentación de mercado.
-
-### 💰 Inteligencia Financiera
-
-Toma el control total de tus flujos de caja.
-
-- **Movimientos**: Registro simplificado de ingresos y egresos.
-- **Convenios y Acuerdos**: Gestiona contratos y regalías con tus creadores de manera transparente.
-- **Centros de Costo**: Asigna cada operación financiera a unidades de negocio específicas para un análisis de rentabilidad preciso.
-
-### 📦 Inventario y Logística
-
-Optimiza la distribución y el stock de tus productos.
-
-- **Multi-Bodega**: Controla el inventario en múltiples almacenes físicos simultáneamente.
-- **Puntos de Venta (POS)**: Gestiona el stock asignado a tiendas propias o puntos de distribución externos.
-- **Auditoría de Stock**: Registro histórico de movimientos de inventario y ajustes de auditoría.
-
-### 🔐 Seguridad y Usuarios
-
-Protege tu información con un sistema de acceso basado en roles. Define exactamente qué puede ver y hacer cada miembro de tu equipo mediante una matriz de permisos granular.
+**Tanuki Admin** es la plataforma definitiva diseñada para transformar la administración de editoriales y distribuidoras. Hemos centralizado el control de inventario, la salud financiera y la gestión de catálogo en una interfaz intuitiva y potente, permitiéndote tomar decisiones estratégicas basadas en datos reales.
 
 ---
 
-## 🛠️ Acceso para Administradores
+## 🚀 ¿Qué puedes hacer con Tanuki Admin?
 
-Si eres el administrador del sistema o un desarrollador, puedes encontrar la documentación técnica en los siguientes enlaces:
+### 📊 Toma el Pulso de tu Negocio (Dashboard)
+Olvídate de las hojas de cálculo interminables. Nuestro panel de control te ofrece una visión inmediata de tus **Ingresos, Gastos y Rentabilidad**.
+- **Indicadores Clave**: Visualiza tu flujo de caja en tiempo real.
+- **Gráficos Dinámicos**: Analiza tendencias históricas y proyecta tu crecimiento con facilidad.
 
-- [**Manual de Usuario y Módulos**](./docs/README.md)
-- [**Registro de Funcionalidades (Features)**](./FEATURES.md)
-- [**Arquitectura del Sistema**](./ARCHITECTURE.md)
-- [**Guía para Desarrolladores**](./CLAUDE.md)
+### 📚 Control Total de tu Catálogo
+Gestiona todo tu ecosistema creativo desde un solo lugar.
+- **Biblioteca Centralizada**: Controla ISBNs, colecciones y metadatos de tus libros.
+- **Ecosistema de Creadores**: Mantén un directorio detallado de autores, ilustradores y colaboradores.
+- **Organización Inteligente**: Clasifica tu catálogo para una segmentación de mercado impecable.
+
+### 💰 Inteligencia Financiera sin Complicaciones
+Toma el control absoluto de tus finanzas con herramientas diseñadas para el sector editorial.
+- **Gestión de Movimientos**: Registra cada operación de entrada y salida de forma sencilla.
+- **Acuerdos y Regalías**: Gestiona contratos y compromisos financieros con transparencia total.
+- **Centros de Costo**: Identifica qué unidades de negocio son las más rentables.
+
+### 📦 Inventario y Logística Multicanal
+Optimiza tu stock y llega a más puntos de venta sin perder el control.
+- **Multialmacén**: Supervisa el stock en diferentes bodegas físicas simultáneamente.
+- **Gestión de Puntos de Venta (POS)**: Controla el inventario asignado a librerías y puntos de distribución.
+- **Auditoría Permanente**: Historial completo de movimientos para un inventario siempre preciso.
+
+### 🔐 Seguridad y Permisos Granulares
+Tu información es valiosa. Define roles específicos para tu equipo y asegúrate de que cada persona tenga acceso exacto a lo que necesita.
 
 ---
 
-**Versión**: 1.0.0 (Lanzamiento Inicial)  
-**Licencia**: © 2026 Tanuki SAS. Todos los derechos reservados.  
+## 📖 Centro de Recursos
+
+Para obtener más información sobre el funcionamiento detallado del sistema, consulta nuestra documentación:
+
+- [**📘 Guía del Desarrollador**](./DEVELOPER.md) – Configuración, arquitectura y estándares para contribuir.
+- [**✨ Listado de Funcionalidades**](./docs/FEATURES.md) – Detalle de todas las herramientas disponibles.
+- [**🏗️ Arquitectura del Sistema**](./docs/ARCHITECTURE.md) – Para administradores y soporte técnico.
+- [**📑 Índice de Documentación**](./docs/INDICE_DOCS.md) – Acceso a guías de migración, diseño y más.
+
+---
+
+**Versión**: 1.0.2 (Optimización de Estructura)  
+**© 2026 Tanuki SAS.** Todos los derechos reservados.  
 **Soporte**: Equipo de Desarrollo Tanuki Admin  
-**Fecha**: Enero 2026
