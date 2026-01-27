@@ -47,6 +47,7 @@ interface InventoryItem {
     _id: string;
     title: string;
     isbn: string;
+    isBundle?: boolean;
   };
   quantity: number;
 }

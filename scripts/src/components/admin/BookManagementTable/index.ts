@@ -1,1 +1,0 @@
-export { BookManagementTable } from './BookManagementTable';

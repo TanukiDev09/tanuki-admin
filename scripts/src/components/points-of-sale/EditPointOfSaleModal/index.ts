@@ -1,1 +1,0 @@
-export { EditPointOfSaleModal } from './EditPointOfSaleModal';

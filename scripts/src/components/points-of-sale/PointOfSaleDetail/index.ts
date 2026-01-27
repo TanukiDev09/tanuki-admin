@@ -1,1 +1,0 @@
-export { PointOfSaleDetail } from './PointOfSaleDetail';

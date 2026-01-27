@@ -1,1 +1,0 @@
-export { InventoryMatrixTable } from './InventoryMatrixTable';

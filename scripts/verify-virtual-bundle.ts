@@ -69,14 +69,21 @@ async function verifyVirtualBundle() {
     await InventoryItem.create({ warehouseId, bookId: vol2._id, quantity: 5 });
 
     // 3. Verify Bundle Stock (Dynamic Calculation)
-    const calculateBundleStock = async (bId: any, wId: any) => {
-      const b: any = await Book.findById(bId).populate('bundleBooks');
+    const calculateBundleStock = async (
+      bId: mongoose.Types.ObjectId,
+      wId: mongoose.Types.ObjectId
+    ) => {
+      const b = await Book.findById(bId).populate('bundleBooks');
+      if (!b) return 0;
+      const bundleBooks = (b.bundleBooks || []) as unknown as {
+        _id: mongoose.Types.ObjectId;
+      }[];
       const invItems = await InventoryItem.find({
         warehouseId: wId,
-        bookId: { $in: b.bundleBooks.map((v: any) => v._id) },
+        bookId: { $in: bundleBooks.map((v) => v._id) },
       });
       const minStock = Math.min(
-        ...b.bundleBooks.map((v: any) => {
+        ...bundleBooks.map((v) => {
           const item = invItems.find(
             (i) => i.bookId.toString() === v._id.toString()
           );

@@ -62,6 +62,122 @@ export async function GET(
   }
 }
 
+/**
+ * Reverse stock in source warehouse
+ */
+async function reverseSourceStock(
+  warehouseId: string,
+  bookId: string,
+  qty: number,
+  session: mongoose.ClientSession
+) {
+  await InventoryItem.updateOne(
+    { warehouseId, bookId },
+    { $inc: { quantity: qty } },
+    { session, upsert: true }
+  );
+}
+
+/**
+ * Reverse stock in destination warehouse
+ */
+async function reverseDestStock(
+  warehouseId: string,
+  bookId: string,
+  qty: number,
+  bookTitle: string,
+  session: mongoose.ClientSession
+) {
+  const destItem = await InventoryItem.findOne({
+    warehouseId,
+    bookId,
+  }).session(session);
+
+  if (!destItem || destItem.quantity < qty) {
+    throw new Error(
+      `Stock insuficiente en destino para revertir el libro: ${bookTitle}`
+    );
+  }
+
+  await InventoryItem.updateOne(
+    { warehouseId, bookId },
+    { $inc: { quantity: -qty } },
+    { session }
+  );
+}
+
+/**
+ * Helper to reverse stock changes for a single item in a movement
+ */
+async function reverseStockForItem(
+  item: { bookId: string | mongoose.Types.ObjectId; quantity: number },
+  movement: { fromWarehouseId?: string; toWarehouseId?: string },
+  session: mongoose.ClientSession
+) {
+  const book = await Book.findById(item.bookId).session(session);
+  if (!book) return;
+
+  const booksToUpdate: Array<{ id: string; qty: number }> = [];
+  if (book.isBundle && book.bundleBooks && book.bundleBooks.length > 0) {
+    for (const volumeId of book.bundleBooks) {
+      booksToUpdate.push({ id: volumeId.toString(), qty: item.quantity });
+    }
+  } else {
+    booksToUpdate.push({ id: item.bookId.toString(), qty: item.quantity });
+  }
+
+  const bookName = book.isBundle ? `Tomos de ${book.title}` : book.title;
+
+  for (const update of booksToUpdate) {
+    if (movement.fromWarehouseId) {
+      await reverseSourceStock(
+        movement.fromWarehouseId.toString(),
+        update.id,
+        update.qty,
+        session
+      );
+    }
+
+    if (movement.toWarehouseId) {
+      await reverseDestStock(
+        movement.toWarehouseId.toString(),
+        update.id,
+        update.qty,
+        bookName,
+        session
+      );
+    }
+  }
+}
+
+/**
+ * Helper to perform the deletion and reversal within a session
+ */
+async function performDelete(id: string, session: mongoose.ClientSession) {
+  const movement = await InventoryMovement.findById(id).session(session);
+  if (!movement) {
+    return { success: false, error: 'Movimiento no encontrado', code: 404 };
+  }
+
+  // Reverse Inventory changes
+  for (const item of movement.items) {
+    await reverseStockForItem(item, movement, session);
+  }
+
+  // Unlink financial movement instead of deleting it
+  if (movement.financialMovementId) {
+    await Movement.findByIdAndUpdate(
+      movement.financialMovementId,
+      { inventoryMovementId: null },
+      { session }
+    );
+  }
+
+  // Delete the inventory movement
+  await InventoryMovement.findByIdAndDelete(id, { session });
+  return { success: true };
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -80,96 +196,29 @@ export async function DELETE(
     await dbConnect();
     const { id } = await params;
 
-    const movement = await InventoryMovement.findById(id).session(session);
-    if (!movement) {
+    const result = await performDelete(id, session);
+    if (!result.success) {
       await session.abortTransaction();
       return NextResponse.json(
-        { success: false, error: 'Movimiento no encontrado' },
-        { status: 404 }
+        { success: false, error: result.error },
+        { status: result.code || 400 }
       );
     }
-
-    // Reverse Inventory changes
-    for (const item of movement.items) {
-      const book = await Book.findById(item.bookId).session(session);
-      if (!book) continue;
-
-      const booksToUpdate = [];
-      if (book.isBundle && book.bundleBooks && book.bundleBooks.length > 0) {
-        for (const volumeId of book.bundleBooks) {
-          booksToUpdate.push({ id: volumeId.toString(), qty: item.quantity });
-        }
-      } else {
-        booksToUpdate.push({ id: item.bookId.toString(), qty: item.quantity });
-      }
-
-      for (const update of booksToUpdate) {
-        // Reverse source warehouse (was decreased, now increase)
-        if (movement.fromWarehouseId) {
-          await InventoryItem.updateOne(
-            { warehouseId: movement.fromWarehouseId, bookId: update.id },
-            { $inc: { quantity: update.qty } },
-            { session, upsert: true } // Use upsert in case record was deleted
-          );
-        }
-
-        // Reverse destination warehouse (was increased, now decrease)
-        if (movement.toWarehouseId) {
-          // Check if we have enough stock to decrease
-          const destItem = await InventoryItem.findOne({
-            warehouseId: movement.toWarehouseId,
-            bookId: update.id,
-          }).session(session);
-
-          if (!destItem || destItem.quantity < update.qty) {
-            const bookName = book.isBundle
-              ? `Tomos de ${book.title}`
-              : book.title;
-            await session.abortTransaction();
-            return NextResponse.json(
-              {
-                success: false,
-                error: `Stock insuficiente en destino para revertir el libro: ${bookName}`,
-              },
-              { status: 400 }
-            );
-          }
-
-          await InventoryItem.updateOne(
-            { warehouseId: movement.toWarehouseId, bookId: update.id },
-            { $inc: { quantity: -update.qty } },
-            { session }
-          );
-        }
-      }
-    }
-
-    // Unlink financial movement instead of deleting it
-    if (movement.financialMovementId) {
-      await Movement.findByIdAndUpdate(
-        movement.financialMovementId,
-        {
-          inventoryMovementId: null,
-        },
-        { session }
-      );
-    }
-
-    // Delete the inventory movement
-    await InventoryMovement.findByIdAndDelete(id, { session });
 
     await session.commitTransaction();
     return NextResponse.json({
       success: true,
       message: 'Movimiento eliminado y stock revertido',
     });
-  } catch (error) {
-    if (session.inTransaction()) {
-      await session.abortTransaction();
-    }
-    console.error('Error deleting inventory movement:', error);
+  } catch (error: unknown) {
+    if (session.inTransaction()) await session.abortTransaction();
+    const e = error as Error;
+    console.error('Error deleting inventory movement:', e);
     return NextResponse.json(
-      { success: false, error: 'Error al eliminar el movimiento' },
+      {
+        success: false,
+        error: e.message || 'Error al eliminar el movimiento',
+      },
       { status: 500 }
     );
   } finally {

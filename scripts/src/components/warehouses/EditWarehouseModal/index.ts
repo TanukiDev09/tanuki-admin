@@ -1,1 +1,0 @@
-export { EditWarehouseModal } from './EditWarehouseModal';

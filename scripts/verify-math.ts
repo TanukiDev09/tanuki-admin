@@ -21,7 +21,7 @@ const testCases = [
 console.log('Running math utility tests...');
 let passed = 0;
 for (const tc of testCases) {
-  const result = toNumber(tc.input as any);
+  const result = toNumber(tc.input as unknown);
   if (result === tc.expected) {
     console.log(`✅ [PASS] ${tc.name}`);
     passed++;

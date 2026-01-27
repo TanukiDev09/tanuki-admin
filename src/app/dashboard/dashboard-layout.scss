@@ -11,13 +11,13 @@
     flex: 1;
     flex-direction: column;
     overflow: hidden;
-    height: 100%; // Ensure it fills the parent
+    height: 100%;
+    position: relative;
   }
 
   &__main {
     flex: 1;
     padding: $spacing-md;
-    padding-bottom: calc(64px + env(safe-area-inset-bottom, #{$spacing-md}));
     background-color: $background;
     overflow-y: auto;
 

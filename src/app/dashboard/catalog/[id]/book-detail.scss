@@ -295,6 +295,7 @@
     background-color: rgba($muted, 0.3);
     border-radius: $radius-md;
     text-decoration: none;
+
     @include transition(background-color);
 
     &:hover {

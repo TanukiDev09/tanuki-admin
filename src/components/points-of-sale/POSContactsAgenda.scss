@@ -8,6 +8,7 @@
 
   &__header {
     @include flex-between;
+
     margin-bottom: $spacing-md;
   }
 
@@ -74,6 +75,7 @@
 
   &__card-header {
     @include flex-between;
+
     align-items: flex-start;
     margin-bottom: $spacing-md;
     gap: $spacing-sm;

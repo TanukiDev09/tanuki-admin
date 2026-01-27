@@ -5,34 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.2] - 2026-01-21
+## [1.0.2] - 2026-01-27
 
 ### ✨ Nuevas Características
 
-- **Visualización Financiera Flexible**:
-  - **Toggle Ingresos/Gastos**: Nueva funcionalidad para alternar entre la visualización de repartición de ingresos y gastos en las gráficas de categorías y centros de costo.
-  - **Identificación de Categorías**: Resolución inteligente de IDs de categorías, mostrando nombres legibles o referencias cortas en lugar de hashes largos.
-- **Precisión de Datos**:
-  - **Filtro UTC Estricto**: Corrección en los límites de fechas para evitar la "contaminación" de reportes con movimientos de años adyacentes debido a diferencias horarias.
+- **Inteligencia Financiera & Control**:
+  - **Visualización Flexible**: Toggle para alternar entre ingresos y gastos en gráficas de categorías y centros de costo.
+  - **Control de Saldo Mensual**: Seguimiento de Saldo Mes Anterior y Nuevo Saldo proyectado.
+  - **Gestión Documental**: Sistema de carga de facturas (PDF/Imágenes) integrado con Vercel Blob.
+  - **Totalizador en Tiempo Real**: Resumen dinámico de títulos y ejemplares en modales de movimiento.
+- **Inventario Avanzado**:
+  - **Segmentación por Bodega**: Visualización discriminada de stock entre Bodega Editorial y puntos de venta externos.
+  - **Resolución de Identidades**: Sustitución de hashes técnicos por nombres de categorías y libros legibles en todo el sistema.
+
+### 🚀 Mejoras & UX
+
+- **Experiencia Visual Premium**:
+  - **Flujo de Caja Rediseñado**: Nueva gráfica de saldo acumulado con gradientes, Tooltips interactivos y escala optimizada.
+  - **Navegación Lógica**: Reorganización total de Sidebar y Mobile Nav bajo un flujo consistente: Catálogo → Logística → Finanzas → Administración.
+  - **Interfaz "Spreadsheet"**: Tabla de ítems con anchos fijos y resaltado minimalista para eliminar ruido visual.
+- **Refinamiento de Interfaz**:
+  - **Estandarización de Iconografía**: Sincronización completa de iconos Lucide en todos los módulos.
+  - **Legibilidad de Divisas**: Formateo mejorado de montos secundarios para evitar recortes en dispositivos móviles.
+  - **Simplificación Estética**: Optimización de StatCards y eliminación de efectos distractores para un enfoque profesional en los datos.
 
 ### 🛠️ Calidad Técnica
 
-- **Mantenimiento de Código**:
-  - **Refactorización Mayor**: Desacople del dashboard financiero en componentes dedicados (`GlobalView`, `MonthlyView`, `AnnualView`) para mejorar la mantenibilidad.
-  - **Complejidad Cognitiva**: Optimización de rutas de API y componentes de React para cumplir con estándares estrictos de complejidad.
-  - **Linting Riguroso**: Corrección total de errores de TypeScript, Stylelint y ESLint, eliminando tipos `any` implícitos y corrigiendo variantes de componentes.
+- **Robustez de Datos & Precisión**:
+  - **Aritmética de Alta Precisión**: Migración a `big.js` y `Decimal128` (MongoDB) para eliminar errores de redondeo financiero.
+  - **Normalización de Capas**: Implementación de una capa intermedia en el API para estandarizar tipos de base de datos a constantes de frontend.
+  - **Filtros Estrictos**: Aplicación de límites UTC para evitar contaminación de datos por zonas horarias.
+- **Estándares de Desarrollo**:
+  - **Zero Lint Policy**: Resolución del 100% de advertencias, logrando un codebase con 0 errores de ESLint, Stylelint y TypeScript.
+  - **Arquitectura Limpia**: Límite estricto de 700 líneas por componente `.tsx` y desacople del dashboard en sub-vistas especializadas.
+  - **Accesibilidad WCAG AAA**: Cumplimiento del estándar 1.4.9 (Imágenes de texto) y automatización de 210 pruebas de a11y.
 
 ### 🐛 Correcciones
 
-- Arreglado bug donde los nombres de categorías no se mostraban en reportes antiguos (Enero 2019).
-- Corregida la comparación de tipos en la tabla de movimientos financieros.
-- Ajustados estilos SCSS para cumplir con el orden de propiedades estándar.
+- **Estabilidad**: Corregida regresión crítica `toFixed` en detalles de libro y errores 500 en el API de resumen.
+- **Lógica Financiera**: Arreglado error en cálculos históricos de saldo inicial y visualización de categorías de 2019.
+- **Inventario**: Resuelto bug en la búsqueda de bodegas que ignoraba términos de filtrado y sincronización de stock de libros inactivos.
+- **Build & Estilos**: Corrección de fallos en el despliegue de Vercel (Recharts type errors) y errores de compilación SCSS por variables/mixins inexistentes.
 
 ---
 
 ## [1.0.1] - 2026-01-21
 
-### ✨ Nuevas Características
+### ✨ Nuevas Características (1.0.1)
 
 - **Gestión Financiera Avanzada**:
   - **Multiniveles de Costos**: Asignación de un movimiento a múltiples centros de costo con validación de sumas en tiempo real.
@@ -52,7 +71,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Radix UI**: Estandarización de todos los selectores y modales para mayor accesibilidad y consistencia.
 - **Reportes PDF Profesionales**: Diseño en escala de grises, formato carta, conteo de ejemplares y firmas dinámicas.
 
-### 🛠️ Calidad Técnica
+### 🛠️ Calidad Técnica (1.0.1)
 
 - **Estabilidad y Seguridad**:
   - **Type Safety**: Cobertura total de TypeScript (Zero `any`).
@@ -60,7 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Accesibilidad**: Cumplimiento WCAG AAA en contrastes y navegación.
 - **Optimización**: Reducción de complejidad cognitiva en controladores API y componentes clave.
 
-### 🐛 Correcciones
+### 🐛 Correcciones (1.0.1)
 
 - Solucionado error de persistencia de montos (`Decimal128`) en edición.
 - Corregidos errores de hidratación en `layout.tsx`.
