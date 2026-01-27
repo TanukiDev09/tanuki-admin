@@ -5,7 +5,15 @@ import dbConnect from '@/lib/mongodb';
 import * as mongoose from 'mongoose';
 import Movement from '@/models/Movement';
 import InventoryMovement from '@/models/InventoryMovement';
-import { add, multiply, divide, compare, toNumber, gtZero } from '@/lib/math';
+import {
+  add,
+  multiply,
+  divide,
+  compare,
+  toNumber,
+  gtZero,
+  DecimalValue,
+} from '@/lib/math';
 
 export const dynamic = 'force-dynamic';
 
@@ -497,9 +505,9 @@ function formatSingleMovement(
     ...obj,
     amount: toNumber(movement.amount),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    amountInCOP: toNumber(movement.amountInCOP as any),
+    amountInCOP: toNumber(movement.amountInCOP as DecimalValue),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    exchangeRate: toNumber(movement.exchangeRate as any),
+    exchangeRate: toNumber(movement.exchangeRate as DecimalValue),
     unit: movement.unit as string | undefined,
     quantity: movement.quantity ? toNumber(movement.quantity) : undefined,
     unitValue: movement.unitValue ? toNumber(movement.unitValue) : undefined,

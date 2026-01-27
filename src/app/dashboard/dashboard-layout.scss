@@ -17,6 +17,7 @@
   &__main {
     flex: 1;
     padding: $spacing-md;
+    padding-bottom: calc(64px + env(safe-area-inset-bottom, #{$spacing-md}));
     background-color: $background;
     overflow-y: auto;
 

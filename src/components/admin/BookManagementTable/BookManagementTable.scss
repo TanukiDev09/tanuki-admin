@@ -112,6 +112,22 @@
     max-width: 250px;
   }
 
+  &__title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    flex-wrap: wrap;
+  }
+
+  &__bundle-badge {
+    pointer-events: none;
+    font-size: 10px;
+    height: 18px;
+    padding: 0 6px;
+    background-color: rgba($secondary, 0.1);
+    color: $secondary-foreground;
+  }
+
   &__title-link {
     color: $foreground;
     font-size: $font-size-sm;
@@ -157,6 +173,28 @@
     &--out-of-stock {
       color: $destructive;
     }
+
+    &--bundle {
+      color: $primary;
+      font-style: italic;
+      cursor: help;
+      text-decoration: underline dotted;
+    }
+  }
+
+  &__virtual-indicator {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    background-color: rgba($primary, 0.1);
+    color: $primary;
+    border-radius: 4px;
+    font-size: 10px;
+    font-style: normal;
+    margin-left: 4px;
+    font-weight: $font-weight-bold;
   }
 
   &__actions-head {

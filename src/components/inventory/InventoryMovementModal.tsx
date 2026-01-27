@@ -39,6 +39,7 @@ interface Book {
   _id: string;
   title: string;
   isbn: string;
+  isBundle?: boolean;
 }
 
 interface InventoryItem {
@@ -219,6 +220,14 @@ export function InventoryMovementModal({
     }
 
     if (items.find((i) => i.bookId === bookId)) return;
+
+    // Defensive check
+    if (!bookId || !title) {
+      console.error('Invalid search result:', item);
+      toast({ title: 'Error al agregar', description: 'Datos del libro incompletos', variant: 'destructive' });
+      return;
+    }
+
     setItems([...items, { bookId, title, quantity: 1, maxQuantity: maxQty }]);
   };
 
@@ -318,15 +327,15 @@ export function InventoryMovementModal({
           <SelectContent>
             {(activeWarehouseType === 'editorial' ||
               activeWarehouseType === 'general') && (
-              <>
-                <SelectItem value="INGRESO">
-                  Ingreso (Compras / Ajuste)
-                </SelectItem>
-                <SelectItem value="REMISION">
-                  Remisión (A Punto de Venta)
-                </SelectItem>
-              </>
-            )}
+                <>
+                  <SelectItem value="INGRESO">
+                    Ingreso (Compras / Ajuste)
+                  </SelectItem>
+                  <SelectItem value="REMISION">
+                    Remisión (A Punto de Venta)
+                  </SelectItem>
+                </>
+              )}
             <SelectItem value="LIQUIDACION">Liquidación (Venta)</SelectItem>
             {activeWarehouseType === 'pos' && (
               <SelectItem value="DEVOLUCION">
@@ -401,24 +410,24 @@ export function InventoryMovementModal({
 
       {(type === 'LIQUIDACION' ||
         (type === 'INGRESO' && subType === 'PURCHASE')) && (
-        <div className="inventory-movement-modal__field">
-          <Label>Vincular Movimiento Financiero (Opcional)</Label>
-          <MovementSearchSelect
-            value={financialMovementId}
-            onValueChange={setFinancialMovementId}
-            type={type === 'LIQUIDACION' ? 'INCOME' : 'EXPENSE'}
-            placeholder={
-              type === 'LIQUIDACION'
-                ? 'Buscar pago/ingreso...'
-                : 'Buscar factura/egreso...'
-            }
-          />
-          <p className="text-[10px] text-muted-foreground mt-1">
-            Permite relacionar este movimiento de inventario con su registro
-            contable.
-          </p>
-        </div>
-      )}
+          <div className="inventory-movement-modal__field">
+            <Label>Vincular Movimiento Financiero (Opcional)</Label>
+            <MovementSearchSelect
+              value={financialMovementId}
+              onValueChange={setFinancialMovementId}
+              type={type === 'LIQUIDACION' ? 'INCOME' : 'EXPENSE'}
+              placeholder={
+                type === 'LIQUIDACION'
+                  ? 'Buscar pago/ingreso...'
+                  : 'Buscar factura/egreso...'
+              }
+            />
+            <p className="text-[10px] text-muted-foreground mt-1">
+              Permite relacionar este movimiento de inventario con su registro
+              contable.
+            </p>
+          </div>
+        )}
 
       <div className="inventory-movement-modal__footer inventory-movement-modal__footer--end">
         <Button
@@ -492,6 +501,16 @@ export function InventoryMovementModal({
               <div className="inventory-movement-modal__item-info">
                 <span className="inventory-movement-modal__item-title">
                   {title}
+                  {item && 'isBundle' in item && (item as Book).isBundle && (
+                    <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">
+                      Obra Completa
+                    </span>
+                  )}
+                  {item && 'bookId' in item && (item as InventoryItem).bookId.isBundle && (
+                    <span className="ml-2 text-[10px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-medium">
+                      Obra Completa
+                    </span>
+                  )}
                 </span>
                 {type !== 'INGRESO' && (
                   <span className="inventory-movement-modal__item-meta">

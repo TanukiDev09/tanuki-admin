@@ -5,7 +5,15 @@ import dbConnect from '@/lib/mongodb';
 import * as mongoose from 'mongoose';
 import Movement from '@/models/Movement';
 import InventoryMovement from '@/models/InventoryMovement';
-import { add, multiply, divide, compare, toNumber, gtZero } from '@/lib/math';
+import {
+  add,
+  multiply,
+  divide,
+  compare,
+  toNumber,
+  gtZero,
+  DecimalValue,
+} from '@/lib/math';
 
 export async function GET(
   request: NextRequest,
@@ -41,6 +49,12 @@ export async function GET(
       ...movement,
       type: normalizedType,
       amount: toNumber(movement.amount),
+      amountInCOP: movement.amountInCOP
+        ? toNumber(movement.amountInCOP)
+        : undefined,
+      exchangeRate: movement.exchangeRate
+        ? toNumber(movement.exchangeRate)
+        : undefined,
       quantity: movement.quantity ? toNumber(movement.quantity) : undefined,
       unitValue: movement.unitValue ? toNumber(movement.unitValue) : undefined,
       allocations: (movement.allocations as Allocation[])?.map((a) => ({
@@ -160,6 +174,12 @@ function formatMovement(
   return {
     ...obj,
     amount: toNumber(movement.amount),
+    amountInCOP: movement.amountInCOP
+      ? toNumber(movement.amountInCOP as DecimalValue)
+      : undefined,
+    exchangeRate: movement.exchangeRate
+      ? toNumber(movement.exchangeRate as DecimalValue)
+      : undefined,
     unit: movement.unit as string | undefined,
     quantity: movement.quantity ? toNumber(movement.quantity) : undefined,
     unitValue: movement.unitValue ? toNumber(movement.unitValue) : undefined,

@@ -3,13 +3,19 @@
 
 .mobile-nav {
   display: block;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
   width: 100%;
-  padding-bottom: env(safe-area-inset-bottom); // Support for notched iPhones
+  padding-bottom: env(safe-area-inset-bottom, $spacing-sm);
   background-color: $background;
-  border-top: 1px solid rgba($border, 0.5);
+  border-top: 1px solid rgba($border, 0.8);
+  box-shadow: 0 -4px 12px -2px rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
 
   @include respond-to('lg') {
-    display: none; // Hide on desktop
+    display: none;
   }
 }

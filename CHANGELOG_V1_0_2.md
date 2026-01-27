@@ -213,4 +213,17 @@ Esta versión se enfoca en el fortalecimiento de la calidad del código, la mant
 
 ---
 
+### 🧮 Sesión: Precisión en Detalles Financieros & Robustez de Datos
+
+**Fecha:** 2026-01-26
+
+#### 🛠️ Correcciones & Calidad Técnica
+
+- **Capa de Robustez Matemática**:
+  - Actualización de la utilidad `toNumber` para manejar el formato nativo `Decimal128` de MongoDB (`$numberDecimal`).
+  - Resolución de bug crítico en los detalles de movimientos financieros donde el monto aparecía como cero en el frontend debido a una conversión de tipos incompleta en el API.
+  - Sincronización de formatos entre las acciones de consulta (`GET`) y actualización (`PUT`) para garantizar la persistencia de datos normalizados.
+
+---
+
 _Nota: Esta versión asegura una base sólida y estandarizada para el crecimiento futuro de Tanuki Admin._

@@ -93,7 +93,11 @@ export default function InventoryPage() {
 
         <div className="inventory-page__section">
           <h2 className="inventory-page__section-title">Últimos Movimientos</h2>
-          <InventoryMovementsList movements={movements} isLoading={loading} />
+          <InventoryMovementsList
+            movements={movements}
+            isLoading={loading}
+            onRefresh={fetchData}
+          />
         </div>
       </div>
 

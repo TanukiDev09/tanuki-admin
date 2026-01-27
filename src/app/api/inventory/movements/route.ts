@@ -9,6 +9,7 @@ import InventoryMovement, {
 import InventoryItem from '@/models/InventoryItem';
 import Warehouse from '@/models/Warehouse';
 import Movement from '@/models/Movement';
+import Book from '@/models/Book';
 
 interface BodyWithItems {
   type: string;
@@ -99,12 +100,30 @@ async function checkStock(
   items: Array<{ bookId: string; quantity: number }>
 ) {
   for (const item of items) {
-    const sourceItem = await InventoryItem.findOne({
-      warehouseId: fromId,
-      bookId: item.bookId,
-    });
-    if (!sourceItem || sourceItem.quantity < item.quantity) {
-      return `Stock insuficiente para el libro ID: ${item.bookId}`;
+    const book = await Book.findById(item.bookId);
+    if (!book) return `Libro no encontrado ID: ${item.bookId}`;
+
+    if (book.isBundle && book.bundleBooks && book.bundleBooks.length > 0) {
+      // Check stock for each volume in the bundle
+      for (const volumeId of book.bundleBooks) {
+        const sourceItem = await InventoryItem.findOne({
+          warehouseId: fromId,
+          bookId: volumeId,
+        });
+        const requiredQty = item.quantity; // 1 per bundle * bundle quantity
+        if (!sourceItem || sourceItem.quantity < requiredQty) {
+          return `Stock insuficiente para el tomo del bundle. Tomo ID: ${volumeId}`;
+        }
+      }
+    } else {
+      // Normal book
+      const sourceItem = await InventoryItem.findOne({
+        warehouseId: fromId,
+        bookId: item.bookId,
+      });
+      if (!sourceItem || sourceItem.quantity < item.quantity) {
+        return `Stock insuficiente para el libro: ${book.title}`;
+      }
     }
   }
   return null;
@@ -135,28 +154,45 @@ async function updateInventory(
   items: Array<{ bookId: string; quantity: number }>
 ) {
   for (const item of items) {
-    if (fromId) {
-      await InventoryItem.updateOne(
-        { warehouseId: fromId, bookId: item.bookId },
-        { $inc: { quantity: -item.quantity } }
-      );
+    const book = await Book.findById(item.bookId);
+    if (!book) continue;
+
+    const booksToUpdate = [];
+
+    if (book.isBundle && book.bundleBooks && book.bundleBooks.length > 0) {
+      // For bundles, we ONLY update the constituent volumes
+      for (const volumeId of book.bundleBooks) {
+        booksToUpdate.push({ id: volumeId.toString(), qty: item.quantity });
+      }
+    } else {
+      // For normal books, we update the book itself
+      booksToUpdate.push({ id: item.bookId, qty: item.quantity });
     }
-    if (toId) {
-      const exists = await InventoryItem.findOne({
-        warehouseId: toId,
-        bookId: item.bookId,
-      });
-      if (exists) {
+
+    for (const update of booksToUpdate) {
+      if (fromId) {
         await InventoryItem.updateOne(
-          { warehouseId: toId, bookId: item.bookId },
-          { $inc: { quantity: item.quantity } }
+          { warehouseId: fromId, bookId: update.id },
+          { $inc: { quantity: -update.qty } }
         );
-      } else {
-        await InventoryItem.create({
+      }
+      if (toId) {
+        const exists = await InventoryItem.findOne({
           warehouseId: toId,
-          bookId: item.bookId,
-          quantity: item.quantity,
+          bookId: update.id,
         });
+        if (exists) {
+          await InventoryItem.updateOne(
+            { warehouseId: toId, bookId: update.id },
+            { $inc: { quantity: update.qty } }
+          );
+        } else {
+          await InventoryItem.create({
+            warehouseId: toId,
+            bookId: update.id,
+            quantity: update.qty,
+          });
+        }
       }
     }
   }

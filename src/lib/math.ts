@@ -19,10 +19,17 @@ const toBig = (val: DecimalValue): Big => {
   if (val === undefined || val === null || val === '') return new Big(0);
   try {
     // Handle Decimal128 by using .toString()
-    const str =
-      typeof val === 'object' && 'toString' in val
-        ? val.toString()
-        : String(val);
+    // Also handle MongoDB JSON representation: { $numberDecimal: string }
+    let str = '';
+    if (typeof val === 'object' && val !== null) {
+      if ('$numberDecimal' in val) {
+        str = String(val.$numberDecimal);
+      } else if ('toString' in val) {
+        str = val.toString();
+      }
+    } else {
+      str = String(val);
+    }
     // Remove any formatting spaces if present
     const cleanStr = str.replace(/\s/g, '').replace(',', '.');
     return new Big(cleanStr || 0);

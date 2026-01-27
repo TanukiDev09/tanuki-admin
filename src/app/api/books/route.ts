@@ -100,7 +100,14 @@ export async function GET(request: NextRequest) {
             as: 'illustrators',
           },
         },
-        // Lookup inventory items
+        {
+          $lookup: {
+            from: 'books',
+            localField: 'bundleBooks',
+            foreignField: '_id',
+            as: 'bundleBooks',
+          },
+        },
         {
           $lookup: {
             from: 'inventoryitems',
@@ -109,16 +116,67 @@ export async function GET(request: NextRequest) {
             as: 'inventory',
           },
         },
+        // Lookup inventory for volumes if it's a bundle
+        {
+          $lookup: {
+            from: 'inventoryitems',
+            localField: 'bundleBooks._id',
+            foreignField: 'bookId',
+            as: 'volumesInventory',
+          },
+        },
         // Calculate total stock
         {
           $addFields: {
-            totalStock: { $sum: '$inventory.quantity' },
+            totalStock: {
+              $cond: {
+                if: { $eq: ['$isBundle', true] },
+                then: {
+                  $let: {
+                    vars: {
+                      volumeStocks: {
+                        $map: {
+                          input: '$bundleBooks',
+                          as: 'vol',
+                          in: {
+                            $sum: {
+                              $map: {
+                                input: {
+                                  $filter: {
+                                    input: '$volumesInventory',
+                                    as: 'vInv',
+                                    cond: {
+                                      $eq: ['$$vInv.bookId', '$$vol._id'],
+                                    },
+                                  },
+                                },
+                                as: 'item',
+                                in: '$$item.quantity',
+                              },
+                            },
+                          },
+                        },
+                      },
+                    },
+                    in: {
+                      $cond: {
+                        if: { $gt: [{ $size: '$$volumeStocks' }, 0] },
+                        then: { $min: '$$volumeStocks' },
+                        else: 0,
+                      },
+                    },
+                  },
+                },
+                else: { $sum: '$inventory.quantity' },
+              },
+            },
           },
         },
-        // Remove inventory array from response (we only need totalStock)
+        // Remove inventory arrays from response
         {
           $project: {
             inventory: 0,
+            volumesInventory: 0,
           },
         },
       ]);

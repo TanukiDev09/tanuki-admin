@@ -1,3 +1,4 @@
+/* stylelint-disable order/properties-order */
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
@@ -40,8 +41,8 @@
   }
 
   &__date {
-    color: $muted-foreground;
     font-size: $font-size-sm;
+    color: $muted-foreground;
   }
 
   &__content {
@@ -64,20 +65,20 @@
 
   &__label {
     margin-bottom: $spacing-2xs;
-    color: $muted-foreground;
     font-size: $font-size-sm;
     font-weight: $font-weight-medium;
+    color: $muted-foreground;
   }
 
   &__value {
     &--income {
-      color: $success;
       font-weight: $font-weight-bold;
+      color: $success;
     }
 
     &--expense {
-      color: $destructive;
       font-weight: $font-weight-bold;
+      color: $destructive;
     }
 
     &--xl {

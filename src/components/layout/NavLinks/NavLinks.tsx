@@ -163,7 +163,9 @@ export function NavLinks({
               className={`nav-links__mobile-item ${active ? 'nav-links__mobile-item--active' : ''}`}
               aria-current={active ? 'page' : undefined}
             >
-              <Icon className="nav-links__mobile-icon" aria-hidden="true" />
+              <div className="nav-links__mobile-icon-wrapper">
+                <Icon className="nav-links__mobile-icon" aria-hidden="true" />
+              </div>
               <span className="nav-links__mobile-label">{label}</span>
             </Link>
           );
@@ -176,10 +178,12 @@ export function NavLinks({
               className="nav-links__mobile-item nav-links__mobile-item--more"
               aria-label="Más opciones"
             >
-              <MoreHorizontal
-                className="nav-links__mobile-icon"
-                aria-hidden="true"
-              />
+              <div className="nav-links__mobile-icon-wrapper">
+                <MoreHorizontal
+                  className="nav-links__mobile-icon"
+                  aria-hidden="true"
+                />
+              </div>
               <span className="nav-links__mobile-label">Más</span>
             </button>
           </DropdownMenuTrigger>

@@ -19,6 +19,8 @@ import {
   User,
   Building2,
   Package,
+  Trash2,
+  AlertCircle,
 } from 'lucide-react';
 import {
   Table,
@@ -89,6 +91,7 @@ export default function InventoryMovementDetailPage() {
   const [editorialSettings, setEditorialSettings] = useState<
     EditorialSettings | undefined
   >(undefined);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -142,6 +145,36 @@ export default function InventoryMovementDetailPage() {
         return 'bg-purple-50 text-purple-700 border-purple-200';
       default:
         return 'bg-slate-50 text-slate-700 border-slate-200';
+    }
+  };
+
+  const handleDelete = async () => {
+    if (
+      !confirm(
+        '¿Estás seguro de eliminar este movimiento? El stock se revertirá automáticamente.'
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      const res = await fetch(`/api/inventory/movements/${id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        router.push('/dashboard/inventory');
+      } else {
+        alert(data.error || 'Error al eliminar el movimiento');
+      }
+    } catch (error) {
+      console.error('Error deleting movement:', error);
+      alert('Error en la conexión al eliminar el movimiento');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -219,16 +252,31 @@ export default function InventoryMovementDetailPage() {
               </div>
             </div>
           </div>
-          {canGeneratePDF(movement.type) && (
+          <div className="flex items-center gap-2">
+            {canGeneratePDF(movement.type) && (
+              <Button
+                onClick={handlePrint}
+                variant="outline"
+                className="shadow-sm"
+              >
+                <Printer className="mr-2 h-4 w-4" />
+                Imprimir
+              </Button>
+            )}
             <Button
-              onClick={handlePrint}
-              variant="default"
-              className="shadow-sm"
+              variant="outline"
+              className="text-red-600 border-red-100 hover:bg-red-50 hover:text-red-700 shadow-sm"
+              onClick={handleDelete}
+              disabled={isDeleting}
             >
-              <Printer className="mr-2 h-4 w-4" />
-              Imprimir
+              {isDeleting ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="mr-2 h-4 w-4" />
+              )}
+              Eliminar
             </Button>
-          )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

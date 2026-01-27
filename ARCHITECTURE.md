@@ -66,7 +66,7 @@ graph TD
 
 ### 1. Hybrid Styling System
 
-The project is currently migrating from Tailwind CSS to a more robust **SASS + BEM** architecture. This provides better performance for complex components and a more maintainable design system while retaining Tailwind for quick layout iterations.
+The project has a robust **SASS + BEM** architecture. This provides better performance for complex components and a more maintainable design system.
 
 ### 2. Role-Based Access Control (RBAC)
 
