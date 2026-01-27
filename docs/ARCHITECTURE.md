@@ -49,16 +49,16 @@ graph TD
 
 ## 📁 Directory Structure & Responsibilities
 
-- **`src/app/`**: routing and entry points. Contains both page components and API route handlers (`/api`).
+- **`src/app/`**: Routing and entry points. Contains both page components and API route handlers (`/api`).
 - **`src/components/`**: UI components organized by domain.
   - `ui/`: Base primitive components.
   - `dashboard/`, `catalog/`, `inventory/`: Feature-specific components.
-- **`src/lib/`**: Core utilities and shared service logic.
-  - `mongodb.ts`: Database connection management.
-  - `auth.ts` / `jwt.ts`: Authentication handling.
-  - `permissions.ts`: RBAC (Role-Based Access Control) logic.
+- **`src/lib/`**: Core utilities and shared service logic (DB, Auth, Permissions).
 - **`src/models/`**: Mongoose schemas and model definitions.
 - **`src/contexts/`**: Client-side state providers.
+- **`scripts/`**: Automation, maintenance, and utility scripts for dev and DB management.
+- **`docs/`**: Technical documentation and system guides.
+- **`logs/`**: Temporary output and diagnostic files.
 - **`src/styles/`**: Design system tokens and global styles using SASS.
 - **`src/types/`**: Shared TypeScript interfaces and enums.
 

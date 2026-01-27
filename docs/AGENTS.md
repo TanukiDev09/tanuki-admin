@@ -17,11 +17,19 @@ This document defines the mandatory rules for agentic AI assistants working on t
 
 ### 3. Structural Continuity
 
-- **Directory Structure**: Preserved and extend the current reorganized structure.
+- **Directory Structure**: Preserve and extend the current reorganized structure.
   - Configuration belongs in `/config`.
   - Documentation belongs in `/docs`.
   - Maintenance/Migration scripts belong in `/scripts`.
+  - Temporary logs or tool outputs belong in `/logs`.
 - **Component Placement**: Logic-heavy components go in `src/components/[domain]/`. Shared primitives go in `src/components/ui/`.
+
+## 📚 Documentation Reference
+
+Agents should consult these documents before starting complex work:
+1.  **[Root DEVELOPER.md](../DEVELOPER.md)**: Entry point for setup and standards.
+2.  **[Deep DEVELOPER.md](./DEVELOPER.md)**: Details on modules, testing, and business logic.
+3.  **[ARCHITECTURE.md](./ARCHITECTURE.md)**: System design and data flow.
 
 ### 4. Mandatory Verification Flow
 
