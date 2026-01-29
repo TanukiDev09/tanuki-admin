@@ -24,6 +24,7 @@ import {
   Tags,
   Calculator,
   UserCog,
+  Wallet,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePermission } from '@/hooks/usePermissions';
@@ -46,6 +47,7 @@ export const navItems = [
   { href: '/dashboard/inventory', label: 'Inventario', icon: Package },
   { href: '/dashboard/movements', label: 'Movimientos', icon: DollarSign },
   { href: '/dashboard/invoices', label: 'Facturas', icon: Receipt },
+  { href: '/dashboard/debts', label: 'Deudas', icon: Wallet },
   { href: '/dashboard/points-of-sale', label: 'Puntos de Venta', icon: Store },
   { href: '/dashboard/warehouses', label: 'Bodegas', icon: Warehouse },
   { href: '/dashboard/agreements', label: 'Contratos', icon: FileText },
@@ -74,6 +76,7 @@ const mobileNavItems = [
   { href: '/dashboard/catalog', label: 'Catálogo', icon: BookOpen },
   { href: '/dashboard/inventory', label: 'Inventario', icon: Package },
   { href: '/dashboard/movements', label: 'Movimientos', icon: List },
+  { href: '/dashboard/debts', label: 'Deudas', icon: Wallet },
 ] as const;
 
 interface NavLinksProps {
@@ -113,6 +116,7 @@ export function NavLinks({
       '/dashboard/users': ModuleName.USERS,
       '/dashboard/permissions': ModuleName.PERMISSIONS,
       '/dashboard/invoices': ModuleName.INVOICES,
+      '/dashboard/debts': ModuleName.DEBTS,
     };
 
     const entry = Object.entries(modulePermissionMap).find(([path]) =>

@@ -3,6 +3,7 @@ import dbConnect from '@/lib/mongodb';
 import Invoice from '@/models/Invoice';
 // import { verifyAuth } from '@/lib/auth'; // Assuming auth is handled like this or similar
 import { z } from 'zod';
+import { syncInvoiceToDebt } from '@/lib/debtSync';
 
 const createInvoiceSchema = z.object({
   number: z.string().min(1, 'El número de factura es requerido'),
@@ -133,6 +134,9 @@ export async function POST(req: NextRequest) {
     }
 
     const newInvoice = await Invoice.create(data);
+
+    // Sync to Debts
+    await syncInvoiceToDebt(newInvoice);
 
     return NextResponse.json(newInvoice, { status: 201 });
   } catch (error) {

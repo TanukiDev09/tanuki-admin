@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Invoice from '@/models/Invoice';
 import { z } from 'zod';
+import { syncInvoiceToDebt } from '@/lib/debtSync';
+import Debt from '@/models/Debt';
 
 const updateInvoiceSchema = z.object({
   number: z.string().min(1).optional(),
@@ -108,6 +110,9 @@ export async function PATCH(
       );
     }
 
+    // Sync to Debts
+    await syncInvoiceToDebt(updatedInvoice);
+
     return NextResponse.json(updatedInvoice);
   } catch (error) {
     console.error('Error updating invoice:', error);
@@ -134,6 +139,9 @@ export async function DELETE(
         { status: 404 }
       );
     }
+
+    // Remove associated Debt if exists
+    await Debt.findOneAndDelete({ 'source.id': id });
 
     return NextResponse.json({ message: 'Factura eliminada correctamente' });
   } catch (error) {

@@ -24,6 +24,7 @@ export interface Movement {
   salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'OTRO';
   pointOfSale?: string | { _id: string; name: string };
   inventoryMovementId?: string;
+  debtId?: string;
   allocations?: {
     costCenter: string;
     amount: number | string;

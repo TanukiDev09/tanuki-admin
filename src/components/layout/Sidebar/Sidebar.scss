@@ -1,185 +1,274 @@
+@use 'sass:color';
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
 // ============================================
-// SIDEBAR & MOBILE NAV (MOBILE-FIRST)
+// PREMIUM SIDEBAR - LIGHT THEME (SASS/BEM)
 // ============================================
 
-// --- DESKTOP SIDEBAR ---
 .sidebar {
   position: relative;
-  display: none; // Hidden on mobile/tablet by default
+  display: none;
   flex-direction: column;
-  width: 224px; // 56 * 4
+  width: 280px;
   height: 100vh;
-  background-color: rgba($muted, 0.3);
-  border-right: 1px solid rgba($border, 0.5);
 
-  @include transition(width);
+  // Solid Theme Base
+  background-color: white;
+  border-right: 1px solid rgba($primary, 0.1);
+  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.03);
+  z-index: 100;
+  overflow: hidden;
+
+  @include transition(width, background-color);
 
   @include respond-to('lg') {
     display: flex;
   }
 
   &--collapsed {
-    width: 64px; // 16 * 4
+    width: 88px;
   }
 
-  &--skeleton {
-    @include respond-to('lg') {
-      display: flex;
-    }
+  // --- ELEMENTOS DECORATIVOS ---
+
+  &__glow {
+    position: absolute;
+    top: -50px;
+    left: -50px;
+    width: 250px;
+    height: 250px;
+    background: radial-gradient(
+      circle,
+      rgba($primary, 0.05) 0%,
+      transparent 70%
+    );
+    filter: blur(40px);
+    pointer-events: none;
+    z-index: 0;
   }
 
   // --- ELEMENTOS ---
 
   &__toggle {
     position: absolute;
-    top: 24px;
-    right: -12px;
-    z-index: 20;
+    top: 32px;
+    right: -14px;
+    z-index: 50;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 24px;
-    height: 24px;
-    background-color: rgba($background, 0.8);
-    color: $muted-foreground;
-    border: 1px solid rgba($border, 0.5);
+    width: 28px;
+    height: 28px;
+    background-color: white;
+    color: $primary;
+    border: 1px solid rgba($primary, 0.1);
     border-radius: $radius-full;
     cursor: pointer;
-    box-shadow: $shadow-sm;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 
     @include transition(all);
 
     &:hover {
-      background-color: $accent;
-      color: $foreground;
+      background-color: $primary;
+      color: white;
+      transform: scale(1.1);
     }
 
     &-icon {
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
     }
   }
 
   &__logo-container {
-    padding: $spacing-md;
-    border-bottom: 1px solid rgba($border, 0.5);
+    padding: $spacing-xl $spacing-lg;
     flex-shrink: 0;
+    position: relative;
+    z-index: 10;
   }
 
   &__logo-wrapper {
     display: flex;
     align-items: center;
-    gap: 10px;
-    overflow: hidden;
+    gap: $spacing-md;
 
     .sidebar--collapsed & {
       justify-content: center;
-      padding: 0;
     }
   }
 
   &__logo-emoji {
-    font-size: $font-size-2xl;
+    font-size: 2rem;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
     flex-shrink: 0;
-  }
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
-  &__logo-text {
-    @include transition(opacity);
-
-    white-space: nowrap;
-  }
-
-  &__logo-title {
-    color: rgba($foreground, 0.9);
-    font-size: $font-size-lg;
-    font-weight: $font-weight-semibold;
-    letter-spacing: -0.025em;
-  }
-
-  &__logo-subtitle {
-    color: $muted-foreground;
-    font-size: $font-size-xs;
-  }
-
-  &__user {
-    padding: $spacing-md;
-    border-bottom: 1px solid rgba($border, 0.5);
-    flex-shrink: 0;
-
-    .sidebar--collapsed & {
-      padding: $spacing-md $spacing-sm;
+    .sidebar:hover & {
+      transform: scale(1.05);
     }
   }
 
-  &__user-wrapper {
+  &__logo-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    animation: fadeIn 0.5s ease-out;
+  }
+
+  &__logo-title {
+    color: $primary;
+    font-size: $font-size-xl;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    line-height: 1;
+  }
+
+  &__logo-badge {
+    @include badge-base(rgba($primary, 0.05), $primary);
+    font-size: 9px;
+    padding: 2px 6px;
+    border: 1px solid rgba($primary, 0.1);
+    letter-spacing: 0.1em;
+  }
+
+  &__user {
+    padding-inline: $spacing-md;
+    margin-bottom: $spacing-lg;
+    position: relative;
+    z-index: 10;
+  }
+
+  &__user-card {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    background: white;
+    border: 1px solid rgba($primary, 0.05);
+    border-radius: $radius-xl;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
 
     .sidebar--collapsed & {
       justify-content: center;
+      padding: $spacing-md;
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
     }
   }
 
   &__user-avatar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 32px;
-    height: 32px;
-    background-color: rgba($primary, 0.1);
-    border-radius: $radius-full;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    background: $muted;
+    border: 1px solid rgba($primary, 0.05);
+    border-radius: $radius-lg;
+    @include flex-center;
     flex-shrink: 0;
   }
 
   &__user-icon {
-    width: 16px;
-    height: 16px;
-    color: rgba($primary, 0.7);
+    width: 20px;
+    height: 20px;
+    color: $primary;
+    opacity: 0.7;
+  }
+
+  &__user-status {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background: #10b981; // emerald-500
+    border: 2px solid white;
+    border-radius: $radius-full;
   }
 
   &__user-info {
     flex: 1;
     min-width: 0;
-
-    @include transition(opacity);
+    animation: fadeIn 0.4s ease-out;
   }
 
   &__user-name {
-    color: rgba($foreground, 0.8);
+    color: $primary;
     font-size: $font-size-sm;
-    font-weight: $font-weight-medium;
-
+    font-weight: $font-weight-bold;
     @include text-truncate;
   }
 
-  &__user-email {
+  &__user-role {
     color: $muted-foreground;
-    font-size: $font-size-xs;
-
-    @include text-truncate;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   &__nav {
     flex: 1;
-    padding: $spacing-md;
+    padding-inline: $spacing-sm;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
     overflow-y: auto;
+    position: relative;
+    z-index: 10;
 
     @include custom-scrollbar;
   }
 
+  &__nav-label {
+    padding-left: $spacing-md;
+    font-size: 10px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: #4b5563; // gray-600
+    margin-bottom: $spacing-xs;
+
+    .sidebar--collapsed & {
+      display: none;
+    }
+  }
+
   &__footer {
-    padding: $spacing-md;
-    border-top: 1px solid rgba($border, 0.5);
-    flex-shrink: 0;
+    padding: $spacing-lg;
+    position: relative;
+    z-index: 10;
+  }
+
+  &__footer-line {
+    height: 1px;
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba($primary, 0.1),
+      transparent
+    );
+    margin-bottom: $spacing-md;
   }
 
   &__footer-text {
-    color: rgba($muted-foreground, 0.6);
-    font-size: $font-size-xs;
+    color: #64748b; // slate-500
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
     text-align: center;
+    text-transform: uppercase;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

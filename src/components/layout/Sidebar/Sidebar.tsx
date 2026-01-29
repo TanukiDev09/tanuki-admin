@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { NavLinks } from '../NavLinks';
 import { useAuth } from '@/contexts/AuthContext';
+import { cn } from '@/lib/utils';
 import { User, ChevronLeft, ChevronRight } from 'lucide-react';
 import './Sidebar.scss';
 
@@ -30,7 +31,13 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop/Sidebar Navigation */}
-      <aside className={`sidebar ${isCollapsed ? 'sidebar--collapsed' : ''}`}>
+      <aside className={cn(
+        "sidebar",
+        isCollapsed && "sidebar--collapsed"
+      )}>
+        {/* Decorative Background Elements */}
+        <div className="sidebar__glow" />
+
         {/* Toggle Button */}
         <button
           className="sidebar__toggle"
@@ -47,13 +54,13 @@ export function Sidebar() {
         {/* Logo Section */}
         <div className="sidebar__logo-container">
           <div className="sidebar__logo-wrapper">
-            <div className="sidebar__logo-emoji" aria-hidden="true">
+            <div className="sidebar__logo-emoji">
               🦝
             </div>
             {!isCollapsed && (
               <div className="sidebar__logo-text">
                 <h1 className="sidebar__logo-title">TANUKI</h1>
-                <p className="sidebar__logo-subtitle">Admin Panel</p>
+                <div className="sidebar__logo-badge">ADMIN</div>
               </div>
             )}
           </div>
@@ -62,14 +69,15 @@ export function Sidebar() {
         {/* User Info */}
         {user && (
           <div className="sidebar__user">
-            <div className="sidebar__user-wrapper">
+            <div className="sidebar__user-card">
               <div className="sidebar__user-avatar">
                 <User className="sidebar__user-icon" />
+                <div className="sidebar__user-status" />
               </div>
               {!isCollapsed && (
                 <div className="sidebar__user-info">
                   <p className="sidebar__user-name">{user.name}</p>
-                  <p className="sidebar__user-email">{user.email}</p>
+                  <p className="sidebar__user-role">Súper Administrador</p>
                 </div>
               )}
             </div>
@@ -77,11 +85,8 @@ export function Sidebar() {
         )}
 
         {/* Main Navigation */}
-        <nav
-          role="navigation"
-          aria-label="Navegación principal"
-          className="sidebar__nav"
-        >
+        <nav className="sidebar__nav">
+          <div className="sidebar__nav-label">Navegación</div>
           <NavLinks
             currentPath={pathname}
             variant="vertical"
@@ -92,7 +97,8 @@ export function Sidebar() {
         {/* Footer Info */}
         {!isCollapsed && (
           <div className="sidebar__footer">
-            <p className="sidebar__footer-text">Tanuki Libros © 2024</p>
+            <div className="sidebar__footer-line" />
+            <p className="sidebar__footer-text">Tanuki Libros v1.0.3</p>
           </div>
         )}
       </aside>

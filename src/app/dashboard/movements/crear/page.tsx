@@ -26,6 +26,7 @@ import { formatCurrency } from '@/lib/utils';
 import { multiply, divide, gtZero, add, toNumber, compare } from '@/lib/math';
 import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import { AllocationTable } from '@/components/finance/AllocationTable';
+import { DebtSelect } from '@/components/finance/DebtSelect';
 import '../movement-form.scss';
 
 export default function CreateMovementPage() {
@@ -262,6 +263,28 @@ export default function CreateMovementPage() {
           onValueChange={(val) => handleSelectChange('category', val)}
           type={formData.type as 'INCOME' | 'EXPENSE'}
         />
+      </div>
+
+      <div className="movement-form__field-group">
+        <Label>Vincular a Deuda Pendiente (Opcional)</Label>
+        <DebtSelect
+          value={formData.debtId}
+          onValueChange={(val, amount) => {
+            setFormData(prev => ({
+              ...prev,
+              debtId: val,
+              // Auto-fill amount if it's currently empty or 0
+              amount: (!prev.amount || toNumber(prev.amount) === 0) ? amount?.toString() : prev.amount
+            }));
+          }}
+          type={formData.type === 'INCOME' ? 'Cuenta por Cobrar' : 'Cuenta por Pagar'}
+          currentAmount={formData.amount}
+          currentConcept={formData.description}
+          currentCurrency={formData.currency}
+        />
+        <p className="text-[10px] text-muted-foreground mt-1">
+          Si este movimiento es un pago de una deuda registrada, selecciónela aquí para actualizar su saldo.
+        </p>
       </div>
 
       <div className="flex items-center justify-between mb-2">
@@ -501,9 +524,9 @@ export default function CreateMovementPage() {
               <div className="movement-form__calculated-value">
                 {gtZero(formData.amount) && gtZero(formData.quantity)
                   ? formatCurrency(
-                      toNumber(divide(formData.amount, formData.quantity)),
-                      formData.currency
-                    )
+                    toNumber(divide(formData.amount, formData.quantity)),
+                    formData.currency
+                  )
                   : '$ 0'}
               </div>
             </div>
