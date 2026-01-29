@@ -6,9 +6,10 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { useToast } from '@/components/ui/Toast';
-import { ArrowLeft, Pencil, Trash2, Package, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2, Package, ExternalLink, Wallet } from 'lucide-react';
 
 import { Movement } from '@/types/movement';
+import { IDebt } from '@/types/debt';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
@@ -203,6 +204,29 @@ function MovementDetailContent({ movement, router }: { movement: Movement; route
           <div>
             <h3 className="movement-detail__label">Referencia Factura</h3>
             <p>{movement.invoiceRef}</p>
+          </div>
+        )}
+
+        {movement.debtId && typeof movement.debtId === 'object' && (
+          <div className="movement-detail__link-section">
+            <h3 className="movement-detail__link-title">
+              <Wallet className="movement-detail__icon" /> Deuda Vinculada
+            </h3>
+            <div className="movement-detail__link-card">
+              <div className="movement-detail__link-text">
+                <strong>{(movement.debtId as unknown as IDebt).source?.reference || 'Referencia no disponible'}</strong>
+                <p className="text-xs text-muted-foreground">
+                  {(movement.debtId as unknown as IDebt).notes || (movement.debtId as unknown as IDebt).type}
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => router.push(`/dashboard/debts/entity/${(movement.debtId as unknown as IDebt)._id}`)}
+              >
+                <ExternalLink className="movement-detail__icon" /> Ver Deuda
+              </Button>
+            </div>
           </div>
         )}
 

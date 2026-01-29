@@ -12,8 +12,10 @@ import {
   compare,
   toNumber,
   gtZero,
+  subtract,
   DecimalValue,
 } from '@/lib/math';
+import Debt from '@/models/Debt';
 
 export async function GET(
   request: NextRequest,
@@ -32,6 +34,7 @@ export async function GET(
     const movement = await Movement.findById(params.id)
       .populate({ path: 'category', select: 'name' })
       .populate({ path: 'pointOfSale', select: 'name' })
+      .populate({ path: 'debtId', select: 'source entityName type notes' })
       .lean();
 
     if (!movement) {
@@ -216,6 +219,7 @@ function checkAllocations(
 }
 
 // Helper to validate and normalize allocations for updates
+// Helper to validate and normalize allocations for updates
 function validateAndNormalizeAllocations(
   body: MovementBody,
   totalAmount: number | string
@@ -254,6 +258,57 @@ function validateAndNormalizeAllocations(
   return null;
 }
 
+async function updateDebtBalance(
+  debtId: string,
+  amountChange: number | string,
+  operation: 'add' | 'subtract'
+) {
+  const debt = await Debt.findById(debtId);
+  if (!debt) return;
+
+  const amount = toNumber(amountChange);
+  const newPaidAmount =
+    operation === 'add'
+      ? add(debt.paidAmount, amount)
+      : subtract(debt.paidAmount, amount);
+
+  const newRemainingBalance = subtract(debt.totalAmount, newPaidAmount);
+
+  debt.paidAmount = newPaidAmount;
+  debt.remainingBalance = newRemainingBalance;
+
+  const remainingNum = toNumber(newRemainingBalance);
+  const paidNum = toNumber(newPaidAmount);
+  const totalNum = toNumber(debt.totalAmount);
+
+  if (remainingNum <= 0) {
+    debt.status = 'Pagado';
+  } else if (remainingNum >= totalNum) {
+    debt.status = 'Pendiente';
+  } else if (paidNum > 0) {
+    debt.status = 'Pagado Parcial';
+  } else {
+    debt.status = 'Pendiente';
+  }
+
+  await debt.save();
+}
+
+async function syncInventoryLink(
+  body: Record<string, unknown>,
+  movementId: string
+) {
+  if (body.inventoryMovementId) {
+    try {
+      await InventoryMovement.findByIdAndUpdate(body.inventoryMovementId, {
+        financialMovementId: movementId,
+      });
+    } catch (linkErr) {
+      console.error('Error linking to inventory movement:', linkErr);
+    }
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   props: { params: Promise<{ id: string }> }
@@ -288,6 +343,23 @@ export async function PUT(
 
     calculateFinancials(body);
 
+    const oldMovement = await Movement.findById(params.id);
+    if (!oldMovement) {
+      return NextResponse.json(
+        { error: 'Movement not found' },
+        { status: 404 }
+      );
+    }
+
+    // 1. Revert old debt if linked
+    if (oldMovement.debtId) {
+      await updateDebtBalance(
+        oldMovement.debtId as string,
+        oldMovement.amount,
+        'subtract'
+      );
+    }
+
     const movement = await Movement.findByIdAndUpdate(
       params.id,
       { $set: body },
@@ -301,16 +373,17 @@ export async function PUT(
       );
     }
 
-    // 4.1 Update Inventory Movement link if provided/updated
-    if (body.inventoryMovementId) {
-      try {
-        await InventoryMovement.findByIdAndUpdate(body.inventoryMovementId, {
-          financialMovementId: movement._id,
-        });
-      } catch (linkErr) {
-        console.error('Error linking to inventory movement (PUT):', linkErr);
-      }
+    // 2. Apply new debt if linked
+    if (movement.debtId) {
+      await updateDebtBalance(
+        movement.debtId as string,
+        movement.amount,
+        'add'
+      );
     }
+
+    // 4.1 Update Inventory Movement link if provided/updated
+    await syncInventoryLink(body, movement._id);
 
     return NextResponse.json({ data: formatMovement(movement) });
   } catch (err: unknown) {
@@ -349,6 +422,15 @@ export async function DELETE(
       return NextResponse.json(
         { error: 'Movement not found' },
         { status: 404 }
+      );
+    }
+
+    // Sync Debt if linked
+    if (movement.debtId) {
+      await updateDebtBalance(
+        movement.debtId as string,
+        movement.amount,
+        'subtract'
       );
     }
 

@@ -9,6 +9,7 @@
 // - Los componentes deben importar este archivo, no al revés
 // ============================================
 
+@use 'sass:color';
 @use '@/styles/variables' as *;
 
 // --- RESPONSIVE BREAKPOINTS (MOBILE-FIRST) ---
