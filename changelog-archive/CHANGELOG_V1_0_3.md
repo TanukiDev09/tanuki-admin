@@ -40,3 +40,23 @@ Esta versión incluye mejoras en la gestión de movimientos financieros y optimi
 - **Semántica y Landmarks**: Estructura de navegación optimizada desde su creación para ser plenamente inclusiva y compatible con tecnologías de asistencia.
 
 ---
+
+## [1.0.3-hotfix] - 2026-01-31
+
+### 🛡️ Seguridad y Estabilidad
+- **Actualización de Next.js**: Migración a **v16.1.5** para corregir vulnerabilidades críticas de Denegación de Servicio (DoS) y consumo excesivo de memoria.
+- **Parche de lodash-es**: Implementación de `overrides` para forzar la versión **4.17.23**, resolviendo riesgos de Prototype Pollution.
+
+### 📊 Correcciones en Salud Financiera (Dashboard)
+- **Precisión Anual**: Se corrigió el error donde el histórico anual empezaba erróneamente en $0; ahora incorpora el **Saldo Inicial** del periodo previo desde la API.
+- **Indicadores Inteligentes**: Ajuste de las métricas de sostenibilidad (Runway & Burn Rate). En el año actual, los promedios ahora se limitan solo a los meses transcurridos, evitando datos diluidos por meses futuros vacíos.
+- **Unificación de Métricas**: Los indicadores de salud (Score, Runway, Gasto Neto) ahora están disponibles de forma consistente en todas las vistas (Mensual y Anual).
+
+### 🛠️ Linter y Refactorización Interna
+- **Estado 'Clean'**: Se han resuelto todos los errores y advertencias de *linting* del proyecto (0 problemas reportados).
+- **Adiós al tipo 'any'**: Limpieza masiva de declaraciones `any` en favor de interfaces estrictas y tipos `unknown` más seguros.
+- **Simplificación de API**: Refactorización profunda de los servicios financieros para reducir su complejidad cognitiva, facilitando el mantenimiento futuro.
+
+### 🧭 Mejoras en UX de Navegación
+- **Sincronización de Períodos**: Se corrigió el salto de navegación donde pasar de diciembre a enero no actualizaba correctamente el año debido a condiciones de carrera en el estado de la URL.
+- **Reseteo de Paginación**: Al cambiar de mes o año, el sistema ahora reinicia automáticamente la vista a la **página 1**, evitando listas vacías accidentales.

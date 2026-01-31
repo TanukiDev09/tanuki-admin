@@ -527,6 +527,25 @@ function formatSingleMovement(
   } as FormattedMovement;
 }
 
+async function updateDebtProgress(debtId: string, movementAmount: number) {
+  const debt = await Debt.findById(debtId);
+  if (!debt) return;
+
+  const newPaidAmount = add(debt.paidAmount, movementAmount);
+  const newRemainingBalance = subtract(debt.totalAmount, newPaidAmount);
+
+  debt.paidAmount = newPaidAmount;
+  debt.remainingBalance = newRemainingBalance;
+
+  if (toNumber(newRemainingBalance) <= 0) {
+    debt.status = 'Pagado';
+  } else {
+    debt.status = 'Pagado Parcial';
+  }
+
+  await debt.save();
+}
+
 export async function POST(request: NextRequest) {
   const permissionError = await requirePermission(
     request,
@@ -568,23 +587,10 @@ export async function POST(request: NextRequest) {
 
     // 4.2 Update Debt if provided
     if (finalDoc.debtId) {
-      const debt = await Debt.findById(finalDoc.debtId);
-      if (debt) {
-        const movementAmount = toNumber(movement.amount);
-        const newPaidAmount = add(debt.paidAmount, movementAmount);
-        const newRemainingBalance = subtract(debt.totalAmount, newPaidAmount);
-
-        debt.paidAmount = newPaidAmount;
-        debt.remainingBalance = newRemainingBalance;
-
-        if (toNumber(newRemainingBalance) <= 0) {
-          debt.status = 'Pagado';
-        } else {
-          debt.status = 'Pagado Parcial';
-        }
-
-        await debt.save();
-      }
+      await updateDebtProgress(
+        finalDoc.debtId as string,
+        toNumber(movement.amount)
+      );
     }
 
     const populatedMovement = await movement.populate([

@@ -3,7 +3,7 @@ import PointOfSale from '@/models/PointOfSale';
 import ExternalEntity from '@/models/ExternalEntity';
 import { toNumber } from './math';
 
-import { IDebt } from '@/types/debt';
+// import { IDebt } from '@/types/debt';
 
 interface MinimalInvoice {
   _id: string;
@@ -38,6 +38,7 @@ export async function syncInvoiceToDebt(invoice: MinimalInvoice) {
 }
 
 async function handleExistingDebtForFinalizedInvoice(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   debt: any,
   status: string
 ) {
@@ -84,7 +85,7 @@ async function findOrCreateEntityForInvoice(invoice: MinimalInvoice) {
 async function updateDebtFromInvoice(
   invoice: MinimalInvoice,
   entityType: string,
-  entityId: any
+  entityId: string | object
 ) {
   await Debt.findOneAndUpdate(
     { 'source.id': invoice._id },
