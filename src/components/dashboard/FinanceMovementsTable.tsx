@@ -22,6 +22,7 @@ interface FinanceMovementsTableProps {
   pagination?: {
     page: number;
     totalPages: number;
+    total: number;
     hasPrevPage: boolean; // Computed or passed
     hasNextPage: boolean; // Computed or passed
   };
@@ -36,7 +37,20 @@ export function FinanceMovementsTable({
   if (!movements || movements.length === 0) {
     return (
       <div className="finance-movements-table__empty">
-        No hay movimientos registrados en este periodo.
+        {pagination && pagination.total > 0 ? (
+          <div className="flex flex-col items-center gap-4">
+            <p>No hay movimientos en esta página.</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange?.(1)}
+            >
+              Volver a la primera página
+            </Button>
+          </div>
+        ) : (
+          'No hay movimientos registrados en este periodo.'
+        )}
       </div>
     );
   }

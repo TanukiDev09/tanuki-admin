@@ -276,6 +276,21 @@ function MonthlyView({
         </div>
       </section>
 
+      {/* Sustainability Indicators */}
+      <section className="financial-health__section">
+        <h2 className="financial-health__section-title">
+          Indicadores de Sostenibilidad (Mes)
+        </h2>
+        <div className="financial-health__metrics-grid">
+          <RunwayCard runway={data.health.runway} />
+          <BurnRateCard
+            grossBurn={data.health.burnRate.gross}
+            netBurn={data.health.burnRate.net}
+          />
+          <HealthScoreCard score={data.health.healthScore} />
+        </div>
+      </section>
+
       <div className="flex justify-center mb-4">
         <Tabs
           value={breakdownType}
@@ -325,11 +340,11 @@ function MonthlyView({
           pagination={
             data.pagination
               ? {
-                  ...data.pagination,
-                  hasPrevPage: data.pagination.page > 1,
-                  hasNextPage:
-                    data.pagination.page < data.pagination.totalPages,
-                }
+                ...data.pagination,
+                hasPrevPage: data.pagination.page > 1,
+                hasNextPage:
+                  data.pagination.page < data.pagination.totalPages,
+              }
               : undefined
           }
           onPageChange={onPageChange}
@@ -373,7 +388,25 @@ function AnnualView({
 
       <section className="financial-health__section">
         <h2 className="financial-health__section-title">Desempeño Mensual</h2>
-        <ScrollableIncomeExpenseChart data={data.monthly} />
+        <ScrollableIncomeExpenseChart
+          data={data.monthly}
+          initialBalance={data.balances?.previousMonth || 0}
+        />
+      </section>
+
+      {/* Sustainability Indicators */}
+      <section className="financial-health__section">
+        <h2 className="financial-health__section-title">
+          Indicadores de Sostenibilidad (Año)
+        </h2>
+        <div className="financial-health__metrics-grid">
+          <RunwayCard runway={data.health.runway} />
+          <BurnRateCard
+            grossBurn={data.health.burnRate.gross}
+            netBurn={data.health.burnRate.net}
+          />
+          <HealthScoreCard score={data.health.healthScore} />
+        </div>
       </section>
 
       <div className="flex justify-center mb-4">
@@ -423,11 +456,11 @@ function AnnualView({
           pagination={
             data.pagination
               ? {
-                  ...data.pagination,
-                  hasPrevPage: data.pagination.page > 1,
-                  hasNextPage:
-                    data.pagination.page < data.pagination.totalPages,
-                }
+                ...data.pagination,
+                hasPrevPage: data.pagination.page > 1,
+                hasNextPage:
+                  data.pagination.page < data.pagination.totalPages,
+              }
               : undefined
           }
           onPageChange={onPageChange}
@@ -551,10 +584,13 @@ export default function FinancialHealthPage() {
             type={view === 'monthly' ? 'monthly' : 'annual'}
             year={year}
             month={month}
-            onYearChange={(y) => updateParams({ year: y.toString() })}
-            onMonthChange={(m) =>
-              updateParams({ month: m ? m.toString() : null })
-            }
+            onPeriodChange={(params) => {
+              const newParams: Record<string, string | null> = { page: '1' };
+              if (params.year !== undefined) newParams.year = params.year.toString();
+              if (params.month !== undefined)
+                newParams.month = params.month ? params.month.toString() : null;
+              updateParams(newParams);
+            }}
           />
         )}
       </div>

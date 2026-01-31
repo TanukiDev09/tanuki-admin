@@ -19,7 +19,7 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
-import { Textarea } from '@/components/ui/Textarea';
+// import { Textarea } from '@/components/ui/Textarea';
 import {
   Select,
   SelectContent,
@@ -172,6 +172,7 @@ export function ManualDebtModal({
         onSuccess(createdDebt.data._id, Number(createdDebt.data.remainingBalance));
       }
     } catch (error) {
+      console.error('Error saving debt:', error);
       toast({
         title: 'Error',
         description: 'No se pudo guardar la deuda',
@@ -197,7 +198,7 @@ export function ManualDebtModal({
                 </Label>
                 <Select
                   value={form.watch('type')}
-                  onValueChange={(val) => form.setValue('type', val as any)}
+                  onValueChange={(val) => form.setValue('type', val as 'Cuenta por Cobrar' | 'Cuenta por Pagar')}
                 >
                   <SelectTrigger className="bg-muted/30">
                     <SelectValue />
@@ -236,7 +237,7 @@ export function ManualDebtModal({
               <Tabs
                 value={form.watch('entityType')}
                 onValueChange={(val) => {
-                  form.setValue('entityType', val as any);
+                  form.setValue('entityType', val as 'PointOfSale' | 'Creator' | 'ExternalEntity');
                   form.setValue('entityId', '');
                   form.setValue('entityName', '');
                 }}

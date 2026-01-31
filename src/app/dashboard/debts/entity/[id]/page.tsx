@@ -7,17 +7,15 @@ import {
   ArrowLeft,
   Receipt,
   Plus,
-  Users,
   TrendingDown,
   TrendingUp,
   Search,
   ChevronRight,
-  Loader2,
   Calendar,
   FileText
 } from 'lucide-react';
 import { IDebt } from '@/types/debt';
-import { Card, CardContent, CardHeader } from '@/components/ui/Card';
+import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { cn, formatCurrency } from '@/lib/utils';

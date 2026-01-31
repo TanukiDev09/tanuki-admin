@@ -11,9 +11,7 @@ import {
   User,
   History,
   ArrowRight,
-  TrendingDown,
   Info,
-  ExternalLink,
   ChevronRight,
   CreditCard,
   Edit2,
@@ -21,15 +19,11 @@ import {
   AlertTriangle,
   Clock,
   ArrowUpRight,
-  ShieldCheck,
   Zap
 } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 import { cn, formatCurrency } from '@/lib/utils';
 import { Badge } from '@/components/ui/Badge';
-import { Separator } from '@/components/ui/Separator';
-import { Progress } from '@/components/ui/Progress';
+import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { ManualDebtModal } from '@/components/finance/ManualDebtModal';
 import {
@@ -92,10 +86,11 @@ export default function DebtDetailPage() {
       });
       queryClient.invalidateQueries({ queryKey: ['debts'] });
       router.push('/dashboard/debts');
-    } catch (error: any) {
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: 'Error al eliminar',
-        description: error.message,
+        description: message,
         variant: 'destructive'
       });
     } finally {
@@ -286,7 +281,7 @@ export default function DebtDetailPage() {
 
           {movements.length > 0 ? (
             <div className="debt-detail__timeline-container">
-              {movements.map((mov: any) => (
+              {movements.map((mov: { _id: string; type: string; description?: string; paymentChannel?: string; date: Date | string; amount: number; currency?: string }) => (
                 <div
                   key={mov._id}
                   className={cn(

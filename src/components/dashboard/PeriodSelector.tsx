@@ -14,8 +14,7 @@ import './PeriodSelector.scss';
 interface PeriodSelectorProps {
   year: number;
   month: number | null;
-  onYearChange: (year: number) => void;
-  onMonthChange: (month: number | null) => void;
+  onPeriodChange: (params: { year?: number; month?: number | null }) => void;
   type: 'monthly' | 'annual';
 }
 
@@ -37,8 +36,7 @@ const MONTHS = [
 export function PeriodSelector({
   year,
   month,
-  onYearChange,
-  onMonthChange,
+  onPeriodChange,
   type,
 }: PeriodSelectorProps) {
   const currentYear = new Date().getFullYear();
@@ -51,26 +49,24 @@ export function PeriodSelector({
   const handlePrev = () => {
     if (type === 'monthly' && month !== null) {
       if (month === 1) {
-        onYearChange(year - 1);
-        onMonthChange(12);
+        onPeriodChange({ year: year - 1, month: 12 });
       } else {
-        onMonthChange(month - 1);
+        onPeriodChange({ month: month - 1 });
       }
     } else {
-      onYearChange(year - 1);
+      onPeriodChange({ year: year - 1 });
     }
   };
 
   const handleNext = () => {
     if (type === 'monthly' && month !== null) {
       if (month === 12) {
-        onYearChange(year + 1);
-        onMonthChange(1);
+        onPeriodChange({ year: year + 1, month: 1 });
       } else {
-        onMonthChange(month + 1);
+        onPeriodChange({ month: month + 1 });
       }
     } else {
-      onYearChange(year + 1);
+      onPeriodChange({ year: year + 1 });
     }
   };
 
@@ -92,7 +88,7 @@ export function PeriodSelector({
           {type === 'monthly' && (
             <Select
               value={month?.toString()}
-              onValueChange={(val) => onMonthChange(parseInt(val))}
+              onValueChange={(val) => onPeriodChange({ month: parseInt(val) })}
             >
               <SelectTrigger className="period-selector__trigger w-[130px]">
                 <SelectValue placeholder="Mes" />
@@ -109,7 +105,7 @@ export function PeriodSelector({
 
           <Select
             value={year.toString()}
-            onValueChange={(val) => onYearChange(parseInt(val))}
+            onValueChange={(val) => onPeriodChange({ year: parseInt(val) })}
           >
             <SelectTrigger className="period-selector__trigger w-[100px]">
               <SelectValue placeholder="Año" />

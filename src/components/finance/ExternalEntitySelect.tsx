@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Users, Check } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
 import {
   Select,
   SelectContent,

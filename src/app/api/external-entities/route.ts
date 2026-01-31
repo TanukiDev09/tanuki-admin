@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
   const search = searchParams.get('search');
   const all = searchParams.get('all') === 'true'; // If true, include inactive
 
-  const query: Record<string, any> = {};
+  const query: Record<string, unknown> = {};
   if (!all) query.status = 'active';
   if (type) query.type = type;
   if (search) {

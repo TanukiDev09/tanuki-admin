@@ -4,15 +4,11 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Wallet,
-  TrendingUp,
-  TrendingDown,
   Search,
   Plus,
   Users,
   ChevronRight,
-  ArrowRightLeft,
-  LayoutGrid,
-  Loader2
+  LayoutGrid
 } from 'lucide-react';
 import { IDebt } from '@/types/debt';
 import { Card, CardContent } from '@/components/ui/Card';

@@ -78,7 +78,7 @@ async function getTotals(matchStage: Record<string, unknown>) {
     {
       $group: {
         _id: '$type',
-        total: { $sum: { $ifNull: ['$amountInCOP', '$amount'] } },
+        total: { $sum: GET_AMOUNT_EXPR },
       },
     },
   ]);
@@ -88,9 +88,13 @@ async function getTotals(matchStage: Record<string, unknown>) {
 
   totalsResponse.forEach((t) => {
     const val = t.total ? t.total.toString() : '0';
-    if (t._id === 'Ingreso' || t._id === 'INCOME')
+    // Match both Spanish and English types
+    const isIncome = t._id === 'Ingreso' || t._id === 'INCOME';
+    if (isIncome) {
       totalIncome = add(totalIncome, val);
-    else totalExpenses = add(totalExpenses, val);
+    } else {
+      totalExpenses = add(totalExpenses, val);
+    }
   });
 
   return {
@@ -100,7 +104,142 @@ async function getTotals(matchStage: Record<string, unknown>) {
   };
 }
 
-async function getMonthlyData(matchStage: Record<string, unknown>) {
+/**
+ * Helper to determine the best amount value for a movement.
+ * Prefers amountInCOP if it's strictly positive, otherwise falls back to amount.
+ */
+const GET_AMOUNT_EXPR = {
+  $cond: [
+    { $gt: [{ $ifNull: ['$amountInCOP', 0] }, 0] },
+    '$amountInCOP',
+    '$amount',
+  ],
+};
+
+async function getMovements(
+  query: Record<string, unknown>,
+  page: number,
+  limit: number
+) {
+  const skip = (page - 1) * limit;
+  const [movements, total] = await Promise.all([
+    Movement.find(query)
+      .populate('category')
+      .sort({ date: 1 })
+      .skip(skip)
+      .limit(limit),
+    Movement.countDocuments(query),
+  ]);
+
+  const formatted = movements.map((m) => {
+    const plain = m.toObject();
+    let normalizedType = plain.type;
+    if (plain.type === 'Ingreso') normalizedType = 'INCOME';
+    else if (plain.type === 'Egreso') normalizedType = 'EXPENSE';
+
+    return {
+      ...plain,
+      _id: plain._id.toString(),
+      type: normalizedType,
+      amount: toNumber(plain.amount),
+      amountInCOP: toNumber(plain.amountInCOP),
+      exchangeRate: toNumber(plain.exchangeRate),
+      quantity: plain.quantity ? toNumber(plain.quantity) : undefined,
+      unitValue: plain.unitValue ? toNumber(plain.unitValue) : undefined,
+      category:
+        plain.category && typeof plain.category === 'object'
+          ? {
+              ...plain.category,
+              color: getSemanticCategoryColor(
+                plain.type,
+                plain.category.color,
+                plain.category._id.toString()
+              ),
+            }
+          : plain.category,
+    };
+  });
+
+  return { formatted, total };
+}
+
+function calculateHealthMetrics(
+  totalIncome: string,
+  totalExpenses: string,
+  netBalance: string,
+  formattedMonthlyData: MonthlyData[],
+  yearParam: string | null,
+  monthParam: string | null
+) {
+  const isAnnual = yearParam && !monthParam;
+  const currentYear = new Date().getUTCFullYear();
+  const currentMonth = new Date().getUTCMonth() + 1;
+
+  // For annual view of current year, only use months up to now for average
+  let relevantMonths = formattedMonthlyData;
+  if (isAnnual && parseInt(yearParam) === currentYear) {
+    relevantMonths = formattedMonthlyData.slice(0, currentMonth);
+  }
+
+  // Filter out months with no activity to avoid dragging down average?
+  // Actually, standard burn rate usually counts all months.
+  // But let's at least use the last 3 ACTIVE months if possible.
+  const last3MonthsMetrics = relevantMonths.slice(-3);
+
+  const avgMonthlyExpenses =
+    last3MonthsMetrics.length > 0
+      ? divide(
+          last3MonthsMetrics.reduce((sum, m) => add(sum, m.expenses), '0'),
+          last3MonthsMetrics.length
+        )
+      : divide(totalExpenses, relevantMonths.length || 1);
+
+  const avgMonthlyIncome =
+    last3MonthsMetrics.length > 0
+      ? divide(
+          last3MonthsMetrics.reduce((sum, m) => add(sum, m.income), '0'),
+          last3MonthsMetrics.length
+        )
+      : divide(totalIncome, relevantMonths.length || 1);
+
+  const netBurnRate = subtract(avgMonthlyExpenses, avgMonthlyIncome);
+
+  const cashRunway = gtZero(netBurnRate)
+    ? toNumber(divide(netBalance, netBurnRate))
+    : Infinity;
+
+  const grossProfitMargin = gtZero(totalIncome)
+    ? toNumber(
+        multiply(divide(subtract(totalIncome, totalExpenses), totalIncome), 100)
+      )
+    : 0;
+
+  const healthScore = calculateHealthScore(
+    cashRunway,
+    grossProfitMargin,
+    relevantMonths
+  );
+
+  const runwayProjection = generateRunwayProjection(netBalance, netBurnRate);
+
+  return {
+    runway: cashRunway,
+    burnRate: {
+      gross: toNumber(avgMonthlyExpenses),
+      net: toNumber(netBurnRate),
+    },
+    profitMargin: grossProfitMargin,
+    avgMonthlyIncome: toNumber(avgMonthlyIncome),
+    avgMonthlyExpense: toNumber(avgMonthlyExpenses),
+    healthScore,
+    runwayProjection,
+  };
+}
+
+async function getMonthlyData(
+  matchStage: Record<string, unknown>,
+  yearContext?: number
+) {
   const monthlyData = await Movement.aggregate([
     { $match: matchStage },
     {
@@ -110,7 +249,7 @@ async function getMonthlyData(matchStage: Record<string, unknown>) {
           $sum: {
             $cond: [
               { $in: ['$type', ['Ingreso', 'INCOME']] },
-              { $ifNull: ['$amountInCOP', '$amount'] },
+              GET_AMOUNT_EXPR,
               0,
             ],
           },
@@ -119,7 +258,7 @@ async function getMonthlyData(matchStage: Record<string, unknown>) {
           $sum: {
             $cond: [
               { $not: { $in: ['$type', ['Ingreso', 'INCOME']] } },
-              { $ifNull: ['$amountInCOP', '$amount'] },
+              GET_AMOUNT_EXPR,
               0,
             ],
           },
@@ -129,11 +268,30 @@ async function getMonthlyData(matchStage: Record<string, unknown>) {
     { $sort: { '_id.year': 1, '_id.month': 1 } },
   ]);
 
-  const formattedMonthlyData = monthlyData.map((d) => ({
+  let formattedMonthlyData = monthlyData.map((d) => ({
     month: `${d._id.year}-${String(d._id.month).padStart(2, '0')}`,
     income: toNumber(d.income),
     expenses: toNumber(d.expense),
   }));
+
+  // If a year context is provided (e.g., Annual View), fill in missing months
+  if (yearContext) {
+    const filledData = [];
+    for (let m = 1; m <= 12; m++) {
+      const monthStr = `${yearContext}-${String(m).padStart(2, '0')}`;
+      const found = formattedMonthlyData.find((d) => d.month === monthStr);
+      if (found) {
+        filledData.push(found);
+      } else {
+        filledData.push({
+          month: monthStr,
+          income: 0,
+          expenses: 0,
+        });
+      }
+    }
+    formattedMonthlyData = filledData;
+  }
 
   return { monthlyData, formattedMonthlyData };
 }
@@ -162,7 +320,7 @@ async function getCategoryBreakdown(
     {
       $group: {
         _id: '$category',
-        value: { $sum: { $ifNull: ['$amountInCOP', '$amount'] } },
+        value: { $sum: GET_AMOUNT_EXPR },
       },
     },
     {
@@ -247,7 +405,7 @@ async function getCostCenterBreakdown(
     {
       $group: {
         _id: { $ifNull: ['$costCenter', 'Sin definir'] },
-        value: { $sum: { $ifNull: ['$amountInCOP', '$amount'] } },
+        value: { $sum: GET_AMOUNT_EXPR },
       },
     },
     { $sort: { value: isIncome ? -1 : 1 } }, // Expenses are usually positive in this view if they are 'amount', but let's check
@@ -282,7 +440,7 @@ async function getDailyData(
           $sum: {
             $cond: [
               { $in: ['$type', ['Ingreso', 'INCOME']] },
-              { $ifNull: ['$amountInCOP', '$amount'] },
+              GET_AMOUNT_EXPR,
               0,
             ],
           },
@@ -291,7 +449,7 @@ async function getDailyData(
           $sum: {
             $cond: [
               { $not: { $in: ['$type', ['Ingreso', 'INCOME']] } },
-              { $ifNull: ['$amountInCOP', '$amount'] },
+              GET_AMOUNT_EXPR,
               0,
             ],
           },
@@ -454,12 +612,22 @@ export async function GET(request: NextRequest) {
         await getTotals(matchStage);
 
       // 2. Monthly Data
-      const { formattedMonthlyData } = await getMonthlyData(matchStage);
+      const { formattedMonthlyData } = await getMonthlyData(
+        matchStage,
+        yearParam && !monthParam ? parseInt(yearParam) : undefined
+      );
 
-      // 3. Category Breakdown (Income & Expense)
-      const [categoriesExpense, categoriesIncome] = await Promise.all([
+      // 3. Category & Cost Center Breakdowns
+      const [
+        categoriesExpense,
+        categoriesIncome,
+        costCentersExpense,
+        costCentersIncome,
+      ] = await Promise.all([
         getCategoryBreakdown(matchStage, startDate, endDate, false),
         getCategoryBreakdown(matchStage, startDate, endDate, true),
+        getCostCenterBreakdown(matchStage, startDate, endDate, false),
+        getCostCenterBreakdown(matchStage, startDate, endDate, true),
       ]);
 
       // 4. Daily Breakdown (Only relevant for monthly view)
@@ -479,154 +647,38 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      // 5. Cost Center Breakdown (Income & Expense)
-      const [costCentersExpense, costCentersIncome] = await Promise.all([
-        getCostCenterBreakdown(matchStage, startDate, endDate, false),
-        getCostCenterBreakdown(matchStage, startDate, endDate, true),
-      ]);
-
-      // 6. Movements List for the period with Pagination
+      // 5. Movements List with Pagination
       const page = parseInt(searchParams.get('page') || '1');
       const limit = parseInt(searchParams.get('limit') || '20');
-      const skip = (page - 1) * limit;
+      const { formatted: movements, total: totalMovements } =
+        await getMovements(matchStage, page, limit);
 
-      const movementQuery: Record<string, unknown> = { ...matchStage };
-      if (startDate && endDate) {
-        movementQuery.date = { $gte: startDate, $lte: endDate };
-      }
-
-      const [movements, totalMovements] = await Promise.all([
-        Movement.find(movementQuery)
-          .populate('category')
-          .sort({ date: 1 })
-          .skip(skip)
-          .limit(limit),
-        Movement.countDocuments(movementQuery),
-      ]);
-
-      const formattedMovements = movements.map((m) => {
-        const plain = m.toObject();
-        let normalizedType = plain.type;
-        if (plain.type === 'Ingreso') normalizedType = 'INCOME';
-        else if (plain.type === 'Egreso') normalizedType = 'EXPENSE';
-
-        return {
-          ...plain,
-          _id: plain._id.toString(),
-          type: normalizedType,
-          amount: toNumber(plain.amount),
-          amountInCOP: toNumber(plain.amountInCOP),
-          exchangeRate: toNumber(plain.exchangeRate),
-          quantity: plain.quantity ? toNumber(plain.quantity) : undefined,
-          unitValue: plain.unitValue ? toNumber(plain.unitValue) : undefined,
-          category:
-            plain.category && typeof plain.category === 'object'
-              ? {
-                  ...plain.category,
-                  color: getSemanticCategoryColor(
-                    plain.type, // 'Ingreso' or 'Egreso'
-                    plain.category.color,
-                    plain.category._id.toString()
-                  ),
-                }
-              : plain.category,
-        };
-      });
-
-      // 7. Calculate Health Metrics
-      // ... (Health logic remains same but ensuring no changes unless necessary)
-
-      // Re-implementing health logic block from previous context if needed,
-      // but simpler to just return the response structure with pagination
-
-      // ... Health Logic ...
-      // 7. Calculate Balance History (for monthly view)
+      // 6. Calculate Balance History (Starting balance before period)
       let balanceData = undefined;
-      if (yearParam && monthParam && startDate && endDate) {
-        const year = parseInt(yearParam);
-        const month = parseInt(monthParam);
+      if (yearParam && startDate && endDate) {
+        // Calculate the last moment of the previous period
+        const prevPeriodEnd = new Date(startDate.getTime() - 1);
 
-        // Calculate the last moment of the previous month
-        // For June (month=6), we want May 31st 23:59:59.999
-        // Date.UTC(year, month-1, 0) gives us the last day of the previous month
-        const prevMonthEnd = new Date(
-          Date.UTC(year, month - 1, 0, 23, 59, 59, 999)
-        );
-
-        // Use baseMatchStage without date restrictions, then add date filter
-        const previousMonthTotals = await getTotals({
-          ...baseMatchStage,
-          date: { $lte: prevMonthEnd },
-        });
-
-        // Calculate current month balance (end of current month)
-        const currentMonthTotals = await getTotals({
-          ...baseMatchStage,
-          date: { $lte: endDate },
-        });
+        const [previousTotals, currentTotals] = await Promise.all([
+          getTotals({ ...baseMatchStage, date: { $lte: prevPeriodEnd } }),
+          getTotals({ ...baseMatchStage, date: { $lte: endDate } }),
+        ]);
 
         balanceData = {
-          previousMonth: toNumber(previousMonthTotals.netBalance),
-          currentMonth: toNumber(currentMonthTotals.netBalance),
+          previousMonth: toNumber(previousTotals.netBalance),
+          currentMonth: toNumber(currentTotals.netBalance),
         };
       }
 
-      // 8. Calculate Health Metrics with 3-month Rolling Average
-      const last3MonthsMetrics = formattedMonthlyData.slice(-3);
-      const avgMonthlyExpenses =
-        last3MonthsMetrics.length > 0
-          ? divide(
-              last3MonthsMetrics.reduce((sum, m) => add(sum, m.expenses), '0'),
-              last3MonthsMetrics.length
-            )
-          : divide(totalExpenses, formattedMonthlyData.length || 1);
-
-      const avgMonthlyIncome =
-        last3MonthsMetrics.length > 0
-          ? divide(
-              last3MonthsMetrics.reduce((sum, m) => add(sum, m.income), '0'),
-              last3MonthsMetrics.length
-            )
-          : divide(totalIncome, formattedMonthlyData.length || 1);
-
-      const netBurnRate = subtract(avgMonthlyExpenses, avgMonthlyIncome);
-
-      const cashRunway = gtZero(netBurnRate)
-        ? toNumber(divide(netBalance, netBurnRate))
-        : Infinity;
-
-      const grossProfitMargin = gtZero(totalIncome)
-        ? toNumber(
-            multiply(
-              divide(subtract(totalIncome, totalExpenses), totalIncome),
-              100
-            )
-          )
-        : 0;
-
-      const healthScore = calculateHealthScore(
-        cashRunway,
-        grossProfitMargin,
-        formattedMonthlyData
-      );
-
-      const runwayProjection = generateRunwayProjection(
+      // 7. Calculate Health Metrics
+      const health = calculateHealthMetrics(
+        totalIncome,
+        totalExpenses,
         netBalance,
-        netBurnRate
+        formattedMonthlyData,
+        yearParam,
+        monthParam
       );
-
-      const healthData = {
-        runway: cashRunway,
-        burnRate: {
-          gross: toNumber(avgMonthlyExpenses),
-          net: toNumber(netBurnRate),
-        },
-        profitMargin: grossProfitMargin,
-        avgMonthlyIncome: toNumber(avgMonthlyIncome),
-        avgMonthlyExpense: toNumber(avgMonthlyExpenses),
-        healthScore,
-        runwayProjection,
-      };
 
       return {
         totals: {
@@ -648,14 +700,14 @@ export async function GET(request: NextRequest) {
         },
         monthly: formattedMonthlyData,
         daily: formattedDailyData,
-        categories: categoriesExpense, // Keeping original structure
+        categories: categoriesExpense,
         categoriesExpense,
         categoriesIncome,
         costCenters: costCentersExpense,
         costCentersExpense,
         costCentersIncome,
-        movements: formattedMovements,
-        health: healthData,
+        movements,
+        health,
         balances: balanceData,
       };
     }
