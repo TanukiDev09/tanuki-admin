@@ -5,6 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-01-31
+
+### ✨ Nuevas Características
+
+- **Módulo de Deudas (Lanzamiento)**:
+  - **Dashboard Consolidado**: Seguimiento en tiempo real de activos (Por Cobrar) y pasivos (Por Pagar) con balance neto.
+  - **Gestión por Entidad**: Vistas detalladas para obligaciones agrupadas por cliente o proveedor.
+  - **Detalle de Obligación**: Ficha técnica con historial de pagos y progreso visual.
+- **Gestión de Movimientos**:
+  - **Borrado Mandatorio**: Funcionalidad de eliminación de movimientos condicionada al permiso `DELETE` del módulo `FINANCE`.
+  - **Navegación Inteligente (Smart Back)**: Redirección automática basada en el contexto de origen del usuario al eliminar registros.
+
+### 🚀 Mejoras & UX
+
+- **Experiencia Visual Premium**:
+  - **Estética "Premium Light"**: Nuevo lenguaje visual de alta claridad y profesionalismo, optimizado para legibilidad.
+  - **Navegación Solid**: Consolidación de Sidebar y MobileNav a estilo "Solid Light" (100% opacidad).
+- **Inteligencia en Salud Financiera**:
+  - **Métricas Sostenibles**: Ajuste dinámico de Runway y Burn Rate limitando promedios solo a meses transcurridos.
+  - **Unificación de Indicadores**: Score, Runway y Gasto Neto disponibles consistentemente en vistas Mensual y Anual.
+- **Flujos de Usuario**:
+  - **Confirmación de Seguridad**: Diálogos preventivos en acciones destructivas.
+  - **Reseteo Automático**: Reinicio de paginación al cambiar de periodo para evitar listas vacías.
+
+### 🛠️ Calidad Técnica
+
+- **Accesibilidad WCAG AAA Nativa**:
+  - **Contraste Enriquecido**: Certificación de contraste 7:1 en todo el módulo de deudas.
+  - **Semántica Optimizada**: Estructura de navegación y landmarks totalmente compatibles con tecnologías de asistencia.
+- **Robustez del Codebase**:
+  - **Strict Typing**: Eliminación masiva de `any` en favor de interfaces estrictas y tipos `unknown` seguros.
+  - **Arquitectura SASS/BEM**: Implementación modular y mantenible sin dependencias de frameworks de utilidad.
+  - **Simplificación de API**: Refactorización de servicios financieros para reducir complejidad cognitiva.
+
+### 🛡️ Seguridad y Estabilidad
+
+- **Protección de Infraestructura**:
+  - **Next.js v16.1.5**: Actualización crítica para mitigar vulnerabilidades DoS y fugas de memoria.
+  - **Parche de Dependencias**: Override forzado de `lodash-es` a la versión 4.17.23 para prevenir Prototype Pollution.
+
+### 🐛 Correcciones
+
+- **Precisión Financiera**: Corregido el inicio del histórico anual ($0) mediante la integración del Saldo Inicial del periodo previo.
+- **Sincronización Temporal**: Solución a condiciones de carrera en la URL que impedían la actualización correcta del año al pasar de diciembre a enero.
+
+---
+
 ## [1.0.2] - 2026-01-27
 
 ### ✨ Nuevas Características

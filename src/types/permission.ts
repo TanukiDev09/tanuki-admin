@@ -15,6 +15,7 @@ export enum ModuleName {
   COST_CENTERS = 'costcenters',
   USERS = 'users',
   PERMISSIONS = 'permissions',
+  DEBTS = 'debts',
 }
 
 // Enum para acciones CRUD
@@ -136,6 +137,10 @@ export const MODULE_METADATA: Record<
   [ModuleName.PERMISSIONS]: {
     label: 'Permisos',
     description: 'Gestión de permisos de usuarios',
+  },
+  [ModuleName.DEBTS]: {
+    label: 'Deudas',
+    description: 'Gestión de deudas por cobrar y pagar',
   },
 };
 

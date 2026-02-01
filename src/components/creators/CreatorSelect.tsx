@@ -29,7 +29,7 @@ import './CreatorSelect.scss';
 
 interface CreatorSelectProps {
   value: string[];
-  onChange: (value: string[]) => void;
+  onChange: (value: string[], names?: string[]) => void;
   placeholder?: string;
   max?: number;
 }
@@ -84,7 +84,12 @@ export function CreatorSelect({
       if (max && value.length >= max) return;
       newValue = [...value, id];
     }
-    onChange(newValue);
+
+    const newNames = creators
+      .filter((c) => newValue.includes(c._id))
+      .map((c) => c.name);
+
+    onChange(newValue, newNames);
   };
 
   // Helper para mostrar el nombre de los seleccionados

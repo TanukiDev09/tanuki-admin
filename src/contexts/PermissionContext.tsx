@@ -84,7 +84,17 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
     }
 
     const modulePermissions = permissions[module];
-    return modulePermissions ? modulePermissions.includes(action) : false;
+    let hasPerm = modulePermissions
+      ? modulePermissions.includes(action)
+      : false;
+
+    // Fallback logic for Debts using Finance permissions
+    if (!hasPerm && module === ModuleName.DEBTS) {
+      const financePerms = permissions[ModuleName.FINANCE];
+      hasPerm = financePerms ? financePerms.includes(action) : false;
+    }
+
+    return hasPerm;
   };
 
   const hasAnyPermission = (module: ModuleName): boolean => {
@@ -94,7 +104,15 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
     }
 
     const modulePermissions = permissions[module];
-    return modulePermissions ? modulePermissions.length > 0 : false;
+    let hasAny = modulePermissions ? modulePermissions.length > 0 : false;
+
+    // Fallback logic for Debts using Finance permissions
+    if (!hasAny && module === ModuleName.DEBTS) {
+      const financePerms = permissions[ModuleName.FINANCE];
+      hasAny = financePerms ? financePerms.length > 0 : false;
+    }
+
+    return hasAny;
   };
 
   const refetchPermissions = async () => {

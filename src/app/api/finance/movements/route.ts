@@ -4,9 +4,11 @@ import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import * as mongoose from 'mongoose';
 import Movement from '@/models/Movement';
+import Debt from '@/models/Debt';
 import InventoryMovement from '@/models/InventoryMovement';
 import {
   add,
+  subtract,
   multiply,
   divide,
   compare,
@@ -174,6 +176,11 @@ const applyOtherFilters = (
         { notes: searchRegex },
       ],
     } as MovementQuery);
+  }
+
+  const debtId = searchParams.get('debtId');
+  if (debtId) {
+    conditions.push({ debtId } as MovementQuery);
   }
 };
 
@@ -479,6 +486,9 @@ function buildMovementDoc(
       body.pointOfSale && mongoose.isValidObjectId(body.pointOfSale)
         ? body.pointOfSale
         : null,
+    debtId:
+      body.debtId && mongoose.isValidObjectId(body.debtId) ? body.debtId : null,
+    inventoryMovementId: body.inventoryMovementId || null,
   };
 }
 
@@ -517,6 +527,25 @@ function formatSingleMovement(
   } as FormattedMovement;
 }
 
+async function updateDebtProgress(debtId: string, movementAmount: number) {
+  const debt = await Debt.findById(debtId);
+  if (!debt) return;
+
+  const newPaidAmount = add(debt.paidAmount, movementAmount);
+  const newRemainingBalance = subtract(debt.totalAmount, newPaidAmount);
+
+  debt.paidAmount = newPaidAmount;
+  debt.remainingBalance = newRemainingBalance;
+
+  if (toNumber(newRemainingBalance) <= 0) {
+    debt.status = 'Pagado';
+  } else {
+    debt.status = 'Pagado Parcial';
+  }
+
+  await debt.save();
+}
+
 export async function POST(request: NextRequest) {
   const permissionError = await requirePermission(
     request,
@@ -553,6 +582,14 @@ export async function POST(request: NextRequest) {
       await linkInventoryMovement(
         finalDoc.inventoryMovementId as string,
         movement._id
+      );
+    }
+
+    // 4.2 Update Debt if provided
+    if (finalDoc.debtId) {
+      await updateDebtProgress(
+        finalDoc.debtId as string,
+        toNumber(movement.amount)
       );
     }
 

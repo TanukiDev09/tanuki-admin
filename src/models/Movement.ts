@@ -36,6 +36,7 @@ export interface IMovement extends Document {
   receiverId?: string;
   receiverName?: string;
   inventoryMovementId?: mongoose.Types.ObjectId | string;
+  debtId?: mongoose.Types.ObjectId | string;
 }
 
 const MovementSchema: Schema = new Schema(
@@ -80,6 +81,10 @@ const MovementSchema: Schema = new Schema(
     inventoryMovementId: {
       type: Schema.Types.ObjectId,
       ref: 'InventoryMovement',
+    },
+    debtId: {
+      type: Schema.Types.ObjectId,
+      ref: 'Debt',
     },
   },
   {

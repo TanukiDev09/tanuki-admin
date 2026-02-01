@@ -297,7 +297,9 @@ export default function CreateBookModal({
                   onRemove={(bookId: string) => {
                     setFormData({
                       ...formData,
-                      bundleBooks: formData.bundleBooks.filter((id) => id !== bookId),
+                      bundleBooks: formData.bundleBooks.filter(
+                        (id) => id !== bookId
+                      ),
                     });
                     setBundleBooksData(
                       bundleBooksData.filter((b) => b._id !== bookId)

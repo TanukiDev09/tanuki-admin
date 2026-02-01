@@ -170,11 +170,18 @@ export default function BookDetailPage(props: {
                 <div className="book-detail__info-row">
                   <span className="book-detail__label">Stock</span>
                   <div className="book-detail__stock-display">
-                    <span className={`book-detail__value book-detail__value--medium ${book.isBundle ? 'book-detail__value--bundle' : ''}`}>
+                    <span
+                      className={`book-detail__value book-detail__value--medium ${book.isBundle ? 'book-detail__value--bundle' : ''}`}
+                    >
                       {formatNumber(book.totalStock ?? book.stock)} unidades
                     </span>
                     {book.isBundle && (
-                      <Badge variant="secondary" className="book-detail__virtual-badge">Virtual</Badge>
+                      <Badge
+                        variant="secondary"
+                        className="book-detail__virtual-badge"
+                      >
+                        Virtual
+                      </Badge>
                     )}
                   </div>
                 </div>
@@ -194,7 +201,10 @@ export default function BookDetailPage(props: {
                 <div className="book-detail__title-row">
                   <h1 className="book-detail__title">{book.title}</h1>
                   {book.isBundle && (
-                    <Badge variant="secondary" className="book-detail__bundle-badge">
+                    <Badge
+                      variant="secondary"
+                      className="book-detail__bundle-badge"
+                    >
                       Obra Completa
                     </Badge>
                   )}
@@ -206,8 +216,9 @@ export default function BookDetailPage(props: {
                 {book.isBundle && (
                   <div className="book-detail__bundle-notice">
                     <p>
-                      <strong>Nota de Inventario:</strong> Este es un artículo virtual. Su stock se calcula
-                      automáticamente basándose en la disponibilidad mínima de sus volúmenes individuales.
+                      <strong>Nota de Inventario:</strong> Este es un artículo
+                      virtual. Su stock se calcula automáticamente basándose en
+                      la disponibilidad mínima de sus volúmenes individuales.
                     </p>
                   </div>
                 )}
@@ -260,24 +271,32 @@ export default function BookDetailPage(props: {
                 </div>
               </div>
 
-              {book.isBundle && book.bundleBooks && book.bundleBooks.length > 0 && (
-                <div className="book-detail__bundle-volumes">
-                  <h2 className="book-detail__section-title--small">Contenido de la Obra</h2>
-                  <div className="book-detail__volumes-list">
-                    {(book.bundleBooks as BookResponse[]).map((vol) => (
-                      <a
-                        key={vol._id}
-                        href={`/dashboard/catalog/${vol._id}`}
-                        className="book-detail__volume-item"
-                      >
-                        <div className="book-detail__volume-dot" />
-                        <span className="book-detail__volume-title">{vol.title}</span>
-                        <span className="book-detail__volume-isbn">{vol.isbn}</span>
-                      </a>
-                    ))}
+              {book.isBundle &&
+                book.bundleBooks &&
+                book.bundleBooks.length > 0 && (
+                  <div className="book-detail__bundle-volumes">
+                    <h2 className="book-detail__section-title--small">
+                      Contenido de la Obra
+                    </h2>
+                    <div className="book-detail__volumes-list">
+                      {(book.bundleBooks as BookResponse[]).map((vol) => (
+                        <a
+                          key={vol._id}
+                          href={`/dashboard/catalog/${vol._id}`}
+                          className="book-detail__volume-item"
+                        >
+                          <div className="book-detail__volume-dot" />
+                          <span className="book-detail__volume-title">
+                            {vol.title}
+                          </span>
+                          <span className="book-detail__volume-isbn">
+                            {vol.isbn}
+                          </span>
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
             </div>
           </div>
 

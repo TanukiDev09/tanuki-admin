@@ -26,6 +26,7 @@ import { formatCurrency } from '@/lib/utils';
 import { multiply, divide, gtZero, add, toNumber, compare } from '@/lib/math';
 import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import { AllocationTable } from '@/components/finance/AllocationTable';
+import { DebtSelect } from '@/components/finance/DebtSelect';
 import '../../movement-form.scss';
 
 export default function EditMovementPage() {
@@ -331,6 +332,32 @@ export default function EditMovementPage() {
           onValueChange={(val) => handleSelectChange('category', val)}
           type={formData.type as 'INCOME' | 'EXPENSE'}
         />
+      </div>
+
+      <div className="movement-form__field-group">
+        <Label>Deuda Relacionada (Opcional)</Label>
+        <DebtSelect
+          value={formData.debtId as string}
+          alwaysIncludeId={formData.debtId as string}
+          onValueChange={(val) => {
+            setFormData((prev) => ({
+              ...prev,
+              debtId: val,
+            }));
+          }}
+          type={
+            formData.type === 'INCOME'
+              ? 'Cuenta por Cobrar'
+              : 'Cuenta por Pagar'
+          }
+          currentAmount={formData.amount}
+          currentConcept={formData.description}
+          currentCurrency={formData.currency}
+        />
+        <p className="text-[10px] text-muted-foreground mt-1">
+          Vincular este movimiento a una deuda pendiente para actualizar su
+          saldo.
+        </p>
       </div>
 
       <div className="flex items-center justify-between mb-2">

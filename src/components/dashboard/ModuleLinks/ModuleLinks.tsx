@@ -16,6 +16,7 @@ import {
   LucideIcon,
   Receipt,
   PenTool,
+  Wallet,
 } from 'lucide-react';
 import {
   ModuleName,
@@ -40,6 +41,7 @@ const MODULE_ICONS: Record<ModuleName, LucideIcon> = {
   [ModuleName.COST_CENTERS]: Calculator,
   [ModuleName.USERS]: UserCog,
   [ModuleName.PERMISSIONS]: Shield,
+  [ModuleName.DEBTS]: Wallet,
 };
 
 // Map module names to routes
@@ -57,6 +59,7 @@ const MODULE_ROUTES: Record<ModuleName, string> = {
   [ModuleName.COST_CENTERS]: '/dashboard/cost-centers',
   [ModuleName.USERS]: '/dashboard/users',
   [ModuleName.PERMISSIONS]: '/dashboard/permissions',
+  [ModuleName.DEBTS]: '/dashboard/debts',
 };
 
 export function ModuleLinks() {
