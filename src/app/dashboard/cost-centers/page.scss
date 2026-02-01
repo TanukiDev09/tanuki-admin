@@ -5,11 +5,14 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-xl;
+  padding-bottom: $spacing-2xl;
 
   &__header {
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
+    border-bottom: 1px solid $border;
+    padding-bottom: $spacing-xl;
 
     @include md {
       flex-direction: row;
@@ -26,9 +29,9 @@
 
   &__title {
     color: $foreground;
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: $font-weight-bold;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 
   &__subtitle {
@@ -36,19 +39,104 @@
     font-size: $font-size-base;
   }
 
-  &__icon {
-    width: 18px;
-    height: 18px;
-    margin-right: $spacing-xs;
+  &__stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+
+    @include md {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
-  &__controls {
+  &__charts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+
+    @include lg {
+      grid-template-columns: 3fr 2fr;
+    }
+  }
+
+  &__chart-card {
+    background-color: $card;
+    border-radius: $radius-lg;
+    border: 1px solid $border;
+    box-shadow: $shadow-sm;
+    transition: $transition-base;
+
+    &:hover {
+      box-shadow: $shadow-md;
+    }
+  }
+
+  &__table-section {
     display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    background-color: $card;
+    border-radius: $radius-lg;
+    border: 1px solid $border;
+    padding: $spacing-lg;
+    box-shadow: $shadow-sm;
+  }
+
+  &__table-header {
+    display: flex;
+    flex-direction: column;
     gap: $spacing-md;
+
+    @include md {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  &__search-container {
+    position: relative;
+    width: 100%;
     max-width: 400px;
   }
 
+  &__search-icon {
+    position: absolute;
+    left: $spacing-md;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: $muted-foreground;
+    pointer-events: none;
+    z-index: 1;
+  }
+
   &__search {
-    background-color: $card;
+    padding-left: 2.5rem;
+    background-color: $muted;
+    border-color: transparent;
+    transition: $transition-fast;
+
+    &:focus {
+      background-color: $card;
+      border-color: $primary;
+    }
+  }
+
+  &__chart-container {
+    height: 300px;
+    padding: $spacing-lg;
+    padding-top: 0;
+  }
+
+  &__new-btn {
+    box-shadow: $shadow-sm;
+    transition: $transition-base;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: $shadow-md;
+    }
   }
 }

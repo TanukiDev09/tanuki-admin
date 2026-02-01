@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { usePermission } from '@/hooks/usePermissions';
+import { usePersistentFilters } from '@/hooks/usePersistentFilters';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import {
   Table,
@@ -56,11 +57,10 @@ const MovementTableRow = ({
     let channelLabel = '';
     switch (movement.salesChannel) {
       case 'LIBRERIA':
-        channelLabel = `Librería: ${
-          typeof movement.pointOfSale === 'object'
-            ? movement.pointOfSale.name
-            : 'Varios'
-        }`;
+        channelLabel = `Librería: ${typeof movement.pointOfSale === 'object'
+          ? movement.pointOfSale.name
+          : 'Varios'
+          }`;
         break;
       case 'DIRECTA':
         channelLabel = 'Directa';
@@ -140,11 +140,10 @@ const MovementTableRow = ({
       <TableCell data-label="Monto">
         <div className="flex flex-col items-end">
           <span
-            className={`movements-list__amount ${
-              movement.type === 'INCOME'
-                ? 'movements-list__amount--income'
-                : 'movements-list__amount--expense'
-            }`}
+            className={`movements-list__amount ${movement.type === 'INCOME'
+              ? 'movements-list__amount--income'
+              : 'movements-list__amount--expense'
+              }`}
           >
             {movement.type === 'INCOME' ? '+' : '-'}
             {formatCurrency(
@@ -220,34 +219,79 @@ export default function MovementsPage() {
   const { toast } = useToast();
   const [movements, setMovements] = useState<Movement[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-  const [typeFilter, setTypeFilter] = useState('ALL');
-  const [categoryFilter, setCategoryFilter] = useState('ALL');
-  const [costCenterFilter, setCostCenterFilter] = useState('ALL');
-  const [minAmount, setMinAmount] = useState<string | number | undefined>('');
-  const [maxAmount, setMaxAmount] = useState<string | number | undefined>('');
-  const [unitFilter, setUnitFilter] = useState('ALL');
-  const [minQuantity, setMinQuantity] = useState<string | number | undefined>(
-    ''
-  );
-  const [maxQuantity, setMaxQuantity] = useState<string | number | undefined>(
-    ''
-  );
-  const [quantityUndefined, setQuantityUndefined] = useState(false);
-  const [paymentChannelFilter, setPaymentChannelFilter] = useState('ALL');
+
+  const {
+    filters,
+    updateFilters,
+    clearFilters: resetAllFilters,
+    hasInitializedRef
+  } = usePersistentFilters({
+    key: 'movements_filters',
+    initialFilters: {
+      search: '',
+      type: 'ALL',
+      category: 'ALL',
+      costCenter: 'ALL',
+      minAmount: '' as string | number | undefined,
+      maxAmount: '' as string | number | undefined,
+      unit: 'ALL',
+      minQuantity: '' as string | number | undefined,
+      maxQuantity: '' as string | number | undefined,
+      quantityUndefined: false,
+      paymentChannel: 'ALL',
+      salesChannel: 'ALL',
+      startDate: '',
+      endDate: '',
+      sortOrder: 'newest',
+      page: 1,
+      showAdvanced: false,
+    }
+  });
+
+  const {
+    search,
+    type: typeFilter,
+    category: categoryFilter,
+    costCenter: costCenterFilter,
+    minAmount,
+    maxAmount,
+    unit: unitFilter,
+    minQuantity,
+    maxQuantity,
+    quantityUndefined,
+    paymentChannel: paymentChannelFilter,
+    salesChannel: salesChannelFilter,
+    startDate,
+    endDate,
+    sortOrder,
+    page,
+    showAdvanced: showAdvancedFilters,
+  } = filters;
+
+  const setShowAdvancedFilters = useCallback((val: boolean) => updateFilters({ showAdvanced: val }), [updateFilters]);
+  const setSearch = useCallback((val: string) => updateFilters({ search: val }), [updateFilters]);
+  const setTypeFilter = useCallback((val: string) => updateFilters({ type: val }), [updateFilters]);
+  const setCategoryFilter = useCallback((val: string) => updateFilters({ category: val }), [updateFilters]);
+  const setCostCenterFilter = useCallback((val: string) => updateFilters({ costCenter: val }), [updateFilters]);
+  const setMinAmount = useCallback((val: string | number | undefined) => updateFilters({ minAmount: val }), [updateFilters]);
+  const setMaxAmount = useCallback((val: string | number | undefined) => updateFilters({ maxAmount: val }), [updateFilters]);
+  const setUnitFilter = useCallback((val: string) => updateFilters({ unit: val }), [updateFilters]);
+  const setMinQuantity = useCallback((val: string | number | undefined) => updateFilters({ minQuantity: val }), [updateFilters]);
+  const setMaxQuantity = useCallback((val: string | number | undefined) => updateFilters({ maxQuantity: val }), [updateFilters]);
+  const setQuantityUndefined = useCallback((val: boolean) => updateFilters({ quantityUndefined: val }), [updateFilters]);
+  const setPaymentChannelFilter = useCallback((val: string) => updateFilters({ paymentChannel: val }), [updateFilters]);
+  const setSalesChannelFilter = useCallback((val: string) => updateFilters({ salesChannel: val }), [updateFilters]);
+  const setStartDate = useCallback((val: string) => updateFilters({ startDate: val }), [updateFilters]);
+  const setEndDate = useCallback((val: string) => updateFilters({ endDate: val }), [updateFilters]);
+  const setSortOrder = useCallback((val: string) => updateFilters({ sortOrder: val }), [updateFilters]);
+  const setPage = useCallback((val: number) => updateFilters({ page: val }), [updateFilters]);
+
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
-  const [availablePaymentChannels, setAvailablePaymentChannels] = useState<
-    string[]
-  >([]);
-  const [salesChannelFilter, setSalesChannelFilter] = useState('ALL');
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [sortOrder, setSortOrder] = useState('newest');
-  const [page, setPage] = useState(1);
+  const [availablePaymentChannels, setAvailablePaymentChannels] = useState<string[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const limit = 10;
+
   const { hasPermission } = usePermission();
   const canCreate = hasPermission(ModuleName.FINANCE, PermissionAction.CREATE);
   const canUpdate = hasPermission(ModuleName.FINANCE, PermissionAction.UPDATE);
@@ -256,45 +300,32 @@ export default function MovementsPage() {
   const fetchMovements = useCallback(async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
 
-      const addParam = (
-        key: string,
-        value: string | undefined | null,
-        condition = true
-      ) => {
-        if (value && condition) params.append(key, value.toString());
+      const params = new URLSearchParams();
+      const normalize = (val: string) => val !== 'ALL' ? val : '';
+
+      const queryParams: Record<string, string> = {
+        search,
+        type: normalize(typeFilter),
+        category: normalize(categoryFilter),
+        costCenter: normalize(costCenterFilter),
+        paymentChannel: normalize(paymentChannelFilter),
+        salesChannel: normalize(salesChannelFilter),
+        minAmount: minAmount?.toString() || '',
+        maxAmount: maxAmount?.toString() || '',
+        unit: normalize(unitFilter),
+        startDate,
+        endDate,
+        sort: sortOrder,
+        page: page.toString(),
+        limit: limit.toString(),
+        minQuantity: quantityUndefined ? '__UNDEFINED__' : (minQuantity?.toString() || ''),
+        maxQuantity: quantityUndefined ? '' : (maxQuantity?.toString() || ''),
       };
 
-      addParam('search', search);
-      addParam('type', typeFilter, typeFilter !== 'ALL');
-      addParam('category', categoryFilter, categoryFilter !== 'ALL');
-      addParam('costCenter', costCenterFilter, costCenterFilter !== 'ALL');
-      addParam(
-        'paymentChannel',
-        paymentChannelFilter,
-        paymentChannelFilter !== 'ALL'
-      );
-      addParam(
-        'salesChannel',
-        salesChannelFilter,
-        salesChannelFilter !== 'ALL'
-      );
-      addParam('minAmount', minAmount?.toString());
-      addParam('maxAmount', maxAmount?.toString());
-      addParam('unit', unitFilter, unitFilter !== 'ALL');
-      addParam('startDate', startDate);
-      addParam('endDate', endDate);
-      addParam('sort', sortOrder);
-      addParam('page', page.toString());
-      addParam('limit', limit.toString());
-
-      if (quantityUndefined) {
-        params.append('minQuantity', '__UNDEFINED__');
-      } else {
-        addParam('minQuantity', minQuantity?.toString());
-        addParam('maxQuantity', maxQuantity?.toString());
-      }
+      Object.entries(queryParams).forEach(([key, value]) => {
+        if (value) params.append(key, value);
+      });
 
       const res = await fetch(`/api/finance/movements?${params.toString()}`);
       if (!res.ok) throw new Error('Error al cargar movimientos');
@@ -365,26 +396,14 @@ export default function MovementsPage() {
   }, [fetchMovements]);
 
   const clearFilters = () => {
-    setSearch('');
-    setTypeFilter('ALL');
-    setCategoryFilter('ALL');
-    setCostCenterFilter('ALL');
-    setPaymentChannelFilter('ALL');
-    setSalesChannelFilter('ALL');
-    setMinAmount('');
-    setMaxAmount('');
-    setUnitFilter('ALL');
-    setMinQuantity('');
-    setMaxQuantity('');
-    setQuantityUndefined(false);
-    setStartDate('');
-    setEndDate('');
-    setSortOrder('newest');
-    setPage(1);
+    resetAllFilters();
   };
 
   // Reset to first page when filters change
   useEffect(() => {
+    if (!hasInitializedRef.current) {
+      return;
+    }
     setPage(1);
   }, [
     search,
@@ -401,6 +420,8 @@ export default function MovementsPage() {
     endDate,
     quantityUndefined,
     sortOrder,
+    setPage,
+    hasInitializedRef
   ]);
 
   const handleDelete = async (id: string) => {
@@ -548,7 +569,7 @@ export default function MovementsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1 || loading}
               className="movements-list__pagination-btn"
             >
@@ -561,7 +582,7 @@ export default function MovementsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages || loading}
               className="movements-list__pagination-btn"
             >

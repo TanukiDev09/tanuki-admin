@@ -10,8 +10,9 @@
 .stat-card {
   position: relative;
   padding: $spacing-md $spacing-lg;
-  background: $card;
-  border: 1px solid $border;
+  background: rgba($card, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba($border, 0.5);
   border-radius: $radius-lg;
   transition: border-color 0.2s ease;
   overflow: hidden;
