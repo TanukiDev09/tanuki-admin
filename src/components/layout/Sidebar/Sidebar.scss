@@ -16,7 +16,7 @@
   // Solid Theme Base
   background-color: white;
   border-right: 1px solid rgba($primary, 0.1);
-  box-shadow: 10px 0 30px rgba(0, 0, 0, 0.03);
+  box-shadow: 10px 0 30px rgb(0 0 0 / 3%);
   z-index: 100;
   overflow: hidden;
 
@@ -65,7 +65,7 @@
     border: 1px solid rgba($primary, 0.1);
     border-radius: $radius-full;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 12px rgb(0 0 0 / 8%);
 
     @include transition(all);
 
@@ -100,7 +100,7 @@
 
   &__logo-emoji {
     font-size: 2rem;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
+    filter: drop-shadow(0 4px 8px rgb(0 0 0 / 10%));
     flex-shrink: 0;
     transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
@@ -113,7 +113,7 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
-    animation: fadeIn 0.5s ease-out;
+    animation: fade-in 0.5s ease-out;
   }
 
   &__logo-title {
@@ -126,6 +126,7 @@
 
   &__logo-badge {
     @include badge-base(rgba($primary, 0.05), $primary);
+
     font-size: 9px;
     padding: 2px 6px;
     border: 1px solid rgba($primary, 0.1);
@@ -147,7 +148,7 @@
     background: white;
     border: 1px solid rgba($primary, 0.05);
     border-radius: $radius-xl;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 15px rgb(0 0 0 / 3%);
 
     .sidebar--collapsed & {
       justify-content: center;
@@ -165,7 +166,9 @@
     background: $muted;
     border: 1px solid rgba($primary, 0.05);
     border-radius: $radius-lg;
+
     @include flex-center;
+
     flex-shrink: 0;
   }
 
@@ -190,13 +193,14 @@
   &__user-info {
     flex: 1;
     min-width: 0;
-    animation: fadeIn 0.4s ease-out;
+    animation: fade-in 0.4s ease-out;
   }
 
   &__user-name {
     color: $primary;
     font-size: $font-size-sm;
     font-weight: $font-weight-bold;
+
     @include text-truncate;
   }
 
@@ -262,11 +266,12 @@
   }
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: translateX(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);

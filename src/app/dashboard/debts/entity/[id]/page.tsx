@@ -12,7 +12,7 @@ import {
   Search,
   ChevronRight,
   Calendar,
-  FileText
+  FileText,
 } from 'lucide-react';
 import { IDebt } from '@/types/debt';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -37,35 +37,56 @@ export default function EntityDebtsPage() {
       const res = await fetch(`/api/debts?entityId=${entityId}`);
       if (!res.ok) throw new Error('Failed to fetch');
       return res.json();
-    }
+    },
   });
 
   const entityData = debts?.data?.[0]?.entityId;
-  const entityName = debts?.data?.[0]?.entityName || entityData?.name || 'Cargando...';
+  const entityName =
+    debts?.data?.[0]?.entityName || entityData?.name || 'Cargando...';
   const entityType = debts?.data?.[0]?.entityType;
 
-  const summary = debts?.data?.reduce((acc: { cobrar: number; pagar: number }, debt: IDebt) => {
-    const amount = Number(debt.remainingBalance);
-    if (debt.type === 'Cuenta por Cobrar') acc.cobrar += amount;
-    else acc.pagar += amount;
-    return acc;
-  }, { cobrar: 0, pagar: 0 }) || { cobrar: 0, pagar: 0 };
+  const summary = debts?.data?.reduce(
+    (acc: { cobrar: number; pagar: number }, debt: IDebt) => {
+      const amount = Number(debt.remainingBalance);
+      if (debt.type === 'Cuenta por Cobrar') acc.cobrar += amount;
+      else acc.pagar += amount;
+      return acc;
+    },
+    { cobrar: 0, pagar: 0 }
+  ) || { cobrar: 0, pagar: 0 };
 
-  const filteredDebts = debts?.data?.filter((debt: IDebt) =>
-    debt.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    debt.source.reference?.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredDebts = debts?.data?.filter(
+    (debt: IDebt) =>
+      debt.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      debt.source.reference?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Pagado':
-        return <Badge className="entity-debts__badge entity-debts__badge--success">Pagado</Badge>;
+        return (
+          <Badge className="entity-debts__badge entity-debts__badge--success">
+            Pagado
+          </Badge>
+        );
       case 'Pagado Parcial':
-        return <Badge className="entity-debts__badge entity-debts__badge--warning">Parcial</Badge>;
+        return (
+          <Badge className="entity-debts__badge entity-debts__badge--warning">
+            Parcial
+          </Badge>
+        );
       case 'Vencido':
-        return <Badge className="entity-debts__badge entity-debts__badge--danger">Vencido</Badge>;
+        return (
+          <Badge className="entity-debts__badge entity-debts__badge--danger">
+            Vencido
+          </Badge>
+        );
       default:
-        return <Badge className="entity-debts__badge entity-debts__badge--muted">Pendiente</Badge>;
+        return (
+          <Badge className="entity-debts__badge entity-debts__badge--muted">
+            Pendiente
+          </Badge>
+        );
     }
   };
 
@@ -74,7 +95,6 @@ export default function EntityDebtsPage() {
   return (
     <div className="entity-debts">
       <div className="entity-debts__container">
-
         {/* Dynamic Header */}
         <div className="entity-debts__header">
           <div className="entity-debts__header-left">
@@ -91,9 +111,7 @@ export default function EntityDebtsPage() {
               <Badge variant="outline" className="entity-debts__entity-type">
                 {entityType || 'Entidad'}
               </Badge>
-              <h1 className="entity-debts__entity-name">
-                {entityName}
-              </h1>
+              <h1 className="entity-debts__entity-name">{entityName}</h1>
             </div>
           </div>
 
@@ -117,8 +135,12 @@ export default function EntityDebtsPage() {
               </div>
               <div className="entity-debts__card-info">
                 <p className="entity-debts__card-label">Activos Totales</p>
-                <p className="entity-debts__card-value">{formatCurrency(summary.cobrar, 'COP')}</p>
-                <p className="entity-debts__card-sub entity-debts__card-sub--active">Cuentas por cobrar</p>
+                <p className="entity-debts__card-value">
+                  {formatCurrency(summary.cobrar, 'COP')}
+                </p>
+                <p className="entity-debts__card-sub entity-debts__card-sub--active">
+                  Cuentas por cobrar
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -130,8 +152,12 @@ export default function EntityDebtsPage() {
               </div>
               <div className="entity-debts__card-info">
                 <p className="entity-debts__card-label">Pasivos Totales</p>
-                <p className="entity-debts__card-value">{formatCurrency(summary.pagar, 'COP')}</p>
-                <p className="entity-debts__card-sub entity-debts__card-sub--passive">Cuentas por pagar</p>
+                <p className="entity-debts__card-value">
+                  {formatCurrency(summary.pagar, 'COP')}
+                </p>
+                <p className="entity-debts__card-sub entity-debts__card-sub--passive">
+                  Cuentas por pagar
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -143,14 +169,20 @@ export default function EntityDebtsPage() {
               </div>
               <div className="entity-debts__card-info">
                 <p className="entity-debts__card-label">Saldo de la Entidad</p>
-                <p className={cn(
-                  "entity-debts__card-value",
-                  netBalance >= 0 ? "entity-debts__card-value--positive" : "entity-debts__card-value--negative"
-                )}>
+                <p
+                  className={cn(
+                    'entity-debts__card-value',
+                    netBalance >= 0
+                      ? 'entity-debts__card-value--positive'
+                      : 'entity-debts__card-value--negative'
+                  )}
+                >
                   {formatCurrency(Math.abs(netBalance), 'COP')}
                 </p>
                 <p className="entity-debts__card-sub">
-                  {netBalance >= 0 ? 'A favor de la empresa' : 'Saldo pendiente de pago'}
+                  {netBalance >= 0
+                    ? 'A favor de la empresa'
+                    : 'Saldo pendiente de pago'}
                 </p>
               </div>
             </CardContent>
@@ -182,7 +214,9 @@ export default function EntityDebtsPage() {
                   <div className="entity-debts__spinner-track" />
                   <div className="entity-debts__spinner-thumb" />
                 </div>
-                <p className="entity-debts__loading-text">Cargando transacciones...</p>
+                <p className="entity-debts__loading-text">
+                  Cargando transacciones...
+                </p>
               </div>
             ) : filteredDebts?.length > 0 ? (
               <>
@@ -193,13 +227,19 @@ export default function EntityDebtsPage() {
                     className="entity-debts__item"
                   >
                     <div className="entity-debts__item-left">
-                      <div className={cn(
-                        "entity-debts__item-icon",
-                        debt.type === 'Cuenta por Cobrar'
-                          ? "entity-debts__item-icon--income"
-                          : "entity-debts__item-icon--expense"
-                      )}>
-                        {debt.type === 'Cuenta por Cobrar' ? <TrendingUp className="w-6 h-6" /> : <TrendingDown className="w-6 h-6" />}
+                      <div
+                        className={cn(
+                          'entity-debts__item-icon',
+                          debt.type === 'Cuenta por Cobrar'
+                            ? 'entity-debts__item-icon--income'
+                            : 'entity-debts__item-icon--expense'
+                        )}
+                      >
+                        {debt.type === 'Cuenta por Cobrar' ? (
+                          <TrendingUp className="w-6 h-6" />
+                        ) : (
+                          <TrendingDown className="w-6 h-6" />
+                        )}
                       </div>
                       <div className="entity-debts__item-info">
                         <div className="entity-debts__item-title-group">
@@ -223,11 +263,17 @@ export default function EntityDebtsPage() {
 
                     <div className="entity-debts__item-right">
                       <div className="entity-debts__item-balance">
-                        <p className="entity-debts__item-balance-label">Saldo Pendiente</p>
-                        <p className={cn(
-                          "entity-debts__item-balance-value",
-                          Number(debt.remainingBalance) > 0 ? "entity-debts__item-balance-value--unpaid" : "entity-debts__item-balance-value--paid"
-                        )}>
+                        <p className="entity-debts__item-balance-label">
+                          Saldo Pendiente
+                        </p>
+                        <p
+                          className={cn(
+                            'entity-debts__item-balance-value',
+                            Number(debt.remainingBalance) > 0
+                              ? 'entity-debts__item-balance-value--unpaid'
+                              : 'entity-debts__item-balance-value--paid'
+                          )}
+                        >
                           {formatCurrency(Number(debt.remainingBalance), 'COP')}
                         </p>
                       </div>
@@ -245,7 +291,9 @@ export default function EntityDebtsPage() {
                 </div>
                 <div className="entity-debts__empty-info">
                   <h3 className="entity-debts__empty-title">Historial vacío</h3>
-                  <p className="entity-debts__empty-desc">No se encontraron documentos registrados para esta entidad.</p>
+                  <p className="entity-debts__empty-desc">
+                    No se encontraron documentos registrados para esta entidad.
+                  </p>
                 </div>
               </div>
             )}

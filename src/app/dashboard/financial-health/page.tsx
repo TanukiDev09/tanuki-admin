@@ -340,11 +340,11 @@ function MonthlyView({
           pagination={
             data.pagination
               ? {
-                ...data.pagination,
-                hasPrevPage: data.pagination.page > 1,
-                hasNextPage:
-                  data.pagination.page < data.pagination.totalPages,
-              }
+                  ...data.pagination,
+                  hasPrevPage: data.pagination.page > 1,
+                  hasNextPage:
+                    data.pagination.page < data.pagination.totalPages,
+                }
               : undefined
           }
           onPageChange={onPageChange}
@@ -456,11 +456,11 @@ function AnnualView({
           pagination={
             data.pagination
               ? {
-                ...data.pagination,
-                hasPrevPage: data.pagination.page > 1,
-                hasNextPage:
-                  data.pagination.page < data.pagination.totalPages,
-              }
+                  ...data.pagination,
+                  hasPrevPage: data.pagination.page > 1,
+                  hasNextPage:
+                    data.pagination.page < data.pagination.totalPages,
+                }
               : undefined
           }
           onPageChange={onPageChange}
@@ -586,7 +586,8 @@ export default function FinancialHealthPage() {
             month={month}
             onPeriodChange={(params) => {
               const newParams: Record<string, string | null> = { page: '1' };
-              if (params.year !== undefined) newParams.year = params.year.toString();
+              if (params.year !== undefined)
+                newParams.year = params.year.toString();
               if (params.month !== undefined)
                 newParams.month = params.month ? params.month.toString() : null;
               updateParams(newParams);

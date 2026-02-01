@@ -31,10 +31,7 @@ export function Sidebar() {
   return (
     <>
       {/* Desktop/Sidebar Navigation */}
-      <aside className={cn(
-        "sidebar",
-        isCollapsed && "sidebar--collapsed"
-      )}>
+      <aside className={cn('sidebar', isCollapsed && 'sidebar--collapsed')}>
         {/* Decorative Background Elements */}
         <div className="sidebar__glow" />
 
@@ -54,9 +51,7 @@ export function Sidebar() {
         {/* Logo Section */}
         <div className="sidebar__logo-container">
           <div className="sidebar__logo-wrapper">
-            <div className="sidebar__logo-emoji">
-              🦝
-            </div>
+            <div className="sidebar__logo-emoji">🦝</div>
             {!isCollapsed && (
               <div className="sidebar__logo-text">
                 <h1 className="sidebar__logo-title">TANUKI</h1>

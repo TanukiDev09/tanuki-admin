@@ -191,7 +191,9 @@ export function ExternalEntitySelect({
                 <SelectContent>
                   <SelectItem value="Socio">Socio</SelectItem>
                   <SelectItem value="Banco">Banco</SelectItem>
-                  <SelectItem value="Persona Natural">Persona Natural</SelectItem>
+                  <SelectItem value="Persona Natural">
+                    Persona Natural
+                  </SelectItem>
                   <SelectItem value="Proveedor">Proveedor</SelectItem>
                   <SelectItem value="Otro">Otro</SelectItem>
                 </SelectContent>

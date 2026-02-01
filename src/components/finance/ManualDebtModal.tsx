@@ -9,13 +9,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter
+  DialogFooter,
 } from '@/components/ui/Dialog';
-import {
-  Tabs,
-  TabsList,
-  TabsTrigger,
-} from '@/components/ui/Tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
@@ -25,7 +21,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/Select';
 import { useToast } from '@/components/ui/Toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -131,7 +127,18 @@ export function ManualDebtModal({
         });
       }
     }
-  }, [open, defaultType, entityId, entityType, entityName, defaultAmount, defaultNotes, defaultCurrency, form, editingDebtId]);
+  }, [
+    open,
+    defaultType,
+    entityId,
+    entityType,
+    entityName,
+    defaultAmount,
+    defaultNotes,
+    defaultCurrency,
+    form,
+    editingDebtId,
+  ]);
 
   const onSubmit = async (data: DebtFormValues) => {
     setLoading(true);
@@ -141,8 +148,8 @@ export function ManualDebtModal({
         remainingBalance: data.totalAmount, // Note: Logic for edit might need check if we want to reset balance? API handles it.
         source: {
           type: data.sourceType,
-          reference: data.sourceReference
-        }
+          reference: data.sourceReference,
+        },
       };
 
       let res;
@@ -156,27 +163,39 @@ export function ManualDebtModal({
         res = await fetch('/api/debts', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...payload, paidAmount: 0, status: 'Pendiente' }),
+          body: JSON.stringify({
+            ...payload,
+            paidAmount: 0,
+            status: 'Pendiente',
+          }),
         });
       }
 
       if (!res.ok) throw new Error('Error al guardar deuda');
 
-      toast({ title: 'Éxito', description: editingDebtId ? 'Deuda actualizada' : 'Deuda registrada correctamente' });
+      toast({
+        title: 'Éxito',
+        description: editingDebtId
+          ? 'Deuda actualizada'
+          : 'Deuda registrada correctamente',
+      });
       const createdDebt = await res.json();
       queryClient.invalidateQueries({ queryKey: ['debts'] });
       queryClient.invalidateQueries({ queryKey: ['debt', editingDebtId] });
       onOpenChange(false);
       form.reset();
       if (onSuccess && createdDebt.data) {
-        onSuccess(createdDebt.data._id, Number(createdDebt.data.remainingBalance));
+        onSuccess(
+          createdDebt.data._id,
+          Number(createdDebt.data.remainingBalance)
+        );
       }
     } catch (error) {
       console.error('Error saving debt:', error);
       toast({
         title: 'Error',
         description: 'No se pudo guardar la deuda',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -187,7 +206,9 @@ export function ManualDebtModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{editingDebtId ? 'Editar Deuda' : 'Registrar Nueva Deuda Manual'}</DialogTitle>
+          <DialogTitle>
+            {editingDebtId ? 'Editar Deuda' : 'Registrar Nueva Deuda Manual'}
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
           <div className="space-y-6 pt-2 pb-4">
@@ -198,14 +219,23 @@ export function ManualDebtModal({
                 </Label>
                 <Select
                   value={form.watch('type')}
-                  onValueChange={(val) => form.setValue('type', val as 'Cuenta por Cobrar' | 'Cuenta por Pagar')}
+                  onValueChange={(val) =>
+                    form.setValue(
+                      'type',
+                      val as 'Cuenta por Cobrar' | 'Cuenta por Pagar'
+                    )
+                  }
                 >
                   <SelectTrigger className="bg-muted/30">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Cuenta por Cobrar">Por Cobrar (Ingreso)</SelectItem>
-                    <SelectItem value="Cuenta por Pagar">Por Pagar (Egreso)</SelectItem>
+                    <SelectItem value="Cuenta por Cobrar">
+                      Por Cobrar (Ingreso)
+                    </SelectItem>
+                    <SelectItem value="Cuenta por Pagar">
+                      Por Pagar (Egreso)
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -237,20 +267,32 @@ export function ManualDebtModal({
               <Tabs
                 value={form.watch('entityType')}
                 onValueChange={(val) => {
-                  form.setValue('entityType', val as 'PointOfSale' | 'Creator' | 'ExternalEntity');
+                  form.setValue(
+                    'entityType',
+                    val as 'PointOfSale' | 'Creator' | 'ExternalEntity'
+                  );
                   form.setValue('entityId', '');
                   form.setValue('entityName', '');
                 }}
                 className="w-full"
               >
                 <TabsList className="grid w-full grid-cols-3 bg-muted/50 p-1">
-                  <TabsTrigger value="PointOfSale" className="rounded-md px-2 py-1.5 text-[11px] font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <TabsTrigger
+                    value="PointOfSale"
+                    className="rounded-md px-2 py-1.5 text-[11px] font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  >
                     Punto Venta
                   </TabsTrigger>
-                  <TabsTrigger value="Creator" className="rounded-md px-2 py-1.5 text-[11px] font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <TabsTrigger
+                    value="Creator"
+                    className="rounded-md px-2 py-1.5 text-[11px] font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  >
                     Creador
                   </TabsTrigger>
-                  <TabsTrigger value="ExternalEntity" className="rounded-md px-3 py-1.5 text-[11px] font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm">
+                  <TabsTrigger
+                    value="ExternalEntity"
+                    className="rounded-md px-3 py-1.5 text-[11px] font-semibold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                  >
                     Externo
                   </TabsTrigger>
                 </TabsList>
@@ -270,7 +312,9 @@ export function ManualDebtModal({
 
                 {form.watch('entityType') === 'Creator' && (
                   <CreatorSelect
-                    value={form.watch('entityId') ? [form.watch('entityId')] : []}
+                    value={
+                      form.watch('entityId') ? [form.watch('entityId')] : []
+                    }
                     onChange={(val, names) => {
                       form.setValue('entityId', val[0] || '');
                       if (names?.[0]) form.setValue('entityName', names[0]);
@@ -320,7 +364,9 @@ export function ManualDebtModal({
                 </Label>
                 <NumericInput
                   value={form.watch('totalAmount')}
-                  onValueChange={(val) => form.setValue('totalAmount', val || 0)}
+                  onValueChange={(val) =>
+                    form.setValue('totalAmount', val || 0)
+                  }
                   className="text-lg font-bold text-primary"
                 />
               </div>
@@ -338,11 +384,19 @@ export function ManualDebtModal({
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <Label className="text-[10px] font-semibold uppercase text-muted-foreground">Origen</Label>
-                <Input value="Manual" disabled className="h-8 bg-muted/20 text-xs" />
+                <Label className="text-[10px] font-semibold uppercase text-muted-foreground">
+                  Origen
+                </Label>
+                <Input
+                  value="Manual"
+                  disabled
+                  className="h-8 bg-muted/20 text-xs"
+                />
               </div>
               <div className="space-y-1">
-                <Label className="text-[10px] font-semibold uppercase text-muted-foreground">Ref. Documento</Label>
+                <Label className="text-[10px] font-semibold uppercase text-muted-foreground">
+                  Ref. Documento
+                </Label>
                 <Input
                   {...form.register('sourceReference')}
                   placeholder="Opcional"
@@ -353,7 +407,11 @@ export function ManualDebtModal({
           </div>
 
           <DialogFooter className="pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={loading}>

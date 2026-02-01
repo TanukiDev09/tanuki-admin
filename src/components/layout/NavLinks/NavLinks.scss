@@ -71,6 +71,7 @@
     width: 20px;
     height: 20px;
     stroke-width: 1.5;
+
     @include transition(all);
   }
 
@@ -96,6 +97,7 @@
     text-overflow: ellipsis;
     width: 100%;
     text-align: center;
+
     @include transition(all);
   }
 
@@ -127,14 +129,17 @@
       width: 0;
       height: 100%;
       background: rgba($primary, 0.03);
+
       @include transition(width);
     }
 
     &:hover {
       color: $primary;
+
       &::before {
         width: 100%;
       }
+
       .nav-links__icon {
         transform: scale(1.1);
         color: $primary;
@@ -180,12 +185,14 @@
     width: 20px;
     height: 20px;
     flex-shrink: 0;
+
     @include transition(all);
   }
 
   &__label {
     font-size: $font-size-sm;
     letter-spacing: -0.01em;
+
     @include text-truncate;
   }
 
@@ -202,6 +209,7 @@
       &--active {
         background-color: $primary;
         color: white;
+
         &::after {
           display: none;
         }
@@ -216,7 +224,7 @@
     border: 1px solid rgba($primary, 0.1);
     border-radius: $radius-2xl;
     padding: $spacing-sm;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 10%);
   }
 
   &__dropdown-item {

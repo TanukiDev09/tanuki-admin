@@ -99,7 +99,11 @@ export default function EditBookModal({
           typeof b === 'string' ? b : b._id
         ),
       });
-      setBundleBooksData((book.bundleBooks || []).filter((b: string | BookResponse) => typeof b !== 'string') as BookResponse[]);
+      setBundleBooksData(
+        (book.bundleBooks || []).filter(
+          (b: string | BookResponse) => typeof b !== 'string'
+        ) as BookResponse[]
+      );
     }
   }, [book]);
 

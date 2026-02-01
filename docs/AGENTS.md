@@ -27,6 +27,7 @@ This document defines the mandatory rules for agentic AI assistants working on t
 ## 📚 Documentation Reference
 
 Agents should consult these documents before starting complex work:
+
 1.  **[Root DEVELOPER.md](../DEVELOPER.md)**: Entry point for setup and standards.
 2.  **[Deep DEVELOPER.md](./DEVELOPER.md)**: Details on modules, testing, and business logic.
 3.  **[ARCHITECTURE.md](./ARCHITECTURE.md)**: System design and data flow.

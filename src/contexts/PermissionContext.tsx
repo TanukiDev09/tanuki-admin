@@ -84,7 +84,9 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
     }
 
     const modulePermissions = permissions[module];
-    let hasPerm = modulePermissions ? modulePermissions.includes(action) : false;
+    let hasPerm = modulePermissions
+      ? modulePermissions.includes(action)
+      : false;
 
     // Fallback logic for Debts using Finance permissions
     if (!hasPerm && module === ModuleName.DEBTS) {

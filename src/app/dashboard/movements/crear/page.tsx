@@ -270,20 +270,28 @@ export default function CreateMovementPage() {
         <DebtSelect
           value={formData.debtId}
           onValueChange={(val, amount) => {
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
               debtId: val,
               // Auto-fill amount if it's currently empty or 0
-              amount: (!prev.amount || toNumber(prev.amount) === 0) ? amount?.toString() : prev.amount
+              amount:
+                !prev.amount || toNumber(prev.amount) === 0
+                  ? amount?.toString()
+                  : prev.amount,
             }));
           }}
-          type={formData.type === 'INCOME' ? 'Cuenta por Cobrar' : 'Cuenta por Pagar'}
+          type={
+            formData.type === 'INCOME'
+              ? 'Cuenta por Cobrar'
+              : 'Cuenta por Pagar'
+          }
           currentAmount={formData.amount}
           currentConcept={formData.description}
           currentCurrency={formData.currency}
         />
         <p className="text-[10px] text-muted-foreground mt-1">
-          Si este movimiento es un pago de una deuda registrada, selecciónela aquí para actualizar su saldo.
+          Si este movimiento es un pago de una deuda registrada, selecciónela
+          aquí para actualizar su saldo.
         </p>
       </div>
 
@@ -524,9 +532,9 @@ export default function CreateMovementPage() {
               <div className="movement-form__calculated-value">
                 {gtZero(formData.amount) && gtZero(formData.quantity)
                   ? formatCurrency(
-                    toNumber(divide(formData.amount, formData.quantity)),
-                    formData.currency
-                  )
+                      toNumber(divide(formData.amount, formData.quantity)),
+                      formData.currency
+                    )
                   : '$ 0'}
               </div>
             </div>
