@@ -9,7 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogFooter
+  DialogFooter,
 } from '@/components/ui/Dialog';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -19,7 +19,7 @@ import {
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from '@/components/ui/Select';
 import { useToast } from '@/components/ui/Toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -44,7 +44,7 @@ interface ExternalEntityModalProps {
 export function ExternalEntityModal({
   open,
   onOpenChange,
-  onSuccess
+  onSuccess,
 }: ExternalEntityModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -69,8 +69,8 @@ export function ExternalEntityModal({
         contactInfo: {
           email: data.email,
           phone: data.phone,
-          address: data.address
-        }
+          address: data.address,
+        },
       };
 
       const res = await fetch('/api/external-entities', {
@@ -94,7 +94,7 @@ export function ExternalEntityModal({
       toast({
         title: 'Error',
         description: 'No se pudo guardar la entidad externa',
-        variant: 'destructive'
+        variant: 'destructive',
       });
     } finally {
       setLoading(false);
@@ -110,8 +110,16 @@ export function ExternalEntityModal({
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 py-4">
           <div className="space-y-2">
             <Label htmlFor="name">Nombre / Razón Social</Label>
-            <Input id="name" {...form.register('name')} placeholder="Nombre completo" />
-            {form.formState.errors.name && <p className="text-xs text-rose-500">{form.formState.errors.name.message}</p>}
+            <Input
+              id="name"
+              {...form.register('name')}
+              placeholder="Nombre completo"
+            />
+            {form.formState.errors.name && (
+              <p className="text-xs text-rose-500">
+                {form.formState.errors.name.message}
+              </p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
@@ -119,13 +127,22 @@ export function ExternalEntityModal({
               <Label>Tipo de Tercero</Label>
               <Select
                 value={form.watch('type')}
-                onValueChange={(val: 'Socio' | 'Banco' | 'Persona Natural' | 'Proveedor' | 'Otro') => form.setValue('type', val)}
+                onValueChange={(
+                  val:
+                    | 'Socio'
+                    | 'Banco'
+                    | 'Persona Natural'
+                    | 'Proveedor'
+                    | 'Otro'
+                ) => form.setValue('type', val)}
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Persona Natural">Persona Natural</SelectItem>
+                  <SelectItem value="Persona Natural">
+                    Persona Natural
+                  </SelectItem>
                   <SelectItem value="Socio">Socio / Accionista</SelectItem>
                   <SelectItem value="Banco">Banco / Entidad Fin.</SelectItem>
                   <SelectItem value="Proveedor">Proveedor</SelectItem>
@@ -135,12 +152,18 @@ export function ExternalEntityModal({
             </div>
             <div className="space-y-2">
               <Label htmlFor="taxId">NIT / Documento</Label>
-              <Input id="taxId" {...form.register('taxId')} placeholder="C.C. o NIT" />
+              <Input
+                id="taxId"
+                {...form.register('taxId')}
+                placeholder="C.C. o NIT"
+              />
             </div>
           </div>
 
           <div className="space-y-2 border-t pt-4 mt-2">
-            <h4 className="text-sm font-semibold text-slate-700">Información de Contacto</h4>
+            <h4 className="text-sm font-semibold text-slate-700">
+              Información de Contacto
+            </h4>
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div className="space-y-1">
                 <Label className="text-xs">Email</Label>
@@ -158,7 +181,11 @@ export function ExternalEntityModal({
           </div>
 
           <DialogFooter className="pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancelar
             </Button>
             <Button type="submit" disabled={loading}>

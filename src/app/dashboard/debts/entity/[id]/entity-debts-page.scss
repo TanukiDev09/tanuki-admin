@@ -7,7 +7,7 @@
   background-color: $background;
   padding-bottom: 8rem;
   padding-inline: $spacing-md;
-  animation: fadeIn $transition-base ease-out;
+  animation: fade-in $transition-base ease-out;
 
   @include md {
     padding-inline: $spacing-lg;
@@ -53,7 +53,9 @@
     width: 3rem;
     height: 3rem;
     border-radius: $radius-xl;
+
     @include flex-center;
+
     background: transparent;
     border: 1px solid transparent;
     transition: all $transition-base;
@@ -85,6 +87,7 @@
 
   &__entity-type {
     @include badge-base(transparent, $primary);
+
     border: 1px solid rgba($primary, 0.2);
     font-size: 0.625rem;
     padding: 0 0.75rem;
@@ -118,11 +121,13 @@
     padding-inline: $spacing-lg;
     border-radius: $radius-xl;
     font-weight: $font-weight-bold;
+
     @include flex-center;
+
     gap: 0.5rem;
     background: #312e81; // indigo-900
     color: white;
-    box-shadow: 0 10px 30px rgba(49, 46, 129, 0.2);
+    box-shadow: 0 10px 30px rgb(49 46 129 / 20%);
 
     @include md {
       width: auto;
@@ -151,7 +156,7 @@
     border: none;
     border-radius: 2rem;
     background: white;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 30px rgb(0 0 0 / 4%);
     overflow: hidden;
 
     &--balance {
@@ -187,25 +192,27 @@
     width: 3.5rem;
     height: 3.5rem;
     border-radius: $radius-lg;
+
     @include flex-center;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
 
     &--active {
       background: #10b981; // emerald-500
       color: white;
-      box-shadow: 0 15px 30px rgba(16, 185, 129, 0.2);
+      box-shadow: 0 15px 30px rgb(16 185 129 / 20%);
     }
 
     &--passive {
       background: #ef4444; // rose-500
       color: white;
-      box-shadow: 0 15px 30px rgba(239, 68, 68, 0.2);
+      box-shadow: 0 15px 30px rgb(239 68 68 / 20%);
     }
 
     &--balance {
-      background: rgba(white, 0.1);
+      background: rgb(white, 0.1);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(white, 0.1);
+      border: 1px solid rgb(white, 0.1);
       color: white;
       box-shadow: none;
     }
@@ -225,7 +232,7 @@
     color: $muted-foreground;
 
     .entity-debts__card--balance & {
-      color: rgba(white, 0.5);
+      color: rgb(white, 0.5);
     }
   }
 
@@ -239,6 +246,7 @@
       &--positive {
         color: #34d399;
       }
+
       &--negative {
         color: #f87171;
       }
@@ -261,7 +269,7 @@
     }
 
     .entity-debts__card--balance & {
-      color: rgba(white, 0.4);
+      color: rgb(white, 0.4);
       font-style: normal;
       text-transform: none;
       letter-spacing: normal;
@@ -331,6 +339,7 @@
 
       &:focus {
         border-color: rgba($primary, 0.1);
+
         @include focus-ring;
       }
     }
@@ -343,12 +352,11 @@
   &__history-list {
     background: white;
     border-radius: 2rem;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 30px rgb(0 0 0 / 4%);
     overflow: hidden;
     border: 1px solid rgba($border, 0.5);
     display: flex;
     flex-direction: column;
-    divide-y: 1px solid rgba($border, 0.2);
   }
 
   &__item {
@@ -388,9 +396,11 @@
     height: 3rem;
     border-radius: $radius-lg;
     flex-shrink: 0;
+
     @include flex-center;
+
     transition: all $transition-base;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%);
 
     .entity-debts__item:hover & {
       transform: scale(1.1);
@@ -399,13 +409,13 @@
     &--income {
       background: #f0fdf4;
       color: #166534; // emerald-800
-      box-shadow: 0 4px 10px rgba(22, 101, 52, 0.1);
+      box-shadow: 0 4px 10px rgb(22 101 52 / 10%);
     }
 
     &--expense {
       background: #fef2f2;
       color: #991b1b; // rose-800
-      box-shadow: 0 4px 10px rgba(153, 27, 27, 0.1);
+      box-shadow: 0 4px 10px rgb(153 27 27 / 10%);
     }
   }
 
@@ -427,7 +437,9 @@
     font-size: $font-size-lg;
     font-weight: 900;
     color: $primary;
+
     @include text-truncate;
+
     transition: color $transition-base;
 
     .entity-debts__item:hover & {
@@ -437,6 +449,7 @@
 
   &__badge {
     @include badge-base(transparent, $primary);
+
     font-size: 0.625rem;
     font-weight: 900;
     text-transform: uppercase;
@@ -530,7 +543,9 @@
     height: 2.5rem;
     border-radius: $radius-full;
     background: $muted;
+
     @include flex-center;
+
     transition: all $transition-base;
     color: $muted-foreground;
 
@@ -594,7 +609,9 @@
     height: 5rem;
     background: $muted;
     border-radius: 1.5rem;
+
     @include flex-center;
+
     margin: 0 auto;
     color: color.adjust($muted-foreground, $lightness: 20%);
   }
@@ -612,11 +629,12 @@
   }
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

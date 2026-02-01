@@ -6,7 +6,14 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { useToast } from '@/components/ui/Toast';
-import { ArrowLeft, Pencil, Trash2, Package, ExternalLink, Wallet } from 'lucide-react';
+import {
+  ArrowLeft,
+  Pencil,
+  Trash2,
+  Package,
+  ExternalLink,
+  Wallet,
+} from 'lucide-react';
 
 import { Movement } from '@/types/movement';
 import { IDebt } from '@/types/debt';
@@ -16,7 +23,6 @@ import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency, formatNumber } from '@/lib/utils';
 import { toNumber } from '@/lib/math';
 import '../movement-detail.scss';
-
 
 interface HeaderProps {
   movement: Movement;
@@ -33,7 +39,7 @@ function MovementDetailHeader({
   canUpdate,
   canDelete,
   onDelete,
-  onEdit
+  onEdit,
 }: HeaderProps) {
   return (
     <div className="movement-detail__header">
@@ -66,7 +72,13 @@ function MovementDetailHeader({
   );
 }
 
-function MovementDetailContent({ movement, router }: { movement: Movement; router: AppRouterInstance }) {
+function MovementDetailContent({
+  movement,
+  router,
+}: {
+  movement: Movement;
+  router: AppRouterInstance;
+}) {
   return (
     <Card>
       <CardHeader>
@@ -127,9 +139,9 @@ function MovementDetailContent({ movement, router }: { movement: Movement; route
             <p>
               {movement.unitValue
                 ? formatCurrency(
-                  toNumber(movement.unitValue),
-                  movement.currency
-                )
+                    toNumber(movement.unitValue),
+                    movement.currency
+                  )
                 : '-'}
             </p>
           </div>
@@ -214,15 +226,23 @@ function MovementDetailContent({ movement, router }: { movement: Movement; route
             </h3>
             <div className="movement-detail__link-card">
               <div className="movement-detail__link-text">
-                <strong>{(movement.debtId as unknown as IDebt).source?.reference || 'Referencia no disponible'}</strong>
+                <strong>
+                  {(movement.debtId as unknown as IDebt).source?.reference ||
+                    'Referencia no disponible'}
+                </strong>
                 <p className="text-xs text-muted-foreground">
-                  {(movement.debtId as unknown as IDebt).notes || (movement.debtId as unknown as IDebt).type}
+                  {(movement.debtId as unknown as IDebt).notes ||
+                    (movement.debtId as unknown as IDebt).type}
                 </p>
               </div>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => router.push(`/dashboard/debts/entity/${(movement.debtId as unknown as IDebt)._id}`)}
+                onClick={() =>
+                  router.push(
+                    `/dashboard/debts/entity/${(movement.debtId as unknown as IDebt)._id}`
+                  )
+                }
               >
                 <ExternalLink className="movement-detail__icon" /> Ver Deuda
               </Button>
@@ -291,7 +311,11 @@ export default function MovementDetailPage() {
   }, [params.id, router, toast]);
 
   const handleDelete = async () => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar este movimiento? Esta acción no se puede deshacer.')) {
+    if (
+      !window.confirm(
+        '¿Estás seguro de que deseas eliminar este movimiento? Esta acción no se puede deshacer.'
+      )
+    ) {
       return;
     }
 
@@ -309,7 +333,12 @@ export default function MovementDetailPage() {
       });
 
       // Smart navigation: go back if we came from another internal page, otherwise go to default list
-      if (typeof window !== 'undefined' && document.referrer && document.referrer.includes(window.location.origin) && !document.referrer.includes(params.id as string)) {
+      if (
+        typeof window !== 'undefined' &&
+        document.referrer &&
+        document.referrer.includes(window.location.origin) &&
+        !document.referrer.includes(params.id as string)
+      ) {
         router.back();
       } else {
         router.push('/dashboard/movements');
@@ -349,7 +378,9 @@ export default function MovementDetailPage() {
         canUpdate={canUpdate}
         canDelete={canDelete}
         onDelete={handleDelete}
-        onEdit={() => router.push(`/dashboard/movements/${movement._id}/editar`)}
+        onEdit={() =>
+          router.push(`/dashboard/movements/${movement._id}/editar`)
+        }
       />
 
       <MovementDetailContent movement={movement} router={router} />

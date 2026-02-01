@@ -2,11 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import {
-  Check,
-  ChevronsUpDown,
-  Plus
-} from 'lucide-react';
+import { Check, ChevronsUpDown, Plus } from 'lucide-react';
 import { ManualDebtModal } from './ManualDebtModal';
 import { IDebt } from '@/types/debt';
 import { cn, formatCurrency } from '@/lib/utils';
@@ -46,7 +42,7 @@ export function DebtSelect({
   alwaysIncludeId,
   currentAmount,
   currentConcept,
-  currentCurrency
+  currentCurrency,
 }: DebtSelectProps) {
   const [open, setOpen] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -61,11 +57,11 @@ export function DebtSelect({
       const res = await fetch(url);
       if (!res.ok) throw new Error('Failed');
       return res.json();
-    }
+    },
   });
 
-  const selectedDebt = useMemo(() =>
-    debts?.data?.find((d: IDebt) => d._id === value),
+  const selectedDebt = useMemo(
+    () => debts?.data?.find((d: IDebt) => d._id === value),
     [debts, value]
   );
 
@@ -89,7 +85,9 @@ export function DebtSelect({
                 </span>
               </>
             ) : (
-              <span className="text-muted-foreground">Seleccionar deuda recibible/pagable...</span>
+              <span className="text-muted-foreground">
+                Seleccionar deuda recibible/pagable...
+              </span>
             )}
           </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -133,10 +131,15 @@ export function DebtSelect({
                       {debt.entityName}
                     </span>
                   </div>
-                  <Badge variant="secondary" className={cn(
-                    "text-[9px] h-4 px-1 uppercase tracking-tighter",
-                    debt.type === 'Cuenta por Cobrar' ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
-                  )}>
+                  <Badge
+                    variant="secondary"
+                    className={cn(
+                      'text-[9px] h-4 px-1 uppercase tracking-tighter',
+                      debt.type === 'Cuenta por Cobrar'
+                        ? 'bg-emerald-50 text-emerald-700'
+                        : 'bg-rose-50 text-rose-700'
+                    )}
+                  >
                     {debt.type.split(' ').pop()}
                   </Badge>
                 </div>
@@ -146,8 +149,12 @@ export function DebtSelect({
                   </div>
                 )}
                 <div className="flex w-full justify-between items-center mt-1 pt-1">
-                  <span className="text-[10px] text-muted-foreground">Saldo pendiente:</span>
-                  <span className="font-bold text-sm text-primary">{formatCurrency(Number(debt.remainingBalance), 'COP')}</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    Saldo pendiente:
+                  </span>
+                  <span className="font-bold text-sm text-primary">
+                    {formatCurrency(Number(debt.remainingBalance), 'COP')}
+                  </span>
                 </div>
                 {value === debt._id && (
                   <Check className="absolute top-1 right-1 h-3 w-3 text-primary" />

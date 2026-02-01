@@ -266,6 +266,6 @@ export function InventoryMovementsList({
           ))}
         </TableBody>
       </Table>
-    </div >
+    </div>
   );
 }

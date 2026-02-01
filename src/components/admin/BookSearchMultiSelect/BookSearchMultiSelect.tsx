@@ -31,7 +31,9 @@ export default function BookSearchMultiSelect({
     if (!searchTerm.trim()) return;
     setSearching(true);
     try {
-      const response = await fetch(`/api/books?search=${encodeURIComponent(searchTerm)}&limit=5&isActive=true`);
+      const response = await fetch(
+        `/api/books?search=${encodeURIComponent(searchTerm)}&limit=5&isActive=true`
+      );
       const data = await response.json();
       if (data.success) {
         setSearchResults(data.data as BookResponse[]);
@@ -54,7 +56,9 @@ export default function BookSearchMultiSelect({
             placeholder="Buscar por título o ISBN..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), searchBooks())}
+            onKeyDown={(e) =>
+              e.key === 'Enter' && (e.preventDefault(), searchBooks())
+            }
           />
         </div>
         <Button
@@ -64,7 +68,11 @@ export default function BookSearchMultiSelect({
           disabled={searching}
           className="book-search-multi-select__search-btn"
         >
-          {searching ? <Loader2 className="animate-spin" size={16} /> : 'Buscar'}
+          {searching ? (
+            <Loader2 className="animate-spin" size={16} />
+          ) : (
+            'Buscar'
+          )}
         </Button>
       </div>
 
@@ -73,10 +81,17 @@ export default function BookSearchMultiSelect({
           {searchResults.map((book) => {
             const isSelected = selectedBookIds.includes(book._id);
             return (
-              <div key={book._id} className="book-search-multi-select__result-item">
+              <div
+                key={book._id}
+                className="book-search-multi-select__result-item"
+              >
                 <div className="book-search-multi-select__result-info">
-                  <span className="book-search-multi-select__result-title">{book.title}</span>
-                  <span className="book-search-multi-select__result-isbn">ISBN: {book.isbn}</span>
+                  <span className="book-search-multi-select__result-title">
+                    {book.title}
+                  </span>
+                  <span className="book-search-multi-select__result-isbn">
+                    ISBN: {book.isbn}
+                  </span>
                 </div>
                 <Button
                   type="button"
@@ -100,10 +115,17 @@ export default function BookSearchMultiSelect({
       {selectedBooksData.length > 0 && (
         <div className="book-search-multi-select__selected-list">
           {selectedBooksData.map((book) => (
-            <div key={book._id} className="book-search-multi-select__selected-item">
+            <div
+              key={book._id}
+              className="book-search-multi-select__selected-item"
+            >
               <div className="book-search-multi-select__selected-info">
-                <span className="book-search-multi-select__selected-title">{book.title}</span>
-                <span className="book-search-multi-select__selected-isbn">{book.isbn}</span>
+                <span className="book-search-multi-select__selected-title">
+                  {book.title}
+                </span>
+                <span className="book-search-multi-select__selected-isbn">
+                  {book.isbn}
+                </span>
               </div>
               <Button
                 type="button"

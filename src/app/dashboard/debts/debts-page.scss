@@ -7,7 +7,7 @@
   background-color: $background;
   padding-bottom: 8rem;
   padding-inline: $spacing-md;
-  animation: fadeIn $transition-base ease-out;
+  animation: fade-in $transition-base ease-out;
 
   @include md {
     padding-inline: $spacing-lg;
@@ -100,7 +100,7 @@
     &--primary {
       background: #312e81; // indigo-900 (High contrast AAA)
       color: white;
-      box-shadow: 0 10px 30px rgba(49, 46, 129, 0.2);
+      box-shadow: 0 10px 30px rgb(49 46 129 / 20%);
       border: none;
 
       &:hover {
@@ -117,7 +117,7 @@
     color: #1e293b;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 20px 50px rgb(0 0 0 / 4%);
     border: 1px solid rgba($primary, 0.08);
 
     &::after {
@@ -156,6 +156,7 @@
 
   &__summary-badge {
     @include badge-base(#f1f5f9, #475569);
+
     border: 1px solid #e2e8f0;
     padding: 0.5rem 1.25rem;
     letter-spacing: 0.1em;
@@ -251,7 +252,7 @@
     border: 1px solid #e2e8f0;
     padding: 0.75rem;
     border-radius: $radius-2xl;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 4%);
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
@@ -299,7 +300,7 @@
       &:focus {
         background: white;
         border-color: #4f46e5;
-        box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        box-shadow: 0 0 0 4px rgb(79 70 229 / 10%);
       }
     }
 
@@ -334,7 +335,7 @@
     &--active {
       background: #312e81; // indigo-900
       color: white;
-      box-shadow: 0 4px 12px rgba(49, 46, 129, 0.2);
+      box-shadow: 0 4px 12px rgb(49 46 129 / 20%);
     }
 
     &--ghost {
@@ -369,7 +370,7 @@
     transition: all 0.5s $transition-base;
     background: white;
     border: none;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 30px rgb(0 0 0 / 4%);
 
     &:hover {
       transform: translateY(-0.5rem);
@@ -399,18 +400,18 @@
     align-items: center;
     justify-content: center;
     transition: transform 0.5s $transition-base;
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 15px rgb(0 0 0 / 5%);
 
     &--supplier {
       background: #6366f1; // indigo-500
       color: white;
-      box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);
+      box-shadow: 0 10px 20px rgb(99 102 241 / 20%);
     }
 
     &--customer {
       background: #f59e0b; // amber-500
       color: white;
-      box-shadow: 0 10px 20px rgba(245, 158, 11, 0.2);
+      box-shadow: 0 10px 20px rgb(245 158 11 / 20%);
     }
 
     .debts-page__entity-card:hover & {
@@ -428,12 +429,15 @@
     font-size: $font-size-xl;
     font-weight: 900;
     color: $primary;
+
     @include text-truncate;
+
     margin-bottom: 0.25rem;
   }
 
   &__entity-badge {
     @include badge-base(transparent, $muted-foreground);
+
     border: 1px solid $border;
     font-size: 0.625rem;
     letter-spacing: 0.1em;
@@ -590,7 +594,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 20px 40px rgba(79, 70, 229, 0.3);
+    box-shadow: 0 20px 40px rgb(79 70 229 / 30%);
     z-index: 50;
     transition: all 0.3s;
 
@@ -610,11 +614,12 @@
   }
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import LoginForm from '@/components/auth/LoginForm';
-import './login.scss';
+import '@/styles/pages/login.scss';
 
 export default function LoginPage() {
   const { user, isLoading } = useAuth();

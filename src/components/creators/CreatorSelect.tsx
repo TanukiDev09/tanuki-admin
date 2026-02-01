@@ -86,8 +86,8 @@ export function CreatorSelect({
     }
 
     const newNames = creators
-      .filter(c => newValue.includes(c._id))
-      .map(c => c.name);
+      .filter((c) => newValue.includes(c._id))
+      .map((c) => c.name);
 
     onChange(newValue, newNames);
   };

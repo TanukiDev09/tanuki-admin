@@ -222,11 +222,11 @@ export default function EditMovementPage() {
         allocations: useMultiCostCenter
           ? formData.allocations
           : [
-            {
-              costCenter: formData.costCenter || '01T001',
-              amount: Number(formData.amount) || 0,
-            },
-          ],
+              {
+                costCenter: formData.costCenter || '01T001',
+                amount: Number(formData.amount) || 0,
+              },
+            ],
         costCenter: useMultiCostCenter
           ? formData.allocations?.[0]?.costCenter || ''
           : formData.costCenter,
@@ -340,18 +340,23 @@ export default function EditMovementPage() {
           value={formData.debtId as string}
           alwaysIncludeId={formData.debtId as string}
           onValueChange={(val) => {
-            setFormData(prev => ({
+            setFormData((prev) => ({
               ...prev,
-              debtId: val
+              debtId: val,
             }));
           }}
-          type={formData.type === 'INCOME' ? 'Cuenta por Cobrar' : 'Cuenta por Pagar'}
+          type={
+            formData.type === 'INCOME'
+              ? 'Cuenta por Cobrar'
+              : 'Cuenta por Pagar'
+          }
           currentAmount={formData.amount}
           currentConcept={formData.description}
           currentCurrency={formData.currency}
         />
         <p className="text-[10px] text-muted-foreground mt-1">
-          Vincular este movimiento a una deuda pendiente para actualizar su saldo.
+          Vincular este movimiento a una deuda pendiente para actualizar su
+          saldo.
         </p>
       </div>
 
@@ -594,9 +599,9 @@ export default function EditMovementPage() {
               <div className="movement-form__calculated-value">
                 {gtZero(formData.amount) && gtZero(formData.quantity)
                   ? formatCurrency(
-                    toNumber(divide(formData.amount, formData.quantity)),
-                    formData.currency
-                  )
+                      toNumber(divide(formData.amount, formData.quantity)),
+                      formData.currency
+                    )
                   : '$ 0'}
               </div>
             </div>
