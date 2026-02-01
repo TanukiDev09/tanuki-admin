@@ -1,238 +1,219 @@
 @use '../../../../styles/variables' as *;
 @use '../../../../styles/mixins' as *;
 
+%section-card {
+  background: $card;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  box-shadow: $shadow-sm;
+  transition: $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    border-color: rgba($primary, 0.2);
+  }
+}
+
+@mixin section-card-base {
+  background: $card;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
+  padding: $spacing-xl;
+  box-shadow: $shadow-sm;
+  transition: $transition-base;
+
+  &:hover {
+    box-shadow: $shadow-md;
+    border-color: rgba($primary, 0.2);
+  }
+}
+
 .cost-center-detail {
   display: flex;
   flex-direction: column;
-  gap: $spacing-3xl;
+  gap: $spacing-2xl;
   width: 100%;
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding-bottom: calc($spacing-3xl * 1.5);
+  padding: $spacing-xl;
+  animation: fade-in 0.5s ease-out;
 
   &__header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: $spacing-md;
     margin-bottom: $spacing-lg;
+
+    @include sm {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
   }
 
-  &__back-btn {
+  &__back-nav {
     display: flex;
     align-items: center;
     gap: $spacing-xs;
     color: $muted-foreground;
     font-size: $font-size-sm;
-    text-decoration: none;
-    transition: color 0.2s;
+    transition: $transition-fast;
 
     &:hover {
-      color: $foreground;
+      color: $primary;
     }
   }
 
-  &__title-group {
-    margin-top: $spacing-md;
-  }
-
-  &__title {
+  &__title-area {
     display: flex;
     align-items: center;
     gap: $spacing-md;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    font-size: $font-size-3xl;
+    font-weight: 800;
+    letter-spacing: -0.02em;
     color: $foreground;
-    font-size: 2rem;
-    font-weight: $font-weight-bold;
   }
 
   &__code-badge {
-    padding: $spacing-xs $spacing-sm;
-    background-color: rgba($primary, 0.1);
+    padding: $spacing-2xs $spacing-sm;
+    background: rgba($primary, 0.1);
     color: $primary;
-    font-family:
-      ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-      'Courier New', monospace;
-    font-size: $font-size-sm;
+    font-family: $font-family-mono;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
     border-radius: $radius-full;
+    border: 1px solid rgba($primary, 0.2);
+    text-transform: uppercase;
   }
 
-  &__card {
-    @include card-base;
-
-    padding: $spacing-xl;
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
   }
 
-  &__section {
-    margin-bottom: $spacing-xl;
+  &__main-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
 
-    &:last-child {
-      margin-bottom: 0;
+    @include lg {
+      grid-template-columns: 2fr 1fr;
     }
   }
 
-  &__label {
-    display: block;
-    margin-bottom: $spacing-xs;
-    color: $muted-foreground;
-    font-size: $font-size-sm;
-    font-weight: $font-weight-medium;
+  &__content-area {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
   }
 
-  &__value {
-    color: $foreground;
+  &__side-area {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  &__section-card {
+    @include section-card-base;
+  }
+
+  &__description {
+    color: $muted-foreground;
     font-size: $font-size-base;
     line-height: $line-height-relaxed;
   }
 
-  &__meta-grid {
+  &__stats-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: $spacing-lg;
-    border-top: 1px solid rgba($border, 0.5);
-    padding-top: $spacing-lg;
-
-    @include sm {
-      grid-template-columns: 1fr 1fr;
-    }
+    margin-bottom: $spacing-xl;
   }
 
-  // Financial Analysis Section - Premium UX
-  &__financial-section {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-2xl;
-    margin-top: $spacing-xl;
-    padding-top: $spacing-2xl;
-    border-top: 1px solid rgba($border, 0.4);
-  }
+  &__chart-card {
+    @extend %section-card;
 
-  &__section-title {
-    display: flex;
-    align-items: center;
-    gap: $spacing-sm;
-    margin-bottom: $spacing-lg;
-    color: $foreground;
-    font-size: $font-size-2xl;
-    font-weight: $font-weight-bold;
-
-    &.subsection {
-      margin-bottom: $spacing-md;
-      color: $muted-foreground;
-      font-size: $font-size-lg;
-
-      &::before {
-        display: none;
-      }
-    }
-  }
-
-  // 1. Acumulados Históricos (Hero Cards)
-  &__hero-stats {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-lg;
-
-    @include lg {
-      display: grid;
-      grid-template-columns: 1fr; // Stacked for now or customized grid
-      gap: $spacing-lg;
-    }
-  }
-
-  // 2. Indicadores de Sostenibilidad (Runway, Burn, Health)
-  &__indicators-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: $spacing-lg;
-
-    @include md {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    @include lg {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  // 3. Historia Financiera (Full Width Chart)
-  &__chart-section {
-    min-height: 400px;
     padding: $spacing-xl;
-    background: white;
-    border: 1px solid rgba($border, 0.5);
-    border-radius: $radius-xl;
-    box-shadow: $shadow-sm;
-  }
-
-  &__movements-section {
+    min-height: 400px;
     display: flex;
     flex-direction: column;
-    gap: $spacing-xl;
-    margin-top: $spacing-3xl;
+    gap: $spacing-lg;
+
+    &__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &__title {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      color: $foreground;
+    }
+  }
+
+  &__movements-card {
+    @extend %section-card;
+
+    padding: 0;
+    overflow: hidden;
+
+    &__header {
+      padding: $spacing-lg $spacing-xl;
+      border-bottom: 1px solid $border;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &__title {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+    }
+  }
+
+  &__info-card {
+    @extend %section-card;
+
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &__info-item {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xs;
+
+    label {
+      font-size: $font-size-xs;
+      font-weight: $font-weight-bold;
+      color: $muted-foreground;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    p {
+      color: $foreground;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+    }
   }
 }
 
-// Custom specialized card styles for this view
-.premium-stat-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: $spacing-xl;
-  background: white;
-  border: 1px solid rgba($border, 0.3);
-  border-radius: $radius-xl;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s;
-  box-shadow: $shadow-sm;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: $shadow-md;
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
 
-  &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: $spacing-md;
-  }
-
-  &__label {
-    color: $muted-foreground;
-    font-size: $font-size-sm;
-    font-weight: $font-weight-bold;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
-
-  &__icon {
-    color: $muted-foreground;
-    opacity: 0.5;
-  }
-
-  &__value {
-    margin-bottom: $spacing-xs;
-    color: $foreground;
-    font-size: $font-size-4xl; // Big number
-    font-weight: 800;
-    letter-spacing: -0.02em;
-  }
-
-  &__subtext {
-    color: $muted-foreground;
-    font-size: $font-size-sm;
-  }
-
-  &--highlight {
-    background: linear-gradient(
-      135deg,
-      rgba($primary, 0.03) 0%,
-      rgba($primary, 0.08) 100%
-    );
-    border-color: rgba($primary, 0.1);
-
-    .premium-stat-card__value {
-      color: $primary;
-    }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

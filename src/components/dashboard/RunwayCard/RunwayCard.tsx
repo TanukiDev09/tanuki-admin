@@ -26,7 +26,7 @@ export function RunwayCard({ runway, className }: RunwayCardProps) {
   const isInfinite = safeRunway === Infinity || safeRunway > 99;
   const displayValue = isInfinite
     ? 'Rentable'
-    : formatNumber(safeRunway.toFixed(1));
+    : formatNumber(Math.floor(safeRunway));
 
   return (
     <Card

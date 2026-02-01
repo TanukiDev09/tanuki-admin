@@ -29,14 +29,18 @@ export function IncomeExpenseChart({ data, title }: IncomeExpenseChartProps) {
   const safeData = useMemo(() => data || [], [data]);
 
   // Detect key
-  const xAxisKey = safeData.length > 0 && safeData[0].month ? 'month' : 'day';
+  const xAxisKey = useMemo(() =>
+    safeData.length > 0 && 'month' in safeData[0] ? 'month' : 'day'
+    , [safeData]);
+
+  const defaultTitle = xAxisKey === 'month' ? 'Evolución Mensual' : 'Flujo de Caja del Mes';
 
   return (
     <Card className="income-expense-chart income-expense-chart--no-border">
       <CardHeader className="income-expense-chart__header">
         <div className="income-expense-chart__header-content">
           <CardTitle className="income-expense-chart__title">
-            {title || 'Flujo de Caja del Mes'}
+            {title || defaultTitle}
           </CardTitle>
           <div className="income-expense-chart__controls">
             {/* ... buttons ... */}
@@ -59,14 +63,17 @@ export function IncomeExpenseChart({ data, title }: IncomeExpenseChartProps) {
                 tickLine={false}
                 axisLine={false}
                 tickFormatter={(value) => {
-                  // If it's a date string YYYY-MM-DD, show only DD
                   if (typeof value === 'string') {
+                    // Handle Day: YYYY-MM-DD -> DD
                     if (xAxisKey === 'day' && value.includes('-')) {
                       return value.split('-')[2];
                     }
+                    // Handle Month: YYYY-MM -> Month YY
                     if (xAxisKey === 'month' && value.includes('-')) {
-                      // Return Month Name or MM
-                      return value; // Or format it nicer if needed
+                      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                      const [year, month] = value.split('-');
+                      const monthIdx = parseInt(month) - 1;
+                      return `${months[monthIdx]} ${year.slice(2)}`;
                     }
                   }
                   return value;

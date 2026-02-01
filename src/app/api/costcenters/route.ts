@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     await dbConnect();
 
     const costCenters = await CostCenter.find({ isActive: true })
-      .sort({ name: 1 })
+      .sort({ code: 1 })
       .lean();
 
     return NextResponse.json({
