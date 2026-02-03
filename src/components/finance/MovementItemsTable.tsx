@@ -6,7 +6,7 @@ import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSele
 import { BookSelect } from '@/components/finance/BookSelect';
 import { Trash2, Plus, Book, Settings } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
-import { add, multiply, toNumber } from '@/lib/math';
+import { add, multiply, toNumber, compare, subtract } from '@/lib/math';
 import { cn } from '@/lib/utils';
 
 interface MovementItem {
