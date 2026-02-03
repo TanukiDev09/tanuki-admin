@@ -142,14 +142,27 @@ interface ViewProps {
   onPageChange?: (page: number) => void;
 }
 
+function SectionHeader({
+  title,
+  children,
+}: {
+  title: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="financial-health__section-header">
+      <h2 className="financial-health__section-title">{title}</h2>
+      {children}
+    </div>
+  );
+}
+
 function GlobalView({ data }: ViewProps) {
   return (
-    <div className="mt-6">
+    <div className="mt-8">
       {/* Global Totals */}
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">
-          Acumulados Históricos
-        </h2>
+        <SectionHeader title="Acumulados Históricos" />
         <div className="financial-health__stat-grid">
           <StatCard
             title="Ingresos Históricos"
@@ -177,9 +190,7 @@ function GlobalView({ data }: ViewProps) {
 
       {/* Health Metrics */}
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">
-          Indicadores de Sostenibilidad
-        </h2>
+        <SectionHeader title="Indicadores de Sostenibilidad" />
         <div className="financial-health__metrics-grid">
           <RunwayCard runway={data.health.runway} />
           <BurnRateCard
@@ -192,17 +203,19 @@ function GlobalView({ data }: ViewProps) {
 
       {/* Historical Flow Chart */}
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">Historia Financiera</h2>
-        <ScrollableIncomeExpenseChart data={data.monthly} scrollable={true} />
+        <SectionHeader title="Historia Financiera" />
+        <div className="financial-health__chart-card">
+          <ScrollableIncomeExpenseChart data={data.monthly} scrollable={true} />
+        </div>
       </section>
 
       {/* Net Income Trend Chart */}
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">
-          Evolución del Resultado
-        </h2>
-        <div className="financial-health__chart-container">
-          <RunwayProjectionChart data={data.monthly || []} />
+        <SectionHeader title="Evolución del Resultado" />
+        <div className="financial-health__chart-card">
+          <div className="financial-health__chart-container">
+            <RunwayProjectionChart data={data.monthly || []} />
+          </div>
         </div>
       </section>
     </div>
@@ -216,11 +229,13 @@ function MonthlyView({
   onPageChange,
 }: ViewProps) {
   return (
-    <div className="mt-6">
+    <div className="mt-8">
       {/* Balance Indicators - Compact */}
       <section className="financial-health__balance-bar">
         <div className="balance-indicator">
-          <Scale className="balance-indicator__icon" size={16} />
+          <div className="balance-indicator__icon-box">
+            <Scale size={20} />
+          </div>
           <div className="balance-indicator__content">
             <span className="balance-indicator__label">Saldo Mes Anterior</span>
             <span className="balance-indicator__value">
@@ -229,7 +244,9 @@ function MonthlyView({
           </div>
         </div>
         <div className="balance-indicator">
-          <Scale className="balance-indicator__icon" size={16} />
+          <div className="balance-indicator__icon-box balance-indicator__icon-box--info">
+            <Activity size={20} />
+          </div>
           <div className="balance-indicator__content">
             <span className="balance-indicator__label">Nuevo Saldo</span>
             <span className="balance-indicator__value">
@@ -241,7 +258,7 @@ function MonthlyView({
 
       {/* Main Statistics */}
       <section className="financial-health__section">
-        <div className="financial-health__stat-grid financial-health__stat-grid--triple">
+        <div className="financial-health__stat-grid">
           <StatCard
             title="Ingresos del Mes"
             value={formatCurrency(data.totals.income)}
@@ -249,9 +266,9 @@ function MonthlyView({
             variant="default"
           />
           <StatCard
-            title="Resultado del Ejercicio"
+            title="Resultado"
             value={formatCurrency(data.totals.balance)}
-            icon={Activity}
+            icon={TrendingUp}
             variant={data.totals.balance >= 0 ? 'info' : 'danger'}
           />
           <StatCard
@@ -264,23 +281,21 @@ function MonthlyView({
       </section>
 
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">
-          Flujo de Efectivo Diario
-        </h2>
-        <div className="financial-health__chart-container">
-          <ScrollableIncomeExpenseChart
-            data={data.daily || []}
-            variant="daily"
-            initialBalance={data.balances?.previousMonth || 0}
-          />
+        <SectionHeader title="Flujo de Efectivo Diario" />
+        <div className="financial-health__chart-card">
+          <div className="financial-health__chart-container">
+            <ScrollableIncomeExpenseChart
+              data={data.daily || []}
+              variant="daily"
+              initialBalance={data.balances?.previousMonth || 0}
+            />
+          </div>
         </div>
       </section>
 
       {/* Sustainability Indicators */}
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">
-          Indicadores de Sostenibilidad (Mes)
-        </h2>
+        <SectionHeader title="Sostenibilidad (Mes)" />
         <div className="financial-health__metrics-grid">
           <RunwayCard runway={data.health.runway} />
           <BurnRateCard
@@ -291,64 +306,68 @@ function MonthlyView({
         </div>
       </section>
 
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-8">
         <Tabs
           value={breakdownType}
           onValueChange={(v) => setBreakdownType?.(v as 'income' | 'expense')}
           className="w-auto"
         >
-          <TabsList className="grid w-[300px] grid-cols-2">
-            <TabsTrigger value="expense">Gastos (Egresos)</TabsTrigger>
+          <TabsList className="grid w-[320px] grid-cols-2">
+            <TabsTrigger value="expense">Gastos</TabsTrigger>
             <TabsTrigger value="income">Ingresos</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       <div className="financial-health__grid-breakdown">
-        <CategoryPieChart
-          data={
-            breakdownType === 'expense'
-              ? data.categoriesExpense || []
-              : data.categoriesIncome || []
-          }
-          title={
-            breakdownType === 'expense'
-              ? 'Gastos por Categoría'
-              : 'Ingresos por Categoría'
-          }
-        />
-        <CostCenterChart
-          data={
-            breakdownType === 'expense'
-              ? data.costCentersExpense || []
-              : data.costCentersIncome || []
-          }
-          title={
-            breakdownType === 'expense'
-              ? 'Gastos por Centro de Costo'
-              : 'Ingresos por Centro de Costo'
-          }
-        />
+        <div className="financial-health__chart-card">
+          <CategoryPieChart
+            data={
+              breakdownType === 'expense'
+                ? data.categoriesExpense || []
+                : data.categoriesIncome || []
+            }
+            title={
+              breakdownType === 'expense'
+                ? 'Gastos por Categoría'
+                : 'Ingresos por Categoría'
+            }
+          />
+        </div>
+        <div className="financial-health__chart-card">
+          <CostCenterChart
+            data={
+              breakdownType === 'expense'
+                ? data.costCentersExpense || []
+                : data.costCentersIncome || []
+            }
+            title={
+              breakdownType === 'expense'
+                ? 'Gastos por Centro de Costo'
+                : 'Ingresos por Centro de Costo'
+            }
+          />
+        </div>
       </div>
 
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">
-          Movimientos del Periodo
-        </h2>
-        <FinanceMovementsTable
-          movements={data.movements || []}
-          pagination={
-            data.pagination
-              ? {
+        <SectionHeader title="Movimientos del Periodo" />
+        <div className="financial-health__chart-card" style={{ padding: 0 }}>
+          <FinanceMovementsTable
+            movements={data.movements || []}
+            pagination={
+              data.pagination
+                ? {
                   ...data.pagination,
                   hasPrevPage: data.pagination.page > 1,
                   hasNextPage:
                     data.pagination.page < data.pagination.totalPages,
                 }
-              : undefined
-          }
-          onPageChange={onPageChange}
-        />
+                : undefined
+            }
+            onPageChange={onPageChange}
+          />
+        </div>
       </section>
     </div>
   );
@@ -361,7 +380,7 @@ function AnnualView({
   onPageChange,
 }: ViewProps) {
   return (
-    <div className="mt-6">
+    <div className="mt-8">
       <section className="financial-health__section">
         <div className="financial-health__stat-grid">
           <StatCard
@@ -371,34 +390,34 @@ function AnnualView({
             variant="default"
           />
           <StatCard
-            title="Rentabilidad Anual"
+            title="Rentabilidad"
             value={formatCurrency(data.totals.balance)}
             icon={Activity}
             variant={data.totals.balance >= 0 ? 'info' : 'danger'}
             subtext={`${((data.totals.balance / (data.totals.income || 1)) * 100).toFixed(1)}% Margen`}
           />
           <StatCard
-            title="Gastos Totales"
-            value={formatCurrency(data.totals.expenses)}
-            icon={ArrowDownRight}
+            title="Caja Actual"
+            value={formatCurrency(data.balances?.currentMonth || 0)}
+            icon={Scale}
             variant="default"
           />
         </div>
       </section>
 
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">Desempeño Mensual</h2>
-        <ScrollableIncomeExpenseChart
-          data={data.monthly}
-          initialBalance={data.balances?.previousMonth || 0}
-        />
+        <SectionHeader title="Desempeño Mensual" />
+        <div className="financial-health__chart-card">
+          <ScrollableIncomeExpenseChart
+            data={data.monthly}
+            initialBalance={data.balances?.previousMonth || 0}
+          />
+        </div>
       </section>
 
       {/* Sustainability Indicators */}
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">
-          Indicadores de Sostenibilidad (Año)
-        </h2>
+        <SectionHeader title="Sostenibilidad (Anual)" />
         <div className="financial-health__metrics-grid">
           <RunwayCard runway={data.health.runway} />
           <BurnRateCard
@@ -409,62 +428,68 @@ function AnnualView({
         </div>
       </section>
 
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-8">
         <Tabs
           value={breakdownType}
           onValueChange={(v) => setBreakdownType?.(v as 'income' | 'expense')}
           className="w-auto"
         >
-          <TabsList className="grid w-[300px] grid-cols-2">
-            <TabsTrigger value="expense">Gastos (Egresos)</TabsTrigger>
+          <TabsList className="grid w-[320px] grid-cols-2">
+            <TabsTrigger value="expense">Gastos</TabsTrigger>
             <TabsTrigger value="income">Ingresos</TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       <div className="financial-health__grid-breakdown">
-        <CategoryBarChart
-          data={
-            breakdownType === 'expense'
-              ? data.categoriesExpense || []
-              : data.categoriesIncome || []
-          }
-          title={
-            breakdownType === 'expense'
-              ? 'Gastos por Categoría'
-              : 'Ingresos por Categoría'
-          }
-        />
-        <CostCenterChart
-          data={
-            breakdownType === 'expense'
-              ? data.costCentersExpense || []
-              : data.costCentersIncome || []
-          }
-          title={
-            breakdownType === 'expense'
-              ? 'Gastos por Centro de Costo'
-              : 'Ingresos por Centro de Costo'
-          }
-        />
+        <div className="financial-health__chart-card">
+          <CategoryBarChart
+            data={
+              breakdownType === 'expense'
+                ? data.categoriesExpense || []
+                : data.categoriesIncome || []
+            }
+            title={
+              breakdownType === 'expense'
+                ? 'Gastos por Categoría'
+                : 'Ingresos por Categoría'
+            }
+          />
+        </div>
+        <div className="financial-health__chart-card">
+          <CostCenterChart
+            data={
+              breakdownType === 'expense'
+                ? data.costCentersExpense || []
+                : data.costCentersIncome || []
+            }
+            title={
+              breakdownType === 'expense'
+                ? 'Gastos por Centro de Costo'
+                : 'Ingresos por Centro de Costo'
+            }
+          />
+        </div>
       </div>
 
       <section className="financial-health__section">
-        <h2 className="financial-health__section-title">Movimientos del Año</h2>
-        <FinanceMovementsTable
-          movements={data.movements || []}
-          pagination={
-            data.pagination
-              ? {
+        <SectionHeader title="Movimientos del Año" />
+        <div className="financial-health__chart-card" style={{ padding: 0 }}>
+          <FinanceMovementsTable
+            movements={data.movements || []}
+            pagination={
+              data.pagination
+                ? {
                   ...data.pagination,
                   hasPrevPage: data.pagination.page > 1,
                   hasNextPage:
                     data.pagination.page < data.pagination.totalPages,
                 }
-              : undefined
-          }
-          onPageChange={onPageChange}
-        />
+                : undefined
+            }
+            onPageChange={onPageChange}
+          />
+        </div>
       </section>
     </div>
   );
@@ -570,12 +595,11 @@ export default function FinancialHealthPage() {
 
   return (
     <div className="financial-health__container">
-      {/* Header */}
       <div className="financial-health__header">
-        <div>
+        <div className="financial-health__title-group">
           <h1 className="financial-health__title">Salud Financiera</h1>
           <p className="financial-health__subtitle">
-            Visión global del estado económico y proyecciones a largo plazo.
+            Resumen de movimientos, indicadores de sostenibilidad y proyecciones.
           </p>
         </div>
 
@@ -589,7 +613,9 @@ export default function FinancialHealthPage() {
               if (params.year !== undefined)
                 newParams.year = params.year.toString();
               if (params.month !== undefined)
-                newParams.month = params.month ? params.month.toString() : null;
+                newParams.month = params.month
+                  ? params.month.toString()
+                  : null;
               updateParams(newParams);
             }}
           />
@@ -602,9 +628,9 @@ export default function FinancialHealthPage() {
         className="financial-health__tabs"
       >
         <TabsList>
-          <TabsTrigger value="global">Global</TabsTrigger>
-          <TabsTrigger value="monthly">Mensual</TabsTrigger>
-          <TabsTrigger value="annual">Anual</TabsTrigger>
+          <TabsTrigger value="global">Evolución Global</TabsTrigger>
+          <TabsTrigger value="monthly">Vista Mensual</TabsTrigger>
+          <TabsTrigger value="annual">Resumen Anual</TabsTrigger>
         </TabsList>
 
         <TabsContent value="global">

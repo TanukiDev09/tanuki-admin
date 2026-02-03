@@ -13,11 +13,17 @@ import {
   Package,
   ExternalLink,
   Wallet,
+  Calendar,
+  CreditCard,
+  User,
+  Tag,
+  Hash,
+  ShoppingBag,
+  Layers,
 } from 'lucide-react';
 
 import { Movement } from '@/types/movement';
 import { IDebt } from '@/types/debt';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency, formatNumber } from '@/lib/utils';
@@ -44,28 +50,32 @@ function MovementDetailHeader({
   return (
     <div className="movement-detail__header">
       <div className="movement-detail__title-group">
-        <h1 className="movement-detail__title">Detalle de Movimiento</h1>
-        <Badge variant="outline" className="movement-detail__status-badge">
-          {movement.status || 'COMPLETED'}
-        </Badge>
+        <div className="movement-detail__status-row">
+          <Badge variant="outline" className="movement-detail__status-badge">
+            {movement.status || 'COMPLETED'}
+          </Badge>
+          <span className="movement-detail__id-badge">
+            ID: {movement._id.slice(-6).toUpperCase()}
+          </span>
+        </div>
+        <h1 className="movement-detail__title">{movement.description}</h1>
       </div>
       <div className="movement-detail__actions">
         {canDelete && (
-          <Button
-            variant="destructive"
+          <button
             onClick={onDelete}
             disabled={deleting}
             className="movement-detail__delete-btn"
           >
-            <Trash2 className="movement-detail__icon" />
+            <Trash2 />
             {deleting ? 'Eliminando...' : 'Eliminar'}
-          </Button>
+          </button>
         )}
         {canUpdate && (
-          <Button onClick={onEdit}>
-            <Pencil className="movement-detail__icon" />
-            Editar
-          </Button>
+          <button onClick={onEdit} className="movement-detail__edit-btn">
+            <Pencil />
+            Editar Movimiento
+          </button>
         )}
       </div>
     </div>
@@ -79,200 +89,175 @@ function MovementDetailContent({
   movement: Movement;
   router: AppRouterInstance;
 }) {
+  const isIncome = movement.type === 'INCOME';
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{movement.description}</CardTitle>
-        <p className="movement-detail__date">
-          {new Date(movement.date).toLocaleDateString()}
-        </p>
-      </CardHeader>
-      <CardContent className="movement-detail__content">
-        <div className="movement-detail__grid-2">
-          <div>
-            <h3 className="movement-detail__label">Tipo</h3>
-            <p
-              className={
-                movement.type === 'INCOME'
-                  ? 'movement-detail__value--income'
-                  : 'movement-detail__value--expense'
-              }
-            >
-              {movement.type === 'INCOME' ? 'INGRESO' : 'EGRESO'}
-            </p>
+    <div className="movement-detail__container">
+      <div className="movement-detail__main-card">
+        <div className="movement-detail__amount-display">
+          <div className="movement-detail__amount-display-label">
+            Ingreso Neto del Movimiento
           </div>
-          <div>
-            <h3 className="movement-detail__label">Monto (COP)</h3>
-            <p className="movement-detail__value--xl">
-              {formatCurrency(
-                toNumber(movement.amountInCOP || movement.amount),
-                'COP'
-              )}
-            </p>
-            {movement.currency !== 'COP' && (
-              <p className="movement-detail__amount-hint">
-                Original:{' '}
-                {formatCurrency(toNumber(movement.amount), movement.currency)}
-                {movement.exchangeRate
-                  ? ` @ TRM ${formatNumber(toNumber(movement.exchangeRate))}`
-                  : ''}
-              </p>
-            )}
+          <div
+            className={`movement-detail__amount-display-value ${isIncome
+              ? 'movement-detail__amount-display-value--income'
+              : 'movement-detail__amount-display-value--expense'
+              }`}
+          >
+            {isIncome ? '+' : '-'} {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
           </div>
+          {movement.currency !== 'COP' && (
+            <div className="movement-detail__amount-display-hint">
+              {formatCurrency(toNumber(movement.amount), movement.currency)}
+              {movement.exchangeRate
+                ? ` @ TRM ${formatNumber(toNumber(movement.exchangeRate))}`
+                : ''}
+            </div>
+          )}
         </div>
 
-        <div className="movement-detail__grid-3">
-          <div>
-            <h3 className="movement-detail__label">Unidad</h3>
-            <p>{movement.unit || '-'}</p>
-          </div>
-          <div>
-            <h3 className="movement-detail__label">Cantidad</h3>
-            <p>
-              {movement.quantity
-                ? formatNumber(toNumber(movement.quantity))
-                : '-'}
-            </p>
-          </div>
-          <div>
-            <h3 className="movement-detail__label">Valor Unitario</h3>
-            <p>
-              {movement.unitValue
-                ? formatCurrency(
-                    toNumber(movement.unitValue),
-                    movement.currency
-                  )
-                : '-'}
-            </p>
-          </div>
-        </div>
-
-        <div className="movement-detail__grid-2">
-          <div>
-            <h3 className="movement-detail__label">Categoría</h3>
-            <p>
-              {movement.category
-                ? typeof movement.category === 'string'
-                  ? movement.category
-                  : movement.category.name
-                : '-'}
-            </p>
-          </div>
-          <div>
-            <h3 className="movement-detail__label">Centro de Costo</h3>
-            {movement.allocations && movement.allocations.length > 1 ? (
-              <div className="movement-detail__allocation-list">
-                <table className="movement-detail__allocation-table">
-                  <thead>
-                    <tr>
-                      <th>Centro</th>
-                      <th className="text-right">Monto</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {movement.allocations.map((alloc, idx) => (
-                      <tr key={idx}>
-                        <td>{alloc.costCenter}</td>
-                        <td className="movement-detail__allocation-amount">
-                          {formatCurrency(
-                            toNumber(alloc.amount),
-                            movement.currency
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+        <div className="movement-detail__section">
+          <h2 className="movement-detail__section-title">Información de la Transacción</h2>
+          <div className="movement-detail__info-grid">
+            <div className="movement-detail__field">
+              <span className="movement-detail__field-label">
+                <Calendar className="inline-block w-3 h-3 mr-1 mb-0.5" /> Fecha
+              </span>
+              <span className="movement-detail__field-value">
+                {new Date(movement.date).toLocaleDateString('es-CO', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric',
+                })}
+              </span>
+            </div>
+            <div className="movement-detail__field">
+              <span className="movement-detail__field-label">
+                <Tag className="inline-block w-3 h-3 mr-1 mb-0.5" /> Categoría
+              </span>
+              <span className="movement-detail__field-value">
+                {movement.category
+                  ? typeof movement.category === 'string'
+                    ? movement.category
+                    : movement.category.name
+                  : '-'}
+              </span>
+            </div>
+            <div className="movement-detail__field">
+              <span className="movement-detail__field-label">
+                <User className="inline-block w-3 h-3 mr-1 mb-0.5" /> Beneficiario / Pagador
+              </span>
+              <span className="movement-detail__field-value">{movement.beneficiary}</span>
+            </div>
+            <div className="movement-detail__field">
+              <span className="movement-detail__field-label">
+                <CreditCard className="inline-block w-3 h-3 mr-1 mb-0.5" /> Canal de Pago
+              </span>
+              <span className="movement-detail__field-value">{movement.paymentChannel}</span>
+            </div>
+            <div className="movement-detail__field">
+              <span className="movement-detail__field-label">
+                <Layers className="inline-block w-3 h-3 mr-1 mb-0.5" /> Centro de Costo
+              </span>
+              <span className="movement-detail__field-value">
+                {movement.costCenter || movement.allocations?.[0]?.costCenter || '-'}
+              </span>
+            </div>
+            {movement.invoiceRef && (
+              <div className="movement-detail__field">
+                <span className="movement-detail__field-label">
+                  <Hash className="inline-block w-3 h-3 mr-1 mb-0.5" /> Ref. Factura
+                </span>
+                <span className="movement-detail__field-value movement-detail__field-value--mono">
+                  {movement.invoiceRef}
+                </span>
               </div>
-            ) : (
-              <p>
-                {movement.costCenter ||
-                  movement.allocations?.[0]?.costCenter ||
-                  '-'}
-              </p>
             )}
           </div>
         </div>
 
-        <div className="movement-detail__grid-2">
-          <div>
-            <h3 className="movement-detail__label">Beneficiario / Pagador</h3>
-            <p>{movement.beneficiary}</p>
+        {movement.notes && (
+          <div className="movement-detail__section">
+            <h2 className="movement-detail__section-title">Notas Adicionales</h2>
+            <div className="movement-detail__notes-box">{movement.notes}</div>
           </div>
-          <div>
-            <h3 className="movement-detail__label">Canal de Pago</h3>
-            <p>{movement.paymentChannel}</p>
-          </div>
-        </div>
+        )}
+      </div>
 
-        <div>
-          <h3 className="movement-detail__label">Notas</h3>
-          <p className="movement-detail__notes">
-            {movement.notes || 'Sin notas adicionales.'}
-          </p>
-        </div>
-
-        {movement.invoiceRef && (
-          <div>
-            <h3 className="movement-detail__label">Referencia Factura</h3>
-            <p>{movement.invoiceRef}</p>
+      <div className="movement-detail__sidebar">
+        {movement.items && movement.items.length > 0 && (
+          <div className="movement-detail__side-card">
+            <h3 className="movement-detail__side-card-title">
+              <ShoppingBag /> Desglose de Items
+            </h3>
+            <div className="movement-detail__items-list">
+              {movement.items.map((item, idx) => (
+                <div key={idx} className="movement-detail__item-row">
+                  <div className="movement-detail__item-row-info">
+                    <span className="movement-detail__item-row-name">{item.description}</span>
+                    <span className="movement-detail__item-row-details">
+                      {formatNumber(toNumber(item.quantity))} x {formatCurrency(toNumber(item.unitValue), movement.currency)}
+                    </span>
+                  </div>
+                  <div className="movement-detail__item-row-total">
+                    {formatCurrency(toNumber(item.total), movement.currency)}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
         {movement.debtId && typeof movement.debtId === 'object' && (
-          <div className="movement-detail__link-section">
-            <h3 className="movement-detail__link-title">
-              <Wallet className="movement-detail__icon" /> Deuda Vinculada
+          <div className="movement-detail__side-card">
+            <h3 className="movement-detail__side-card-title">
+              <Wallet /> Deuda Relacionada
             </h3>
-            <div className="movement-detail__link-card">
-              <div className="movement-detail__link-text">
-                <strong>
-                  {(movement.debtId as unknown as IDebt).source?.reference ||
-                    'Referencia no disponible'}
-                </strong>
-                <p className="text-xs text-muted-foreground">
-                  {(movement.debtId as unknown as IDebt).notes ||
-                    (movement.debtId as unknown as IDebt).type}
-                </p>
+            <div
+              className="movement-detail__link-card"
+              onClick={() =>
+                router.push(
+                  `/dashboard/debts/entity/${(movement.debtId as unknown as IDebt)._id}`
+                )
+              }
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="movement-detail__link-card-content">
+                <span className="movement-detail__link-card-title">
+                  {(movement.debtId as unknown as IDebt).source?.reference || 'Documento de Deuda'}
+                </span>
+                <span className="movement-detail__link-card-subtitle">
+                  Haga clic para ver detalles de la obligación
+                </span>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  router.push(
-                    `/dashboard/debts/entity/${(movement.debtId as unknown as IDebt)._id}`
-                  )
-                }
-              >
-                <ExternalLink className="movement-detail__icon" /> Ver Deuda
-              </Button>
+              <ExternalLink className="w-4 h-4 text-primary opacity-50" />
             </div>
           </div>
         )}
 
         {movement.inventoryMovementId && (
-          <div className="movement-detail__link-section">
-            <h3 className="movement-detail__link-title">
-              <Package className="movement-detail__icon" /> Movimiento de
-              Inventario Vinculado
+          <div className="movement-detail__side-card">
+            <h3 className="movement-detail__side-card-title">
+              <Package /> Inventario
             </h3>
-            <div className="movement-detail__link-card">
-              <div className="movement-detail__link-text">
-                <strong>Relacionado con Control de Stock</strong>
+            <div
+              className="movement-detail__link-card"
+              onClick={() => router.push('/dashboard/inventory')}
+              style={{ cursor: 'pointer' }}
+            >
+              <div className="movement-detail__link-card-content">
+                <span className="movement-detail__link-card-title">Gestión de Stock</span>
+                <span className="movement-detail__link-card-subtitle">
+                  Este movimiento afectó el inventario de libros
+                </span>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => router.push('/dashboard/inventory')}
-              >
-                <ExternalLink className="movement-detail__icon" /> Ir a
-                Inventario
-              </Button>
+              <ExternalLink className="w-4 h-4 text-primary opacity-50" />
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
 
@@ -332,7 +317,6 @@ export default function MovementDetailPage() {
         description: 'El movimiento ha sido eliminado exitosamente',
       });
 
-      // Smart navigation: go back if we came from another internal page, otherwise go to default list
       if (
         typeof window !== 'undefined' &&
         document.referrer &&
@@ -354,22 +338,14 @@ export default function MovementDetailPage() {
     }
   };
 
-  if (loading)
-    return <div className="movement-detail__loading">Cargando...</div>;
-  if (!movement)
-    return (
-      <div className="movement-detail__error">Movimiento no encontrado</div>
-    );
+  if (loading) return <div className="movement-detail__loading">Preparando vista premium...</div>;
+  if (!movement) return <div className="movement-detail__error">Movimiento no encontrado</div>;
 
   return (
     <div className="movement-detail">
-      <Button
-        variant="ghost"
-        onClick={() => router.back()}
-        className="movement-detail__back-btn"
-      >
-        <ArrowLeft className="movement-detail__icon" />
-        Volver
+      <Button variant="ghost" onClick={() => router.back()} className="movement-detail__back-btn">
+        <ArrowLeft className="w-4 h-4 mr-2" />
+        Volver al Listado
       </Button>
 
       <MovementDetailHeader
@@ -378,9 +354,7 @@ export default function MovementDetailPage() {
         canUpdate={canUpdate}
         canDelete={canDelete}
         onDelete={handleDelete}
-        onEdit={() =>
-          router.push(`/dashboard/movements/${movement._id}/editar`)
-        }
+        onEdit={() => router.push(`/dashboard/movements/${movement._id}/editar`)}
       />
 
       <MovementDetailContent movement={movement} router={router} />

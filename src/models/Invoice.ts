@@ -3,6 +3,21 @@ import './CostCenter';
 import './Movement';
 import './InventoryMovement';
 
+export interface IDianInvoiceData {
+  invoiceAuthorization?: string;
+  authorizationPeriod?: {
+    start: Date;
+    end: Date;
+  };
+  softwareProvider?: string;
+  softwareId?: string;
+  validationResponse?: {
+    code: string;
+    description: string;
+    validatedAt: Date;
+  };
+}
+
 export interface IInvoiceItem {
   type: 'libro' | 'servicio';
   description: string;
@@ -36,6 +51,21 @@ export interface IInvoice extends Document {
 
   fileUrl?: string; // URL to PDF/Image
   notes?: string;
+
+  // DIAN Electronic Invoice fields (optional, for imported XML invoices)
+  dianData?: IDianInvoiceData; // Complete DIAN metadata
+  cufe?: string; // Código Único de Factura Electrónica
+  orderReference?: string; // Número de orden de compra
+  newsletterSignup?: boolean; // Newsletter signup (natural person + order reference)
+  currency?: string; // 'COP', 'USD', etc.
+  exchangeRate?: number; // Conversion factor to COP
+  amountInCOP?: number; // Total amount in COP for reporting
+
+  customerDocumentType?: string; // Tipo de documento (CC, NIT, etc.)
+  customerAddress?: string; // Dirección del cliente
+  customerCity?: string; // Ciudad del cliente
+  customerEmail?: string; // Email del cliente
+  customerPhone?: string; // Teléfono del cliente
 
   createdAt: Date;
   updatedAt: Date;
@@ -77,6 +107,7 @@ const InvoiceSchema: Schema = new Schema(
         description: { type: String, required: true },
         quantity: { type: Number, required: true, min: 0 },
         unitPrice: { type: Number, required: true, min: 0 },
+        discount: { type: Number, default: 0 },
         total: { type: Number, required: true },
         bookId: { type: Schema.Types.ObjectId, ref: 'Book' },
         costCenter: { type: String, required: true },
@@ -127,6 +158,39 @@ const InvoiceSchema: Schema = new Schema(
     notes: {
       type: String,
     },
+    // DIAN Electronic Invoice fields
+    dianData: {
+      invoiceAuthorization: String,
+      authorizationPeriod: {
+        start: Date,
+        end: Date,
+      },
+      softwareProvider: String,
+      softwareId: String,
+      validationResponse: {
+        code: String,
+        description: String,
+        validatedAt: Date,
+      },
+    },
+    cufe: {
+      type: String,
+      unique: true,
+      sparse: true, // Allow null/undefined, but unique if present
+    },
+    orderReference: String,
+    newsletterSignup: {
+      type: Boolean,
+      default: false,
+    },
+    customerDocumentType: String,
+    customerAddress: String,
+    customerCity: String,
+    customerEmail: String,
+    customerPhone: String,
+    currency: { type: String, default: 'COP' },
+    exchangeRate: { type: Number, default: 1 },
+    amountInCOP: { type: Number, default: 0 },
   },
   {
     timestamps: true,
@@ -134,11 +198,11 @@ const InvoiceSchema: Schema = new Schema(
 );
 
 // Indexes
-InvoiceSchema.index({ number: 1 }, { unique: true });
 InvoiceSchema.index({ date: -1 });
 InvoiceSchema.index({ status: 1 });
 InvoiceSchema.index({ costCenters: 1 });
 InvoiceSchema.index({ inventoryMovement: 1 });
+InvoiceSchema.index({ newsletterSignup: 1 }); // For newsletter queries
 
 export default mongoose.models.Invoice ||
   mongoose.model<IInvoice>('Invoice', InvoiceSchema, 'invoices');

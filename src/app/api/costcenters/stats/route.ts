@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PipelineStage } from 'mongoose';
 import dbConnect from '@/lib/mongodb';
 import Movement from '@/models/Movement';
 import CostCenter from '@/models/CostCenter';
@@ -10,7 +11,7 @@ import { subMonths, startOfMonth, format } from 'date-fns';
 /**
  * Helper to determine the best amount value for a movement.
  */
-const GET_AMOUNT_EXPR = {
+const GET_AMOUNT_COP_EXPR = {
   $cond: [
     { $gt: [{ $ifNull: ['$amountInCOP', 0] }, 0] },
     '$amountInCOP',
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
       {
         $group: {
           _id: '$type',
-          total: { $sum: GET_AMOUNT_EXPR },
+          total: { $sum: GET_AMOUNT_COP_EXPR },
         },
       },
     ]);
@@ -52,7 +53,11 @@ export async function GET(request: NextRequest) {
 
     globalTotals.forEach((t) => {
       const val = t.total ? t.total.toString() : '0';
-      if (t._id === 'Ingreso' || t._id === 'INCOME') {
+      const isIncome =
+        t._id === 'Ingreso' ||
+        t._id === 'INCOME' ||
+        t._id === 'factura_emitida';
+      if (isIncome) {
         totalIncome = add(totalIncome, val);
       } else {
         totalExpenses = add(totalExpenses, val);
@@ -73,7 +78,7 @@ export async function GET(request: NextRequest) {
             month: { $month: '$date' },
             type: '$type',
           },
-          total: { $sum: GET_AMOUNT_EXPR },
+          total: { $sum: GET_AMOUNT_COP_EXPR },
         },
       },
       { $sort: { '_id.year': 1, '_id.month': 1 } },
@@ -117,14 +122,90 @@ export async function GET(request: NextRequest) {
     });
 
     // 4. Per Cost Center Stats
+    const incomeTypes = ['Ingreso', 'INCOME', 'factura_emitida'];
+
+    const basePortionsPipeline: PipelineStage[] = [
+      {
+        $project: {
+          portions: {
+            $cond: {
+              if: {
+                $and: [
+                  { $isArray: '$items' },
+                  { $gt: [{ $size: '$items' }, 0] },
+                ],
+              },
+              then: {
+                $map: {
+                  input: '$items',
+                  as: 'item',
+                  in: {
+                    cc: { $ifNull: ['$$item.costCenter', '$costCenter'] },
+                    val: '$$item.total',
+                  },
+                },
+              },
+              else: {
+                $cond: {
+                  if: {
+                    $and: [
+                      { $isArray: '$allocations' },
+                      { $gt: [{ $size: '$allocations' }, 0] },
+                    ],
+                  },
+                  then: {
+                    $map: {
+                      input: '$allocations',
+                      as: 'alloc',
+                      in: {
+                        cc: '$$alloc.costCenter',
+                        val: '$$alloc.amount',
+                      },
+                    },
+                  },
+                  else: [
+                    {
+                      cc: { $ifNull: ['$costCenter', '00'] },
+                      val: GET_AMOUNT_COP_EXPR,
+                    },
+                  ],
+                },
+              },
+            },
+          },
+          type: '$type',
+          date: '$date',
+          exchangeRate: { $ifNull: ['$exchangeRate', 1] },
+        },
+      },
+      { $unwind: '$portions' },
+      {
+        $addFields: {
+          finalAmount: {
+            $multiply: [
+              { $toDouble: { $ifNull: ['$portions.val', 0] } },
+              {
+                $cond: [
+                  { $eq: ['$portions.val', GET_AMOUNT_COP_EXPR] },
+                  1,
+                  '$exchangeRate',
+                ],
+              },
+            ],
+          },
+        },
+      },
+    ];
+
     const ccStats = await Movement.aggregate([
+      ...basePortionsPipeline,
       {
         $group: {
           _id: {
-            costCenter: '$costCenter',
+            costCenter: '$portions.cc',
             type: '$type',
           },
-          total: { $sum: GET_AMOUNT_EXPR },
+          total: { $sum: '$finalAmount' },
         },
       },
     ]);
@@ -136,27 +217,24 @@ export async function GET(request: NextRequest) {
           date: { $gte: sixMonthsAgo },
         },
       },
+      ...basePortionsPipeline,
       {
         $group: {
           _id: {
-            costCenter: '$costCenter',
+            costCenter: '$portions.cc',
             year: { $year: '$date' },
             month: { $month: '$date' },
           },
           income: {
             $sum: {
-              $cond: [
-                { $in: ['$type', ['Ingreso', 'INCOME']] },
-                GET_AMOUNT_EXPR,
-                0,
-              ],
+              $cond: [{ $in: ['$type', incomeTypes] }, '$finalAmount', 0],
             },
           },
           expense: {
             $sum: {
               $cond: [
-                { $not: [{ $in: ['$type', ['Ingreso', 'INCOME']] }] },
-                GET_AMOUNT_EXPR,
+                { $not: [{ $in: ['$type', incomeTypes] }] },
+                '$finalAmount',
                 0,
               ],
             },

@@ -14,6 +14,7 @@ import {
   DollarSign,
   PieChart,
   ChevronRight,
+  Tag,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -208,6 +209,13 @@ export default function CostCenterDetailPage() {
             icon={TrendingDown}
             variant="danger"
             subtext="Total histórico"
+          />
+          <StatCard
+            title="Unidades Vendidas"
+            value={(financialData.totals?.totalQuantity || 0).toString()}
+            icon={Tag}
+            variant="default"
+            subtext="Volumen de ventas"
           />
           <StatCard
             title="Balance Neto"
