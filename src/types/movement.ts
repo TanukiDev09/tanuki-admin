@@ -9,6 +9,7 @@ export interface Movement {
   currency: string;
   exchangeRate?: number | string;
   amountInCOP?: number | string;
+  relevantAmount?: number | string;
   type: MovementType;
   category: string | { _id: string; name: string; color?: string };
   costCenter: string;
@@ -28,6 +29,17 @@ export interface Movement {
   allocations?: {
     costCenter: string;
     amount: number | string;
+  }[];
+  items?: {
+    type: 'libro' | 'servicio' | 'otro';
+    description: string;
+    quantity: number | string;
+    unitValue: number | string;
+    catalogPrice?: number | string;
+    discount?: number | string;
+    total: number | string;
+    costCenter: string;
+    bookId?: string;
   }[];
 }
 

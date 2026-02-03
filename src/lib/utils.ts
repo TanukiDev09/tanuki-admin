@@ -9,8 +9,8 @@ export function formatCurrency(amount: number, currency: string = 'COP') {
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency: currency,
-    minimumFractionDigits: currency === 'JPY' ? 0 : 0,
-    maximumFractionDigits: currency === 'JPY' ? 0 : 0,
+    minimumFractionDigits: currency === 'JPY' || currency === 'COP' ? 0 : 2,
+    maximumFractionDigits: currency === 'JPY' || currency === 'COP' ? 0 : 2,
   })
     .formatToParts(amount)
     .map((part) => (part.type === 'group' ? '\u00A0' : part.value))

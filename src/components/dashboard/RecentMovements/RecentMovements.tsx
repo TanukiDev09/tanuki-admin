@@ -12,6 +12,7 @@ interface Movement {
   date: string;
   description: string;
   amount: number | string;
+  relevantAmount?: number | string;
   currency?: string;
   amountInCOP?: number | string;
   type: string;
@@ -79,7 +80,11 @@ export function RecentMovements({ movements }: RecentMovementsProps) {
                   >
                     {isIncome ? '+' : '-'}
                     {formatCurrency(
-                      toNumber(movement.amountInCOP || movement.amount),
+                      toNumber(
+                        movement.relevantAmount ??
+                        movement.amountInCOP ??
+                        movement.amount
+                      ),
                       'COP'
                     )}
                     {movement.currency && movement.currency !== 'COP' && (

@@ -14,10 +14,14 @@ const createInvoiceSchema = z.object({
   items: z
     .array(
       z.object({
+        type: z.enum(['libro', 'servicio']).optional(),
         description: z.string().min(1),
         quantity: z.number().min(0),
         unitPrice: z.number().min(0),
+        discount: z.number().default(0),
         total: z.number(),
+        bookId: z.string().optional().nullable(),
+        costCenter: z.string().min(1, 'Centro de costo requerido'),
       })
     )
     .min(1, 'Debe haber al menos un ítem'),
@@ -30,8 +34,40 @@ const createInvoiceSchema = z.object({
     .default('Draft'),
   costCenters: z.array(z.string()).optional(), // Array of ObjectIds as strings
   movements: z.array(z.string()).optional(), // Array of ObjectIds
-  inventoryMovement: z.string().optional(), // ObjectId
+  inventoryMovement: z.string().optional().nullable(), // ObjectId
   notes: z.string().optional(),
+  // DIAN fields
+  cufe: z.string().optional(),
+  orderReference: z.string().optional(),
+  newsletterSignup: z.boolean().optional(),
+  customerEmail: z.string().optional(),
+  customerPhone: z.string().optional(),
+  customerAddress: z.string().optional(),
+  customerCity: z.string().optional(),
+  customerDocumentType: z.string().optional(),
+  currency: z.string().optional().default('COP'),
+  exchangeRate: z.number().optional().default(1),
+  amountInCOP: z.number().optional(),
+  dianData: z
+    .object({
+      invoiceAuthorization: z.string().optional(),
+      authorizationPeriod: z
+        .object({
+          start: z.string().or(z.date()).optional(),
+          end: z.string().or(z.date()).optional(),
+        })
+        .optional(),
+      softwareProvider: z.string().optional(),
+      softwareId: z.string().optional(),
+      validationResponse: z
+        .object({
+          code: z.string().optional(),
+          description: z.string().optional(),
+          validatedAt: z.string().or(z.date()).optional(),
+        })
+        .optional(),
+    })
+    .optional(),
 });
 
 export async function GET(req: NextRequest) {
@@ -55,19 +91,16 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '50');
     const skip = (page - 1) * limit;
 
+    const minAmount = searchParams.get('minAmount');
+    const maxAmount = searchParams.get('maxAmount');
+
     const query: Record<string, unknown> = {};
-
     if (startDate && endDate) {
-      query.date = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate),
-      };
+      query.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
     }
-
     if (status) {
       query.status = status;
     }
-
     if (search) {
       query.$or = [
         { number: { $regex: search, $options: 'i' } },
@@ -76,8 +109,25 @@ export async function GET(req: NextRequest) {
       ];
     }
 
+    if (minAmount || maxAmount) {
+      const amountQuery: Record<string, number> = {};
+      if (minAmount) amountQuery.$gte = parseFloat(minAmount);
+      if (maxAmount) amountQuery.$lte = parseFloat(maxAmount);
+      query.total = amountQuery;
+    }
+
+    // Sorting
+    const sortField = searchParams.get('sortField') || 'date';
+    const sortOrder = searchParams.get('sortOrder') === 'asc' ? 1 : -1;
+    const sort: Record<string, 1 | -1> = { [sortField]: sortOrder as 1 | -1 };
+
+    // Fallback sort to ensure consistent order
+    if (sortField !== 'date') {
+      sort.date = -1;
+    }
+
     const invoices = await Invoice.find(query)
-      .sort({ date: -1 })
+      .sort(sort)
       .skip(skip)
       .limit(limit)
       .populate('costCenters', 'name code')
@@ -122,7 +172,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const data = validation.data;
+    const data = { ...validation.data };
+
+    // Sanitize optional ObjectId strings to avoid casting errors with empty strings
+    if (data.inventoryMovement === '' || data.inventoryMovement === null) {
+      data.inventoryMovement = undefined;
+    }
+
+    if (data.items) {
+      data.items = data.items.map((item) => ({
+        ...item,
+        bookId:
+          item.bookId === '' || item.bookId === null ? undefined : item.bookId,
+      }));
+    }
+
+    // Calculate amountInCOP if not explicitly provided
+    if (data.total && data.exchangeRate && !data.amountInCOP) {
+      data.amountInCOP = data.total * data.exchangeRate;
+    } else if (data.total && !data.amountInCOP) {
+      data.amountInCOP = data.total; // Assumes COP if no rate
+    }
 
     // Check for duplicate number
     const existing = await Invoice.findOne({ number: data.number });

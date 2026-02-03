@@ -35,6 +35,7 @@ export interface FinancialTotals {
   income: number;
   expenses: number;
   balance: number;
+  totalQuantity?: number;
 }
 
 export interface FinancialSummary {
