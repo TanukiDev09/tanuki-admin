@@ -3,7 +3,7 @@
 
 .invoices-list {
   padding: 2rem;
-  background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+  background: linear-gradient(135deg, #f8faff 0%, #fff 100%);
   min-height: calc(100vh - var(--header-height));
 
   &__container {
@@ -47,8 +47,8 @@
     background: white;
     padding: 1.5rem;
     border-radius: var(--radius-2xl);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgb(0 0 0 / 5%);
+    box-shadow: 0 4px 25px rgb(0 0 0 / 3%);
   }
 
   &__search {
@@ -78,7 +78,7 @@
       &:focus {
         background: white !important;
         border-color: var(--primary) !important;
-        box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1) !important;
+        box-shadow: 0 0 0 4px rgb(var(--primary-rgb), 0.1) !important;
       }
     }
   }
@@ -149,7 +149,7 @@
   }
 
   &__slider {
-    -webkit-appearance: none;
+    appearance: none;
     width: 100%;
     height: 4px;
     border-radius: 5px;
@@ -158,19 +158,19 @@
     cursor: pointer;
 
     &::-webkit-slider-thumb {
-      -webkit-appearance: none;
+      appearance: none;
       appearance: none;
       width: 16px;
       height: 16px;
       border-radius: 50%;
       background: var(--primary);
       border: 2px solid white;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
       transition: all 0.2s ease;
 
       &:hover {
         transform: scale(1.2);
-        box-shadow: 0 3px 6px rgba(var(--primary-rgb), 0.3);
+        box-shadow: 0 3px 6px rgb(var(--primary-rgb), 0.3);
       }
     }
 
@@ -180,12 +180,12 @@
       border-radius: 50%;
       background: var(--primary);
       border: 2px solid white;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
       transition: all 0.2s ease;
 
       &:hover {
         transform: scale(1.2);
-        box-shadow: 0 3px 6px rgba(var(--primary-rgb), 0.3);
+        box-shadow: 0 3px 6px rgb(var(--primary-rgb), 0.3);
       }
     }
   }
@@ -193,8 +193,8 @@
   &__card {
     background: white;
     border-radius: var(--radius-2xl);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    border: 1px solid rgb(0 0 0 / 6%);
+    box-shadow: 0 10px 30px rgb(0 0 0 / 4%);
     overflow: hidden;
   }
 
@@ -216,10 +216,10 @@
     text-decoration: none;
     padding: 0.25rem 0.5rem;
     border-radius: var(--radius-sm);
-    background: rgba(var(--primary-rgb), 0.05);
+    background: rgb(var(--primary-rgb), 0.05);
 
     &:hover {
-      background: rgba(var(--primary-rgb), 0.1);
+      background: rgb(var(--primary-rgb), 0.1);
       text-decoration: underline;
     }
   }
@@ -288,7 +288,7 @@
 
       &:hover {
         color: var(--primary);
-        background: rgba(var(--primary-rgb), 0.05);
+        background: rgb(var(--primary-rgb), 0.05);
       }
     }
   }
@@ -308,11 +308,11 @@
       #4f46e5 100%
     ) !important;
     border: none !important;
-    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.25) !important;
+    box-shadow: 0 4px 12px rgb(var(--primary-rgb), 0.25) !important;
 
     &:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 15px rgba(var(--primary-rgb), 0.35) !important;
+      box-shadow: 0 6px 15px rgb(var(--primary-rgb), 0.35) !important;
       filter: brightness(1.1);
     }
 
@@ -336,22 +336,27 @@
     background: #f1f5f9;
     color: #475569;
   }
+
   &--sent {
     background: #eff6ff;
     color: #2563eb;
   }
+
   &--success {
     background: #f0fdf4;
     color: #16a34a;
   }
+
   &--warning {
     background: #fffbeb;
     color: #d97706;
   }
+
   &--danger {
     background: #fef2f2;
     color: #dc2626;
   }
+
   &--outline {
     background: transparent;
     border: 1px solid #e2e8f0;
@@ -386,10 +391,12 @@
     color: #2563eb;
     background: #eff6ff;
   }
+
   &--delete:hover {
     color: #dc2626;
     background: #fef2f2;
   }
+
   &--view:hover {
     color: #10b981;
     background: #ecfdf5;
@@ -408,6 +415,7 @@
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: -200% 0;
   }
@@ -417,6 +425,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }

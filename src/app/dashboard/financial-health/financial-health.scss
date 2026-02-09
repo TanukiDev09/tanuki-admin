@@ -4,6 +4,7 @@
 
 .financial-health {
   @extend %dashboard-base;
+
   background: var(--color-background);
   min-height: 100vh;
   padding-bottom: $spacing-2xl;

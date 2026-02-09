@@ -6,8 +6,8 @@
   padding: 2rem;
   background: linear-gradient(
     135deg,
-    hsl(220, 70%, 97%) 0%,
-    hsl(260, 70%, 97%) 100%
+    hsl(220deg 70% 97%) 0%,
+    hsl(260deg 70% 97%) 100%
   );
 
   @include respond-to('tablet') {
@@ -24,10 +24,10 @@
     font-weight: 700;
     background: linear-gradient(
       135deg,
-      hsl(260, 80%, 50%) 0%,
-      hsl(220, 80%, 50%) 100%
+      hsl(260deg 80% 50%) 0%,
+      hsl(220deg 80% 50%) 100%
     );
-    -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 0.5rem;
@@ -35,7 +35,7 @@
 
   .subtitle {
     font-size: 1.125rem;
-    color: hsl(220, 20%, 50%);
+    color: hsl(220deg 20% 50%);
   }
 }
 
@@ -64,11 +64,11 @@
       .stepNumber {
         background: linear-gradient(
           135deg,
-          hsl(260, 80%, 60%) 0%,
-          hsl(220, 80%, 60%) 100%
+          hsl(260deg 80% 60%) 0%,
+          hsl(220deg 80% 60%) 100%
         );
         color: white;
-        box-shadow: 0 4px 20px hsla(240, 80%, 60%, 0.3);
+        box-shadow: 0 4px 20px hsl(240deg 80% 60% / 30%);
         transform: scale(1.1);
       }
     }
@@ -77,8 +77,8 @@
       width: 3rem;
       height: 3rem;
       border-radius: 50%;
-      background: hsl(0, 0%, 90%);
-      color: hsl(0, 0%, 60%);
+      background: hsl(0deg 0% 90%);
+      color: hsl(0deg 0% 60%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -90,7 +90,7 @@
     .stepLabel {
       font-size: 0.875rem;
       font-weight: 600;
-      color: hsl(220, 20%, 40%);
+      color: hsl(220deg 20% 40%);
     }
   }
 }
@@ -102,29 +102,29 @@
 }
 
 .dropzone {
-  border: 3px dashed hsl(240, 30%, 80%);
+  border: 3px dashed hsl(240deg 30% 80%);
   border-radius: 24px;
   padding: 4rem 2rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  background: hsla(0, 0%, 100%, 0.6);
+  background: hsl(0deg 0% 100% / 60%);
   backdrop-filter: blur(10px);
 
   &:hover {
-    border-color: hsl(240, 60%, 60%);
-    background: hsla(240, 80%, 98%, 0.8);
+    border-color: hsl(240deg 60% 60%);
+    background: hsl(240deg 80% 98% / 80%);
     transform: translateY(-2px);
-    box-shadow: 0 8px 30px hsla(240, 60%, 60%, 0.1);
+    box-shadow: 0 8px 30px hsl(240deg 60% 60% / 10%);
   }
 
   &.active {
-    border-color: hsl(260, 80%, 60%);
+    border-color: hsl(260deg 80% 60%);
     background: linear-gradient(
       135deg,
-      hsla(260, 80%, 95%, 0.9) 0%,
-      hsla(220, 80%, 95%, 0.9) 100%
+      hsl(260deg 80% 95% / 90%) 0%,
+      hsl(220deg 80% 95% / 90%) 100%
     );
-    box-shadow: 0 12px 40px hsla(240, 80%, 60%, 0.2);
+    box-shadow: 0 12px 40px hsl(240deg 80% 60% / 20%);
     transform: scale(1.02);
   }
 }
@@ -136,7 +136,7 @@
     margin: 0 auto 1.5rem;
     width: 64px;
     height: 64px;
-    color: hsl(240, 60%, 60%);
+    color: hsl(240deg 60% 60%);
 
     svg {
       width: 100%;
@@ -148,12 +148,12 @@
   h3 {
     font-size: 1.5rem;
     font-weight: 600;
-    color: hsl(220, 30%, 30%);
+    color: hsl(220deg 30% 30%);
     margin-bottom: 0.5rem;
   }
 
   p {
-    color: hsl(220, 20%, 50%);
+    color: hsl(220deg 20% 50%);
     margin-bottom: 1.5rem;
   }
 
@@ -166,13 +166,13 @@
       padding: 0.5rem 1rem;
       background: linear-gradient(
         135deg,
-        hsl(260, 80%, 95%) 0%,
-        hsl(220, 80%, 95%) 100%
+        hsl(260deg 80% 95%) 0%,
+        hsl(220deg 80% 95%) 100%
       );
       border-radius: 12px;
       font-size: 0.875rem;
       font-weight: 600;
-      color: hsl(240, 60%, 50%);
+      color: hsl(240deg 60% 50%);
     }
   }
 }
@@ -192,7 +192,7 @@
   h3 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: hsl(220, 30%, 30%);
+    color: hsl(220deg 30% 30%);
   }
 }
 
@@ -206,8 +206,8 @@
   padding: 0.875rem 2rem;
   background: linear-gradient(
     135deg,
-    hsl(260, 80%, 65%) 0%,
-    hsl(280, 80%, 55%) 100%
+    hsl(260deg 80% 65%) 0%,
+    hsl(280deg 80% 55%) 100%
   );
   color: white;
   border: none;
@@ -216,11 +216,11 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px hsla(270, 80%, 60%, 0.3);
+  box-shadow: 0 4px 15px hsl(270deg 80% 60% / 30%);
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 25px hsla(270, 80%, 60%, 0.4);
+    box-shadow: 0 6px 25px hsl(270deg 80% 60% / 40%);
     filter: brightness(1.1);
   }
 
@@ -234,8 +234,8 @@
   padding: 0.875rem 2rem;
   background: linear-gradient(
     135deg,
-    hsl(260, 80%, 60%) 0%,
-    hsl(220, 80%, 60%) 100%
+    hsl(260deg 80% 60%) 0%,
+    hsl(220deg 80% 60%) 100%
   );
   color: white;
   border: none;
@@ -244,11 +244,11 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px hsla(240, 80%, 60%, 0.3);
+  box-shadow: 0 4px 20px hsl(240deg 80% 60% / 30%);
 
   &:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 30px hsla(240, 80%, 60%, 0.4);
+    box-shadow: 0 6px 30px hsl(240deg 80% 60% / 40%);
   }
 
   &:disabled {
@@ -268,46 +268,46 @@
   align-items: center;
   justify-content: space-between;
   padding: 1.5rem;
-  background: hsla(0, 0%, 100%, 0.8);
+  background: hsl(0deg 0% 100% / 80%);
   backdrop-filter: blur(10px);
   border-radius: 16px;
-  border: 2px solid hsl(0, 0%, 90%);
+  border: 2px solid hsl(0deg 0% 90%);
   transition: all 0.3s ease;
 
   &:hover {
     transform: translateX(4px);
-    box-shadow: 0 4px 20px hsla(0, 0%, 0%, 0.05);
+    box-shadow: 0 4px 20px hsl(0deg 0% 0% / 5%);
   }
 
   &.success {
-    border-color: hsl(140, 60%, 60%);
+    border-color: hsl(140deg 60% 60%);
     background: linear-gradient(
       135deg,
-      hsla(140, 80%, 98%, 0.9) 0%,
-      hsla(140, 60%, 96%, 0.9) 100%
+      hsl(140deg 80% 98% / 90%) 0%,
+      hsl(140deg 60% 96% / 90%) 100%
     );
   }
 
   &.error {
-    border-color: hsl(0, 60%, 60%);
+    border-color: hsl(0deg 60% 60%);
     background: linear-gradient(
       135deg,
-      hsla(0, 80%, 98%, 0.9) 0%,
-      hsla(0, 60%, 96%, 0.9) 100%
+      hsl(0deg 80% 98% / 90%) 0%,
+      hsl(0deg 60% 96% / 90%) 100%
     );
   }
 
   &.processing {
-    border-color: hsl(240, 60%, 70%);
+    border-color: hsl(240deg 60% 70%);
     background: linear-gradient(
       135deg,
-      hsla(240, 80%, 98%, 0.9) 0%,
-      hsla(240, 60%, 96%, 0.9) 100%
+      hsl(240deg 80% 98% / 90%) 0%,
+      hsl(240deg 60% 96% / 90%) 100%
     );
   }
 
   &.imported {
-    border-color: hsl(140, 60%, 50%);
+    border-color: hsl(140deg 60% 50%);
     opacity: 0.8;
   }
 }
@@ -322,8 +322,8 @@
   padding: 0.6rem 1.2rem;
   background: linear-gradient(
     135deg,
-    hsl(260, 80%, 60%) 0%,
-    hsl(220, 80%, 60%) 100%
+    hsl(260deg 80% 60%) 0%,
+    hsl(220deg 80% 60%) 100%
   );
   color: white;
   border: none;
@@ -335,7 +335,7 @@
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 15px hsla(240, 80%, 60%, 0.2);
+    box-shadow: 0 4px 15px hsl(240deg 80% 60% / 20%);
   }
 }
 
@@ -343,8 +343,8 @@
   padding: 0.875rem 2rem;
   background: linear-gradient(
     135deg,
-    hsl(140, 80%, 50%) 0%,
-    hsl(160, 80%, 40%) 100%
+    hsl(140deg 80% 50%) 0%,
+    hsl(160deg 80% 40%) 100%
   );
   color: white;
   border: none;
@@ -353,11 +353,11 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 20px hsla(140, 80%, 50%, 0.3);
+  box-shadow: 0 4px 20px hsl(140deg 80% 50% / 30%);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 30px hsla(140, 80%, 50%, 0.4);
+    box-shadow: 0 6px 30px hsl(140deg 80% 50% / 40%);
   }
 }
 
@@ -365,12 +365,12 @@
   padding: 0.25rem 0.75rem;
   background: linear-gradient(
     135deg,
-    hsl(140, 80%, 95%) 0%,
-    hsl(160, 80%, 95%) 100%
+    hsl(140deg 80% 95%) 0%,
+    hsl(160deg 80% 95%) 100%
   );
   border-radius: 8px;
   font-weight: 600;
-  color: hsl(140, 80%, 30%);
+  color: hsl(140deg 80% 30%);
   font-size: 0.75rem;
 }
 
@@ -389,29 +389,29 @@
   align-items: center;
   justify-content: center;
   font-size: 1.5rem;
-  background: hsl(0, 0%, 95%);
+  background: hsl(0deg 0% 95%);
 
   .success &,
   .imported & {
-    background: hsl(140, 60%, 95%);
-    color: hsl(140, 60%, 40%);
+    background: hsl(140deg 60% 95%);
+    color: hsl(140deg 60% 40%);
   }
 
   .error & {
-    background: hsl(0, 60%, 95%);
-    color: hsl(0, 60%, 50%);
+    background: hsl(0deg 60% 95%);
+    color: hsl(0deg 60% 50%);
   }
 
   .processing & {
-    background: hsl(240, 60%, 95%);
+    background: hsl(240deg 60% 95%);
   }
 }
 
 .spinner {
   width: 24px;
   height: 24px;
-  border: 3px solid hsl(240, 60%, 90%);
-  border-top-color: hsl(240, 80%, 60%);
+  border: 3px solid hsl(240deg 60% 90%);
+  border-top-color: hsl(240deg 80% 60%);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -428,7 +428,7 @@
 
 .fileName {
   font-weight: 600;
-  color: hsl(220, 30%, 30%);
+  color: hsl(220deg 30% 30%);
   margin-bottom: 0.25rem;
 }
 
@@ -437,11 +437,11 @@
   gap: 1rem;
   flex-wrap: wrap;
   font-size: 0.875rem;
-  color: hsl(220, 20%, 50%);
+  color: hsl(220deg 20% 50%);
 
   .amount {
     font-weight: 700;
-    color: hsl(260, 80%, 50%);
+    color: hsl(260deg 80% 50%);
   }
 }
 
@@ -449,17 +449,17 @@
   padding: 0.25rem 0.75rem;
   background: linear-gradient(
     135deg,
-    hsl(260, 80%, 95%) 0%,
-    hsl(220, 80%, 95%) 100%
+    hsl(260deg 80% 95%) 0%,
+    hsl(220deg 80% 95%) 100%
   );
   border-radius: 8px;
   font-weight: 600;
-  color: hsl(240, 60%, 50%);
+  color: hsl(240deg 60% 50%);
   font-size: 0.75rem;
 }
 
 .error {
-  color: hsl(0, 60%, 50%);
+  color: hsl(0deg 60% 50%);
   font-size: 0.875rem;
 }
 
@@ -468,8 +468,8 @@
   height: 2rem;
   border-radius: 8px;
   border: none;
-  background: hsl(0, 0%, 95%);
-  color: hsl(0, 0%, 40%);
+  background: hsl(0deg 0% 95%);
+  color: hsl(0deg 0% 40%);
   font-size: 1.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -478,8 +478,8 @@
   justify-content: center;
 
   &:hover {
-    background: hsl(0, 60%, 95%);
-    color: hsl(0, 60%, 50%);
+    background: hsl(0deg 60% 95%);
+    color: hsl(0deg 60% 50%);
     transform: scale(1.1);
   }
 }
@@ -496,12 +496,12 @@
   gap: 2rem;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid hsl(220, 20%, 90%);
+  border-bottom: 2px solid hsl(220deg 20% 90%);
 
   .backButton {
     background: none;
     border: none;
-    color: hsl(240, 60%, 60%);
+    color: hsl(240deg 60% 60%);
     font-weight: 600;
     cursor: pointer;
     font-size: 1rem;
@@ -510,7 +510,7 @@
     transition: all 0.2s;
 
     &:hover {
-      background: hsl(240, 60%, 95%);
+      background: hsl(240deg 60% 95%);
       transform: translateX(-4px);
     }
   }
@@ -519,10 +519,11 @@
     h2 {
       font-size: 1.75rem;
       font-weight: 700;
-      color: hsl(220, 30%, 20%);
+      color: hsl(220deg 30% 20%);
     }
+
     p {
-      color: hsl(220, 20%, 50%);
+      color: hsl(220deg 20% 50%);
     }
   }
 }
@@ -531,7 +532,7 @@
   background: white;
   padding: 2rem;
   border-radius: 20px;
-  box-shadow: 0 10px 40px hsla(0, 0%, 0%, 0.05);
+  box-shadow: 0 10px 40px hsl(0deg 0% 0% / 5%);
   margin-bottom: 4rem;
 }
 
@@ -543,11 +544,11 @@
 
 .summaryCard {
   padding: 3rem;
-  background: hsla(0, 0%, 100%, 0.8);
+  background: hsl(0deg 0% 100% / 80%);
   backdrop-filter: blur(10px);
   border-radius: 24px;
   text-align: center;
-  box-shadow: 0 8px 40px hsla(0, 0%, 0%, 0.08);
+  box-shadow: 0 8px 40px hsl(0deg 0% 0% / 8%);
 }
 
 .summaryIcon {
@@ -558,7 +559,7 @@
 .summaryCard h2 {
   font-size: 2rem;
   font-weight: 700;
-  color: hsl(220, 30%, 30%);
+  color: hsl(220deg 30% 30%);
   margin-bottom: 2rem;
 }
 
@@ -573,8 +574,8 @@
   padding: 1.5rem 2rem;
   background: linear-gradient(
     135deg,
-    hsl(140, 80%, 98%) 0%,
-    hsl(140, 60%, 96%) 100%
+    hsl(140deg 80% 98%) 0%,
+    hsl(140deg 60% 96%) 100%
   );
   border-radius: 16px;
   min-width: 120px;
@@ -582,26 +583,26 @@
   &.error {
     background: linear-gradient(
       135deg,
-      hsl(0, 80%, 98%) 0%,
-      hsl(0, 60%, 96%) 100%
+      hsl(0deg 80% 98%) 0%,
+      hsl(0deg 60% 96%) 100%
     );
 
     .statValue {
-      color: hsl(0, 60%, 50%);
+      color: hsl(0deg 60% 50%);
     }
   }
 
   .statValue {
     font-size: 2.5rem;
     font-weight: 700;
-    color: hsl(140, 60%, 40%);
+    color: hsl(140deg 60% 40%);
     margin-bottom: 0.25rem;
   }
 
   .statLabel {
     font-size: 0.875rem;
     font-weight: 600;
-    color: hsl(220, 20%, 50%);
+    color: hsl(220deg 20% 50%);
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
@@ -627,24 +628,24 @@
 .primaryButton {
   background: linear-gradient(
     135deg,
-    hsl(260, 80%, 60%) 0%,
-    hsl(220, 80%, 60%) 100%
+    hsl(260deg 80% 60%) 0%,
+    hsl(220deg 80% 60%) 100%
   );
   color: white;
-  box-shadow: 0 4px 20px hsla(240, 80%, 60%, 0.3);
+  box-shadow: 0 4px 20px hsl(240deg 80% 60% / 30%);
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 30px hsla(240, 80%, 60%, 0.4);
+    box-shadow: 0 6px 30px hsl(240deg 80% 60% / 40%);
   }
 }
 
 .secondaryButton {
-  background: hsl(0, 0%, 95%);
-  color: hsl(220, 30%, 30%);
+  background: hsl(0deg 0% 95%);
+  color: hsl(220deg 30% 30%);
 
   &:hover {
-    background: hsl(0, 0%, 90%);
+    background: hsl(0deg 0% 90%);
     transform: translateY(-2px);
   }
 }
