@@ -206,7 +206,10 @@ export function POSStats({ posId, posName }: POSStatsProps) {
                         border: 'none',
                         boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
                       }}
-                      formatter={(value: number | string) => [formatCurrency(Number(value)), 'Ventas']}
+                      formatter={(value: number | string | undefined) => [
+                        formatCurrency(value === undefined ? 0 : Number(value)),
+                        'Ventas'
+                      ]}
                     />
                     <Area
                       type="monotone"

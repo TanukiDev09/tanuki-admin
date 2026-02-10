@@ -112,7 +112,8 @@ export function DataTable<T>({
                   <TableCell key={column.accessorKey} className={column.className}>
                     {column.cell
                       ? column.cell(item)
-                      : String(getNestedValue(item, column.accessorKey) ?? '')}
+                      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      String(getNestedValue(item as any, column.accessorKey) ?? '')}
                   </TableCell>
                 ))}
               </TableRow>

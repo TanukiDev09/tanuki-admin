@@ -1,8 +1,11 @@
 const { MongoClient } = require('mongodb');
 
 async function debug() {
-  const uri =
-    'mongodb://juan_o:d0uxEV8MM2TnjIA7@ac-spbcbke-shard-00-00.o7z2iay.mongodb.net:27017,ac-spbcbke-shard-00-01.o7z2iay.mongodb.net:27017,ac-spbcbke-shard-00-02.o7z2iay.mongodb.net:27017/accounting?replicaSet=atlas-y7b4tl-shard-0&authSource=admin&tls=true';
+  const uri = process.env.MONGODB_URI;
+  if (!uri) {
+    console.error('Error: MONGODB_URI environment variable is not defined.');
+    return;
+  }
   const client = new MongoClient(uri);
 
   try {
