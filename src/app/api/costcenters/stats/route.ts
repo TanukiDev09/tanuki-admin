@@ -141,7 +141,12 @@ export async function GET(request: NextRequest) {
                   as: 'item',
                   in: {
                     cc: { $ifNull: ['$$item.costCenter', '$costCenter'] },
-                    val: '$$item.total',
+                    val: {
+                      $multiply: [
+                        { $ifNull: ['$$item.total', 0] },
+                        { $ifNull: ['$exchangeRate', 1] },
+                      ],
+                    },
                   },
                 },
               },
@@ -159,7 +164,12 @@ export async function GET(request: NextRequest) {
                       as: 'alloc',
                       in: {
                         cc: '$$alloc.costCenter',
-                        val: '$$alloc.amount',
+                        val: {
+                          $multiply: [
+                            { $ifNull: ['$$alloc.amount', 0] },
+                            { $ifNull: ['$exchangeRate', 1] },
+                          ],
+                        },
                       },
                     },
                   },
@@ -175,24 +185,12 @@ export async function GET(request: NextRequest) {
           },
           type: '$type',
           date: '$date',
-          exchangeRate: { $ifNull: ['$exchangeRate', 1] },
         },
       },
       { $unwind: '$portions' },
       {
         $addFields: {
-          finalAmount: {
-            $multiply: [
-              { $toDouble: { $ifNull: ['$portions.val', 0] } },
-              {
-                $cond: [
-                  { $eq: ['$portions.val', GET_AMOUNT_COP_EXPR] },
-                  1,
-                  '$exchangeRate',
-                ],
-              },
-            ],
-          },
+          finalAmount: { $toDouble: { $ifNull: ['$portions.val', 0] } },
         },
       },
     ];

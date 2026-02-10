@@ -46,7 +46,7 @@
       $primary 0%,
       color.adjust($primary, $lightness: 20%) 100%
     );
-    -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
@@ -58,6 +58,7 @@
 
   &__container {
     @include glass-effect(0.8, 12px);
+
     border-radius: $radius-xl;
     display: flex;
     flex-direction: column;
@@ -73,6 +74,7 @@
 
     &--2 {
       grid-template-columns: 1fr;
+
       @include md {
         grid-template-columns: repeat(2, 1fr);
       }
@@ -80,9 +82,11 @@
 
     &--3 {
       grid-template-columns: 1fr;
+
       @include sm {
         grid-template-columns: repeat(2, 1fr);
       }
+
       @include md {
         grid-template-columns: repeat(3, 1fr);
       }
@@ -182,6 +186,7 @@
 
     &-btn {
       @include button-reset;
+
       padding: $spacing-xs $spacing-lg;
       color: $muted-foreground;
       font-size: $font-size-xs;
@@ -255,7 +260,7 @@
       gap: $spacing-lg;
       align-items: flex-end;
 
-      @media (max-width: 1024px) {
+      @media (width <= 1024px) {
         grid-template-columns: repeat(2, 1fr);
       }
     }
@@ -307,6 +312,7 @@
   &__item-type-btn {
     @include button-reset;
     @include flex-center;
+
     width: 36px;
     height: 36px;
     border-radius: $radius-sm;
@@ -339,6 +345,7 @@
   &__remove-allocation {
     @include button-reset;
     @include flex-center;
+
     width: 32px;
     height: 32px;
     margin: 0 auto;
@@ -453,6 +460,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);

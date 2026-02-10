@@ -1,0 +1,97 @@
+﻿
+> dashboard@1.0.4 build
+> next build
+
+Ôû▓ Next.js 16.1.5 (Turbopack)
+- Environments: .env
+
+node.exe : ÔÜá The 
+"middleware" file 
+convention is 
+deprecated. Please 
+use "proxy" 
+instead. Learn 
+more: https://nextj
+s.org/docs/messages
+/middleware-to-prox
+y
+En línea: 1 
+Carácter: 1
++ & "C:\Program Fil
+es\nodejs/node.exe"
+ "C:\Program Files\
+nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~
+    + CategoryInfo 
+             : No  
+  tSpecified: (Ô   
+ Üá The "middle    
+...leware-to-p    
+roxy:String) [    
+], RemoteExcep    
+tion
+    + FullyQualifi 
+   edErrorId : Na  
+  tiveCommandErr   
+ or
+ 
+  Creating an optimized production build ...
+Ô£ô Compiled successfully in 5.5s
+  Running TypeScript ...
+Failed to compile.
+
+./src/components/ui
+/DataTable/DataTabl
+e.tsx:115:47
+Type error: 
+Argument of type 
+'T' is not 
+assignable to 
+parameter of type 
+'Record<string, 
+unknown> | null | 
+undefined'.
+
+[0m [90m 113 
+|[39m             
+        {column[33
+m.[39mcell
+ [90m 114 |[39m  
+                   
+  [33m?[39m colum
+n[33m.[39mcell(it
+em)
+[31m[1m>[22m[39
+m[90m 115 |[39m  
+                   
+  [33m:[39m [33m
+String[39m(getNest
+edValue(item[33m,
+[39m column[33m.[
+39maccessorKey) [3
+3m?[39m[33m?[39m
+ [32m''[39m)}
+ [90m     |[39m  
+                   
+                   
+       [31m[1m^[
+22m[39m
+ [90m 116 |[39m  
+                 [
+33m<[39m[33m/[39
+m[33mTableCell[39
+m[33m>[39m
+ [90m 117 |[39m  
+               ))}
+ [90m 118 |[39m  
+             [33m<
+[39m[33m/[39m[3
+3mTableRow[39m[33
+m>[39m[0m
+Next.js build 
+worker exited with 
+code: 1 and 
+signal: null

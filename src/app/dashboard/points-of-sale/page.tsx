@@ -3,7 +3,8 @@ import { Suspense } from 'react';
 import { PointOfSaleList } from '@/components/points-of-sale/PointOfSaleList';
 import { CreatePointOfSaleButton } from '@/components/points-of-sale/CreatePointOfSaleButton';
 import dbConnect from '@/lib/mongodb';
-import PointOfSale from '@/models/PointOfSale';
+import PointOfSale, { IPOSContact } from '@/models/PointOfSale';
+import { Types } from 'mongoose';
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = 'force-dynamic';
@@ -20,6 +21,10 @@ async function getPointsOfSale() {
     createdAt: doc.createdAt?.toISOString(),
     updatedAt: doc.updatedAt?.toISOString(),
     warehouseId: doc.warehouseId ? doc.warehouseId.toString() : null,
+    contacts: (doc.contacts || []).map((contact: IPOSContact & { _id?: Types.ObjectId }) => ({
+      ...contact,
+      _id: contact._id?.toString(),
+    })),
   }));
 }
 

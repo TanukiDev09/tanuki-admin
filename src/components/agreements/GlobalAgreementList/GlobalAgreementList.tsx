@@ -1,14 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/Table';
+import { DataTable, Column } from '@/components/ui/DataTable';
 import { AgreementResponse } from '@/types/agreement';
 import { FileText, Search, Eye, BookOpen } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
@@ -84,6 +77,104 @@ export default function GlobalAgreementList() {
     }
   };
 
+  const columns: Column<AgreementResponse>[] = [
+    {
+      header: 'Libro',
+      accessorKey: 'book.title',
+      sortable: true,
+      cell: (agreement) => (
+        <a
+          href={`/dashboard/catalog/${(agreement.book as unknown as IBook)?._id}`}
+          className="global-agreement-list__link"
+        >
+          {(agreement.book as unknown as IBook)?.title || 'Desconocido'}
+        </a>
+      ),
+    },
+    {
+      header: 'Creador',
+      accessorKey: 'creator.name',
+      sortable: true,
+      cell: (agreement) => (
+        <a
+          href={`/dashboard/creators/${(agreement.creator as unknown as ICreator)?._id}`}
+          className="global-agreement-list__link"
+        >
+          {(agreement.creator as unknown as ICreator)?.name || 'Desconocido'}
+        </a>
+      ),
+    },
+    {
+      header: 'Rol',
+      accessorKey: 'role',
+      sortable: true,
+      cell: (agreement) =>
+        agreement.role === 'author'
+          ? 'Autor'
+          : agreement.role === 'illustrator'
+            ? 'Ilustrador'
+            : 'Traductor',
+    },
+    {
+      header: 'Royalties (%)',
+      accessorKey: 'royaltyPercentage',
+      sortable: true,
+      cell: (agreement) =>
+        (agreement as { isPublicDomain?: boolean }).isPublicDomain ? (
+          <Badge
+            variant="outline"
+            className="global-agreement-list__public-domain"
+          >
+            <BookOpen className="global-agreement-list__icon--small" />
+            Dominio Público
+          </Badge>
+        ) : (
+          `${agreement.royaltyPercentage}%`
+        ),
+    },
+    {
+      header: 'Estado',
+      accessorKey: 'status',
+      sortable: true,
+      cell: (agreement) => getStatusBadge(agreement.status),
+    },
+    {
+      header: 'Contrato',
+      accessorKey: 'signedContractUrl',
+      cell: (agreement) =>
+        agreement.signedContractUrl ? (
+          <a
+            href={`/uploads/contracts/${agreement.signedContractUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="global-agreement-list__pdf-link"
+          >
+            <FileText className="global-agreement-list__icon" />
+            PDF
+          </a>
+        ) : (
+          <span className="global-agreement-list__text-muted">-</span>
+        ),
+    },
+    {
+      header: 'Acciones',
+      accessorKey: '_id',
+      className: 'global-agreement-list__text-right',
+      cell: (agreement) => (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() =>
+            (window.location.href = `/dashboard/agreements/${agreement._id}`)
+          }
+        >
+          <Eye className="global-agreement-list__action-icon" />
+          Ver Detalles
+        </Button>
+      ),
+    },
+  ];
+
   return (
     <div className="global-agreement-list">
       <div className="global-agreement-list__controls">
@@ -99,116 +190,12 @@ export default function GlobalAgreementList() {
       </div>
 
       <div className="global-agreement-list__table-container">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Libro</TableHead>
-              <TableHead>Creador</TableHead>
-              <TableHead>Rol</TableHead>
-              <TableHead>Royalties (%)</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Contrato</TableHead>
-              <TableHead className="global-agreement-list__text-right">
-                Acciones
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="global-agreement-list__loading-cell"
-                >
-                  Cargando...
-                </TableCell>
-              </TableRow>
-            ) : filteredAgreements.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={7}
-                  className="global-agreement-list__loading-cell"
-                >
-                  No se encontraron contratos.
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredAgreements.map((agreement) => (
-                <TableRow key={agreement._id}>
-                  <TableCell className="global-agreement-list__book-title">
-                    <a
-                      href={`/dashboard/catalog/${(agreement.book as unknown as IBook)?._id}`}
-                      className="global-agreement-list__link"
-                    >
-                      {(agreement.book as unknown as IBook)?.title ||
-                        'Desconocido'}
-                    </a>
-                  </TableCell>
-                  <TableCell>
-                    <a
-                      href={`/dashboard/creators/${(agreement.creator as unknown as ICreator)?._id}`}
-                      className="global-agreement-list__link"
-                    >
-                      {(agreement.creator as unknown as ICreator)?.name ||
-                        'Desconocido'}
-                    </a>
-                  </TableCell>
-                  <TableCell>
-                    {agreement.role === 'author'
-                      ? 'Autor'
-                      : agreement.role === 'illustrator'
-                        ? 'Ilustrador'
-                        : 'Traductor'}
-                  </TableCell>
-                  <TableCell>
-                    {(agreement as { isPublicDomain?: boolean })
-                      .isPublicDomain ? (
-                      <Badge
-                        variant="outline"
-                        className="global-agreement-list__public-domain"
-                      >
-                        <BookOpen className="global-agreement-list__icon--small" />
-                        Dominio Público
-                      </Badge>
-                    ) : (
-                      `${agreement.royaltyPercentage}%`
-                    )}
-                  </TableCell>
-                  <TableCell>{getStatusBadge(agreement.status)}</TableCell>
-                  <TableCell>
-                    {agreement.signedContractUrl ? (
-                      <a
-                        href={`/uploads/contracts/${agreement.signedContractUrl}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="global-agreement-list__pdf-link"
-                      >
-                        <FileText className="global-agreement-list__icon" />
-                        PDF
-                      </a>
-                    ) : (
-                      <span className="global-agreement-list__text-muted">
-                        -
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell className="global-agreement-list__text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() =>
-                        (window.location.href = `/dashboard/agreements/${agreement._id}`)
-                      }
-                    >
-                      <Eye className="global-agreement-list__action-icon" />
-                      Ver Detalles
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        <DataTable
+          data={filteredAgreements}
+          columns={columns}
+          loading={loading}
+          emptyMessage="No se encontraron contratos."
+        />
       </div>
     </div>
   );

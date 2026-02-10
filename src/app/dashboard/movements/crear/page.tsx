@@ -166,12 +166,13 @@ export default function CreateMovementPage() {
         amount
       }));
 
+      setUseMultiCostCenter(newAllocations.length > 1);
+
       return {
         ...prev,
         items: newItems,
         quantity: newQuantity,
         allocations: newAllocations,
-        useMultiCostCenter: newAllocations.length > 1
       };
     });
   };
@@ -236,8 +237,8 @@ export default function CreateMovementPage() {
         fiscalYear: formData.date
           ? new Date(formData.date).getFullYear()
           : new Date().getFullYear(),
-        allocations: useMultiCostCenter ? formData.allocations : undefined,
-        costCenter: useMultiCostCenter
+        allocations: (useMultiCostCenter || useItems) ? formData.allocations : undefined,
+        costCenter: (useMultiCostCenter || useItems)
           ? formData.allocations?.[0]?.costCenter || ''
           : formData.costCenter,
       };

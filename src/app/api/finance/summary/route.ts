@@ -657,7 +657,12 @@ async function getCostCenterBreakdown(
                 as: 'item',
                 in: {
                   cc: { $ifNull: ['$$item.costCenter', '$costCenter'] },
-                  val: '$$item.total',
+                  val: {
+                    $multiply: [
+                      { $ifNull: ['$$item.total', 0] },
+                      { $ifNull: ['$exchangeRate', 1] },
+                    ],
+                  },
                 },
               },
             },
@@ -675,7 +680,12 @@ async function getCostCenterBreakdown(
                     as: 'alloc',
                     in: {
                       cc: '$$alloc.costCenter',
-                      val: '$$alloc.amount',
+                      val: {
+                        $multiply: [
+                          { $ifNull: ['$$alloc.amount', 0] },
+                          { $ifNull: ['$exchangeRate', 1] },
+                        ],
+                      },
                     },
                   },
                 },
@@ -689,7 +699,6 @@ async function getCostCenterBreakdown(
             },
           },
         },
-        exchangeRate: { $ifNull: ['$exchangeRate', 1] },
       },
     },
     { $unwind: '$costCenters' },
@@ -697,20 +706,7 @@ async function getCostCenterBreakdown(
       $group: {
         _id: '$costCenters.cc',
         value: {
-          $sum: {
-            $toDouble: {
-              $multiply: [
-                { $ifNull: ['$costCenters.val', 0] },
-                {
-                  $cond: [
-                    { $eq: ['$costCenters.val', GET_AMOUNT_COP_EXPR] },
-                    1,
-                    '$exchangeRate',
-                  ],
-                },
-              ],
-            },
-          },
+          $sum: { $toDouble: '$costCenters.val' },
         },
       },
     },
@@ -719,7 +715,7 @@ async function getCostCenterBreakdown(
   ]);
 
   return breakdown.map((cc) => ({
-    name: cc._id,
+    name: cc._id || 'Sin definir',
     value: Math.abs(toNumber(cc.value)),
   }));
 }

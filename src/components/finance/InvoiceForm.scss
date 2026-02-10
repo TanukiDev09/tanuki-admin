@@ -17,6 +17,7 @@
       opacity: 0;
       transform: translateY(20px);
     }
+
     to {
       opacity: 1;
       transform: translateY(0);
@@ -176,7 +177,7 @@
       &--active {
         background: var(--color-background) !important;
         color: var(--invoice-accent-color) !important;
-        box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.12); // Slightly more shadow
+        box-shadow: 0 4px 12px -2px rgb(0 0 0 / 12%); // Slightly more shadow
       }
 
       svg {
@@ -237,7 +238,7 @@
   &__items-wrapper {
     overflow-x: auto;
 
-    @media (max-width: 1023px) {
+    @media (width <= 1023px) {
       padding: 1rem;
     }
   }
@@ -279,7 +280,7 @@
     }
 
     // "Glass & Cards" Mobile View
-    @media (max-width: 1023px) {
+    @media (width <= 1023px) {
       display: block;
 
       thead {
@@ -324,6 +325,7 @@
               flex-direction: column;
               align-items: stretch;
               text-align: left;
+
               &::before {
                 margin-bottom: 0.5rem;
               }
@@ -336,6 +338,7 @@
               right: 0.75rem;
               width: auto !important;
               padding: 0;
+
               &::before {
                 display: none;
               }
@@ -375,7 +378,7 @@
       height: 200%;
       background: radial-gradient(
         circle,
-        rgba(255, 255, 255, 0.1) 0%,
+        rgb(255 255 255 / 10%) 0%,
         transparent 70%
       );
       pointer-events: none;
@@ -391,7 +394,7 @@
       &--total {
         margin-top: 2rem;
         padding-top: 1.5rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        border-top: 1px solid rgb(255 255 255 / 20%);
         opacity: 1;
 
         .label {
@@ -464,8 +467,8 @@
 // Custom numeric input styling inside summary
 .summary-input {
   input {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgb(255 255 255 / 15%);
+    border: 1px solid rgb(255 255 255 / 30%);
     color: white;
     height: 36px;
     width: 120px;
@@ -473,7 +476,7 @@
     border-radius: 8px;
 
     &:focus {
-      background: rgba(255, 255, 255, 0.25);
+      background: rgb(255 255 255 / 25%);
       border-color: white;
       box-shadow: none;
     }

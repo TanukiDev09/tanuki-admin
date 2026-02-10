@@ -12,6 +12,9 @@ import { Button } from '@/components/ui/Button';
 import { InventoryList } from '@/components/inventory/InventoryList';
 import { InventoryAdjustModal } from '@/components/inventory/InventoryAdjustModal';
 import { AddBookToInventoryModal } from '@/components/inventory/AddBookToInventoryModal';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
+import { useToast } from '@/components/ui/Toast';
 import {
   Warehouse,
   Package,
@@ -61,6 +64,10 @@ export function PointOfSaleStock({ warehouseId }: PointOfSaleStockProps) {
     mode: 'add',
   });
 
+  const { hasPermission } = usePermission();
+  const { toast } = useToast();
+  const canDeleteInventory = hasPermission(ModuleName.INVENTORY, PermissionAction.DELETE);
+
   const fetchData = useCallback(async () => {
     if (!warehouseId) {
       setLoading(false);
@@ -100,6 +107,46 @@ export function PointOfSaleStock({ warehouseId }: PointOfSaleStockProps) {
       item,
       mode,
     });
+  };
+
+  const handleDeleteInventoryItem = async (item: InventoryItem) => {
+    if (item.quantity > 0) {
+      if (
+        !window.confirm(
+          `Atención: El libro "${item.bookId.title}" tiene ${item.quantity} unidades en stock. ¿Está seguro de que desea eliminarlo de este inventario?`
+        )
+      ) {
+        return;
+      }
+    } else {
+      if (!window.confirm(`¿Eliminar "${item.bookId.title}" de este inventario?`)) {
+        return;
+      }
+    }
+
+    try {
+      const res = await fetch(`/api/inventory/${item._id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Error al eliminar');
+      }
+
+      toast({
+        title: 'Éxito',
+        description: 'Libro eliminado del inventario correctamente',
+      });
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting inventory item:', error);
+      toast({
+        title: 'Error',
+        description: (error as Error).message || 'No se pudo eliminar el libro',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (!warehouseId) {
@@ -200,6 +247,7 @@ export function PointOfSaleStock({ warehouseId }: PointOfSaleStockProps) {
           <InventoryList
             data={inventory}
             onAdjust={(item) => handleAdjustStock(item, 'set')}
+            onDelete={canDeleteInventory ? handleDeleteInventoryItem : undefined}
           />
         </CardContent>
       </Card>

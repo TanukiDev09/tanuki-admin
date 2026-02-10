@@ -126,13 +126,14 @@ const MovementTableRow = ({
         )}
       </TableCell>
       <TableCell data-label="Centro Costo">
-        {movement.allocations && movement.allocations.length > 1 ? (
+        {((movement.allocations && movement.allocations.length > 1) || (movement.items && movement.items.length > 1)) ? (
           <Badge variant="secondary" className="opacity-80">
-            Múltiple ({movement.allocations.length})
+            Múltiple ({(movement.allocations?.length || 0) || (movement.items?.length || 0)})
           </Badge>
         ) : (
           movement.costCenter ||
-          movement.allocations?.[0]?.costCenter || (
+          movement.allocations?.[0]?.costCenter ||
+          movement.items?.[0]?.costCenter || (
             <span className="movements-list__no-category">Sin definir</span>
           )
         )}

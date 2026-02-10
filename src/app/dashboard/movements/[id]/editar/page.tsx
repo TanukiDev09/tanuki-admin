@@ -196,12 +196,13 @@ export default function EditMovementPage() {
         amount
       }));
 
+      setUseMultiCostCenter(newAllocations.length > 1);
+
       return {
         ...prev,
         items: newItems,
         quantity: newQuantity,
         allocations: newAllocations,
-        useMultiCostCenter: newAllocations.length > 1
       };
     });
   };
@@ -284,7 +285,7 @@ export default function EditMovementPage() {
         fiscalYear: formData.date
           ? new Date(formData.date).getFullYear()
           : new Date().getFullYear(),
-        allocations: useMultiCostCenter
+        allocations: (useMultiCostCenter || useItems)
           ? formData.allocations
           : [
             {
@@ -292,7 +293,7 @@ export default function EditMovementPage() {
               amount: Number(formData.amount) || 0,
             },
           ],
-        costCenter: useMultiCostCenter
+        costCenter: (useMultiCostCenter || useItems)
           ? formData.allocations?.[0]?.costCenter || ''
           : formData.costCenter,
       };

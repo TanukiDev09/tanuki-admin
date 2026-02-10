@@ -4,14 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/Table';
+import { DataTable, Column } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
 import { PointOfSaleStatusBadge } from './PointOfSaleStatusBadge';
 import { IPointOfSale } from '@/models/PointOfSale';
@@ -149,6 +142,101 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
     );
   };
 
+  const columns: Column<IPointOfSale>[] = [
+    {
+      header: 'Código',
+      accessorKey: 'code',
+      sortable: true,
+      cell: (pos) => (
+        <div className="pos-list__code-cell">
+          {pos.code}
+          {pos.identificationNumber && (
+            <div className="pos-list__identification">
+              {pos.identificationType} {pos.identificationNumber}
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      header: 'Nombre',
+      accessorKey: 'name',
+      sortable: true,
+    },
+    {
+      header: 'Tipo',
+      accessorKey: 'type',
+      sortable: true,
+      cell: (pos) =>
+        pos.type === 'physical'
+          ? 'Físico'
+          : pos.type === 'online'
+            ? 'Online'
+            : 'Evento',
+    },
+    {
+      header: 'Descuento',
+      accessorKey: 'discountPercentage',
+      sortable: true,
+      cell: (pos) =>
+        pos.discountPercentage ? `${pos.discountPercentage}%` : '0%',
+    },
+    {
+      header: 'Encargado',
+      accessorKey: 'managers',
+      sortable: true,
+      cell: (pos) => renderArrayCell(pos.managers),
+    },
+    {
+      header: 'Teléfono',
+      accessorKey: 'phones',
+      sortable: true,
+      cell: (pos) => renderArrayCell(pos.phones),
+    },
+    {
+      header: 'Correo',
+      accessorKey: 'emails',
+      sortable: true,
+      cell: (pos) => renderArrayCell(pos.emails),
+    },
+    {
+      header: 'Estado',
+      accessorKey: 'status',
+      sortable: true,
+      cell: (pos) => <PointOfSaleStatusBadge status={pos.status} />,
+    },
+    {
+      header: 'Acciones',
+      accessorKey: '_id',
+      className: 'pos-list__actions-cell',
+      cell: (pos) => (
+        <div className="pos-list__actions-group">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href={`/dashboard/points-of-sale/${pos._id}`}>
+              <Eye className="pos-list__icon" />
+            </Link>
+          </Button>
+          {canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="pos-list__delete-btn"
+              onClick={() =>
+                setItemToDelete({
+                  id: pos._id as unknown as string,
+                  name: pos.name,
+                })
+              }
+              disabled={deletingId === (pos._id as unknown as string)}
+            >
+              <Trash2 className="pos-list__icon" />
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <>
       <div className="pos-list__filters">
@@ -179,91 +267,15 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
       </div>
 
       <div className="pos-list__container">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Descuento</TableHead>
-              <TableHead>Encargado</TableHead>
-              <TableHead>Teléfono</TableHead>
-              <TableHead>Correo</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead className="pos-list__actions-cell">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={8} className="pos-list__empty-cell">
-                  {data.length === 0
-                    ? 'No hay puntos de venta registrados.'
-                    : 'No se encontraron resultados para los filtros aplicados.'}
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredData.map((pos) => (
-                <TableRow key={pos._id as unknown as string}>
-                  <TableCell className="pos-list__code-cell">
-                    {pos.code}
-                    {pos.identificationNumber && (
-                      <div className="pos-list__identification">
-                        {pos.identificationType} {pos.identificationNumber}
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>{pos.name}</TableCell>
-                  <TableCell className="pos-list__type-cell">
-                    {pos.type === 'physical'
-                      ? 'Físico'
-                      : pos.type === 'online'
-                        ? 'Online'
-                        : 'Evento'}
-                  </TableCell>
-                  <TableCell>
-                    {pos.discountPercentage
-                      ? `${pos.discountPercentage}%`
-                      : '0%'}
-                  </TableCell>
-                  <TableCell>{renderArrayCell(pos.managers)}</TableCell>
-                  <TableCell>{renderArrayCell(pos.phones)}</TableCell>
-                  <TableCell>{renderArrayCell(pos.emails)}</TableCell>
-                  <TableCell>
-                    <PointOfSaleStatusBadge status={pos.status} />
-                  </TableCell>
-                  <TableCell className="pos-list__actions-cell">
-                    <div className="pos-list__actions-group">
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/dashboard/points-of-sale/${pos._id}`}>
-                          <Eye className="pos-list__icon" />
-                        </Link>
-                      </Button>
-                      {canDelete && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="pos-list__delete-btn"
-                          onClick={() =>
-                            setItemToDelete({
-                              id: pos._id as unknown as string,
-                              name: pos.name,
-                            })
-                          }
-                          disabled={
-                            deletingId === (pos._id as unknown as string)
-                          }
-                        >
-                          <Trash2 className="pos-list__icon" />
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        <DataTable
+          data={filteredData}
+          columns={columns}
+          emptyMessage={
+            data.length === 0
+              ? 'No hay puntos de venta registrados.'
+              : 'No se encontraron resultados para los filtros aplicados.'
+          }
+        />
       </div>
 
       <Dialog
@@ -276,7 +288,7 @@ export function PointOfSaleList({ data }: PointOfSaleListProps) {
             <DialogDescription>
               Esta acción no se puede deshacer. Se eliminará permanentemente el
               punto de venta{' '}
-              {itemToDelete?.name ? `&quot;${itemToDelete.name}&quot;` : ''}.
+              {itemToDelete?.name ? `"${itemToDelete.name}"` : ''}.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

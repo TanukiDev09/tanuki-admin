@@ -27,7 +27,7 @@
     margin-bottom: $spacing-2xl;
     gap: $spacing-xl;
 
-    @media (max-width: 768px) {
+    @media (width <= 768px) {
       flex-direction: column;
       align-items: flex-start;
     }
@@ -49,7 +49,7 @@
       $primary 0%,
       color.adjust($primary, $lightness: 20%) 100%
     );
-    -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     margin: 0;
   }
@@ -91,6 +91,7 @@
     .movement-detail__edit-btn,
     .movement-detail__delete-btn {
       @include button-reset;
+
       display: flex;
       align-items: center;
       gap: $spacing-sm;
@@ -137,17 +138,18 @@
     grid-template-columns: 1.5fr 1fr;
     gap: $spacing-2xl;
 
-    @media (max-width: 1024px) {
+    @media (width <= 1024px) {
       grid-template-columns: 1fr;
     }
   }
 
   &__main-card {
     @include glass-effect(0.8, 12px);
+
     border-radius: $radius-xl;
     padding: $spacing-2xl;
     box-shadow: $shadow-xl;
-    border: 1px solid rgba(white, 0.2);
+    border: 1px solid rgb(white, 0.2);
   }
 
   &__section {
@@ -203,6 +205,7 @@
       &--income {
         color: $success;
       }
+
       &--expense {
         color: $danger;
       }
@@ -222,7 +225,7 @@
     gap: $spacing-xl;
     margin-bottom: $spacing-2xl;
 
-    @media (max-width: 640px) {
+    @media (width <= 640px) {
       grid-template-columns: 1fr;
     }
   }
@@ -373,6 +376,7 @@
   &__loading,
   &__error {
     @include flex-center;
+
     height: 300px;
     font-size: $font-size-lg;
     color: $muted-foreground;

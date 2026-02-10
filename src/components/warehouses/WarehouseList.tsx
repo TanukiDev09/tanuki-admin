@@ -5,14 +5,7 @@ import './WarehouseList.scss';
 import { useRouter } from 'next/navigation';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/Table';
+import { DataTable, Column } from '@/components/ui/DataTable';
 import { Button } from '@/components/ui/Button';
 import { WarehouseStatusBadge } from './WarehouseStatusBadge';
 import { WarehouseTypeBadge } from './WarehouseTypeBadge';
@@ -146,6 +139,97 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
     }
   };
 
+  const columns: Column<Warehouse>[] = [
+    {
+      header: 'Código',
+      accessorKey: 'code',
+      sortable: true,
+      className: 'warehouse-list__code',
+    },
+    {
+      header: 'Nombre',
+      accessorKey: 'name',
+      sortable: true,
+    },
+    {
+      header: 'Tipo',
+      accessorKey: 'type',
+      sortable: true,
+      cell: (warehouse) => <WarehouseTypeBadge type={warehouse.type} />,
+    },
+    {
+      header: 'Punto de Venta',
+      accessorKey: 'pointOfSaleId.name',
+      sortable: true,
+      cell: (warehouse) =>
+        warehouse.pointOfSaleId ? (
+          <Link
+            href={`/dashboard/points-of-sale/${warehouse.pointOfSaleId._id}`}
+            className="warehouse-list__link"
+          >
+            {warehouse.pointOfSaleId.name}
+          </Link>
+        ) : (
+          <span className="warehouse-list__link--placeholder">Sin asociar</span>
+        ),
+    },
+    {
+      header: 'Ciudad',
+      accessorKey: 'city',
+      sortable: true,
+      cell: (warehouse) =>
+        warehouse.city || (
+          <span className="warehouse-list__link--placeholder">-</span>
+        ),
+    },
+    {
+      header: 'Estado',
+      accessorKey: 'status',
+      sortable: true,
+      cell: (warehouse) => <WarehouseStatusBadge status={warehouse.status} />,
+    },
+    {
+      header: 'Acciones',
+      accessorKey: '_id',
+      className: 'warehouse-list__cell--right',
+      cell: (warehouse) => (
+        <div className="warehouse-list__actions">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href={`/dashboard/warehouses/${warehouse._id}`}>
+              <Eye className="warehouse-list__icon" />
+            </Link>
+          </Button>
+          {onAssociateClick && canUpdate && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => onAssociateClick(warehouse._id)}
+              title="Asociar punto de venta"
+            >
+              <LinkIcon className="warehouse-list__icon" />
+            </Button>
+          )}
+          {canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="warehouse-list__action-btn--delete"
+              onClick={() =>
+                setItemToDelete({
+                  id: warehouse._id,
+                  name: warehouse.name,
+                })
+              }
+              disabled={deletingId === warehouse._id}
+            >
+              <Trash2 className="warehouse-list__icon" />
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <>
       <div className="warehouse-list__filter-bar">
@@ -226,103 +310,15 @@ export function WarehouseList({ data, onAssociateClick }: WarehouseListProps) {
       </div>
 
       <div className="warehouse-list">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Código</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead>Punto de Venta</TableHead>
-              <TableHead>Ciudad</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead className="warehouse-list__header-cell--right">
-                Acciones
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredData.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="warehouse-list__empty">
-                  {data.length === 0
-                    ? 'No hay bodegas registradas.'
-                    : 'No se encontraron resultados para los filtros aplicados.'}
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredData.map((warehouse) => (
-                <TableRow key={warehouse._id}>
-                  <TableCell className="warehouse-list__code">
-                    {warehouse.code}
-                  </TableCell>
-                  <TableCell>{warehouse.name}</TableCell>
-                  <TableCell>
-                    <WarehouseTypeBadge type={warehouse.type} />
-                  </TableCell>
-                  <TableCell>
-                    {warehouse.pointOfSaleId ? (
-                      <Link
-                        href={`/dashboard/points-of-sale/${warehouse.pointOfSaleId._id}`}
-                        className="warehouse-list__link"
-                      >
-                        {warehouse.pointOfSaleId.name}
-                      </Link>
-                    ) : (
-                      <span className="warehouse-list__link--placeholder">
-                        Sin asociar
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {warehouse.city || (
-                      <span className="warehouse-list__link--placeholder">
-                        -
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <WarehouseStatusBadge status={warehouse.status} />
-                  </TableCell>
-                  <TableCell className="warehouse-list__cell--right">
-                    <div className="warehouse-list__actions">
-                      <Button variant="ghost" size="icon" asChild>
-                        <Link href={`/dashboard/warehouses/${warehouse._id}`}>
-                          <Eye className="warehouse-list__icon" />
-                        </Link>
-                      </Button>
-                      {onAssociateClick && canUpdate && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => onAssociateClick(warehouse._id)}
-                          title="Asociar punto de venta"
-                        >
-                          <LinkIcon className="warehouse-list__icon" />
-                        </Button>
-                      )}
-                      {canDelete && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="warehouse-list__action-btn--delete"
-                          onClick={() =>
-                            setItemToDelete({
-                              id: warehouse._id,
-                              name: warehouse.name,
-                            })
-                          }
-                          disabled={deletingId === warehouse._id}
-                        >
-                          <Trash2 className="warehouse-list__icon" />
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        <DataTable
+          data={filteredData}
+          columns={columns}
+          emptyMessage={
+            data.length === 0
+              ? 'No hay bodegas registradas.'
+              : 'No se encontraron resultados para los filtros aplicados.'
+          }
+        />
       </div>
 
       <Dialog

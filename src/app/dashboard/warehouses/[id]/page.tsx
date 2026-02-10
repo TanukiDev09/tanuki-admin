@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Separator } from '@/components/ui/Separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { useToast } from '@/components/ui/Toast';
 import {
   Card,
   CardContent,
@@ -85,6 +86,7 @@ export default function WarehouseDetailPage() {
   const [movementModalOpen, setMovementModalOpen] = useState(false);
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const { toast } = useToast();
 
   const { hasPermission } = usePermission();
   const canUpdateWarehouse = hasPermission(
@@ -99,12 +101,59 @@ export default function WarehouseDetailPage() {
     ModuleName.INVENTORY,
     PermissionAction.UPDATE
   );
+  const canDeleteInventory = hasPermission(
+    ModuleName.INVENTORY,
+    PermissionAction.DELETE
+  );
 
   const handleAdjustStock = (item: InventoryItem) => {
     setSelectedItem(item);
     setAdjustModalOpen(true);
   };
 
+  const handleDeleteInventoryItem = async (item: InventoryItem) => {
+    if (item.quantity > 0) {
+      if (
+        !window.confirm(
+          `Atención: El libro "${item.bookId.title}" tiene ${item.quantity} unidades en stock. ¿Está seguro de que desea eliminarlo del inventario de todas formas?`
+        )
+      ) {
+        return;
+      }
+    } else {
+      if (
+        !window.confirm(
+          `¿Está seguro de que desea eliminar el libro "${item.bookId.title}" de este inventario?`
+        )
+      ) {
+        return;
+      }
+    }
+
+    try {
+      const res = await fetch(`/api/inventory/${item._id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.error || 'Error al eliminar');
+      }
+
+      toast({
+        title: 'Éxito',
+        description: 'Libro eliminado del inventario correctamente',
+      });
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting inventory item:', error);
+      toast({
+        title: 'Error',
+        description: (error as Error).message || 'No se pudo eliminar el libro',
+        variant: 'destructive',
+      });
+    }
+  };
   const fetchData = useCallback(async () => {
     try {
       const [warehouseRes, inventoryRes] = await Promise.all([
@@ -225,7 +274,11 @@ export default function WarehouseDetailPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <InventoryList data={inventory} onAdjust={handleAdjustStock} />
+              <InventoryList
+                data={inventory}
+                onAdjust={handleAdjustStock}
+                onDelete={canDeleteInventory ? handleDeleteInventoryItem : undefined}
+              />
             </CardContent>
           </Card>
         </TabsContent>
