@@ -29,7 +29,7 @@ export interface ParsedInvoice {
   customerAddress?: string;
   customerCity?: string;
   notes?: string;
-  status: 'Draft' | 'Sent' | 'Paid' | 'Partial' | 'Cancelled';
+  status: 'Draft' | 'Sent' | 'Paid' | 'Partial' | 'Cancelled' | 'Unchecked';
 }
 
 export interface UploadedFile {

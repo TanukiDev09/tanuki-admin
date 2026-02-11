@@ -388,7 +388,7 @@ export async function POST(request: NextRequest) {
         exchangeRate: data.exchangeRate,
         amountInCOP:
           data.currency === 'COP' ? data.total : data.total * data.exchangeRate,
-        status: 'Draft',
+        status: 'Unchecked',
         cufe: data.cufe,
         orderReference: data.orderRef,
         newsletterSignup: data.newsletterSignup,
