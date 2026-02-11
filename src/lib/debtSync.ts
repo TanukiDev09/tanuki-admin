@@ -21,7 +21,8 @@ export async function syncInvoiceToDebt(invoice: MinimalInvoice) {
   if (
     invoice.status === 'Paid' ||
     invoice.status === 'Cancelled' ||
-    invoice.status === 'Draft'
+    invoice.status === 'Draft' ||
+    invoice.status === 'Unchecked'
   ) {
     const existing = await Debt.findOne({ 'source.id': invoice._id });
     if (existing) {

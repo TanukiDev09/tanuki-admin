@@ -30,7 +30,9 @@ const updateInvoiceSchema = z.object({
   tax: z.number().optional(),
   discount: z.number().optional(),
   total: z.number().optional(),
-  status: z.enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled']).optional(),
+  status: z
+    .enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked'])
+    .optional(),
   costCenters: z.array(z.string()).optional(),
   movements: z.array(z.string()).optional(),
   inventoryMovement: z.string().optional().nullable(),

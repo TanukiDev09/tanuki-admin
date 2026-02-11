@@ -14,18 +14,9 @@ async function getPointsOfSale() {
   // Lean queries for performance
   const docs = await PointOfSale.find({}).sort({ createdAt: -1 }).lean();
 
-  // Serialize ObjectId and dates
-  return docs.map((doc) => ({
-    ...doc,
-    _id: doc._id.toString(),
-    createdAt: doc.createdAt?.toISOString(),
-    updatedAt: doc.updatedAt?.toISOString(),
-    warehouseId: doc.warehouseId ? doc.warehouseId.toString() : null,
-    contacts: (doc.contacts || []).map((contact: IPOSContact & { _id?: Types.ObjectId }) => ({
-      ...contact,
-      _id: contact._id?.toString(),
-    })),
-  }));
+  // Deep serialize by converting to string and back to ensure a plain object
+  // Next.js Server Components require plain objects (no toJSON methods, etc.)
+  return JSON.parse(JSON.stringify(docs));
 }
 
 import '../dashboard.scss';

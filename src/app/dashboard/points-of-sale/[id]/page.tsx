@@ -114,7 +114,7 @@ export default async function PointOfSaleDetailPage({ params, searchParams }: Pa
           <TabsTrigger value="info">Información</TabsTrigger>
           <TabsTrigger value="contacts">Contactos</TabsTrigger>
           <TabsTrigger value="stock">Inventario</TabsTrigger>
-          <TabsTrigger value="stats">Estadísticas</TabsTrigger>
+          <TabsTrigger value="ventas">Ventas</TabsTrigger>
         </TabsList>
         <TabsContent value="info" className="space-y-4">
           <div className="pos-detail__grid">
@@ -135,7 +135,7 @@ export default async function PointOfSaleDetailPage({ params, searchParams }: Pa
         <TabsContent value="stock" className="space-y-4">
           <PointOfSaleStock warehouseId={pos.warehouseId?.toString()} />
         </TabsContent>
-        <TabsContent value="stats" className="space-y-4">
+        <TabsContent value="ventas" className="space-y-4">
           <POSStats
             posId={pos._id}
             posName={pos.name}

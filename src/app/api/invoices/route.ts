@@ -30,8 +30,8 @@ const createInvoiceSchema = z.object({
   discount: z.number().default(0),
   total: z.number(),
   status: z
-    .enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled'])
-    .default('Draft'),
+    .enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked'])
+    .default('Unchecked'),
   costCenters: z.array(z.string()).optional(), // Array of ObjectIds as strings
   movements: z.array(z.string()).optional(), // Array of ObjectIds
   inventoryMovement: z.string().optional().nullable(), // ObjectId

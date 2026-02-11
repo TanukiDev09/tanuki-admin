@@ -47,6 +47,19 @@ interface Invoice {
   currency?: string;
 }
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { MailListTab } from './MailListTab';
+import { usePersistentFilters } from '@/hooks/usePersistentFilters';
+
+interface InvoiceFilters {
+  search: string;
+  statusFilter: string;
+  sortField: string;
+  sortOrder: string;
+  amountRange: [number, number];
+  page: number;
+}
+
 export default function InvoicesPage() {
   return (
     <Suspense fallback={<div className="p-8 text-center">Cargando facturación...</div>}>
@@ -63,12 +76,19 @@ function InvoicesList() {
   const { toast } = useToast();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState(initialSearch);
-  const [statusFilter, setStatusFilter] = useState('ALL');
-  const [sortField, setSortField] = useState('date');
-  const [sortOrder, setSortOrder] = useState('desc');
-  const [amountRange, setAmountRange] = useState<[number, number]>([0, 5000000]);
-  const [page, setPage] = useState(1);
+  const { filters, updateFilters } = usePersistentFilters<InvoiceFilters>({
+    key: 'invoices-filters',
+    initialFilters: {
+      search: '',
+      statusFilter: 'ALL',
+      sortField: 'date',
+      sortOrder: 'desc',
+      amountRange: [0, 5000000],
+      page: 1,
+    },
+  });
+
+  const { search, statusFilter, sortField, sortOrder, amountRange, page } = filters;
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const limit = 10;
@@ -140,6 +160,7 @@ function InvoicesList() {
       Paid: 'success',
       Partial: 'warning',
       Cancelled: 'danger',
+      Unchecked: 'outline',
     };
     const labels: Record<string, string> = {
       Draft: 'Borrador',
@@ -147,6 +168,7 @@ function InvoicesList() {
       Paid: 'Pagada',
       Partial: 'Parcial',
       Cancelled: 'Anulada',
+      Unchecked: 'Sin comprobar',
     };
     return (
       <span className={`invoice-badge invoice-badge--${map[status] || 'outline'}`}>
@@ -180,207 +202,216 @@ function InvoicesList() {
           </div>
         </header>
 
-        <section className="invoices-list__filters-bar">
-          <div className="invoices-list__search">
-            <Search className="invoices-list__search-icon" />
-            <Input
-              placeholder="Buscar por número, cliente..."
-              value={search}
-              onChange={(e) => {
-                setSearch(e.target.value);
-                setPage(1);
-              }}
-              className="invoices-list__search-input"
-            />
-          </div>
+        <Tabs defaultValue="list" className="invoices-list__tabs">
+          <TabsList className="invoices-list__tabs-list">
+            <TabsTrigger value="list">Facturas</TabsTrigger>
+            <TabsTrigger value="mail-list">Lista de Correos</TabsTrigger>
+          </TabsList>
 
-          <div className="invoices-list__controls">
-            <div className="invoices-list__control-item">
-              <Filter className="invoices-list__control-icon" />
-              <Select value={statusFilter} onValueChange={(val) => {
-                setStatusFilter(val);
-                setPage(1);
-              }}>
-                <SelectTrigger className="invoices-list__select-trigger">
-                  <SelectValue placeholder="Estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ALL">Todos los estados</SelectItem>
-                  <SelectItem value="Draft">Borrador</SelectItem>
-                  <SelectItem value="Sent">Enviada</SelectItem>
-                  <SelectItem value="Paid">Pagada</SelectItem>
-                  <SelectItem value="Partial">Parcial</SelectItem>
-                  <SelectItem value="Cancelled">Anulada</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="invoices-list__control-item invoices-list__control-item--slider">
-              <div className="invoices-list__slider-container">
-                <div className="invoices-list__slider-label">
-                  Total hasta: <span>{formatCurrency(amountRange[1], 'COP')}</span>
-                </div>
-                <input
-                  type="range"
-                  min="0"
-                  max="10000000"
-                  step="50000"
-                  value={amountRange[1]}
+          <TabsContent value="list">
+            <section className="invoices-list__filters-bar">
+              <div className="invoices-list__search">
+                <Search className="invoices-list__search-icon" />
+                <Input
+                  placeholder="Buscar por número, cliente..."
+                  value={search}
                   onChange={(e) => {
-                    const val = parseInt(e.target.value);
-                    setAmountRange([amountRange[0], val]);
-                    setPage(1);
+                    updateFilters({ search: e.target.value, page: 1 });
                   }}
-                  className="invoices-list__slider"
+                  className="invoices-list__search-input"
                 />
               </div>
-            </div>
 
-            <div className="invoices-list__control-item">
-              {sortOrder === 'asc' ? <SortAsc className="invoices-list__control-icon" /> : <SortDesc className="invoices-list__control-icon" />}
-              <Select value={`${sortField}_${sortOrder}`} onValueChange={(val) => {
-                const [field, order] = val.split('_');
-                setSortField(field);
-                setSortOrder(order);
-                setPage(1);
-              }}>
-                <SelectTrigger className="invoices-list__select-trigger">
-                  <SelectValue placeholder="Ordenar por" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="date_desc">Más recientes primero</SelectItem>
-                  <SelectItem value="date_asc">Más antiguas primero</SelectItem>
-                  <SelectItem value="number_desc">Número (Z-A)</SelectItem>
-                  <SelectItem value="number_asc">Número (A-Z)</SelectItem>
-                  <SelectItem value="total_desc">Total (Mayor a Menor)</SelectItem>
-                  <SelectItem value="total_asc">Total (Menor a Mayor)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </section>
+              <div className="invoices-list__controls">
+                <div className="invoices-list__control-item">
+                  <Filter className="invoices-list__control-icon" />
+                  <Select value={statusFilter} onValueChange={(val) => {
+                    updateFilters({ statusFilter: val, page: 1 });
+                  }}>
+                    <SelectTrigger className="invoices-list__select-trigger">
+                      <SelectValue placeholder="Estado" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ALL">Todos los estados</SelectItem>
+                      <SelectItem value="Draft">Borrador</SelectItem>
+                      <SelectItem value="Unchecked">Sin comprobar</SelectItem>
+                      <SelectItem value="Sent">Enviada</SelectItem>
+                      <SelectItem value="Paid">Pagada</SelectItem>
+                      <SelectItem value="Partial">Parcial</SelectItem>
+                      <SelectItem value="Cancelled">Anulada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-        <div className="invoices-list__card">
-          <div className="invoices-list__table-wrapper">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Factura</TableHead>
-                  <TableHead>Fecha Emisión</TableHead>
-                  <TableHead>Cliente</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <AnimatePresence mode="popLayout">
-                  {loading ? (
-                    Array.from({ length: 5 }).map((_, i) => (
-                      <TableRow key={`skeleton-${i}`}>
-                        <TableCell colSpan={6}><div className="skeleton-line" /></TableCell>
-                      </TableRow>
-                    ))
-                  ) : invoices.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} className="invoices-list__empty-state">
-                        <div className="empty-content">
-                          <Search className="w-12 h-12 mb-2 opacity-20" />
-                          <p>No se encontraron facturas</p>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    invoices.map((invoice) => (
-                      <motion.tr
-                        key={invoice._id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, x: -10 }}
-                        className="invoices-list__row"
-                      >
-                        <TableCell className="font-bold">
-                          <button
-                            onClick={() => router.push(`/dashboard/invoices/${invoice._id}`)}
-                            className="invoices-list__invoice-link"
-                          >
-                            {invoice.number}
-                          </button>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground whitespace-nowrap">
-                          {new Date(invoice.date).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        </TableCell>
-                        <TableCell>
-                          <div className="invoices-list__customer">
-                            {invoice.customerName}
-                          </div>
-                        </TableCell>
-                        <TableCell className="font-semibold">
-                          {formatCurrency(invoice.total, invoice.currency || 'COP')}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(invoice.status)}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="invoices-list__row-actions">
-                            <button
-                              onClick={() => router.push(`/dashboard/invoices/${invoice._id}`)}
-                              className="action-icon-btn action-icon-btn--view"
-                              title="Ver detalle"
-                            >
-                              <Eye />
-                            </button>
-                            <button
-                              onClick={() => router.push(`/dashboard/invoices/${invoice._id}/editar`)}
-                              className="action-icon-btn action-icon-btn--edit"
-                              title="Editar"
-                            >
-                              <Pencil />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(invoice._id)}
-                              className="action-icon-btn action-icon-btn--delete"
-                              title="Eliminar"
-                            >
-                              <Trash2 />
-                            </button>
-                          </div>
-                        </TableCell>
-                      </motion.tr>
-                    ))
-                  )}
-                </AnimatePresence>
-              </TableBody>
-            </Table>
-          </div>
+                <div className="invoices-list__control-item invoices-list__control-item--slider">
+                  <div className="invoices-list__slider-container">
+                    <div className="invoices-list__slider-label">
+                      Total hasta: <span>{formatCurrency(amountRange[1], 'COP')}</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0"
+                      max="10000000"
+                      step="50000"
+                      value={amountRange[1]}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        updateFilters({ amountRange: [amountRange[0], val], page: 1 });
+                      }}
+                      className="invoices-list__slider"
+                    />
+                  </div>
+                </div>
 
-          <footer className="invoices-list__pagination">
-            <p className="invoices-list__pagination-summary">
-              Mostrando <span>{invoices.length}</span> de <span>{totalResults}</span> resultados
-            </p>
-            <div className="invoices-list__pagination-nav">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="pagination-btn"
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                disabled={page === 1}
-              >
-                <ChevronLeft className="w-4 h-4 mr-1" /> Anterior
-              </Button>
-              <div className="pagination-pages">
-                Página <span>{page}</span> de {totalPages}
+                <div className="invoices-list__control-item">
+                  {sortOrder === 'asc' ? <SortAsc className="invoices-list__control-icon" /> : <SortDesc className="invoices-list__control-icon" />}
+                  <Select value={`${sortField}_${sortOrder}`} onValueChange={(val) => {
+                    const [field, order] = val.split('_');
+                    updateFilters({ sortField: field, sortOrder: order, page: 1 });
+                  }}>
+                    <SelectTrigger className="invoices-list__select-trigger">
+                      <SelectValue placeholder="Ordenar por" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="date_desc">Más recientes primero</SelectItem>
+                      <SelectItem value="date_asc">Más antiguas primero</SelectItem>
+                      <SelectItem value="number_desc">Número (Z-A)</SelectItem>
+                      <SelectItem value="number_asc">Número (A-Z)</SelectItem>
+                      <SelectItem value="total_desc">Total (Mayor a Menor)</SelectItem>
+                      <SelectItem value="total_asc">Total (Menor a Mayor)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="pagination-btn"
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-              >
-                Siguiente <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
+            </section>
+
+            <div className="invoices-list__card invoices-list__spacer">
+              <div className="invoices-list__table-wrapper">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Factura</TableHead>
+                      <TableHead>Fecha Emisión</TableHead>
+                      <TableHead>Cliente</TableHead>
+                      <TableHead>Total</TableHead>
+                      <TableHead>Estado</TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <AnimatePresence mode="popLayout">
+                      {loading ? (
+                        Array.from({ length: 5 }).map((_, i) => (
+                          <TableRow key={`skeleton-${i}`}>
+                            <TableCell colSpan={6}><div className="skeleton-line" /></TableCell>
+                          </TableRow>
+                        ))
+                      ) : invoices.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={6} className="invoices-list__empty-state">
+                            <div className="empty-content">
+                              <Search className="w-12 h-12 mb-2 opacity-20" />
+                              <p>No se encontraron facturas</p>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        invoices.map((invoice) => (
+                          <motion.tr
+                            key={invoice._id}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, x: -10 }}
+                            className="invoices-list__row"
+                          >
+                            <TableCell className="font-bold">
+                              <button
+                                onClick={() => router.push(`/dashboard/invoices/${invoice._id}`)}
+                                className="invoices-list__invoice-link"
+                              >
+                                {invoice.number}
+                              </button>
+                            </TableCell>
+                            <TableCell className="text-muted-foreground whitespace-nowrap">
+                              {new Date(invoice.date).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </TableCell>
+                            <TableCell>
+                              <div className="invoices-list__customer">
+                                {invoice.customerName}
+                              </div>
+                            </TableCell>
+                            <TableCell className="font-semibold">
+                              {formatCurrency(invoice.total, invoice.currency || 'COP')}
+                            </TableCell>
+                            <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                            <TableCell className="text-right">
+                              <div className="invoices-list__row-actions">
+                                <button
+                                  onClick={() => router.push(`/dashboard/invoices/${invoice._id}`)}
+                                  className="action-icon-btn action-icon-btn--view"
+                                  title="Ver detalle"
+                                >
+                                  <Eye />
+                                </button>
+                                <button
+                                  onClick={() => router.push(`/dashboard/invoices/${invoice._id}/editar`)}
+                                  className="action-icon-btn action-icon-btn--edit"
+                                  title="Editar"
+                                >
+                                  <Pencil />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(invoice._id)}
+                                  className="action-icon-btn action-icon-btn--delete"
+                                  title="Eliminar"
+                                >
+                                  <Trash2 />
+                                </button>
+                              </div>
+                            </TableCell>
+                          </motion.tr>
+                        ))
+                      )}
+                    </AnimatePresence>
+                  </TableBody>
+                </Table>
+              </div>
+
+              <footer className="invoices-list__pagination">
+                <p className="invoices-list__pagination-summary">
+                  Mostrando <span>{invoices.length}</span> de <span>{totalResults}</span> resultados
+                </p>
+                <div className="invoices-list__pagination-nav">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="pagination-btn"
+                    onClick={() => updateFilters({ page: Math.max(1, page - 1) })}
+                    disabled={page === 1}
+                  >
+                    <ChevronLeft className="w-4 h-4 mr-1" /> Anterior
+                  </Button>
+                  <div className="pagination-pages">
+                    Página <span>{page}</span> de {totalPages}
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="pagination-btn"
+                    onClick={() => updateFilters({ page: Math.min(totalPages, page + 1) })}
+                    disabled={page === totalPages}
+                  >
+                    Siguiente <ChevronRight className="w-4 h-4 ml-1" />
+                  </Button>
+                </div>
+              </footer>
             </div>
-          </footer>
-        </div>
+          </TabsContent>
+
+          <TabsContent value="mail-list">
+            <MailListTab />
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );

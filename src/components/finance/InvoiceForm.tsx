@@ -47,7 +47,7 @@ const invoiceSchema = z.object({
       })
     )
     .min(1, 'Debe agregar al menos un ítem'),
-  status: z.enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled']),
+  status: z.enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked']),
   costCenters: z.array(z.string()).optional(),
   inventoryMovement: z.string().optional(),
   notes: z.string().optional(),
@@ -139,7 +139,7 @@ export default function InvoiceForm({
           costCenter: '',
         },
       ],
-    status: initialData?.status || 'Draft',
+    status: initialData?.status || 'Unchecked',
     costCenters: initialData?.costCenters || [],
     inventoryMovement: initialData?.inventoryMovement || '',
     notes: initialData?.notes || '',
@@ -606,6 +606,7 @@ export default function InvoiceForm({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Draft">Borrador</SelectItem>
+                    <SelectItem value="Unchecked">Sin comprobar</SelectItem>
                     <SelectItem value="Sent">Enviada</SelectItem>
                     <SelectItem value="Paid">Pagada</SelectItem>
                     <SelectItem value="Partial">Parcial</SelectItem>

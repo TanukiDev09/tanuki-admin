@@ -42,7 +42,7 @@ export interface IInvoice extends Document {
   discount: number;
   total: number;
 
-  status: 'Draft' | 'Sent' | 'Paid' | 'Partial' | 'Cancelled';
+  status: 'Draft' | 'Sent' | 'Paid' | 'Partial' | 'Cancelled' | 'Unchecked';
 
   // Relations
   costCenters?: mongoose.Types.ObjectId[]; // Deprecated in favor of per-item CC, but keeping for compatibility if needed
@@ -133,8 +133,8 @@ const InvoiceSchema: Schema = new Schema(
     },
     status: {
       type: String,
-      enum: ['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled'],
-      default: 'Draft',
+      enum: ['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked'],
+      default: 'Unchecked',
     },
     costCenters: [
       {

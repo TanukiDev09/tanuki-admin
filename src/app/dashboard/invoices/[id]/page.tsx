@@ -232,7 +232,7 @@ export default function InvoiceDetailPage() {
                 variant={invoice.status === 'Paid' ? 'default' : 'outline'}
                 className="invoice-detail__status-badge"
               >
-                {invoice.status}
+                {invoice.status === 'Unchecked' ? 'Sin comprobar' : invoice.status}
               </Badge>
             </CardHeader>
             <CardContent>
