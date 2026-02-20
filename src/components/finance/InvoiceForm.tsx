@@ -20,12 +20,12 @@ import { useToast } from '@/components/ui/Toast';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
 import { BookSelect } from '@/components/finance/BookSelect';
 import InventorySettlementSelect from '@/components/finance/InventorySettlementSelect';
-import { Trash2, Plus, Save, Book, Settings, FileText, User, ShoppingBag, Info, ShieldCheck, ArrowLeft } from 'lucide-react';
+import { Trash2, Plus, Save, Book, Settings, FileText, User, ShoppingBag, ArrowLeft, ShieldCheck } from 'lucide-react';
 import { NumericInput } from '@/components/ui/Input/NumericInput';
 import { cn, formatCurrency } from '@/lib/utils';
 import { BookResponse } from '@/types/book';
 import DocumentUploader from './DocumentUploader';
-import './InvoiceForm.scss';
+import './invoice-form.scss';
 
 const invoiceSchema = z.object({
   number: z.string().min(1, 'El número es requerido'),
@@ -224,9 +224,8 @@ export default function InvoiceForm({
       form.setValue(`items.${index}.description`, book.title);
     }
 
-    // Only update cost center if it's not set
-    const currentCC = form.getValues(`items.${index}.costCenter`);
-    if (!currentCC && book.costCenter) {
+    // Auto-assign cost center if the book has one
+    if (book.costCenter) {
       form.setValue(`items.${index}.costCenter`, book.costCenter);
     }
 
@@ -282,23 +281,23 @@ export default function InvoiceForm({
             </header>
             <div className="invoice-form__grid invoice-form__grid--3col">
               <div className="invoice-form__field">
-                <Label>Número de Factura</Label>
+                <Label className="invoice-form__label">Número de Factura</Label>
                 <Input {...form.register('number')} placeholder="FAC-000" disabled={isEditing} />
                 {form.formState.errors.number && <p className="invoice-form__error">{form.formState.errors.number.message}</p>}
               </div>
               <div className="invoice-form__field">
-                <Label>Fecha Emisión</Label>
+                <Label className="invoice-form__label">Fecha Emisión</Label>
                 <Input type="date" {...form.register('date')} />
               </div>
               <div className="invoice-form__field">
-                <Label>Fecha Vencimiento</Label>
+                <Label className="invoice-form__label">Fecha Vencimiento</Label>
                 <Input type="date" {...form.register('dueDate')} />
               </div>
             </div>
 
-            <div className="invoice-form__grid invoice-form__grid--3col border-t pt-6 mt-6">
+            <div className="invoice-form__grid invoice-form__grid--3col">
               <div className="invoice-form__field">
-                <Label>Moneda</Label>
+                <Label className="invoice-form__label">Moneda</Label>
                 <Controller
                   control={form.control}
                   name="currency"
@@ -319,7 +318,7 @@ export default function InvoiceForm({
                 />
               </div>
               <div className="invoice-form__field">
-                <Label>Tasa de Cambio (→ COP)</Label>
+                <Label className="invoice-form__label">Tasa de Cambio (→ COP)</Label>
                 <Controller
                   control={form.control}
                   name="exchangeRate"
@@ -333,8 +332,8 @@ export default function InvoiceForm({
                 />
               </div>
               <div className="invoice-form__field">
-                <Label>Total en COP (Calculado)</Label>
-                <div className="h-[48px] flex items-center px-4 bg-muted/30 rounded-md font-mono font-bold text-primary border border-dashed border-primary/20">
+                <Label className="invoice-form__label">Total en COP</Label>
+                <div className="invoice-form__amount-display">
                   {formatCurrency(form.watch('amountInCOP') || 0, 'COP')}
                 </div>
               </div>
@@ -347,16 +346,16 @@ export default function InvoiceForm({
               <User className="invoice-form__header-icon" />
               <h2 className="invoice-form__header-title">Detalles del Cliente</h2>
             </header>
-            <div className="invoice-form__grid">
-              <div className="invoice-form__field">
-                <Label>Razón Social / Nombre</Label>
+            <div className="invoice-form__grid invoice-form__grid--3col">
+              <div className="invoice-form__field invoice-form__field--2col">
+                <Label className="invoice-form__label">Razón Social / Nombre</Label>
                 <Input {...form.register('customerName')} placeholder="Nombre completo" />
                 {form.formState.errors.customerName && <p className="invoice-form__error">{form.formState.errors.customerName.message}</p>}
               </div>
               <div className="invoice-form__field">
-                <Label>Identificación</Label>
-                <div className="flex gap-2">
-                  <div className="w-28 flex-shrink-0">
+                <Label className="invoice-form__label">Identificación</Label>
+                <div className="invoice-form__doc-type-group">
+                  <div className="invoice-form__doctype-select">
                     <Controller
                       control={form.control}
                       name="customerDocumentType"
@@ -378,24 +377,24 @@ export default function InvoiceForm({
                       )}
                     />
                   </div>
-                  <Input {...form.register('customerTaxId')} placeholder="Documento" className="flex-1" />
+                  <Input {...form.register('customerTaxId')} placeholder="Documento" />
                 </div>
               </div>
               <div className="invoice-form__field">
-                <Label>Correo Electrónico</Label>
+                <Label className="invoice-form__label">Correo Electrónico</Label>
                 <Input {...form.register('customerEmail')} type="email" placeholder="email@ejemplo.com" />
               </div>
               <div className="invoice-form__field">
-                <Label>Teléfono</Label>
+                <Label className="invoice-form__label">Teléfono</Label>
                 <Input {...form.register('customerPhone')} placeholder="300 000 0000" />
               </div>
               <div className="invoice-form__field">
-                <Label>Dirección</Label>
-                <Input {...form.register('customerAddress')} placeholder="Calle 123 # 45-67" />
-              </div>
-              <div className="invoice-form__field">
-                <Label>Ciudad</Label>
+                <Label className="invoice-form__label">Ciudad</Label>
                 <Input {...form.register('customerCity')} placeholder="Bogotá, D.C." />
+              </div>
+              <div className="invoice-form__field invoice-form__field--3col">
+                <Label className="invoice-form__label">Dirección</Label>
+                <Input {...form.register('customerAddress')} placeholder="Calle 123 # 45-67" />
               </div>
             </div>
             <div className="invoice-form__newsletter">
@@ -411,137 +410,164 @@ export default function InvoiceForm({
             <header className="invoice-form__header">
               <ShoppingBag className="invoice-form__header-icon" />
               <h2 className="invoice-form__header-title">Conceptos y Productos</h2>
-              <div className="ml-auto">
-                <Button type="button" variant="ghost" size="sm" onClick={() => append({ type: 'servicio', description: '', quantity: 1, unitPrice: 0, discount: 0, total: 0, costCenter: '' })} className="hover:bg-primary/10 text-primary">
-                  <Plus className="w-4 h-4 mr-2" /> Agregar Item
-                </Button>
-              </div>
+              <button type="button" onClick={() => append({ type: 'servicio', description: '', quantity: 1, unitPrice: 0, discount: 0, total: 0, costCenter: '' })} className="invoice-form__add-item-btn">
+                <Plus /> Agregar Item
+              </button>
             </header>
-            <div className="invoice-form__items-wrapper">
-              <table className="invoice-form__table">
-                <thead>
-                  <tr>
-                    <th className="w-20">Tipo</th>
-                    <th>Descripción</th>
-                    <th className="w-40">C. Costo</th>
-                    <th className="w-24 text-right">Cant.</th>
-                    <th className="w-32 text-right">Precio</th>
-                    <th className="w-28 text-right">Desc.</th>
-                    <th className="w-36 text-right">Total</th>
-                    <th className="w-12"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {fields.map((field, index) => {
-                    const itemType = form.watch(`items.${index}.type`);
-                    return (
-                      <tr key={field.id}>
-                        <td data-label="Tipo">
+            <div className="invoice-form__items-list">
+              {fields.map((field, index) => {
+                const itemType = form.watch(`items.${index}.type`);
+                return (
+                  <div key={field.id} className="invoice-form__item-row">
+                    {/* Line 1: Type icon, Description/Select, Trash */}
+                    <div className="invoice-form__item-main">
+                      <div className="invoice-form__item-type">
+                        <Controller
+                          control={form.control}
+                          name={`items.${index}.type` as const}
+                          render={({ field: typeField }) => (
+                            <div className="invoice-form__type-toggle">
+                              <button
+                                type="button"
+                                onClick={() => typeField.onChange('libro')}
+                                className={cn('invoice-form__type-toggle-btn', typeField.value === 'libro' && 'invoice-form__type-toggle-btn--active')}
+                              >
+                                <Book />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => typeField.onChange('servicio')}
+                                className={cn('invoice-form__type-toggle-btn', typeField.value === 'servicio' && 'invoice-form__type-toggle-btn--active')}
+                              >
+                                <Settings />
+                              </button>
+                            </div>
+                          )}
+                        />
+                      </div>
+
+                      <div className="invoice-form__item-desc">
+                        {itemType === 'libro' ? (
                           <Controller
                             control={form.control}
-                            name={`items.${index}.type` as const}
-                            render={({ field: typeField }) => (
-                              <div className="invoice-form__type-toggle">
-                                <button
-                                  type="button"
-                                  onClick={() => typeField.onChange('libro')}
-                                  className={cn('invoice-form__type-toggle-btn', typeField.value === 'libro' && 'invoice-form__type-toggle-btn--active')}
-                                >
-                                  <Book />
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => typeField.onChange('servicio')}
-                                  className={cn('invoice-form__type-toggle-btn', typeField.value === 'servicio' && 'invoice-form__type-toggle-btn--active')}
-                                >
-                                  <Settings />
-                                </button>
-                              </div>
+                            name={`items.${index}.bookId` as const}
+                            render={({ field: bField }) => (
+                              <BookSelect value={bField.value} onSelect={(b) => handleBookSelect(index, b)} />
                             )}
                           />
-                        </td>
-                        <td data-label="Descripción">
-                          {itemType === 'libro' ? (
-                            <Controller control={form.control} name={`items.${index}.bookId` as const} render={({ field: bField }) => (
-                              <BookSelect value={bField.value} onSelect={(b) => handleBookSelect(index, b)} />
-                            )} />
-                          ) : (
-                            <Input {...form.register(`items.${index}.description` as const)} placeholder="Referencia..." />
-                          )}
-                        </td>
-                        <td data-label="C. Costo">
-                          <Controller control={form.control} name={`items.${index}.costCenter` as const} render={({ field: ccField }) => (
+                        ) : (
+                          <Input
+                            {...form.register(`items.${index}.description` as const)}
+                            placeholder="Descripción del servicio o producto..."
+                            className="bg-transparent border-none shadow-none focus:ring-0 p-0 h-auto font-medium"
+                          />
+                        )}
+                      </div>
+
+                      <button type="button" onClick={() => remove(index)} className="invoice-form__item-remove">
+                        <Trash2 />
+                      </button>
+                    </div>
+
+                    {/* Line 2: Cost Center and Financials */}
+                    <div className="invoice-form__item-details">
+                      <div className="invoice-form__item-detail invoice-form__item-detail--cc">
+                        <Label className="invoice-form__item-detail-label">C. Costo</Label>
+                        <Controller
+                          control={form.control}
+                          name={`items.${index}.costCenter` as const}
+                          render={({ field: ccField }) => (
                             <CostCenterSelect value={ccField.value} onValueChange={ccField.onChange} hideLabel allowCreation={false} />
-                          )} />
-                        </td>
-                        <td data-label="Cant.">
-                          <Controller control={form.control} name={`items.${index}.quantity` as const} render={({ field: qField }) => (
-                            <NumericInput value={qField.value} onValueChange={(v) => handleItemChange(index, 'quantity', Number(v))} className="text-right" />
-                          )} />
-                        </td>
-                        <td data-label="Precio">
-                          <Controller control={form.control} name={`items.${index}.unitPrice` as const} render={({ field: pField }) => (
-                            <NumericInput value={pField.value} onValueChange={(v) => handleItemChange(index, 'unitPrice', Number(v))} className="text-right font-medium" />
-                          )} />
-                        </td>
-                        <td data-label="Desc.">
-                          <Controller control={form.control} name={`items.${index}.discount` as const} render={({ field: dField }) => (
-                            <NumericInput value={dField.value} onValueChange={(v) => handleItemChange(index, 'discount', Number(v))} className="text-right text-destructive font-semibold" />
-                          )} />
-                        </td>
-                        <td data-label="Subtotal" className="text-right font-bold text-primary">
+                          )}
+                        />
+                      </div>
+
+                      <div className="invoice-form__item-detail invoice-form__item-detail--qty">
+                        <Label className="invoice-form__item-detail-label">Cantidad</Label>
+                        <Controller
+                          control={form.control}
+                          name={`items.${index}.quantity` as const}
+                          render={({ field: qField }) => (
+                            <NumericInput
+                              value={qField.value}
+                              onValueChange={(v) => handleItemChange(index, 'quantity', Number(v))}
+                              className="invoice-form__input--right"
+                            />
+                          )}
+                        />
+                      </div>
+
+                      <div className="invoice-form__item-detail invoice-form__item-detail--price">
+                        <Label className="invoice-form__item-detail-label">Precio Unitario</Label>
+                        <Controller
+                          control={form.control}
+                          name={`items.${index}.unitPrice` as const}
+                          render={({ field: pField }) => (
+                            <NumericInput
+                              value={pField.value}
+                              onValueChange={(v) => handleItemChange(index, 'unitPrice', Number(v))}
+                              className="invoice-form__input--right invoice-form__input--bold"
+                            />
+                          )}
+                        />
+                      </div>
+
+                      <div className="invoice-form__item-detail invoice-form__item-detail--disc">
+                        <Label className="invoice-form__item-detail-label">Descuento</Label>
+                        <Controller
+                          control={form.control}
+                          name={`items.${index}.discount` as const}
+                          render={({ field: dField }) => (
+                            <NumericInput
+                              value={dField.value}
+                              onValueChange={(v) => handleItemChange(index, 'discount', Number(v))}
+                              className="invoice-form__input--right invoice-form__input--danger"
+                            />
+                          )}
+                        />
+                      </div>
+
+                      <div className="invoice-form__item-detail invoice-form__item-detail--total">
+                        <Label className="invoice-form__item-detail-label">Subtotal</Label>
+                        <div className="invoice-form__item-row-total">
                           {formatCurrency(watchItems[index]?.total || 0, form.watch('currency'))}
-                        </td>
-                        <td>
-                          <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="hover:text-destructive">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-              {fields.length === 0 && <div className="p-12 text-center text-muted-foreground font-medium bg-muted/5">No has agregado conceptos a esta factura.</div>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {fields.length === 0 && (
+                <div className="invoice-form__empty-state">No has agregado conceptos a esta factura.</div>
+              )}
             </div>
           </div>
 
-          {/* Bottom Sections Row */}
-          <div className="invoice-form__cards-row">
-            <div className="invoice-form__card">
-              <header className="invoice-form__header">
-                <Info className="invoice-form__header-icon" />
-                <h2 className="invoice-form__header-title">Vínculos</h2>
-              </header>
-              <div className="invoice-form__grid">
-                <div className="invoice-form__field">
-                  <Label>Liq. de Inventario</Label>
-                  <Controller control={form.control} name="inventoryMovement" render={({ field }) => (
-                    <InventorySettlementSelect value={field.value} onValueChange={field.onChange} />
-                  )} />
-                </div>
-                <div className="invoice-form__field">
-                  {/* The DocumentUploader already has its own internal label */}
-                  <Controller control={form.control} name="fileUrl" render={({ field }) => (
-                    <DocumentUploader value={field.value} onChange={field.onChange} onRemove={() => field.onChange('')} />
-                  )} />
-                </div>
+          {/* Links & Metadata Card */}
+          <div className="invoice-form__card">
+            <header className="invoice-form__header">
+              <Settings className="invoice-form__header-icon" />
+              <h2 className="invoice-form__header-title">Vínculos y Metadatos</h2>
+            </header>
+            <div className="invoice-form__links-metadata">
+              <div className="invoice-form__field">
+                <Label className="invoice-form__label">Liq. de Inventario</Label>
+                <Controller control={form.control} name="inventoryMovement" render={({ field }) => (
+                  <InventorySettlementSelect value={field.value} onValueChange={field.onChange} />
+                )} />
               </div>
-            </div>
-            <div className="invoice-form__card">
-              <header className="invoice-form__header">
-                <Settings className="invoice-form__header-icon" />
-                <h2 className="invoice-form__header-title">Metadatos</h2>
-              </header>
-              <div className="invoice-form__grid">
-                <div className="invoice-form__field">
-                  <Label>Ref. de Orden</Label>
-                  <Input {...form.register('orderReference')} placeholder="N° Pedido Interno" />
-                </div>
-                <div className="invoice-form__field">
-                  <Label>CUFE (DIAN)</Label>
-                  <Input {...form.register('cufe')} placeholder="UUID de la factura electrónica" className="font-mono text-[10px]" />
-                </div>
+              <div className="invoice-form__field">
+                <Label className="invoice-form__label">Ref. de Orden</Label>
+                <Input {...form.register('orderReference')} placeholder="N° Pedido Interno" />
+              </div>
+              <div className="invoice-form__field">
+                <Label className="invoice-form__label">CUFE (DIAN)</Label>
+                <Input {...form.register('cufe')} placeholder="UUID de la factura..." />
+              </div>
+              <div className="invoice-form__links-metadata-uploader">
+                <Controller control={form.control} name="fileUrl" render={({ field }) => (
+                  <DocumentUploader value={field.value} onChange={field.onChange} onRemove={() => field.onChange('')} />
+                )} />
               </div>
             </div>
           </div>
@@ -551,19 +577,19 @@ export default function InvoiceForm({
               <FileText className="invoice-form__header-icon" />
               <h2 className="invoice-form__header-title">Observaciones Internas</h2>
             </header>
-            <div className="p-6">
-              <Textarea {...form.register('notes')} placeholder="Escribe aquí notas adicionales para administración..." className="min-h-[120px]" />
+            <div className="p-4">
+              <Textarea {...form.register('notes')} placeholder="Escribe aquí notas adicionales para administración..." className="min-h-[80px] text-sm" />
             </div>
           </div>
-        </main>
+        </main >
 
         <aside className="invoice-form__sidebar">
           <div className="invoice-form__summary-card">
-            <h3 className="text-xs font-black uppercase tracking-[0.2em] mb-8 opacity-70">Liquidación Final</h3>
-            <div className="space-y-4">
+            <h3 className="invoice-form__summary-title">Liquidación Final</h3>
+            <div className="invoice-form__summary-content">
               <div className="summary-row">
                 <span>Total Líneas</span>
-                <span className="font-bold">{formatCurrency(form.watch('subtotal'), form.watch('currency'))}</span>
+                <span className="summary-row__value">{formatCurrency(form.watch('subtotal'), form.watch('currency'))}</span>
               </div>
               <div className="summary-row">
                 <span>Descuento Global</span>
@@ -583,11 +609,11 @@ export default function InvoiceForm({
               </div>
 
               <div className="summary-row summary-row--total">
-                <div className="flex flex-col">
+                <div className="summary-row--total-content">
                   <span className="label">Gran Total ({form.watch('currency')})</span>
                   <span className="value">{formatCurrency(form.watch('total'), form.watch('currency'))}</span>
                   {form.watch('currency') !== 'COP' && (
-                    <span className="text-[10px] mt-2 opacity-60 font-mono">
+                    <span className="summary-equivalent">
                       ≈ {formatCurrency(form.watch('amountInCOP') || 0, 'COP')}
                     </span>
                   )}
@@ -627,27 +653,27 @@ export default function InvoiceForm({
 
           {/* DIAN Metadata Panel Overlay */}
           {(form.watch('dianData.invoiceAuthorization') || form.watch('cufe')) && (
-            <div className="mt-8 p-6 rounded-3xl border-2 border-primary/10 bg-primary/[0.02]">
-              <div className="flex items-center gap-2 mb-4">
-                <ShieldCheck className="w-4 h-4 text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-primary">Firma Electrónica DIAN</span>
+            <div className="invoice-form__dian-panel">
+              <div className="invoice-form__dian-header">
+                <ShieldCheck className="invoice-form__dian-icon" />
+                <span className="invoice-form__dian-title">Firma Electrónica DIAN</span>
               </div>
-              <div className="space-y-4">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[9px] font-bold text-muted-foreground uppercase">ID Autorización</span>
-                  <code className="text-[10px] bg-white p-2 rounded-lg border border-primary/10 truncate font-mono">{form.watch('dianData.invoiceAuthorization')}</code>
+              <div className="invoice-form__dian-content">
+                <div className="invoice-form__dian-field">
+                  <span className="invoice-form__dian-label">ID Autorización</span>
+                  <code className="invoice-form__dian-value">{form.watch('dianData.invoiceAuthorization')}</code>
                 </div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-[9px] font-bold text-muted-foreground uppercase">Estado Validación</span>
-                  <p className="text-[10px] bg-white p-2 rounded-lg border border-primary/10 leading-relaxed italic">
-                    <span className="font-bold text-primary">[{form.watch('dianData.validationResponse.code')}]</span> {form.watch('dianData.validationResponse.description')}
+                <div className="invoice-form__dian-field">
+                  <span className="invoice-form__dian-label">Estado Validación</span>
+                  <p className="invoice-form__dian-text">
+                    <span className="invoice-form__dian-code">[{form.watch('dianData.validationResponse.code')}]</span> {form.watch('dianData.validationResponse.description')}
                   </p>
                 </div>
               </div>
             </div>
           )}
         </aside>
-      </div>
-    </form>
+      </div >
+    </form >
   );
 }

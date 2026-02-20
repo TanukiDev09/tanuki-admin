@@ -39,10 +39,19 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const response = await fetch(`/api/permissions/user/${user._id}`);
+      const primaryUrl = `/api/permissions/user/${user._id}`;
+      const fallbackUrl = `/api/permissions?userId=${user._id}`;
+
+      let response = await fetch(primaryUrl);
+
+      // Si falla con 404, intentar la ruta fallback
+      if (response.status === 404) {
+        console.warn(`[PermissionContext] Primary route ${primaryUrl} failed with 404, trying fallback ${fallbackUrl}`);
+        response = await fetch(fallbackUrl);
+      }
 
       if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
+        throw new Error(`Server responded with status: ${response.status} at ${response.url}`);
       }
 
       const data = await response.json();

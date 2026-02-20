@@ -98,4 +98,44 @@ Nuevo sistema de validación visual para la distribución de valores:
 
 ---
 
-_Versión 1.0.4 - Sistema de Importación DIAN & Control Financiero Estricto_
+#### 🧩 Refactor de Interfaz: Layout de Dos Líneas
+
+- **Optimización de Densidad**: Rediseño del listado de ítems en facturas para usar una estructura de rejilla de dos líneas.
+- **Legibilidad Mejorada**: Mayor espacio para campos críticos como `BookSelect` y `CostCenterSelect`, eliminando el truncado de texto en pantallas pequeñas y brindando aire visual en escritorio.
+- **Responsive Design Enhanced**: Adaptación fluida de la tabla de ítems para mantener la profesionalidad en todas las resoluciones mediante un sistema de cards en móvil.
+
+#### 🧠 Automatización e Inteligencia de Datos
+
+- **Auto-asignación de Centro de Costo**: Al seleccionar un libro del catálogo en el formulario de facturas, el sistema asocia automáticamente su centro de costo predefinido.
+- **Vínculos Inteligentes**: Conservación de la descripción original del ítem al vincular productos, permitiendo personalización sin perder la referencia interna al catálogo.
+
+---
+
+## Panel de Control y Analítica
+
+### Nuevas Funcionalidades
+
+#### 📊 Analítica de Centros de Costo
+
+- **Visualización de Participación**: Nuevos gráficos dinámicos para visualizar la contribución porcentual de cada centro de costo en ingresos y egresos totales.
+- **Dashboard de Salud**: Integración de métricas de sostenibilidad (Runway, Burn Rate) por categorías y centros de costo.
+
+---
+
+## Infraestructura, Seguridad y Performance
+
+### Mejoras Técnicas
+
+#### 🛡️ Seguridad y Robustez
+
+- **Tolerancia Financiera**: Implementación de un margen de tolerancia inteligente (± $5) en las validaciones de montos para evitar bloqueos por discrepancias ínfimas de precisión decimal en cálculos complejos.
+- **Seguridad "Zero Hardcode"**: Limpieza profunda de credenciales y cadenas de conexión MongoDB en el código fuente, asegurando que toda configuración sensible resida exclusivamente en variables de entorno.
+
+#### ⚡ Performance y Escalabilidad
+
+- **Optimización de MongoDB**: Implementación de una nueva estrategia de índices y search indexes para acelerar las consultas de búsqueda y filtrado en los módulos de movimientos y deudas.
+- **Middleware Optimizado**: Refactorización del middleware de autenticación para garantizar una persistencia de sesión más robusta y mejor manejo de redirecciones.
+
+---
+
+_Versión 1.0.4 - Sistema de Importación DIAN, Analítica Avanzada & Infraestructura Segura_

@@ -53,6 +53,7 @@ import { usePersistentFilters } from '@/hooks/usePersistentFilters';
 
 interface InvoiceFilters {
   search: string;
+  bookId: string;
   statusFilter: string;
   sortField: string;
   sortOrder: string;
@@ -76,10 +77,11 @@ function InvoicesList() {
   const { toast } = useToast();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
-  const { filters, updateFilters } = usePersistentFilters<InvoiceFilters>({
+  const { filters, updateFilters, clearFilters } = usePersistentFilters<InvoiceFilters>({
     key: 'invoices-filters',
     initialFilters: {
       search: '',
+      bookId: '',
       statusFilter: 'ALL',
       sortField: 'date',
       sortOrder: 'desc',
@@ -88,7 +90,25 @@ function InvoicesList() {
     },
   });
 
-  const { search, statusFilter, sortField, sortOrder, amountRange, page } = filters;
+  // Handle URL parameters for initial filtering
+  useEffect(() => {
+    const bookIdParam = searchParams.get('bookId');
+    const searchParam = searchParams.get('search');
+
+    const updates: Partial<InvoiceFilters> = {};
+    if (bookIdParam && bookIdParam !== filters.bookId) {
+      updates.bookId = bookIdParam;
+    }
+    if (searchParam && searchParam !== filters.search) {
+      updates.search = searchParam;
+    }
+
+    if (Object.keys(updates).length > 0) {
+      updateFilters({ ...updates, page: 1 });
+    }
+  }, [searchParams, updateFilters, filters.bookId, filters.search]);
+
+  const { search, bookId, statusFilter, sortField, sortOrder, amountRange, page } = filters;
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const limit = 10;
@@ -98,6 +118,7 @@ function InvoicesList() {
       setLoading(true);
       const params = new URLSearchParams();
       if (search) params.append('search', search);
+      if (bookId) params.append('bookId', bookId);
       if (statusFilter && statusFilter !== 'ALL')
         params.append('status', statusFilter);
 
@@ -221,6 +242,20 @@ function InvoicesList() {
                   className="invoices-list__search-input"
                 />
               </div>
+
+              {bookId && (
+                <div className="invoices-list__active-filter">
+                  <span className="invoices-list__filter-badge">
+                    Filtrando por Libro
+                    <button
+                      onClick={() => updateFilters({ bookId: '', page: 1 })}
+                      className="invoices-list__filter-clear"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </span>
+                </div>
+              )}
 
               <div className="invoices-list__controls">
                 <div className="invoices-list__control-item">

@@ -6,7 +6,7 @@ import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSele
 import { BookSelect } from '@/components/finance/BookSelect';
 import { Trash2, Plus, Book, Settings } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
-import { add, multiply, toNumber, compare, subtract } from '@/lib/math';
+import { add, multiply, toNumber, compare, subtract, isMatchedFinancial } from '@/lib/math';
 import { cn } from '@/lib/utils';
 
 interface MovementItem {
@@ -40,7 +40,7 @@ export function MovementItemsTable({
 }: MovementItemsTableProps) {
   const sumItems = items.reduce((sum, item) => add(sum, item.total || '0'), '0');
   const target = targetAmount || '0';
-  const isMatched = compare(sumItems, target) === 0;
+  const isMatched = isMatchedFinancial(sumItems, target);
   const difference = subtract(target, sumItems);
 
   return (

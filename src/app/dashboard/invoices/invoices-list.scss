@@ -83,6 +83,44 @@
     }
   }
 
+  &__active-filter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: -0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__filter-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.35rem 0.75rem;
+    background: rgb(var(--primary-rgb), 0.1);
+    color: var(--primary);
+    border-radius: 99px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  &__filter-clear {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.15rem;
+    background: white;
+    border-radius: 50%;
+    color: var(--primary);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      background: var(--primary);
+      color: white;
+    }
+  }
+
   &__controls {
     display: flex;
     flex-wrap: wrap;
@@ -158,7 +196,6 @@
     cursor: pointer;
 
     &::-webkit-slider-thumb {
-      appearance: none;
       appearance: none;
       width: 16px;
       height: 16px;

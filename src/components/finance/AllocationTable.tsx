@@ -4,7 +4,7 @@ import { NumericInput } from '@/components/ui/Input/NumericInput';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
 import { Trash2, Plus } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
-import { add, subtract, compare, toNumber } from '@/lib/math';
+import { add, subtract, compare, toNumber, isMatchedFinancial } from '@/lib/math';
 
 interface Allocation {
   costCenter: string;
@@ -39,7 +39,7 @@ export function AllocationTable({
     '0'
   );
 
-  const isMatched = compare(sumAllocations, totalAmount || '0') === 0;
+  const isMatched = isMatchedFinancial(sumAllocations, totalAmount || '0');
   const difference = subtract(totalAmount || '0', sumAllocations);
 
   return (

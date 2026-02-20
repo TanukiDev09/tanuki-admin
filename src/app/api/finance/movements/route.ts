@@ -15,6 +15,7 @@ import {
   toNumber,
   gtZero,
   DecimalValue,
+  isMatchedFinancial,
 } from '@/lib/math';
 
 export const dynamic = 'force-dynamic';
@@ -430,7 +431,7 @@ function validateAllocations(
     sumAllocations = add(sumAllocations, allocAmount);
   }
 
-  if (compare(amount, sumAllocations) !== 0) {
+  if (!isMatchedFinancial(amount, sumAllocations, 10)) {
     return {
       error: `La suma de los detalles (${sumAllocations}) debe ser igual al total del movimiento (${amount})`,
       status: 400,

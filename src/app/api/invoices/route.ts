@@ -85,6 +85,7 @@ export async function GET(req: NextRequest) {
     const endDate = searchParams.get('endDate');
     const status = searchParams.get('status');
     const search = searchParams.get('search');
+    const bookId = searchParams.get('bookId');
 
     // Pagination
     const page = parseInt(searchParams.get('page') || '1');
@@ -100,6 +101,9 @@ export async function GET(req: NextRequest) {
     }
     if (status) {
       query.status = status;
+    }
+    if (bookId) {
+      query['items.bookId'] = bookId;
     }
     if (search) {
       query.$or = [

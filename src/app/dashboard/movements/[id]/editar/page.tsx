@@ -21,7 +21,7 @@ import { POSSelect } from '@/components/admin/POSSelect/POSSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency } from '@/lib/utils';
-import { multiply, divide, gtZero, add, toNumber, compare } from '@/lib/math';
+import { multiply, divide, gtZero, add, toNumber, compare, isMatchedFinancial } from '@/lib/math';
 import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import { MovementItemsTable } from '@/components/finance/MovementItemsTable';
 import { GeneralInfoSection, AllocationSection } from '@/components/finance/MovementFormSections';
@@ -227,7 +227,7 @@ export default function EditMovementPage() {
   };
 
   const validateAllocations = () => {
-    if (!useMultiCostCenter) return true;
+    if (!useMultiCostCenter && !useItems) return true;
 
     const allocations = formData.allocations || [];
     if (allocations.length === 0) {
@@ -241,7 +241,7 @@ export default function EditMovementPage() {
     );
     const totalAmount = formData.amount || '0';
 
-    if (compare(totalAllocated, totalAmount) !== 0) {
+    if (!isMatchedFinancial(totalAllocated, totalAmount, 10)) {
       setAllocationError(
         `La suma de asignaciones (${formatCurrency(toNumber(totalAllocated), formData.currency)}) no coincide con el total (${formatCurrency(toNumber(totalAmount), formData.currency)})`
       );

@@ -159,7 +159,20 @@ async function getBillingHistory(
   invoiceFilter: Record<string, unknown>,
   now: Date
 ): Promise<BillingHistoryItem[]> {
-  const twelveMonthsAgo = startOfMonth(subMonths(now, 11));
+  // Find the oldest invoice to determine the start date
+  const oldestInvoice = await Invoice.findOne(
+    {
+      ...invoiceFilter,
+      status: { $ne: 'Cancelled' },
+    },
+    { date: 1 }
+  )
+    .sort({ date: 1 })
+    .lean();
+
+  const startDate = oldestInvoice
+    ? startOfMonth(oldestInvoice.date)
+    : startOfMonth(now);
 
   // For billing history, we aggregate the total of the invoice to simplify
   // since multi-criteria matching at item-level CC is unreliable here.
@@ -167,7 +180,7 @@ async function getBillingHistory(
     {
       $match: {
         ...invoiceFilter,
-        date: { $gte: twelveMonthsAgo },
+        date: { $gte: startDate },
       },
     },
     {
@@ -185,19 +198,42 @@ async function getBillingHistory(
 
 function formatChartData(billingHistory: BillingHistoryItem[], now: Date) {
   const chartData = [];
-  for (let i = 0; i < 12; i++) {
-    const d = subMonths(now, 11 - i);
-    const year = d.getFullYear();
-    const month = d.getMonth() + 1;
+
+  if (billingHistory.length === 0) {
+    // If no history, just show current month
+    const d = startOfMonth(now);
+    chartData.push({
+      month: format(d, 'MMM yy'),
+      fullMonth: format(d, 'yyyy-MM'),
+      revenue: 0,
+    });
+    return chartData;
+  }
+
+  // Find the chronological start date from the history
+  const sortedHistory = [...billingHistory].sort((a, b) => {
+    if (a._id.year !== b._id.year) return a._id.year - b._id.year;
+    return a._id.month - b._id.month;
+  });
+
+  const first = sortedHistory[0]._id;
+  let current = new Date(first.year, first.month - 1, 1);
+  const end = startOfMonth(now);
+
+  while (current <= end) {
+    const year = current.getFullYear();
+    const month = current.getMonth() + 1;
 
     const match = billingHistory.find(
       (h) => h._id.year === year && h._id.month === month
     );
     chartData.push({
-      month: format(d, 'MMM'),
-      fullMonth: format(d, 'yyyy-MM'),
+      month: format(current, 'MMM yy'),
+      fullMonth: format(current, 'yyyy-MM'),
       revenue: match ? toNumber(match.total) : 0,
     });
+
+    current = subMonths(current, -1);
   }
   return chartData;
 }
