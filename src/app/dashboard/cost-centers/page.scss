@@ -49,6 +49,18 @@
     }
   }
 
+  &__participation-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+
+    @include lg {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    min-width: 0;
+  }
+
   &__charts-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -57,6 +69,8 @@
     @include lg {
       grid-template-columns: 3fr 2fr;
     }
+
+    min-width: 0;
   }
 
   &__chart-card {
@@ -69,6 +83,103 @@
     &:hover {
       box-shadow: $shadow-md;
     }
+  }
+
+  &__chart-container {
+    height: 300px;
+    padding: $spacing-lg;
+    padding-top: 0;
+    min-width: 0;
+    overflow: hidden;
+
+    &--pie {
+      height: auto;
+      min-height: 400px;
+      padding: $spacing-xl;
+    }
+  }
+
+  &__pie-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+    height: 100%;
+    align-items: center;
+
+    @include md {
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+    }
+  }
+
+  &__pie-main {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    flex-shrink: 0;
+  }
+
+  &__pie-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  &__custom-legend {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  &__legend-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-md;
+    transition: $transition-fast;
+
+    &:hover {
+      background-color: $muted;
+    }
+  }
+
+  &__legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  &__legend-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__legend-name {
+    font-size: $font-size-sm;
+    color: $foreground;
+    font-weight: $font-weight-medium;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+  }
+
+  &__legend-percentage {
+    font-size: $font-size-sm;
+    color: $muted-foreground;
+    font-variant-numeric: tabular-nums;
   }
 
   &__table-section {
@@ -122,12 +233,6 @@
       background-color: $card;
       border-color: $primary;
     }
-  }
-
-  &__chart-container {
-    height: 300px;
-    padding: $spacing-lg;
-    padding-top: 0;
   }
 
   &__new-btn {

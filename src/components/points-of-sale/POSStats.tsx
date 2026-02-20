@@ -170,7 +170,7 @@ export function POSStats({ posId, posName }: POSStatsProps) {
             <div className="pos-stats__card-header">
               <div className="pos-stats__card-title-group">
                 <div className="pos-stats__card-title-row">
-                  <span className="pos-stats__card-title">Ventas de los últimos 12 meses</span>
+                  <span className="pos-stats__card-title">Histórico de Ventas</span>
                   <ExternalLink className="pos-stats__card-icon-external" />
                 </div>
                 <CardDescription>Perfil de facturación histórica (Clic para ver facturas)</CardDescription>
@@ -178,49 +178,54 @@ export function POSStats({ posId, posName }: POSStatsProps) {
               <TrendingUp className="pos-stats__card-trend-icon" />
             </div>
             <CardContent>
-              <div className="pos-stats__chart-container">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={billingHistory}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                    <XAxis
-                      dataKey="month"
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: '#64748b', fontSize: 12 }}
-                    />
-                    <YAxis
-                      axisLine={false}
-                      tickLine={false}
-                      tick={{ fill: '#64748b', fontSize: 12 }}
-                      tickFormatter={(value) => `$${value / 1000000}M`}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        borderRadius: '12px',
-                        border: 'none',
-                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
-                      }}
-                      formatter={(value: number | string | undefined) => [
-                        formatCurrency(value === undefined ? 0 : Number(value)),
-                        'Ventas'
-                      ]}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="#3b82f6"
-                      strokeWidth={3}
-                      fillOpacity={1}
-                      fill="url(#colorRevenue)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+              <div className="pos-stats__chart-scroll-container">
+                <div
+                  className="pos-stats__chart-container"
+                  style={{ width: `${Math.max(100, billingHistory.length * 60)}px`, minWidth: '100%' }}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={billingHistory}>
+                      <defs>
+                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <XAxis
+                        dataKey="month"
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: '#64748b', fontSize: 11 }}
+                      />
+                      <YAxis
+                        axisLine={false}
+                        tickLine={false}
+                        tick={{ fill: '#64748b', fontSize: 11 }}
+                        tickFormatter={(value) => `$${value / 1000000}M`}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          borderRadius: '12px',
+                          border: 'none',
+                          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
+                        }}
+                        formatter={(value: number | string | undefined) => [
+                          formatCurrency(value === undefined ? 0 : Number(value)),
+                          'Ventas'
+                        ]}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="#3b82f6"
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#colorRevenue)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
               </div>
             </CardContent>
           </Card>

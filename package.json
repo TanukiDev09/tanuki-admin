@@ -17,6 +17,9 @@
     "test:e2e:open": "cypress open",
     "discover-routes": "node scripts/dev/discover-routes.js",
     "seed:permissions": "npx tsx scripts/db/seed/seedPermissions.ts",
+    "db:create-indexes": "npx tsx scripts/db/create-indexes.ts",
+    "db:check-indexes": "npx tsx scripts/db/check-indexes.ts",
+    "db:benchmark": "npx tsx scripts/db/benchmark-queries.ts",
     "perf": "next build && echo 'Build complete. Start the server with \"npm start\" in a separate terminal then run: npx lighthouse http://localhost:3000/dashboard?audit=true --output=json --output-path=./lighthouse-report.json'"
   },
   "dependencies": {

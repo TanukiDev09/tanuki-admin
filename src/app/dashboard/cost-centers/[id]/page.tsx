@@ -15,6 +15,7 @@ import {
   PieChart,
   ChevronRight,
   Tag,
+  Percent,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
@@ -225,11 +226,11 @@ export default function CostCenterDetailPage() {
             subtext="Saldo disponible"
           />
           <StatCard
-            title="Salud (Runway)"
-            value={`${Math.floor(financialData.health?.runway || 0)} meses`}
-            icon={Activity}
-            variant="default"
-            subtext="Supervivencia estimada"
+            title="Rentabilidad"
+            value={`${(financialData.health?.profitMargin || 0).toFixed(1)}%`}
+            icon={Percent}
+            variant={financialData.health?.profitMargin >= 0 ? 'success' : 'danger'}
+            subtext="Margen sobre ingresos"
           />
         </div>
       )}

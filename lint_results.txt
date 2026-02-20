@@ -1,0 +1,53 @@
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\scripts\db\benchmark-queries.ts[24m[0m
+[0m  [2m33:15[22m  [31merror[39m    Unexpected any. Specify a different type      [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m35:10[22m  [31merror[39m    Unexpected any. Specify a different type      [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m36:13[22m  [31merror[39m    Unexpected any. Specify a different type      [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m42:9[22m   [33mwarning[39m  'results' is assigned a value but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\scripts\db\check-indexes.ts[24m[0m
+[0m  [2m39:16[22m  [31merror[39m  Refactor this function to reduce its Cognitive Complexity from 20 to the 12 allowed  [2msonarjs/cognitive-complexity[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\src\app\api\finance\movements\[id]\route.ts[24m[0m
+[0m  [2m12:3[22m  [33mwarning[39m  'compare' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\src\app\api\finance\movements\route.ts[24m[0m
+[0m  [2m14:3[22m  [33mwarning[39m  'compare' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\src\app\api\invoices\mail-list\route.ts[24m[0m
+[0m  [2m5:27[22m  [33mwarning[39m  'req' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\src\app\api\invoices\route.ts[24m[0m
+[0m  [2m73:23[22m  [31merror[39m  Refactor this function to reduce its Cognitive Complexity from 13 to the 12 allowed  [2msonarjs/cognitive-complexity[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\src\app\dashboard\cost-centers\page.tsx[24m[0m
+[0m   [2m55:52[22m   [31merror[39m    Unexpected any. Specify a different type                                                                                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m180:81[22m   [33mwarning[39m  React Hook useMemo has a missing dependency: 'processParticipationData'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m181:83[22m   [33mwarning[39m  React Hook useMemo has a missing dependency: 'processParticipationData'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m  [2m266:80[22m   [31merror[39m    Unexpected any. Specify a different type                                                                                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m308:80[22m   [31merror[39m    Unexpected any. Specify a different type                                                                                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m348:41[22m   [31merror[39m    Unexpected any. Specify a different type                                                                                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m348:100[22m  [31merror[39m    Unexpected any. Specify a different type                                                                                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m370:41[22m   [31merror[39m    Unexpected any. Specify a different type                                                                                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m  [2m370:100[22m  [31merror[39m    Unexpected any. Specify a different type                                                                                   [2m@typescript-eslint/no-explicit-any[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\src\app\dashboard\invoices\MailListTab.tsx[24m[0m
+[0m  [2m81:14[22m  [33mwarning[39m  'err' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\src\app\dashboard\invoices\page.tsx[24m[0m
+[0m   [2m75:9[22m   [33mwarning[39m  'initialSearch' is assigned a value but never used                                                           [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m   [2m80:35[22m  [33mwarning[39m  'clearFilters' is assigned a value but never used                                                            [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m149:6[22m   [33mwarning[39m  React Hook useCallback has a missing dependency: 'bookId'. Either include it or remove the dependency array  [2mreact-hooks/exhaustive-deps[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\src\app\dashboard\movements\[id]\editar\page.tsx[24m[0m
+[0m  [2m24:51[22m  [33mwarning[39m  'compare' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\src\app\dashboard\movements\crear\page.tsx[24m[0m
+[0m  [2m24:51[22m  [33mwarning[39m  'compare' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[4mD:\Dev\Web\tanuki-admin\src\app\dashboard\points-of-sale\page.tsx[24m[0m
+[0m  [2m6:23[22m  [33mwarning[39m  'IPOSContact' is defined but never used  [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m  [2m7:10[22m  [33mwarning[39m  'Types' is defined but never used        [2m@typescript-eslint/no-unused-vars[22m[0m
+[0m[0m
+[0m[31m[1m✖ 26 problems (12 errors, 14 warnings)[22m[39m[0m
+[0m[31m[1m[22m[39m[0m

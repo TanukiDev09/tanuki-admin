@@ -89,6 +89,34 @@ export const compare = (a: DecimalValue, b: DecimalValue): number =>
   toBig(a).cmp(toBig(b));
 
 /**
+ * Compares two decimal values rounded to a specific precision (default 2).
+ * Returns 0 if they are equal when rounded.
+ */
+export const compareFinancial = (
+  a: DecimalValue,
+  b: DecimalValue,
+  precision: number = 2
+): number => {
+  const aRounded = toBig(a).toFixed(precision);
+  const bRounded = toBig(b).toFixed(precision);
+  if (aRounded === bRounded) return 0;
+  return toBig(aRounded).cmp(toBig(bRounded));
+};
+
+/**
+ * Checks if two decimal values are close enough within a given tolerance.
+ * Default tolerance is 5 units (e.g., 5 pesos).
+ */
+export const isMatchedFinancial = (
+  a: DecimalValue,
+  b: DecimalValue,
+  tolerance: number = 5
+): boolean => {
+  const diff = toBig(a).minus(toBig(b)).abs();
+  return diff.lte(tolerance);
+};
+
+/**
  * Checks if a value is greater than zero.
  */
 export const gtZero = (val: DecimalValue): boolean => toBig(val).gt(0);

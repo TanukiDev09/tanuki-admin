@@ -16,10 +16,11 @@
   &__scroll-container {
     width: 100%;
     max-width: 100%;
+    overflow-x: auto;
+    min-width: 0; // Crucial for flex/grid containment
     padding-bottom: $spacing-md;
 
     .scrollable-income-expense-chart--scrollable & {
-      overflow-x: auto;
       padding-bottom: $spacing-xl;
 
       @include custom-scrollbar;

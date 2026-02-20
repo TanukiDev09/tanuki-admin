@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/Button';
-import { Plus, Search, TrendingUp, DollarSign, PieChart } from 'lucide-react';
+import { Plus, Search, TrendingUp, DollarSign, PieChart as PieChartIcon } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import CostCentersTable from '@/components/admin/CostCentersTable/CostCentersTable';
 import { CostCenter } from '@/types/cost-center';
@@ -22,6 +22,8 @@ import {
   BarChart,
   Bar,
   Cell,
+  PieChart,
+  Pie,
 } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
 import './page.scss';
@@ -48,6 +50,26 @@ interface StatsData {
   }>;
   costCenters: CostCenterStats[];
 }
+
+// Custom Legend Component for better legibility
+const CustomPieLegend = ({ data, colors }: { data: any[], colors: string[] }) => {
+  return (
+    <div className="cost-centers-page__custom-legend">
+      {data.map((entry, index) => (
+        <div key={index} className="cost-centers-page__legend-item">
+          <div
+            className="cost-centers-page__legend-color"
+            style={{ backgroundColor: colors[index % colors.length] }}
+          />
+          <div className="cost-centers-page__legend-info">
+            <span className="cost-centers-page__legend-name">{entry.fullName || entry.name}</span>
+            <span className="cost-centers-page__legend-percentage">{entry.percentage}%</span>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default function CostCentersPage() {
   const { toast } = useToast();
@@ -105,6 +127,59 @@ export default function CostCentersPage() {
       cc.code.toLowerCase().includes(search.toLowerCase())
   ) || [];
 
+  const COLORS = [
+    '#3b82f6', // blue-500
+    '#10b981', // emerald-500
+    '#f59e0b', // amber-500
+    '#ef4444', // red-500
+    '#8b5cf6', // violet-500
+    '#06b6d4', // cyan-500
+    '#ec4899', // pink-500
+    '#f97316', // orange-500
+    '#6366f1', // indigo-500
+    '#14b8a6', // teal-500
+    '#94a3b8', // slate-400 (for Others)
+  ];
+
+  const processParticipationData = (type: 'income' | 'expense') => {
+    if (!data) return [];
+
+    const items = data.costCenters
+      .filter(cc => cc[type] > 0)
+      .map(cc => ({
+        name: cc.code,
+        fullName: cc.name,
+        value: cc[type]
+      }))
+      .sort((a, b) => b.value - a.value);
+
+    const total = items.reduce((sum, item) => sum + item.value, 0);
+    if (total === 0) return [];
+
+    const topItems = items.slice(0, 5);
+    const others = items.slice(5);
+
+    const result = topItems.map(item => ({
+      ...item,
+      percentage: ((item.value / total) * 100).toFixed(1)
+    }));
+
+    if (others.length > 0) {
+      const othersTotal = others.reduce((sum, item) => sum + item.value, 0);
+      result.push({
+        name: 'OTROS',
+        fullName: 'Otros centros de costo',
+        value: othersTotal,
+        percentage: ((othersTotal / total) * 100).toFixed(1)
+      });
+    }
+
+    return result;
+  };
+
+  const incomeParticipation = useMemo(() => processParticipationData('income'), [data]);
+  const expenseParticipation = useMemo(() => processParticipationData('expense'), [data]);
+
   return (
     <div className="cost-centers-page">
       <div className="cost-centers-page__header">
@@ -153,10 +228,97 @@ export default function CostCentersPage() {
             <StatCard
               title="Resultado Neto"
               value={formatCurrency(data.summary.balance)}
-              icon={PieChart}
+              icon={PieChartIcon}
               variant="balance"
               sparklineData={data.history.map((h) => h.balance)}
             />
+          </div>
+
+          {/* New Participation Row */}
+          <div className="cost-centers-page__participation-grid">
+            <Card className="cost-centers-page__chart-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                  Participación en Ingresos
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="cost-centers-page__chart-container cost-centers-page__chart-container--pie">
+                <div className="cost-centers-page__pie-wrapper">
+                  <div className="cost-centers-page__pie-main">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={incomeParticipation}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={70}
+                          outerRadius={100}
+                          paddingAngle={4}
+                          dataKey="value"
+                          nameKey="fullName"
+                          stroke="none"
+                        >
+                          {incomeParticipation.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={((val: number) => formatCurrency(val)) as any}
+                          contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="cost-centers-page__pie-center">
+                      <span className="text-2xl font-bold">{incomeParticipation.length > 0 ? `${incomeParticipation[0].percentage}%` : '0%'}</span>
+                      <span className="text-xs text-muted-foreground uppercase">{incomeParticipation.length > 0 ? incomeParticipation[0].name : ''}</span>
+                    </div>
+                  </div>
+                  <CustomPieLegend data={incomeParticipation} colors={COLORS} />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="cost-centers-page__chart-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                  Participación en Egresos
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="cost-centers-page__chart-container cost-centers-page__chart-container--pie">
+                <div className="cost-centers-page__pie-wrapper">
+                  <div className="cost-centers-page__pie-main">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={expenseParticipation}
+                          cx="50%"
+                          cy="50%"
+                          innerRadius={70}
+                          outerRadius={100}
+                          paddingAngle={4}
+                          dataKey="value"
+                          nameKey="fullName"
+                          stroke="none"
+                        >
+                          {expenseParticipation.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          formatter={((val: number) => formatCurrency(val)) as any}
+                          contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    <div className="cost-centers-page__pie-center">
+                      <span className="text-2xl font-bold">{expenseParticipation.length > 0 ? `${expenseParticipation[0].percentage}%` : '0%'}</span>
+                      <span className="text-xs text-muted-foreground uppercase">{expenseParticipation.length > 0 ? expenseParticipation[0].name : ''}</span>
+                    </div>
+                  </div>
+                  <CustomPieLegend data={expenseParticipation} colors={COLORS} />
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           {/* Charts Row */}
@@ -183,7 +345,7 @@ export default function CostCentersPage() {
                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(val) => `$${val / 1000000}M`} />
                     <Tooltip
                       contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                      formatter={(val: number | undefined) => (val !== undefined ? formatCurrency(val) : '')}
+                      formatter={((val: any) => (val !== undefined ? formatCurrency(val) : '')) as any}
                     />
                     <Area type="monotone" dataKey="income" name="Ingresos" stroke="hsl(var(--success))" fillOpacity={1} fill="url(#colorIncome)" strokeWidth={2} />
                     <Area type="monotone" dataKey="expenses" name="Egresos" stroke="hsl(var(--danger))" fillOpacity={1} fill="url(#colorExpense)" strokeWidth={2} />
@@ -205,7 +367,7 @@ export default function CostCentersPage() {
                     <Tooltip
                       cursor={{ fill: 'hsl(var(--muted))', opacity: 0.1 }}
                       contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                      formatter={(val: number | undefined) => (val !== undefined ? formatCurrency(val) : '')}
+                      formatter={((val: any) => (val !== undefined ? formatCurrency(val) : '')) as any}
                     />
                     <Bar dataKey="balance" name="Resultado" radius={[4, 4, 0, 0]}>
                       {data.costCenters.map((entry, index) => (

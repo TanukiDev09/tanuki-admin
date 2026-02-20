@@ -14,6 +14,7 @@ import {
   gtZero,
   subtract,
   DecimalValue,
+  isMatchedFinancial,
 } from '@/lib/math';
 import Debt from '@/models/Debt';
 
@@ -63,6 +64,16 @@ export async function GET(
       allocations: (movement.allocations as Allocation[])?.map((a) => ({
         ...a,
         amount: a.amount ? toNumber(a.amount) : 0,
+      })),
+      items: (movement.items as Item[])?.map((item) => ({
+        ...item,
+        quantity: item.quantity ? toNumber(item.quantity) : 0,
+        unitValue: item.unitValue ? toNumber(item.unitValue) : 0,
+        total: item.total ? toNumber(item.total) : 0,
+        catalogPrice: item.catalogPrice
+          ? toNumber(item.catalogPrice)
+          : undefined,
+        discount: item.discount ? toNumber(item.discount) : 0,
       })),
       _id: movement._id.toString(),
     };
@@ -230,7 +241,7 @@ function checkAllocations(
     sumAllocations = add(sumAllocations, allocation.amount);
   }
 
-  if (compare(totalAmount, sumAllocations) !== 0) {
+  if (!isMatchedFinancial(totalAmount, sumAllocations, 10)) {
     return {
       error: `La suma de los detalles (${sumAllocations}) debe ser igual al total del movimiento (${totalAmount})`,
       status: 400,
