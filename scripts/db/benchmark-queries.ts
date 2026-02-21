@@ -4,7 +4,7 @@
  * Mide el tiempo de ejecución de las consultas más comunes
  */
 
-import { MongoClient } from 'mongodb';
+import { MongoClient, Collection, Document, FindOptions } from 'mongodb';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
@@ -29,23 +29,37 @@ interface BenchmarkResult {
   usesIndex: boolean;
 }
 
+interface ExplainResult {
+  executionStats?: {
+    totalDocsExamined?: number;
+    nReturned?: number;
+  };
+  queryPlanner?: {
+    winningPlan?: {
+      inputStage?: {
+        indexName?: string;
+      };
+    };
+  };
+}
+
 async function runBenchmark(
-  collection: any,
+  collection: Collection<Document>,
   queryName: string,
-  query: any,
-  options?: any
+  query: Document,
+  options?: FindOptions
 ): Promise<BenchmarkResult> {
   const startTime = Date.now();
 
   // Ejecutar la consulta
-  const cursor = collection.find(query, options);
-  const results = await cursor.toArray();
+  const cursor = collection.find(query, options || {});
+  await cursor.toArray();
   const executionTime = Date.now() - startTime;
 
   // Obtener plan de ejecución
-  const explain = await collection
-    .find(query, options)
-    .explain('executionStats');
+  const explain = (await collection
+    .find(query, options || {})
+    .explain('executionStats')) as unknown as ExplainResult;
 
   const executionStats = explain.executionStats;
 
@@ -53,8 +67,8 @@ async function runBenchmark(
     query: queryName,
     collection: collection.collectionName,
     executionTime,
-    docsExamined: executionStats.totalDocsExamined || 0,
-    docsReturned: executionStats.nReturned || 0,
+    docsExamined: executionStats?.totalDocsExamined || 0,
+    docsReturned: executionStats?.nReturned || 0,
     indexUsed: explain.queryPlanner?.winningPlan?.inputStage?.indexName || null,
     usesIndex: !!explain.queryPlanner?.winningPlan?.inputStage?.indexName,
   };

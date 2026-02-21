@@ -29,7 +29,7 @@ export function RecentMovements({ movements }: RecentMovementsProps) {
   return (
     <Card className="recent-movements recent-movements--no-border">
       <CardHeader className="recent-movements__header">
-        <CardTitle className="recent-movements__title">
+        <CardTitle as="h2" className="recent-movements__title">
           Movimientos Recientes
         </CardTitle>
       </CardHeader>

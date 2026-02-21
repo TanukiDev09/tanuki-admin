@@ -51,8 +51,15 @@ interface StatsData {
   costCenters: CostCenterStats[];
 }
 
+interface ParticipationItem {
+  name: string;
+  fullName: string;
+  value: number;
+  percentage?: string;
+}
+
 // Custom Legend Component for better legibility
-const CustomPieLegend = ({ data, colors }: { data: any[], colors: string[] }) => {
+const CustomPieLegend = ({ data, colors }: { data: ParticipationItem[], colors: string[] }) => {
   return (
     <div className="cost-centers-page__custom-legend">
       {data.map((entry, index) => (
@@ -141,7 +148,7 @@ export default function CostCentersPage() {
     '#94a3b8', // slate-400 (for Others)
   ];
 
-  const processParticipationData = (type: 'income' | 'expense') => {
+  const processParticipationData = useCallback((type: 'income' | 'expense') => {
     if (!data) return [];
 
     const items = data.costCenters
@@ -159,7 +166,7 @@ export default function CostCentersPage() {
     const topItems = items.slice(0, 5);
     const others = items.slice(5);
 
-    const result = topItems.map(item => ({
+    const result: ParticipationItem[] = topItems.map(item => ({
       ...item,
       percentage: ((item.value / total) * 100).toFixed(1)
     }));
@@ -175,10 +182,10 @@ export default function CostCentersPage() {
     }
 
     return result;
-  };
+  }, [data]);
 
-  const incomeParticipation = useMemo(() => processParticipationData('income'), [data]);
-  const expenseParticipation = useMemo(() => processParticipationData('expense'), [data]);
+  const incomeParticipation = useMemo(() => processParticipationData('income'), [processParticipationData]);
+  const expenseParticipation = useMemo(() => processParticipationData('expense'), [processParticipationData]);
 
   return (
     <div className="cost-centers-page">
@@ -238,7 +245,7 @@ export default function CostCentersPage() {
           <div className="cost-centers-page__participation-grid">
             <Card className="cost-centers-page__chart-card">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                <CardTitle as="h2" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                   Participación en Ingresos
                 </CardTitle>
               </CardHeader>
@@ -248,7 +255,8 @@ export default function CostCentersPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={incomeParticipation}
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          data={incomeParticipation as any}
                           cx="50%"
                           cy="50%"
                           innerRadius={70}
@@ -263,6 +271,7 @@ export default function CostCentersPage() {
                           ))}
                         </Pie>
                         <Tooltip
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                           formatter={((val: number) => formatCurrency(val)) as any}
                           contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
                         />
@@ -280,7 +289,7 @@ export default function CostCentersPage() {
 
             <Card className="cost-centers-page__chart-card">
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                <CardTitle as="h2" className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                   Participación en Egresos
                 </CardTitle>
               </CardHeader>
@@ -290,7 +299,8 @@ export default function CostCentersPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          data={expenseParticipation}
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                          data={expenseParticipation as any}
                           cx="50%"
                           cy="50%"
                           innerRadius={70}
@@ -305,6 +315,7 @@ export default function CostCentersPage() {
                           ))}
                         </Pie>
                         <Tooltip
+                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
                           formatter={((val: number) => formatCurrency(val)) as any}
                           contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
                         />
@@ -325,7 +336,7 @@ export default function CostCentersPage() {
           <div className="cost-centers-page__charts-grid">
             <Card className="cost-centers-page__chart-card">
               <CardHeader>
-                <CardTitle>Evolución de Ingresos vs Egresos</CardTitle>
+                <CardTitle as="h2">Evolución de Ingresos vs Egresos</CardTitle>
               </CardHeader>
               <CardContent className="cost-centers-page__chart-container">
                 <ResponsiveContainer width="100%" height="100%">
@@ -345,7 +356,8 @@ export default function CostCentersPage() {
                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} tickFormatter={(val) => `$${val / 1000000}M`} />
                     <Tooltip
                       contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                      formatter={((val: any) => (val !== undefined ? formatCurrency(val) : '')) as any}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      formatter={((val: number) => (val !== undefined ? formatCurrency(val) : '')) as any}
                     />
                     <Area type="monotone" dataKey="income" name="Ingresos" stroke="hsl(var(--success))" fillOpacity={1} fill="url(#colorIncome)" strokeWidth={2} />
                     <Area type="monotone" dataKey="expenses" name="Egresos" stroke="hsl(var(--danger))" fillOpacity={1} fill="url(#colorExpense)" strokeWidth={2} />
@@ -356,7 +368,7 @@ export default function CostCentersPage() {
 
             <Card className="cost-centers-page__chart-card">
               <CardHeader>
-                <CardTitle>Resultado por Centro</CardTitle>
+                <CardTitle as="h2">Resultado por Centro</CardTitle>
               </CardHeader>
               <CardContent className="cost-centers-page__chart-container">
                 <ResponsiveContainer width="100%" height="100%">
@@ -367,7 +379,8 @@ export default function CostCentersPage() {
                     <Tooltip
                       cursor={{ fill: 'hsl(var(--muted))', opacity: 0.1 }}
                       contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', borderRadius: '8px' }}
-                      formatter={((val: any) => (val !== undefined ? formatCurrency(val) : '')) as any}
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      formatter={((val: number) => (val !== undefined ? formatCurrency(val) : '')) as any}
                     />
                     <Bar dataKey="balance" name="Resultado" radius={[4, 4, 0, 0]}>
                       {data.costCenters.map((entry, index) => (

@@ -142,12 +142,9 @@ function getModuleLabel(module: ModuleName): string {
  * Los admins tienen acceso total sin verificar permisos
  */
 export async function isAdmin(request: NextRequest): Promise<boolean> {
-  const userId = getUserIdFromRequest(request);
+  const userId = await getUserIdFromRequest(request);
   if (!userId) return false;
 
-  // TODO: Implementar verificación de rol
-  // const user = await User.findById(userId);
-  // return user?.role === 'admin';
-
-  return false;
+  const user = await User.findById(userId);
+  return user?.role === 'admin';
 }

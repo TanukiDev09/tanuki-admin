@@ -30,8 +30,15 @@ const toBig = (val: DecimalValue): Big => {
     } else {
       str = String(val);
     }
-    // Remove any formatting spaces if present
-    const cleanStr = str.replace(/\s/g, '').replace(',', '.');
+    // Remove any formatting spaces or thousand separator dots if a comma is present
+    let cleanStr = str.replace(/\s/g, '');
+    if (cleanStr.includes(',') && cleanStr.includes('.')) {
+      // If both are present, assume . is thousand separator and , is decimal
+      cleanStr = cleanStr.replace(/\./g, '').replace(',', '.');
+    } else {
+      // Just one separator or none, handle normally
+      cleanStr = cleanStr.replace(',', '.');
+    }
     return new Big(cleanStr || 0);
   } catch (e) {
     console.warn('Error converting to Big:', val, e);

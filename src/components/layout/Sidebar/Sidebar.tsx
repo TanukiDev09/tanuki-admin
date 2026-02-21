@@ -94,8 +94,7 @@ export function Sidebar() {
           <div className="sidebar__footer">
             <div className="sidebar__footer-line" />
             <div className="sidebar__footer-brand">
-              <p className="sidebar__footer-text">Tanuki Libros v1.0.3</p>
-              <span className="sidebar__footer-paw" title="¡Miau! (o lo que diga un tanuki)">🐾</span>
+              <p className="sidebar__footer-text">Tanuki Libros v1.0.4</p>
             </div>
           </div>
         )}

@@ -72,12 +72,11 @@ export default function InvoicesPage() {
 function InvoicesList() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const initialSearch = searchParams.get('search') || '';
 
   const { toast } = useToast();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
-  const { filters, updateFilters, clearFilters } = usePersistentFilters<InvoiceFilters>({
+  const { filters, updateFilters } = usePersistentFilters<InvoiceFilters>({
     key: 'invoices-filters',
     initialFilters: {
       search: '',
@@ -146,7 +145,7 @@ function InvoicesList() {
     } finally {
       setLoading(false);
     }
-  }, [search, statusFilter, amountRange, sortField, sortOrder, page, limit, toast]);
+  }, [search, bookId, statusFilter, amountRange, sortField, sortOrder, page, limit, toast]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

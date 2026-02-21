@@ -24,6 +24,10 @@ graph TD
         VBlob[Vercel Blob Storage]
     end
 
+    subgraph "External Integrations"
+        DIAN[DIAN - XML UBL 2.1]
+    end
+
     User <--> UI
     UI <--> Context
     Context <--> API
@@ -31,6 +35,7 @@ graph TD
     Permissions <--> Lib
     Lib <--> MongoDB
     Lib <--> VBlob
+    API <--> DIAN
 ```
 
 ## 🛠️ Technology Stack

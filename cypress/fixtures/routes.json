@@ -23,6 +23,7 @@
   "/dashboard/invoices/crear",
   "/dashboard/invoices/id",
   "/dashboard/invoices/id/editar",
+  "/dashboard/invoices/upload-xml",
   "/dashboard/movements",
   "/dashboard/movements/crear",
   "/dashboard/movements/id",

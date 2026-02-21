@@ -11,7 +11,6 @@ import {
   subtract,
   multiply,
   divide,
-  compare,
   toNumber,
   gtZero,
   DecimalValue,

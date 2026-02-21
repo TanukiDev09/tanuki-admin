@@ -1,15 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
   Wallet,
   Search,
   Plus,
-  Users,
   ChevronRight,
   LayoutGrid,
+  TrendingUp,
+  TrendingDown,
+  ArrowUpRight,
+  ArrowDownRight,
+  Filter,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { IDebt } from '@/types/debt';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -22,6 +27,15 @@ import { Badge } from '@/components/ui/Badge';
 
 import './debts-page.scss';
 
+interface GroupedDebt {
+  _id: string;
+  entityName: string;
+  entityType: string;
+  totalDebt: number;
+  debtCount: number;
+  debts: IDebt[];
+}
+
 export default function DebtsPage() {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,15 +43,6 @@ export default function DebtsPage() {
     'all'
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-  interface GroupedDebt {
-    _id: string;
-    entityName: string;
-    entityType: string;
-    totalDebt: number;
-    debtCount: number;
-    debts: IDebt[];
-  }
 
   const { data: groupedDebts, isLoading } = useQuery({
     queryKey: ['debts', 'grouped', typeFilter],
@@ -51,244 +56,300 @@ export default function DebtsPage() {
     },
   });
 
-  const filteredGroups = groupedDebts?.data?.filter((group: GroupedDebt) =>
-    group.entityName?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredGroups = useMemo(() => {
+    return groupedDebts?.data?.filter((group: GroupedDebt) => {
+      const matchesSearch = group.entityName
+        ?.toLowerCase()
+        .includes(searchTerm.toLowerCase());
+      const isNotLiquidated = Math.abs(group.totalDebt) > 0.01;
+      return matchesSearch && isNotLiquidated;
+    });
+  }, [groupedDebts, searchTerm]);
 
-  const totalCobrar =
-    groupedDebts?.data?.reduce(
-      (acc: number, g: GroupedDebt) =>
-        acc +
-        g.debts
-          .filter((d: IDebt) => d.type === 'Cuenta por Cobrar')
-          .reduce(
-            (sum: number, d: IDebt) => sum + Number(d.remainingBalance),
-            0
-          ),
-      0
-    ) || 0;
+  const totals = useMemo(() => {
+    const data = groupedDebts?.data || [];
+    let cobrar = 0;
+    let pagar = 0;
 
-  const totalPagar =
-    groupedDebts?.data?.reduce(
-      (acc: number, g: GroupedDebt) =>
-        acc +
-        g.debts
-          .filter((d: IDebt) => d.type === 'Cuenta por Pagar')
-          .reduce(
-            (sum: number, d: IDebt) => sum + Number(d.remainingBalance),
-            0
-          ),
-      0
-    ) || 0;
+    data.forEach((group: GroupedDebt) => {
+      group.debts.forEach((d: IDebt) => {
+        const amount = Number(d.remainingBalance);
+        if (d.type === 'Cuenta por Cobrar') cobrar += amount;
+        else if (d.type === 'Cuenta por Pagar') pagar += amount;
+      });
+    });
 
-  const netBalance = totalCobrar - totalPagar;
+    return { cobrar, pagar, net: cobrar - pagar };
+  }, [groupedDebts]);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.05,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
 
   return (
     <div className="debts-page">
       <div className="debts-page__container">
         {/* Modern Header */}
-        <div className="debts-page__header">
-          <div className="debts-page__header-info">
-            <h1 className="debts-page__title">Deudas</h1>
-            <p className="debts-page__subtitle">
-              <LayoutGrid className="w-4 h-4" />
-              Gestión centralizada de activos y pasivos
+        <header className="debts-header">
+          <div className="debts-header__content">
+            <h1 className="debts-header__title">Deudas y Obligaciones</h1>
+            <p className="debts-header__description">
+              Control exhaustivo de sus activos y pasivos financieros.
             </p>
           </div>
 
-          <div className="debts-page__header-actions">
+          <div className="debts-header__actions">
             <Button
               variant="outline"
               onClick={() => router.push('/dashboard/movements/crear')}
-              className="debts-page__btn debts-page__btn--outline"
+              className="debts-header__btn debts-header__btn--secondary"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="debts-header__btn-icon" />
               Desde Movimiento
             </Button>
             <Button
               onClick={() => setIsModalOpen(true)}
-              className="debts-page__btn debts-page__btn--primary"
+              className="debts-header__btn debts-header__btn--primary"
             >
-              <Wallet className="w-4 h-4 mr-2" />
+              <Wallet className="debts-header__btn-icon" />
               Nueva Deuda
             </Button>
           </div>
-        </div>
+        </header>
 
-        {/* Unified Summary Header */}
-        <section className="debts-page__summary">
-          <div className="debts-page__summary-content">
-            <div className="debts-page__summary-main">
-              <Badge className="debts-page__summary-badge">BALANCE NETO</Badge>
-              <div className="debts-page__summary-balance">
-                <p
-                  className={cn(
-                    'debts-page__summary-amount',
-                    netBalance >= 0
-                      ? 'debts-page__summary-amount--positive'
-                      : 'debts-page__summary-amount--negative'
-                  )}
-                >
-                  {formatCurrency(netBalance, 'COP')}
-                </p>
-                <p className="debts-page__summary-note">
-                  Diferencia consolidada entre cuentas por cobrar y pagar
+        {/* Global Summary */}
+        <section className="debts-summary">
+          <div className="debts-summary__main">
+            <div className="debts-summary__label">BALANCE NETO CONSOLIDADO</div>
+            <div
+              className={cn(
+                'debts-summary__value',
+                totals.net >= 0
+                  ? 'debts-summary__value--positive'
+                  : 'debts-summary__value--negative'
+              )}
+            >
+              {formatCurrency(totals.net, 'COP')}
+            </div>
+            <div className="debts-summary__indicator">
+              {totals.net >= 0 ? (
+                <TrendingUp className="debts-summary__indicator-icon debts-summary__indicator-icon--positive" />
+              ) : (
+                <TrendingDown className="debts-summary__indicator-icon debts-summary__indicator-icon--negative" />
+              )}
+              <span>
+                {totals.net >= 0 ? 'Superávit Financiero' : 'Déficit de Caja'}
+              </span>
+            </div>
+          </div>
+
+          <div className="debts-summary__details">
+            <div className="debts-summary__stat debts-summary__stat--cobrar">
+              <div className="debts-summary__stat-icon">
+                <ArrowUpRight strokeWidth={3} />
+              </div>
+              <div>
+                <span className="debts-summary__stat-label">Por Cobrar</span>
+                <p className="debts-summary__stat-amount">
+                  {formatCurrency(totals.cobrar, 'COP')}
                 </p>
               </div>
             </div>
 
-            <div className="debts-page__summary-stats">
-              <div className="debts-page__stat-item">
-                <p className="debts-page__stat-label">Por Cobrar</p>
-                <p className="debts-page__stat-value debts-page__stat-value--positive">
-                  {formatCurrency(totalCobrar, 'COP')}
-                </p>
+            <div className="debts-summary__stat debts-summary__stat--pagar">
+              <div className="debts-summary__stat-icon">
+                <ArrowDownRight strokeWidth={3} />
               </div>
-              <div className="debts-page__stat-item">
-                <p className="debts-page__stat-label">Por Pagar</p>
-                <p className="debts-page__stat-value debts-page__stat-value--negative">
-                  {formatCurrency(totalPagar, 'COP')}
+              <div>
+                <span className="debts-summary__stat-label">Por Pagar</span>
+                <p className="debts-summary__stat-amount">
+                  {formatCurrency(totals.pagar, 'COP')}
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Sticky Controls */}
-        <div className="debts-page__controls">
-          <div className="debts-page__search">
-            <Search className="debts-page__search-icon" />
+        {/* Filters/Search */}
+        <div className="debts-toolbar">
+          <div className="debts-toolbar__search">
+            <Search className="debts-toolbar__search-icon" />
             <Input
-              placeholder="Buscar entidad..."
-              aria-label="Buscar entidad"
-              className="debts-page__search-input"
+              placeholder="Buscar por nombre de entidad..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              className="debts-toolbar__input"
             />
           </div>
 
-          <div className="debts-page__filters">
+          <div className="debts-toolbar__filters">
             {(['all', 'cobrar', 'pagar'] as const).map((filter) => (
-              <Button
+              <button
                 key={filter}
-                variant={typeFilter === filter ? 'default' : 'ghost'}
                 onClick={() => setTypeFilter(filter)}
                 className={cn(
-                  'debts-page__filter-btn',
-                  typeFilter === filter
-                    ? 'debts-page__filter-btn--active'
-                    : 'debts-page__filter-btn--ghost'
+                  'debts-toolbar__filter-btn',
+                  typeFilter === filter && 'debts-toolbar__filter-btn--active'
                 )}
               >
-                {filter === 'all' ? 'Ver Todos' : filter}
-              </Button>
+                {filter === 'all'
+                  ? 'Todos'
+                  : filter === 'cobrar'
+                    ? 'Por Cobrar'
+                    : 'Por Pagar'}
+              </button>
             ))}
+            <div className="debts-toolbar__divider" />
+            <Button variant="ghost" size="icon" className="debts-toolbar__action-btn">
+              <Filter className="debts-toolbar__action-icon" />
+            </Button>
           </div>
         </div>
 
-        {/* Dynamic Content */}
+        {/* Content */}
         {isLoading ? (
-          <div className="debts-page__loading">
-            <div className="debts-page__spinner">
-              <div className="debts-page__spinner-track" />
-              <div className="debts-page__spinner-thumb" />
-            </div>
-            <p className="debts-page__loading-text">Consultando Registros...</p>
-          </div>
-        ) : filteredGroups?.length > 0 ? (
-          <div className="debts-page__grid">
-            {filteredGroups.map((group: GroupedDebt) => (
-              <Link
-                key={group._id}
-                href={`/dashboard/debts/entity/${group._id}`}
-                className="group relative"
-              >
-                <Card className="debts-page__entity-card">
-                  <CardContent className="debts-page__entity-content">
-                    <div className="debts-page__entity-header">
-                      <div
-                        className={cn(
-                          'debts-page__entity-icon',
-                          group.entityType === 'Proveedor'
-                            ? 'debts-page__entity-icon--supplier'
-                            : 'debts-page__entity-icon--customer'
-                        )}
-                      >
-                        <Users className="w-8 h-8" />
-                      </div>
-                      <div className="debts-page__entity-info">
-                        <h2 className="debts-page__entity-name">
-                          {group.entityName || 'Entidad'}
-                        </h2>
-                        <Badge
-                          variant="outline"
-                          className="debts-page__entity-badge"
-                        >
-                          {group.entityType}
-                        </Badge>
-                      </div>
-                    </div>
-
-                    <div className="debts-page__entity-footer">
-                      <div className="debts-page__entity-balance">
-                        <p className="debts-page__entity-balance-label">
-                          Saldo Neto
-                        </p>
-                        <p
-                          className={cn(
-                            'debts-page__entity-balance-value',
-                            group.totalDebt >= 0
-                              ? 'debts-page__entity-balance-value--positive'
-                              : 'debts-page__entity-balance-value--negative'
-                          )}
-                        >
-                          {formatCurrency(Math.abs(group.totalDebt), 'COP')}
-                        </p>
-                      </div>
-
-                      <div className="debts-page__entity-meta">
-                        <span className="debts-page__entity-count">
-                          {group.debtCount}{' '}
-                          {group.debtCount === 1
-                            ? 'Obligación'
-                            : 'Obligaciones'}
-                        </span>
-                        <div className="debts-page__entity-link">
-                          DETALLES
-                          <ChevronRight className="w-4 h-4" />
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
+          <div className="debts-loader">
+            <div className="debts-loader__spinner" />
+            <p>Sincronizando flujos de deuda...</p>
           </div>
         ) : (
-          <div className="debts-page__empty">
-            <div className="debts-page__empty-icon">
-              <Search className="w-10 h-10" />
-            </div>
-            <div className="space-y-2">
-              <h2 className="debts-page__empty-title">Sin coincidencias</h2>
-              <p className="debts-page__empty-desc">
-                {searchTerm
-                  ? `No encontramos nada para "${searchTerm}"`
-                  : 'Empieza registrando una nueva deuda para visualizar aquí.'}
-              </p>
-            </div>
-          </div>
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="debts-grid"
+          >
+            <AnimatePresence mode="popLayout">
+              {filteredGroups?.map((group: GroupedDebt) => {
+                const isPositive = group.totalDebt >= 0;
+                const absBalance = Math.abs(group.totalDebt);
+
+                return (
+                  <motion.div
+                    key={group._id}
+                    variants={itemVariants}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <Link
+                      href={`/dashboard/debts/entity/${group._id}`}
+                      className={cn(
+                        'debt-card',
+                        isPositive ? 'debt-card--cobrar' : 'debt-card--pagar'
+                      )}
+                    >
+                      <Card className="debt-card__inner">
+                        <CardContent className="debt-card__content">
+                          <div className="debt-card__header">
+                            <div
+                              className={cn(
+                                'debt-card__indicator',
+                                isPositive
+                                  ? 'debt-card__indicator--cobrar'
+                                  : 'debt-card__indicator--pagar'
+                              )}
+                            >
+                              {isPositive ? (
+                                <ArrowUpRight className="debt-card__indicator-icon" />
+                              ) : (
+                                <ArrowDownRight className="debt-card__indicator-icon" />
+                              )}
+                            </div>
+                            <div className="debt-card__info">
+                              <h3 className="debt-card__name">
+                                {group.entityName}
+                              </h3>
+                              <Badge
+                                variant="outline"
+                                className={cn(
+                                  'debt-card__type-badge',
+                                  isPositive ? 'debt-card__type-badge--cobrar' : 'debt-card__type-badge--pagar'
+                                )}
+                              >
+                                {isPositive ? 'Por Cobrar' : 'Por Pagar'}
+                              </Badge>
+                            </div>
+                          </div>
+
+                          <div className="debt-card__body">
+                            <div className="debt-card__balance">
+                              <span className="debt-card__balance-label">
+                                SALDO NETO
+                              </span>
+                              <div
+                                className={cn(
+                                  'debt-card__balance-value',
+                                  isPositive
+                                    ? 'debt-card__balance-value--positive'
+                                    : 'debt-card__balance-value--negative'
+                                )}
+                              >
+                                {isPositive ? '+' : '-'}
+                                {formatCurrency(absBalance, 'COP')}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="debt-card__footer">
+                            <div className="debt-card__meta">
+                              <LayoutGrid className="debt-card__meta-icon" />
+                              <span>
+                                {group.debtCount}{' '}
+                                {group.debtCount === 1
+                                  ? 'obligación'
+                                  : 'obligaciones'}
+                              </span>
+                            </div>
+                            <div className="debt-card__action">
+                              <ChevronRight className="debt-card__action-icon" />
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </motion.div>
         )}
 
-        {/* Mobile FAB Integration */}
-        <div className="debts-page__fab">
-          <Button
-            onClick={() => setIsModalOpen(true)}
-            className="debts-page__fab-btn"
-          >
-            <Plus className="debts-page__fab-icon" />
-          </Button>
-        </div>
+        {!isLoading && filteredGroups?.length === 0 && (
+          <div className="debts-empty">
+            <div className="debts-empty__visual">
+              <Search className="debts-empty__icon" />
+            </div>
+            <h2 className="debts-empty__title">No se encontraron deudas</h2>
+            <p className="debts-empty__text">
+              {searchTerm
+                ? `No hay resultados para "${searchTerm}"`
+                : 'Todas las deudas han sido liquidadas.'}
+            </p>
+            {searchTerm && (
+              <Button
+                variant="link"
+                onClick={() => setSearchTerm('')}
+                className="debts-empty__clear-btn"
+              >
+                Limpiar búsqueda
+              </Button>
+            )}
+          </div>
+        )}
       </div>
 
       <ManualDebtModal open={isModalOpen} onOpenChange={setIsModalOpen} />

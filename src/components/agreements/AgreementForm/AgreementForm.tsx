@@ -68,8 +68,6 @@ export function AgreementForm({
   });
 
   // Watch values for conditional rendering
-  // TODO: This variable is currently unused. Consider removing or using it.
-  // const paymentType = form.watch('isPublicDomain') ? 'public' : ((form.watch('royaltyPercentage') || 0) > 0 ? 'royalty' : 'cash');
   const contractUrl = form.watch('signedContractUrl');
 
   useEffect(() => {
