@@ -33,6 +33,12 @@
     }
   }
 
+  &__actions {
+    display: flex;
+    gap: $spacing-sm;
+    align-items: center;
+  }
+
   &__title-group {
     display: flex;
     flex-direction: column;
