@@ -1,2 +1,16 @@
-// This file re-exports the main configuration from the config directory
-export { default } from './config/eslint.config.mjs';
+import baseConfig from './config/eslint.config.mjs';
+
+const config = [
+  {
+    ignores: [
+      'debug_db.js',
+      '.next/**',
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+    ],
+  },
+  ...baseConfig,
+];
+
+export default config;

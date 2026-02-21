@@ -12,6 +12,7 @@ interface Movement {
   date: string;
   description: string;
   amount: number | string;
+  relevantAmount?: number | string;
   currency?: string;
   amountInCOP?: number | string;
   type: string;
@@ -28,7 +29,7 @@ export function RecentMovements({ movements }: RecentMovementsProps) {
   return (
     <Card className="recent-movements recent-movements--no-border">
       <CardHeader className="recent-movements__header">
-        <CardTitle className="recent-movements__title">
+        <CardTitle as="h2" className="recent-movements__title">
           Movimientos Recientes
         </CardTitle>
       </CardHeader>
@@ -79,7 +80,11 @@ export function RecentMovements({ movements }: RecentMovementsProps) {
                   >
                     {isIncome ? '+' : '-'}
                     {formatCurrency(
-                      toNumber(movement.amountInCOP || movement.amount),
+                      toNumber(
+                        movement.relevantAmount ??
+                        movement.amountInCOP ??
+                        movement.amount
+                      ),
                       'COP'
                     )}
                     {movement.currency && movement.currency !== 'COP' && (

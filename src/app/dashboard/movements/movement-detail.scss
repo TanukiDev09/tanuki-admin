@@ -1,28 +1,36 @@
-/* stylelint-disable order/properties-order */
+@use 'sass:color';
 @use '../../../styles/variables' as *;
 @use '../../../styles/mixins' as *;
 
 .movement-detail {
-  max-width: 48rem; // max-w-3xl
+  max-width: 64rem;
   margin: 0 auto;
   padding: $spacing-2xl;
+  animation: form-slide-up 0.5s ease-out;
 
   &__back-btn {
     margin-bottom: $spacing-xl;
-    padding-left: 0;
-  }
+    color: $muted-foreground;
+    transition: all $transition-base;
 
-  &__loading,
-  &__error {
-    padding: $spacing-2xl;
-    text-align: center;
+    &:hover {
+      color: $primary;
+      background: rgba($primary, 0.05);
+      transform: translateX(-4px);
+    }
   }
 
   &__header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: $spacing-xl;
+    align-items: flex-end;
+    margin-bottom: $spacing-2xl;
+    gap: $spacing-xl;
+
+    @media (width <= 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
 
   &__actions {
@@ -38,126 +46,346 @@
   }
 
   &__title {
-    font-size: $font-size-2xl;
-    font-weight: $font-weight-bold;
+    font-family: $font-serif;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-black;
+    letter-spacing: -0.03em;
+    background: linear-gradient(
+      135deg,
+      $primary 0%,
+      color.adjust($primary, $lightness: 20%) 100%
+    );
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 0;
+  }
+
+  &__status-row {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    margin-bottom: $spacing-xs;
   }
 
   &__status-badge {
-    font-size: $font-size-sm;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: $font-weight-black;
+    font-size: 10px;
+    padding: 4px 12px;
+    border-radius: $radius-full;
+    background: rgba($primary, 0.05);
+    color: $primary;
+    border: 1px solid rgba($primary, 0.2);
   }
 
-  &__date {
-    font-size: $font-size-sm;
-    color: $muted-foreground;
+  &__id-badge {
+    font-size: 11px;
+    font-family: $font-family-mono;
+    font-weight: $font-weight-bold;
+    color: $primary;
+    background: rgba($primary, 0.1);
+    padding: 2px 8px;
+    border-radius: $radius-sm;
+    letter-spacing: 0.05em;
   }
 
-  &__content {
+  &__actions {
+    display: flex;
+    gap: $spacing-md;
+
+    .movement-detail__edit-btn,
+    .movement-detail__delete-btn {
+      @include button-reset;
+
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      padding: $spacing-md $spacing-xl;
+      border-radius: $radius-lg;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+      transition: all $transition-base;
+      cursor: pointer;
+
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  &__edit-btn {
+    background-color: $primary !important;
+    color: $primary-foreground !important;
+    box-shadow: $shadow-md;
+
+    &:hover {
+      background-color: color.adjust($primary, $lightness: 10%) !important;
+      transform: translateY(-2px);
+      box-shadow: $shadow-lg;
+    }
+  }
+
+  &__delete-btn {
+    background-color: transparent !important;
+    border: 1px solid rgba($danger, 0.3) !important;
+    color: $danger !important;
+
+    &:hover {
+      background-color: rgba($danger, 0.05) !important;
+      border-color: $danger !important;
+      transform: translateY(-2px);
+    }
+  }
+
+  &__container {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: $spacing-2xl;
+
+    @media (width <= 1024px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__main-card {
+    @include glass-effect(0.8, 12px);
+
+    border-radius: $radius-xl;
+    padding: $spacing-2xl;
+    box-shadow: $shadow-xl;
+    border: 1px solid rgb(white, 0.2);
+  }
+
+  &__section {
+    margin-bottom: $spacing-2xl;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    &-title {
+      font-size: $font-size-xs;
+      font-weight: $font-weight-black;
+      color: $primary;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: $spacing-xl;
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+
+      &::after {
+        content: '';
+        flex: 1;
+        height: 1px;
+        background: linear-gradient(to right, rgba($border, 0.8), transparent);
+      }
+    }
+  }
+
+  &__amount-display {
+    text-align: center;
+    padding: $spacing-2xl;
+    background: rgba($primary, 0.03);
+    border-radius: $radius-lg;
+    border: 1px dashed rgba($primary, 0.2);
+    margin-bottom: $spacing-2xl;
+
+    &-label {
+      font-size: 11px;
+      font-weight: $font-weight-black;
+      color: $primary;
+      text-transform: uppercase;
+      margin-bottom: $spacing-sm;
+    }
+
+    &-value {
+      font-size: 3.5rem;
+      font-weight: $font-weight-black;
+      font-family: $font-family-mono;
+      letter-spacing: -0.05em;
+      line-height: 1.1;
+
+      &--income {
+        color: $success;
+      }
+
+      &--expense {
+        color: $danger;
+      }
+    }
+
+    &-hint {
+      margin-top: $spacing-sm;
+      font-size: $font-size-sm;
+      color: $muted-foreground;
+      font-family: $font-family-mono;
+    }
+  }
+
+  &__info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-xl;
+    margin-bottom: $spacing-2xl;
+
+    @media (width <= 640px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &-label {
+      font-size: 10px;
+      font-weight: $font-weight-black;
+      color: $primary;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 2px;
+    }
+
+    &-value {
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      color: $foreground;
+
+      &--mono {
+        font-family: $font-family-mono;
+        letter-spacing: -0.02em;
+      }
+    }
+  }
+
+  &__notes-box {
+    padding: $spacing-lg;
+    background: rgba($muted, 0.3);
+    border-radius: $radius-md;
+    border-left: 4px solid $primary;
+    font-size: $font-size-sm;
+    color: $foreground;
+    line-height: $line-height-relaxed;
+    font-style: italic;
+  }
+
+  &__sidebar {
     display: flex;
     flex-direction: column;
     gap: $spacing-xl;
   }
 
-  &__grid-2 {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: $spacing-md;
-  }
-
-  &__grid-3 {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: $spacing-md;
-  }
-
-  &__label {
-    margin-bottom: $spacing-2xs;
-    font-size: $font-size-sm;
-    font-weight: $font-weight-medium;
-    color: $muted-foreground;
-  }
-
-  &__value {
-    &--income {
-      font-weight: $font-weight-bold;
-      color: $success;
-    }
-
-    &--expense {
-      font-weight: $font-weight-bold;
-      color: $destructive;
-    }
-
-    &--xl {
-      font-size: $font-size-xl;
-      font-weight: $font-weight-bold;
-    }
-  }
-
-  &__notes {
-    white-space: pre-wrap;
-  }
-
-  &__allocation-list {
-    margin-top: $spacing-xs;
-    background: $background;
+  &__side-card {
+    background: $card;
+    border-radius: $radius-xl;
+    padding: $spacing-xl;
     border: 1px solid $border;
-    border-radius: $radius-md;
-    overflow: hidden;
-  }
+    box-shadow: $shadow-md;
 
-  &__allocation-table {
-    width: 100%;
-    font-size: $font-size-sm;
-    border-collapse: collapse;
+    &-title {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-black;
+      margin-bottom: $spacing-lg;
+      display: flex;
+      align-items: center;
+      gap: $spacing-sm;
+      color: $foreground;
 
-    th {
-      padding: $spacing-xs $spacing-sm;
-      background: $muted;
-      color: $muted-foreground;
-      font-size: $font-size-xs;
-      font-weight: $font-weight-medium;
-      text-align: left;
-      text-transform: uppercase;
-
-      &.text-right {
-        text-align: right;
+      svg {
+        width: 18px;
+        height: 18px;
+        color: $primary;
       }
     }
-
-    td {
-      padding: $spacing-xs $spacing-sm;
-      border-top: 1px solid $muted;
-    }
   }
 
-  &__allocation-amount {
-    font-family: $font-family-mono;
-    font-weight: $font-weight-medium;
-    text-align: right;
-  }
-
-  &__link-section {
-    margin-top: $spacing-xl;
-  }
-
-  &__link-title {
+  &__items-list {
     display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__item-row {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: $spacing-xs;
+    padding: $spacing-md;
+    background: rgba($muted, 0.2);
+    border-radius: $radius-md;
+    transition: all $transition-base;
+
+    &:hover {
+      background: rgba($muted, 0.4);
+    }
+
+    &-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    &-name {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+    }
+
+    &-details {
+      font-size: 11px;
+      color: $muted-foreground;
+    }
+
+    &-total {
+      font-family: $font-family-mono;
+      font-weight: $font-weight-bold;
+      color: $primary;
+    }
   }
 
   &__link-card {
     display: flex;
     align-items: center;
     gap: $spacing-md;
-    margin-top: $spacing-xs;
     padding: $spacing-md;
-    background-color: $muted;
+    background: rgba($primary, 0.03);
+    border: 1px solid rgba($primary, 0.1);
     border-radius: $radius-lg;
+    transition: all $transition-base;
+
+    &:hover {
+      background: rgba($primary, 0.06);
+      border-color: rgba($primary, 0.2);
+    }
+
+    &-content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    &-title {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    &-subtitle {
+      font-size: 11px;
+      color: $muted-foreground;
+      display: block;
+    }
   }
 
-  &__link-text {
-    flex: 1;
-    font-size: $font-size-sm;
+  &__loading,
+  &__error {
+    @include flex-center;
+
+    height: 300px;
+    font-size: $font-size-lg;
+    color: $muted-foreground;
+    font-weight: $font-weight-medium;
   }
 }

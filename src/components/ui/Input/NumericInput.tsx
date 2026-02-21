@@ -4,7 +4,7 @@ import * as React from 'react';
 import { Input, InputProps } from './Input';
 import { formatNumber } from '@/lib/utils';
 
-interface NumericInputProps extends Omit<InputProps, 'value' | 'onChange'> {
+export interface NumericInputProps extends Omit<InputProps, 'value' | 'onChange'> {
   value?: number | string;
   onValueChange?: (value: number | undefined) => void;
   allowDecimals?: boolean;
@@ -19,7 +19,10 @@ export const NumericInput = React.forwardRef<
   // Update display value when prop value changes
   React.useEffect(() => {
     if (value === undefined || value === null || value === '') {
-      setDisplayValue('');
+      // Only clear if not in an intermediate state like '-'
+      if (displayValue !== '-') {
+        setDisplayValue('');
+      }
     } else {
       const numValue =
         typeof value === 'string'

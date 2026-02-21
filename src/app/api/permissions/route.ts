@@ -3,7 +3,11 @@ import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import Permission from '@/models/Permission';
-import { BulkUpdatePermissionsDTO } from '@/types/permission';
+import {
+  BulkUpdatePermissionsDTO,
+  PermissionMatrix,
+  IPermission,
+} from '@/types/permission';
 import mongoose from 'mongoose';
 
 // GET /api/permissions - Listar todos los permisos (admin only)
@@ -27,6 +31,19 @@ export async function GET(request: NextRequest) {
     const permissions = await Permission.find(query)
       .populate('userId', 'name email role')
       .sort({ userId: 1, module: 1 });
+
+    // If a userId was provided, return as a matrix for compatibility with PermissionContext
+    if (userId) {
+      const matrix: PermissionMatrix = {};
+      (permissions as unknown as IPermission[]).forEach((perm) => {
+        matrix[perm.module] = perm.actions;
+      });
+
+      return NextResponse.json({
+        success: true,
+        data: matrix,
+      });
+    }
 
     return NextResponse.json({
       success: true,

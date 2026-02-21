@@ -95,6 +95,18 @@
   }
 }
 
+@mixin sm-only {
+  @include respond-to-max('md') {
+    @content;
+  }
+}
+
+@mixin md-only {
+  @media (min-width: $breakpoint-md) and (max-width: #{$breakpoint-lg - 1}) {
+    @content;
+  }
+}
+
 // --- FLEXBOX UTILITIES ---
 
 @mixin flex-center {

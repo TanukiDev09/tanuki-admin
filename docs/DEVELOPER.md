@@ -14,7 +14,14 @@ Bienvenido a la documentación completa del proyecto Tanuki Admin. Esta guía te
 ### 🔌 API y Backend
 
 - [**Guía de Integración de Permisos API**](./api/permissions-integration.md)
-  Cómo implementar y verificar permisos en las rutas API
+  Cómo implementar y verificar permisos en las rutas API.
+
+### 🧾 Gestión Documental y DIAN
+
+- [**Guía de Importación DIAN XML**](./dian-xml-import-guide.md)
+  Procesamiento de facturas electrónicas y uso del wizard web.
+- [**Estructura Técnica XML UBL 2.1**](./dian-xml-structure.md)
+  Análisis de campos y mapeo de datos DIAN.
 
 ### 📦 Módulos de la Aplicación
 
@@ -200,5 +207,5 @@ npm run test:a11y
 
 ---
 
-**Última actualización**: Enero 2026  
-**Versión de documentación**: 1.1
+**Última actualización**: Febrero 2026  
+**Versión de documentación**: 1.2

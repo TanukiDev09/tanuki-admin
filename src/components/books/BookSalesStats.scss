@@ -1,0 +1,188 @@
+.book-sales-stats {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border);
+
+  &__section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: var(--color-foreground);
+    letter-spacing: -0.02em;
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  &__summary-card {
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgb(0 0 0 / 5%);
+    }
+  }
+
+  &__summary-content {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.5rem;
+  }
+
+  &__summary-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    flex-shrink: 0;
+
+    &--blue {
+      background-color: rgb(59 130 246 / 10%);
+      color: #3b82f6;
+    }
+
+    &--green {
+      background-color: rgb(34 197 94 / 10%);
+      color: #22c55e;
+    }
+  }
+
+  &__summary-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__summary-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-muted-foreground);
+    margin-bottom: 0.25rem;
+  }
+
+  &__summary-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-foreground);
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  &__view-invoices {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #3b82f6;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: rgb(59 130 246 / 5%);
+    border-radius: 6px;
+    width: fit-content;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgb(59 130 246 / 10%);
+      text-decoration: underline;
+      transform: translateX(2px);
+    }
+  }
+
+  &__summary-unit {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-muted-foreground);
+  }
+
+  &__chart-card {
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    overflow: hidden;
+  }
+
+  &__chart-header {
+    padding: 1.5rem 1.5rem 0.5rem;
+    border-bottom: none;
+  }
+
+  &__chart-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+
+  &__chart-title-icon {
+    color: var(--color-primary);
+  }
+
+  &__chart-content {
+    padding: 1.5rem;
+  }
+
+  &__chart-scroll-container {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border) transparent;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--color-border);
+      border-radius: 20px;
+    }
+  }
+
+  &__chart-wrapper {
+    min-height: 300px;
+  }
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    color: var(--color-muted-foreground);
+    gap: 1rem;
+  }
+
+  &__loading-spinner {
+    width: 2.5rem;
+    height: 2.5rem;
+    border: 3px solid var(--color-muted);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: book-sales-spinner 0.8s linear infinite;
+  }
+}
+
+@keyframes book-sales-spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}

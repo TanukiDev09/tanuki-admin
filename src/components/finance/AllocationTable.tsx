@@ -4,7 +4,7 @@ import { NumericInput } from '@/components/ui/Input/NumericInput';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
 import { Trash2, Plus } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
-import { add, subtract, compare, toNumber } from '@/lib/math';
+import { add, subtract, compare, toNumber, isMatchedFinancial } from '@/lib/math';
 
 interface Allocation {
   costCenter: string;
@@ -39,7 +39,7 @@ export function AllocationTable({
     '0'
   );
 
-  const isMatched = compare(sumAllocations, totalAmount || '0') === 0;
+  const isMatched = isMatchedFinancial(sumAllocations, totalAmount || '0');
   const difference = subtract(totalAmount || '0', sumAllocations);
 
   return (
@@ -95,23 +95,22 @@ export function AllocationTable({
         <Plus size={14} /> Agregar Asignación
       </button>
 
-      <div className="movement-form__allocation-summary">
-        <div className="movement-form__allocation-summary-label">
-          Total:{' '}
-          <span className="font-semibold">
+      <div className="movement-form__summary-bar">
+        <div className="movement-form__summary-bar-content">
+          <span className="movement-form__summary-bar-label">Total a Distribuir</span>
+          <span className="movement-form__summary-bar-value">
             {formatCurrency(toNumber(totalAmount || 0), currency)}
           </span>
         </div>
 
-        <div className="text-right flex flex-col items-end gap-1">
-          <div className="flex gap-2 items-center">
+        <div className="flex flex-col items-end gap-1">
+          <div className="flex gap-2 items-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             <span>Asignado:</span>
             <span
-              className={`movement-form__allocation-summary-total ${
-                isMatched
-                  ? 'movement-form__allocation-summary-total--match'
-                  : 'movement-form__allocation-summary-total--error'
-              }`}
+              className={`font-mono text-sm ${isMatched
+                ? 'text-success'
+                : 'text-danger'
+                }`}
             >
               {formatCurrency(toNumber(sumAllocations), currency)}
             </span>
@@ -123,11 +122,13 @@ export function AllocationTable({
             </span>
           ) : isMatched ? (
             <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--success">
-              ✓ Distribuido
+              ✓ Distribuido Correctamente
             </span>
           ) : (
             <span className="movement-form__allocation-summary-status movement-form__allocation-summary-status--warning">
-              {formatCurrency(Math.abs(toNumber(difference)), currency)}
+              {compare(difference, '0') > 0
+                ? `Faltan ${formatCurrency(Math.abs(toNumber(difference)), currency)} en asignaciones`
+                : `Sobran ${formatCurrency(Math.abs(toNumber(difference)), currency)} en asignaciones`}
             </span>
           )}
         </div>

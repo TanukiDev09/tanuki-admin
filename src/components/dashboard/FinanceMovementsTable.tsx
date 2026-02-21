@@ -104,21 +104,55 @@ export function FinanceMovementsTable({
                   )}
                 </TableCell>
                 <TableCell>
-                  <span className="text-muted-foreground text-sm">
-                    {m.costCenter || 'N/A'}
-                  </span>
+                  <div className="flex flex-wrap gap-1">
+                    {(() => {
+                      const ccs = new Set<string>();
+                      if (m.costCenter) ccs.add(m.costCenter);
+                      m.items?.forEach((it) => {
+                        if (it.costCenter) ccs.add(it.costCenter);
+                      });
+                      m.allocations?.forEach((al) => {
+                        if (al.costCenter) ccs.add(al.costCenter);
+                      });
+
+                      const ccList = Array.from(ccs);
+                      if (ccList.length === 0)
+                        return (
+                          <span className="text-muted-foreground text-xs italic">
+                            N/A
+                          </span>
+                        );
+
+                      return ccList.map((cc) => (
+                        <Badge
+                          key={cc}
+                          variant="secondary"
+                          className="bg-primary/5 text-primary border-primary/10 font-mono text-[10px] hover:bg-primary/10 transition-colors"
+                        >
+                          {cc}
+                        </Badge>
+                      ));
+                    })()}
+                  </div>
                 </TableCell>
                 <TableCell
                   className={`text-right font-mono ${m.type === 'INCOME' ? 'text-success' : 'text-danger'}`}
                 >
                   <div className="flex flex-col items-end">
-                    <span>
+                    <span className="font-bold">
                       {m.type === 'INCOME' ? '+' : '-'}{' '}
                       {formatCurrency(
-                        toNumber(m.amountInCOP || m.amount || 0),
+                        toNumber(m.relevantAmount ?? m.amountInCOP ?? m.amount ?? 0),
                         'COP'
                       )}
                     </span>
+                    {m.relevantAmount !== undefined &&
+                      m.amountInCOP !== undefined &&
+                      toNumber(m.relevantAmount) !== toNumber(m.amountInCOP) && (
+                        <span className="text-[10px] opacity-60 italic">
+                          de {formatCurrency(toNumber(m.amountInCOP), 'COP')}
+                        </span>
+                      )}
                     {m.currency && m.currency !== 'COP' && (
                       <span className="text-[10px] opacity-70">
                         {' ('}

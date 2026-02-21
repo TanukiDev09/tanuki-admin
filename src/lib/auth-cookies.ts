@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 
 const TOKEN_NAME = 'token';
-const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 export async function setAuthCookie(token: string) {
   try {
@@ -12,7 +12,7 @@ export async function setAuthCookie(token: string) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: ONE_DAY_MS / 1000,
+      maxAge: SEVEN_DAYS_MS / 1000, // 7 days in seconds
     });
   } catch (error) {
     console.error('[Auth Cookies] Error setting cookie:', error);

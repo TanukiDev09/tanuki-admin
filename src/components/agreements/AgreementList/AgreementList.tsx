@@ -10,14 +10,7 @@ import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '@/components/ui/Table';
+import { DataTable, Column } from '@/components/ui/DataTable';
 import { formatNumber } from '@/lib/utils';
 import './AgreementList.scss';
 
@@ -172,6 +165,110 @@ export default function AgreementList({
     }
   };
 
+  const columns: Column<AgreementResponse>[] = [
+    {
+      header: 'Creador',
+      accessorKey: 'creator.name',
+      sortable: true,
+      cell: (agreement) => (
+        <a
+          href={`/dashboard/agreements/${agreement._id}`}
+          className="agreement-list__link"
+        >
+          {(agreement.creator as unknown as ICreator)?.name || 'Desconocido'}
+        </a>
+      ),
+    },
+    {
+      header: 'Rol',
+      accessorKey: 'role',
+      sortable: true,
+      cell: (agreement) => getRoleLabel(agreement.role),
+    },
+    {
+      header: 'Royalties (%)',
+      accessorKey: 'royaltyPercentage',
+      sortable: true,
+      cell: (agreement) =>
+        (agreement as { isPublicDomain?: boolean }).isPublicDomain ? (
+          <Badge variant="outline" className="agreement-list__public-domain">
+            <BookOpen className="agreement-list__icon-sm" />
+            Dominio Público
+          </Badge>
+        ) : (
+          `${formatNumber(agreement.royaltyPercentage)}%`
+        ),
+    },
+    {
+      header: 'Estado',
+      accessorKey: 'status',
+      sortable: true,
+      cell: (agreement) => (
+        <Badge
+          variant={
+            getStatusVariant(agreement.status) as
+            | 'default'
+            | 'secondary'
+            | 'destructive'
+            | 'outline'
+            | 'success'
+            | 'warning'
+          }
+        >
+          {getStatusLabel(agreement.status)}
+        </Badge>
+      ),
+    },
+    {
+      header: 'Contrato',
+      accessorKey: 'signedContractUrl',
+      cell: (agreement) =>
+        agreement.signedContractUrl ? (
+          <a
+            href={`/uploads/contracts/${agreement.signedContractUrl}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="agreement-list__pdf-link"
+          >
+            <FileText className="agreement-list__icon-sm" />
+            PDF
+          </a>
+        ) : (
+          <span className="agreement-list__no-contract">-</span>
+        ),
+    },
+    {
+      header: 'Acciones',
+      accessorKey: '_id',
+      className: 'agreement-list__actions-cell',
+      cell: (agreement) => (
+        <div className="agreement-list__actions">
+          {canUpdate && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEdit(agreement)}
+              title="Editar"
+            >
+              <Edit className="agreement-list__icon" />
+            </Button>
+          )}
+          {canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleDelete(agreement._id)}
+              className="agreement-list__delete-btn"
+              title="Eliminar"
+            >
+              <Trash2 className="agreement-list__icon" />
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="agreement-list">
       {/* Warnings for missing agreements */}
@@ -220,124 +317,12 @@ export default function AgreementList({
       </div>
 
       <div className="agreement-list__table-container">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Creador</TableHead>
-              <TableHead>Rol</TableHead>
-              <TableHead>Royalties (%)</TableHead>
-              <TableHead>Estado</TableHead>
-              <TableHead>Contrato</TableHead>
-              <TableHead className="agreement-list__actions-head">
-                Acciones
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={6} className="agreement-list__loading-cell">
-                  <div className="agreement-list__loading">
-                    <div className="agreement-list__spinner" />
-                    <span>Cargando contratos...</span>
-                  </div>
-                </TableCell>
-              </TableRow>
-            ) : agreements.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="agreement-list__empty-cell">
-                  <span className="agreement-list__empty-text">
-                    No hay contratos registrados para este libro.
-                  </span>
-                </TableCell>
-              </TableRow>
-            ) : (
-              agreements.map((agreement) => (
-                <TableRow key={agreement._id}>
-                  <TableCell className="agreement-list__creator-name">
-                    <a
-                      href={`/dashboard/agreements/${agreement._id}`}
-                      className="agreement-list__link"
-                    >
-                      {(agreement.creator as unknown as ICreator)?.name ||
-                        'Desconocido'}
-                    </a>
-                  </TableCell>
-                  <TableCell>{getRoleLabel(agreement.role)}</TableCell>
-                  <TableCell>
-                    {(agreement as { isPublicDomain?: boolean })
-                      .isPublicDomain ? (
-                      <Badge
-                        variant="outline"
-                        className="agreement-list__public-domain"
-                      >
-                        <BookOpen className="agreement-list__icon-sm" />
-                        Dominio Público
-                      </Badge>
-                    ) : (
-                      `${formatNumber(agreement.royaltyPercentage)}%`
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={
-                        getStatusVariant(agreement.status) as
-                          | 'default'
-                          | 'secondary'
-                          | 'destructive'
-                          | 'outline'
-                          | 'success'
-                          | 'warning'
-                      }
-                    >
-                      {getStatusLabel(agreement.status)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    {agreement.signedContractUrl ? (
-                      <a
-                        href={`/uploads/contracts/${agreement.signedContractUrl}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="agreement-list__pdf-link"
-                      >
-                        <FileText className="agreement-list__icon-sm" />
-                        PDF
-                      </a>
-                    ) : (
-                      <span className="agreement-list__no-contract">-</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="agreement-list__actions-cell">
-                    <div className="agreement-list__actions">
-                      {canUpdate && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEdit(agreement)}
-                          title="Editar"
-                        >
-                          <Edit className="agreement-list__icon" />
-                        </Button>
-                      )}
-                      {canDelete && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(agreement._id)}
-                          className="agreement-list__delete-btn"
-                          title="Eliminar"
-                        >
-                          <Trash2 className="agreement-list__icon" />
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+        <DataTable
+          data={agreements}
+          columns={columns}
+          loading={loading}
+          emptyMessage="No hay contratos registrados para este libro."
+        />
       </div>
 
       {/* Note: AgreementForm will need to be migrated next, for now imports from parent dir */}

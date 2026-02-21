@@ -1,4 +1,4 @@
-# 🐾 Tanuki Admin – Gestión Editorial Profesional
+# Tanuki Admin – Gestión Editorial Profesional
 
 **Tanuki Admin** es la plataforma definitiva diseñada para transformar la administración de editoriales y distribuidoras. Hemos centralizado el control de inventario, la salud financiera y la gestión de catálogo en una interfaz intuitiva y potente, permitiéndote tomar decisiones estratégicas basadas en datos reales.
 
@@ -37,9 +37,13 @@ Optimiza tu stock y llega a más puntos de venta sin perder el control.
 - **Gestión de Puntos de Venta (POS)**: Controla el inventario asignado a librerías y puntos de distribución.
 - **Auditoría Permanente**: Historial completo de movimientos para un inventario siempre preciso.
 
-### 🔐 Seguridad y Permisos Granulares
+### 📑 Gestión Documental Inteligente (DIAN XML)
 
-Tu información es valiosa. Define roles específicos para tu equipo y asegúrate de que cada persona tenga acceso exacto a lo que necesita.
+Automatiza la carga de datos financieros procesando directamente las facturas electrónicas.
+
+- **Importación UBL 2.1**: Extracción automática de datos desde archivos XML de la DIAN.
+- **Wizard de Carga Premium**: Interfaz intuitiva paso a paso para procesar facturas individuales o por lotes.
+- **Automatización de Marketing**: Detección automática de suscriptores al newsletter.
 
 ---
 
@@ -50,10 +54,10 @@ Para obtener más información sobre el funcionamiento detallado del sistema, co
 - [**📘 Guía del Desarrollador**](./DEVELOPER.md) – Configuración, arquitectura y estándares para contribuir.
 - [**✨ Listado de Funcionalidades**](./docs/FEATURES.md) – Detalle de todas las herramientas disponibles.
 - [**🏗️ Arquitectura del Sistema**](./docs/ARCHITECTURE.md) – Para administradores y soporte técnico.
-- [**📑 Índice de Documentación**](./docs/INDICE_DOCS.md) – Acceso a guías de migración, diseño y más.
+- [**📑 Índice de Documentación**](./docs/README.md) – Acceso a guías de migración, diseño y más.
 
 ---
 
-**Versión**: 1.0.2 (Optimización de Estructura)  
+**Versión**: 1.0.4 (DIAN XML Integration & Advanced Analytics)  
 **© 2026 Tanuki SAS.** Todos los derechos reservados.  
 **Soporte**: Equipo de Desarrollo Tanuki Admin

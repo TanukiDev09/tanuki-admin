@@ -11,10 +11,10 @@ import {
   subtract,
   multiply,
   divide,
-  compare,
   toNumber,
   gtZero,
   DecimalValue,
+  isMatchedFinancial,
 } from '@/lib/math';
 
 export const dynamic = 'force-dynamic';
@@ -22,6 +22,18 @@ export const dynamic = 'force-dynamic';
 interface Allocation {
   costCenter: string;
   amount: { toString: () => string } | number;
+}
+
+interface Item {
+  type: 'libro' | 'servicio' | 'otro';
+  description: string;
+  quantity: { toString: () => string } | number;
+  unitValue: { toString: () => string } | number;
+  catalogPrice?: { toString: () => string } | number;
+  discount?: { toString: () => string } | number;
+  total: { toString: () => string } | number;
+  costCenter: string;
+  bookId?: string | { toString: () => string };
 }
 
 interface MovementDoc {
@@ -34,6 +46,8 @@ interface MovementDoc {
   quantity?: { toString: () => string };
   unitValue?: { toString: () => string };
   allocations?: Allocation[];
+  items?: Item[];
+  costCenter?: string;
   [key: string]: unknown;
 }
 
@@ -200,21 +214,56 @@ interface FormattedMovement extends Omit<
 > {
   _id: string;
   amount: number;
+  relevantAmount?: number;
   quantity?: number;
   unitValue?: number;
 }
 
-function formatMovements(movements: MovementDoc[]): FormattedMovement[] {
+function formatMovements(
+  movements: MovementDoc[],
+  costCenterCode?: string
+): FormattedMovement[] {
   return movements.map((m: MovementDoc) => {
     let normalizedType = m.type;
     if (m.type === 'Ingreso') normalizedType = 'INCOME';
     else if (m.type === 'Egreso') normalizedType = 'EXPENSE';
 
+    const amountInCOP = toNumber(m.amountInCOP);
+    let relevantAmount = amountInCOP;
+
+    if (costCenterCode) {
+      if (m.items && m.items.length > 0) {
+        const matchingTotal = m.items.reduce((sum, item) => {
+          const itemCC = item.costCenter || m.costCenter;
+          if (itemCC === costCenterCode) {
+            return add(sum, item.total?.toString() || '0');
+          }
+          return sum;
+        }, '0');
+        relevantAmount = toNumber(
+          multiply(matchingTotal, m.exchangeRate?.toString() || '1')
+        );
+      } else if (m.allocations && m.allocations.length > 0) {
+        const matchingTotal = m.allocations.reduce((sum, alloc) => {
+          if (alloc.costCenter === costCenterCode) {
+            return add(sum, alloc.amount?.toString() || '0');
+          }
+          return sum;
+        }, '0');
+        relevantAmount = toNumber(
+          multiply(matchingTotal, m.exchangeRate?.toString() || '1')
+        );
+      } else if (m.costCenter !== costCenterCode) {
+        relevantAmount = 0;
+      }
+    }
+
     return {
       ...m,
       type: normalizedType,
       amount: toNumber(m.amount),
-      amountInCOP: toNumber(m.amountInCOP),
+      amountInCOP,
+      relevantAmount,
       exchangeRate: toNumber(m.exchangeRate),
       unit: m.unit,
       quantity: m.quantity ? toNumber(m.quantity) : undefined,
@@ -222,6 +271,16 @@ function formatMovements(movements: MovementDoc[]): FormattedMovement[] {
       allocations: m.allocations?.map((a) => ({
         ...a,
         amount: a.amount ? toNumber(a.amount) : 0,
+      })),
+      items: m.items?.map((item) => ({
+        ...item,
+        quantity: item.quantity ? toNumber(item.quantity) : 0,
+        unitValue: item.unitValue ? toNumber(item.unitValue) : 0,
+        total: item.total ? toNumber(item.total) : 0,
+        catalogPrice: item.catalogPrice
+          ? toNumber(item.catalogPrice)
+          : undefined,
+        discount: item.discount ? toNumber(item.discount) : 0,
       })),
       _id: m._id.toString(),
     } as FormattedMovement;
@@ -293,7 +352,11 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Format for frontend (Decimal128 to number)
-    const formattedMovements = formatMovements(movements);
+    const costCenter = searchParams.get('costCenter');
+    const formattedMovements = formatMovements(
+      movements,
+      costCenter || undefined
+    );
 
     const response = NextResponse.json({
       data: formattedMovements,
@@ -367,7 +430,7 @@ function validateAllocations(
     sumAllocations = add(sumAllocations, allocAmount);
   }
 
-  if (compare(amount, sumAllocations) !== 0) {
+  if (!isMatchedFinancial(amount, sumAllocations, 10)) {
     return {
       error: `La suma de los detalles (${sumAllocations}) debe ser igual al total del movimiento (${amount})`,
       status: 400,
@@ -461,6 +524,25 @@ function buildMovementDoc(
     createdAt: new Date(),
   };
 
+  // Normalize items if present
+  let items = body.items;
+  if (items && Array.isArray(items)) {
+    items = items.map((item) => ({
+      ...item,
+      quantity: toNumber(item.quantity).toString(),
+      unitValue: toNumber(item.unitValue).toString(),
+      total: toNumber(item.total).toString(),
+      catalogPrice: item.catalogPrice
+        ? toNumber(item.catalogPrice).toString()
+        : undefined,
+      discount: toNumber(item.discount || 0).toString(),
+      bookId:
+        item.bookId && mongoose.isValidObjectId(item.bookId)
+          ? item.bookId
+          : null,
+    }));
+  }
+
   return {
     ...body,
     amount, // Explicitly set numeric amount
@@ -470,6 +552,7 @@ function buildMovementDoc(
     flowDirection,
     movementType,
     allocations,
+    items, // Set normalized items
     metadata,
     amountInCOP,
     unitValue,
@@ -522,6 +605,14 @@ function formatSingleMovement(
     allocations: obj.allocations?.map((a) => ({
       ...a,
       amount: a.amount ? toNumber(a.amount) : 0,
+    })),
+    items: (obj.items as Item[])?.map((item) => ({
+      ...item,
+      quantity: item.quantity ? toNumber(item.quantity) : 0,
+      unitValue: item.unitValue ? toNumber(item.unitValue) : 0,
+      total: item.total ? toNumber(item.total) : 0,
+      catalogPrice: item.catalogPrice ? toNumber(item.catalogPrice) : undefined,
+      discount: item.discount ? toNumber(item.discount) : 0,
     })),
     _id: movement._id.toString(),
   } as FormattedMovement;

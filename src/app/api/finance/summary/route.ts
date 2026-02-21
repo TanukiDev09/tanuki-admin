@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PipelineStage } from 'mongoose';
 import dbConnect from '@/lib/mongodb';
 import Movement from '@/models/Movement';
 import CostCenter from '@/models/CostCenter';
@@ -72,26 +73,51 @@ function generateRunwayProjection(netBalance: string, netBurnRate: string) {
   return projection;
 }
 
-async function getTotals(matchStage: Record<string, unknown>) {
-  const totalsResponse = await Movement.aggregate([
-    { $match: matchStage },
-    {
+async function getTotals(
+  matchStage: Record<string, unknown>,
+  costCenterCode?: string
+) {
+  const pipeline: PipelineStage[] = [{ $match: matchStage }];
+
+  if (costCenterCode) {
+    // If a cost center filter is applied, we only want the portion of the amount that belongs to it.
+    pipeline.push({
+      $addFields: {
+        finalAmount: GET_CC_PORTION_EXPR(costCenterCode),
+      },
+    });
+
+    pipeline.push({
       $group: {
         _id: '$type',
-        total: { $sum: GET_AMOUNT_EXPR },
+        total: { $sum: '$finalAmount' },
+        quantity: { $sum: { $ifNull: ['$quantity', 0] } },
       },
-    },
-  ]);
+    });
+  } else {
+    pipeline.push({
+      $group: {
+        _id: '$type',
+        total: { $sum: GET_AMOUNT_COP_EXPR },
+        quantity: { $sum: { $ifNull: ['$quantity', 0] } },
+      },
+    });
+  }
+
+  const totalsResponse = await Movement.aggregate(pipeline);
 
   let totalIncome = '0';
   let totalExpenses = '0';
+  let totalQuantity = 0;
 
   totalsResponse.forEach((t) => {
     const val = t.total ? t.total.toString() : '0';
     // Match both Spanish and English types
-    const isIncome = t._id === 'Ingreso' || t._id === 'INCOME';
+    const isIncome =
+      t._id === 'Ingreso' || t._id === 'INCOME' || t._id === 'factura_emitida';
     if (isIncome) {
       totalIncome = add(totalIncome, val);
+      totalQuantity += toNumber(t.quantity || 0);
     } else {
       totalExpenses = add(totalExpenses, val);
     }
@@ -100,15 +126,12 @@ async function getTotals(matchStage: Record<string, unknown>) {
   return {
     totalIncome,
     totalExpenses,
+    totalQuantity,
     netBalance: subtract(totalIncome, totalExpenses),
   };
 }
 
-/**
- * Helper to determine the best amount value for a movement.
- * Prefers amountInCOP if it's strictly positive, otherwise falls back to amount.
- */
-const GET_AMOUNT_EXPR = {
+const GET_AMOUNT_COP_EXPR = {
   $cond: [
     { $gt: [{ $ifNull: ['$amountInCOP', 0] }, 0] },
     '$amountInCOP',
@@ -116,16 +139,162 @@ const GET_AMOUNT_EXPR = {
   ],
 };
 
+const GET_CC_PORTION_EXPR = (ccCode: string) => ({
+  $multiply: [
+    {
+      $cond: {
+        if: {
+          $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }],
+        },
+        then: {
+          $reduce: {
+            input: '$items',
+            initialValue: 0,
+            in: {
+              $add: [
+                '$$value',
+                {
+                  $cond: [
+                    {
+                      $eq: [
+                        { $ifNull: ['$$this.costCenter', '$costCenter'] },
+                        ccCode,
+                      ],
+                    },
+                    { $ifNull: ['$$this.total', 0] },
+                    0,
+                  ],
+                },
+              ],
+            },
+          },
+        },
+        else: {
+          $cond: {
+            if: {
+              $and: [
+                { $isArray: '$allocations' },
+                { $gt: [{ $size: '$allocations' }, 0] },
+              ],
+            },
+            then: {
+              $reduce: {
+                input: '$allocations',
+                initialValue: 0,
+                in: {
+                  $add: [
+                    '$$value',
+                    {
+                      $cond: [
+                        { $eq: ['$$this.costCenter', ccCode] },
+                        { $ifNull: ['$$this.amount', 0] },
+                        0,
+                      ],
+                    },
+                  ],
+                },
+              },
+            },
+            else: {
+              $cond: [{ $eq: ['$costCenter', ccCode] }, GET_AMOUNT_COP_EXPR, 0],
+            },
+          },
+        },
+      },
+    },
+    {
+      $cond: [
+        {
+          $or: [
+            {
+              $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }],
+            },
+            {
+              $and: [
+                { $isArray: '$allocations' },
+                { $gt: [{ $size: '$allocations' }, 0] },
+              ],
+            },
+          ],
+        },
+        { $ifNull: ['$exchangeRate', 1] },
+        1,
+      ],
+    },
+  ],
+});
+
+interface MovementItem {
+  costCenter?: string;
+  total?: { toString(): string } | string | number;
+}
+
+interface MovementAllocation {
+  costCenter?: string;
+  amount?: { toString(): string } | string | number;
+}
+
+function calculateRelevantAmount(
+  plain: {
+    items?: MovementItem[];
+    allocations?: MovementAllocation[];
+    costCenter?: string;
+    exchangeRate?: { toString(): string } | string | number;
+  },
+  amountInCOP: number,
+  costCenterCode?: string
+): number {
+  if (!costCenterCode) return amountInCOP;
+
+  if (plain.items && plain.items.length > 0) {
+    const matchingItemsTotal = plain.items.reduce(
+      (sum: string, item: MovementItem) => {
+        const itemCC = item.costCenter || plain.costCenter;
+        if (itemCC === costCenterCode) {
+          return add(sum, item.total?.toString() || '0');
+        }
+        return sum;
+      },
+      '0'
+    );
+    return toNumber(
+      multiply(matchingItemsTotal, plain.exchangeRate?.toString() || '1')
+    );
+  }
+
+  if (plain.allocations && plain.allocations.length > 0) {
+    const matchingAllocTotal = plain.allocations.reduce(
+      (sum: string, alloc: MovementAllocation) => {
+        if (alloc.costCenter === costCenterCode) {
+          return add(sum, alloc.amount?.toString() || '0');
+        }
+        return sum;
+      },
+      '0'
+    );
+    return toNumber(
+      multiply(matchingAllocTotal, plain.exchangeRate?.toString() || '1')
+    );
+  }
+
+  if (plain.costCenter !== costCenterCode) {
+    return 0;
+  }
+
+  return amountInCOP;
+}
+
 async function getMovements(
   query: Record<string, unknown>,
   page: number,
-  limit: number
+  limit: number,
+  costCenterCode?: string
 ) {
   const skip = (page - 1) * limit;
   const [movements, total] = await Promise.all([
     Movement.find(query)
       .populate('category')
-      .sort({ date: 1 })
+      .sort({ date: -1 })
       .skip(skip)
       .limit(limit),
     Movement.countDocuments(query),
@@ -134,15 +303,29 @@ async function getMovements(
   const formatted = movements.map((m) => {
     const plain = m.toObject();
     let normalizedType = plain.type;
-    if (plain.type === 'Ingreso') normalizedType = 'INCOME';
-    else if (plain.type === 'Egreso') normalizedType = 'EXPENSE';
+
+    if (
+      plain.type === 'Ingreso' ||
+      plain.type === 'INCOME' ||
+      plain.type === 'factura_emitida'
+    )
+      normalizedType = 'INCOME';
+    else normalizedType = 'EXPENSE';
+
+    const amountInCOP = toNumber(plain.amountInCOP || 0);
+    const relevantAmount = calculateRelevantAmount(
+      plain,
+      amountInCOP,
+      costCenterCode
+    );
 
     return {
       ...plain,
       _id: plain._id.toString(),
       type: normalizedType,
       amount: toNumber(plain.amount),
-      amountInCOP: toNumber(plain.amountInCOP),
+      amountInCOP,
+      relevantAmount,
       exchangeRate: toNumber(plain.exchangeRate),
       quantity: plain.quantity ? toNumber(plain.quantity) : undefined,
       unitValue: plain.unitValue ? toNumber(plain.unitValue) : undefined,
@@ -238,18 +421,26 @@ function calculateHealthMetrics(
 
 async function getMonthlyData(
   matchStage: Record<string, unknown>,
-  yearContext?: number
+  yearContext?: number,
+  costCenterCode?: string
 ) {
-  const monthlyData = await Movement.aggregate([
-    { $match: matchStage },
-    {
+  const pipeline: PipelineStage[] = [{ $match: matchStage }];
+
+  if (costCenterCode) {
+    pipeline.push({
+      $addFields: {
+        finalAmount: GET_CC_PORTION_EXPR(costCenterCode),
+      },
+    });
+
+    pipeline.push({
       $group: {
         _id: { year: { $year: '$date' }, month: { $month: '$date' } },
         income: {
           $sum: {
             $cond: [
-              { $in: ['$type', ['Ingreso', 'INCOME']] },
-              GET_AMOUNT_EXPR,
+              { $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']] },
+              '$finalAmount',
               0,
             ],
           },
@@ -257,14 +448,50 @@ async function getMonthlyData(
         expense: {
           $sum: {
             $cond: [
-              { $not: { $in: ['$type', ['Ingreso', 'INCOME']] } },
-              GET_AMOUNT_EXPR,
+              {
+                $not: {
+                  $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']],
+                },
+              },
+              '$finalAmount',
               0,
             ],
           },
         },
       },
-    },
+    });
+  } else {
+    pipeline.push({
+      $group: {
+        _id: { year: { $year: '$date' }, month: { $month: '$date' } },
+        income: {
+          $sum: {
+            $cond: [
+              { $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']] },
+              GET_AMOUNT_COP_EXPR,
+              0,
+            ],
+          },
+        },
+        expense: {
+          $sum: {
+            $cond: [
+              {
+                $not: {
+                  $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']],
+                },
+              },
+              GET_AMOUNT_COP_EXPR,
+              0,
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  const monthlyData = await Movement.aggregate([
+    ...pipeline,
     { $sort: { '_id.year': 1, '_id.month': 1 } },
   ]);
 
@@ -300,7 +527,8 @@ async function getCategoryBreakdown(
   matchStage: Record<string, unknown>,
   startDate: Date | undefined,
   endDate: Date | undefined,
-  isIncome: boolean = false
+  isIncome: boolean = false,
+  costCenterCode?: string
 ) {
   const matchQuery: Record<string, unknown> = {
     ...matchStage,
@@ -313,16 +541,30 @@ async function getCategoryBreakdown(
     matchQuery['date'] = { $gte: startDate, $lte: endDate };
   }
 
-  const categoryBreakdown = await Movement.aggregate([
-    {
-      $match: matchQuery,
-    },
-    {
+  const pipeline: PipelineStage[] = [{ $match: matchQuery }];
+
+  if (costCenterCode) {
+    pipeline.push({
+      $addFields: {
+        finalAmount: GET_CC_PORTION_EXPR(costCenterCode),
+      },
+    });
+    pipeline.push({
       $group: {
         _id: '$category',
-        value: { $sum: GET_AMOUNT_EXPR },
+        value: { $sum: '$finalAmount' },
       },
-    },
+    });
+  } else {
+    pipeline.push({
+      $group: {
+        _id: '$category',
+        value: { $sum: GET_AMOUNT_COP_EXPR },
+      },
+    });
+  }
+
+  pipeline.push(
     {
       $lookup: {
         from: 'categories',
@@ -365,8 +607,10 @@ async function getCategoryBreakdown(
       },
     },
     { $sort: { value: -1 } },
-    { $limit: 15 },
-  ]);
+    { $limit: 15 }
+  );
+
+  const categoryBreakdown = await Movement.aggregate(pipeline);
 
   return categoryBreakdown.map((c) => ({
     name:
@@ -390,8 +634,8 @@ async function getCostCenterBreakdown(
   const matchQuery: Record<string, unknown> = {
     ...matchStage,
     type: isIncome
-      ? { $in: ['Ingreso', 'INCOME'] }
-      : { $nin: ['Ingreso', 'INCOME'] },
+      ? { $in: ['Ingreso', 'INCOME', 'factura_emitida'] }
+      : { $nin: ['Ingreso', 'INCOME', 'factura_emitida'] },
   };
 
   if (startDate && endDate) {
@@ -399,22 +643,80 @@ async function getCostCenterBreakdown(
   }
 
   const breakdown = await Movement.aggregate([
+    { $match: matchQuery },
     {
-      $match: matchQuery,
-    },
-    {
-      $group: {
-        _id: { $ifNull: ['$costCenter', 'Sin definir'] },
-        value: { $sum: GET_AMOUNT_EXPR },
+      $project: {
+        costCenters: {
+          $cond: {
+            if: {
+              $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }],
+            },
+            then: {
+              $map: {
+                input: '$items',
+                as: 'item',
+                in: {
+                  cc: { $ifNull: ['$$item.costCenter', '$costCenter'] },
+                  val: {
+                    $multiply: [
+                      { $ifNull: ['$$item.total', 0] },
+                      { $ifNull: ['$exchangeRate', 1] },
+                    ],
+                  },
+                },
+              },
+            },
+            else: {
+              $cond: {
+                if: {
+                  $and: [
+                    { $isArray: '$allocations' },
+                    { $gt: [{ $size: '$allocations' }, 0] },
+                  ],
+                },
+                then: {
+                  $map: {
+                    input: '$allocations',
+                    as: 'alloc',
+                    in: {
+                      cc: '$$alloc.costCenter',
+                      val: {
+                        $multiply: [
+                          { $ifNull: ['$$alloc.amount', 0] },
+                          { $ifNull: ['$exchangeRate', 1] },
+                        ],
+                      },
+                    },
+                  },
+                },
+                else: [
+                  {
+                    cc: { $ifNull: ['$costCenter', 'Sin definir'] },
+                    val: GET_AMOUNT_COP_EXPR,
+                  },
+                ],
+              },
+            },
+          },
+        },
       },
     },
-    { $sort: { value: isIncome ? -1 : 1 } }, // Expenses are usually positive in this view if they are 'amount', but let's check
-    { $limit: 10 },
+    { $unwind: '$costCenters' },
+    {
+      $group: {
+        _id: '$costCenters.cc',
+        value: {
+          $sum: { $toDouble: '$costCenters.val' },
+        },
+      },
+    },
+    { $sort: { value: isIncome ? -1 : 1 } },
+    { $limit: 15 },
   ]);
 
   return breakdown.map((cc) => ({
-    name: cc._id,
-    value: toNumber(cc.value),
+    name: cc._id || 'Sin definir',
+    value: Math.abs(toNumber(cc.value)),
   }));
 }
 
@@ -422,16 +724,25 @@ async function getDailyData(
   matchStage: Record<string, unknown>,
   startOfMonth: Date,
   endOfMonth: Date,
-  referenceDate: Date
+  referenceDate: Date,
+  costCenterCode?: string
 ) {
-  const dailyData = await Movement.aggregate([
+  const pipeline: PipelineStage[] = [
     {
       $match: {
         ...matchStage,
         date: { $gte: startOfMonth, $lte: endOfMonth },
       },
     },
-    {
+  ];
+
+  if (costCenterCode) {
+    pipeline.push({
+      $addFields: {
+        finalAmount: GET_CC_PORTION_EXPR(costCenterCode),
+      },
+    });
+    pipeline.push({
       $group: {
         _id: {
           day: { $dayOfMonth: '$date' },
@@ -439,8 +750,8 @@ async function getDailyData(
         income: {
           $sum: {
             $cond: [
-              { $in: ['$type', ['Ingreso', 'INCOME']] },
-              GET_AMOUNT_EXPR,
+              { $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']] },
+              '$finalAmount',
               0,
             ],
           },
@@ -448,16 +759,52 @@ async function getDailyData(
         expense: {
           $sum: {
             $cond: [
-              { $not: { $in: ['$type', ['Ingreso', 'INCOME']] } },
-              GET_AMOUNT_EXPR,
+              {
+                $not: {
+                  $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']],
+                },
+              },
+              '$finalAmount',
               0,
             ],
           },
         },
       },
-    },
-    { $sort: { '_id.day': 1 } },
-  ]);
+    });
+  } else {
+    pipeline.push({
+      $group: {
+        _id: {
+          day: { $dayOfMonth: '$date' },
+        },
+        income: {
+          $sum: {
+            $cond: [
+              { $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']] },
+              GET_AMOUNT_COP_EXPR,
+              0,
+            ],
+          },
+        },
+        expense: {
+          $sum: {
+            $cond: [
+              {
+                $not: {
+                  $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']],
+                },
+              },
+              GET_AMOUNT_COP_EXPR,
+              0,
+            ],
+          },
+        },
+      },
+    });
+  }
+
+  pipeline.push({ $sort: { '_id.day': 1 } });
+  const dailyData = await Movement.aggregate(pipeline);
 
   // Fill in missing days
   const year = referenceDate.getFullYear();
@@ -534,6 +881,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const { searchParams } = new URL(request.url);
+    const now = new Date();
     const costCenterParam = searchParams.get('costCenter');
     const groupBy = searchParams.get('groupBy');
 
@@ -574,7 +922,14 @@ export async function GET(request: NextRequest) {
         const cc = await CostCenter.findOne({
           $or: [{ code: costCenterParam }, { name: costCenterParam }],
         });
-        matchStage = { costCenter: cc ? cc.code : costCenterParam };
+        const code = cc ? cc.code : costCenterParam;
+        matchStage = {
+          $or: [
+            { costCenter: code },
+            { 'allocations.costCenter': code },
+            { 'items.costCenter': code },
+          ],
+        };
       } else if (creatorId) {
         const books = await Book.find({
           $or: [
@@ -605,16 +960,24 @@ export async function GET(request: NextRequest) {
       yearParam: string | null,
       monthParam: string | null
     ) {
-      const now = new Date();
+      // 0. Extract cost center code if present for refined totals
+      const costCenterCode = costCenterParam
+        ? (
+            await CostCenter.findOne({
+              $or: [{ code: costCenterParam }, { name: costCenterParam }],
+            })
+          )?.code || costCenterParam
+        : undefined;
 
       // 1. Calculate Totals (for the filtered period)
-      const { totalIncome, totalExpenses, netBalance } =
-        await getTotals(matchStage);
+      const { totalIncome, totalExpenses, totalQuantity, netBalance } =
+        await getTotals(matchStage, costCenterCode);
 
       // 2. Monthly Data
       const { formattedMonthlyData } = await getMonthlyData(
         matchStage,
-        yearParam && !monthParam ? parseInt(yearParam) : undefined
+        yearParam && !monthParam ? parseInt(yearParam) : undefined,
+        costCenterCode
       );
 
       // 3. Category & Cost Center Breakdowns
@@ -624,8 +987,20 @@ export async function GET(request: NextRequest) {
         costCentersExpense,
         costCentersIncome,
       ] = await Promise.all([
-        getCategoryBreakdown(matchStage, startDate, endDate, false),
-        getCategoryBreakdown(matchStage, startDate, endDate, true),
+        getCategoryBreakdown(
+          matchStage,
+          startDate,
+          endDate,
+          false,
+          costCenterCode
+        ),
+        getCategoryBreakdown(
+          matchStage,
+          startDate,
+          endDate,
+          true,
+          costCenterCode
+        ),
         getCostCenterBreakdown(matchStage, startDate, endDate, false),
         getCostCenterBreakdown(matchStage, startDate, endDate, true),
       ]);
@@ -643,7 +1018,8 @@ export async function GET(request: NextRequest) {
           matchStage,
           startDate,
           endDate,
-          startDate
+          startDate,
+          costCenterCode
         );
       }
 
@@ -651,7 +1027,7 @@ export async function GET(request: NextRequest) {
       const page = parseInt(searchParams.get('page') || '1');
       const limit = parseInt(searchParams.get('limit') || '20');
       const { formatted: movements, total: totalMovements } =
-        await getMovements(matchStage, page, limit);
+        await getMovements(matchStage, page, limit, costCenterCode);
 
       // 6. Calculate Balance History (Starting balance before period)
       let balanceData = undefined;
@@ -685,6 +1061,7 @@ export async function GET(request: NextRequest) {
           income: toNumber(totalIncome),
           expenses: toNumber(totalExpenses),
           balance: toNumber(netBalance),
+          totalQuantity: toNumber(totalQuantity),
         },
         period: {
           year: yearParam ? parseInt(yearParam) : now.getFullYear(),

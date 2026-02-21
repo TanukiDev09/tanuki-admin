@@ -129,6 +129,18 @@ node scripts/db/inspect/check_matrix.js
 
 ---
 
+## 🧾 Procesamiento DIAN XML
+
+```bash
+# Importar facturas desde carpeta (Python)
+python scripts/process_dian_invoices.py --folder data/facturas --import
+
+# Ayuda para el script
+python scripts/process_dian_invoices.py --help
+```
+
+---
+
 ## 🛠️ Scripts de Desarrollo
 
 ```bash
@@ -170,9 +182,6 @@ cat docs/README.md
 
 # Ver scripts disponibles
 cat scripts/README.md
-
-# Ver cambios recientes
-cat RESUMEN_REORGANIZACION.md
 
 # Ver sistema de diseño
 cat docs/design/quick-reference.md
@@ -294,10 +303,10 @@ npm run seed:permissions
 
 ## 📚 Más Información
 
-- **Completa**: [README.md](./README.md)
-- **Documentación**: [docs/README.md](./docs/README.md)
-- **Scripts**: [scripts/README.md](./scripts/README.md)
-- **Índice**: [INDICE_DOCS.md](./INDICE_DOCS.md)
+- **Completa**: [README.md](../README.md)
+- **Documentación**: [docs/README.md](./README.md)
+- **Scripts**: [scripts/README.md](../scripts/README.md)
+- **Historial**: [docs/CHANGELOG.md](./CHANGELOG.md)
 
 ---
 

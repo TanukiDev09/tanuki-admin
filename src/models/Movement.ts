@@ -37,6 +37,18 @@ export interface IMovement extends Document {
   receiverName?: string;
   inventoryMovementId?: mongoose.Types.ObjectId | string;
   debtId?: mongoose.Types.ObjectId | string;
+
+  items?: {
+    type: 'libro' | 'servicio' | 'otro';
+    description: string;
+    quantity: mongoose.Types.Decimal128;
+    unitValue: mongoose.Types.Decimal128;
+    catalogPrice?: mongoose.Types.Decimal128;
+    discount?: mongoose.Types.Decimal128;
+    total: mongoose.Types.Decimal128;
+    costCenter: string;
+    bookId?: mongoose.Types.ObjectId | string;
+  }[];
 }
 
 const MovementSchema: Schema = new Schema(
@@ -86,6 +98,20 @@ const MovementSchema: Schema = new Schema(
       type: Schema.Types.ObjectId,
       ref: 'Debt',
     },
+    items: [
+      {
+        _id: false,
+        type: { type: String, enum: ['libro', 'servicio', 'otro'] },
+        description: { type: String },
+        quantity: { type: Schema.Types.Decimal128 },
+        unitValue: { type: Schema.Types.Decimal128 },
+        catalogPrice: { type: Schema.Types.Decimal128 },
+        discount: { type: Schema.Types.Decimal128, default: 0 },
+        total: { type: Schema.Types.Decimal128 },
+        costCenter: { type: String },
+        bookId: { type: Schema.Types.ObjectId, ref: 'Book' },
+      },
+    ],
   },
   {
     strict: false, // Allow other fields that might be required by the DB validator

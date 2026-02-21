@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-02-20
+
+### ✨ Nuevas Características
+
+- **Importación de Facturas XML (DIAN)**:
+  - **Procesamiento UBL 2.1**: Soporte completo para el estándar de factura electrónica de la DIAN Colombia.
+  - **Carga Masiva Web**: Nueva interfaz premium con wizard de 3 pasos (Cargar → Procesar → Confirmar) y efectos glassmorphism.
+  - **Script de Automatización Python**: Herramienta de línea de comandos para importación recursiva de carpetas completas de XML.
+  - **Detección de Newsletter**: Identificación automática de suscriptores basada en el tipo de documento y actividad de compra.
+- **Control Financiero de Alta Precisión**:
+  - **Monto Total Fijo**: Bloqueo del monto principal en movimientos para garantizar la integridad de la distribución.
+  - **Validación en Tiempo Real**: Feedback visual dinámico (Badges y alertas) sobre faltantes o sobrantes en asignaciones.
+  - **Tolerancia Inteligente**: Margen de ± $5 para evitar bloqueos por discrepancias de redondeo decimal.
+- **Analítica Avanzada**:
+  - **Gráficos de Participación**: Nuevas visualizaciones (Donut Charts) para la contribución de centros de costo en ingresos y gastos.
+  - **Métricas de Sostenibilidad**: Integración de Runway y Burn Rate por centro de costo.
+
+### 🚀 Mejoras & UX
+
+- **Refactor de Interfaz (Two-Line Layout)**: Optimización del listado de ítems en facturas para mejorar la legibilidad y evitar truncado de texto.
+- **Automatización Inteligente**: Auto-asignación de Centro de Costo al seleccionar libros del catálogo.
+- **Persistencia de Sesión**: Mejoras en el middleware para una experiencia de usuario más fluida entre pestañas.
+
+### 🛠️ Calidad Técnica
+
+- **Seguridad "Zero Hardcode"**: Auditoría y limpieza total de credenciales en el código fuente.
+- **Optimización de Base de Datos**: Estrategia de índices y search indexes para consultas masivas en movimientos y deudas.
+- **Sincronización de Datos**: Mejora en la preservación de descripciones originales al vincular productos del catálogo.
+
+---
+
 ## [1.0.3] - 2026-01-31
 
 ### ✨ Nuevas Características

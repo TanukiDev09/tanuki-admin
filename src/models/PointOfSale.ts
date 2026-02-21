@@ -78,6 +78,7 @@ const PointOfSaleSchema: Schema = new Schema(
           phone: { type: String },
           position: { type: String },
         },
+        { _id: false },
       ],
       default: [],
     },

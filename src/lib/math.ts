@@ -30,8 +30,15 @@ const toBig = (val: DecimalValue): Big => {
     } else {
       str = String(val);
     }
-    // Remove any formatting spaces if present
-    const cleanStr = str.replace(/\s/g, '').replace(',', '.');
+    // Remove any formatting spaces or thousand separator dots if a comma is present
+    let cleanStr = str.replace(/\s/g, '');
+    if (cleanStr.includes(',') && cleanStr.includes('.')) {
+      // If both are present, assume . is thousand separator and , is decimal
+      cleanStr = cleanStr.replace(/\./g, '').replace(',', '.');
+    } else {
+      // Just one separator or none, handle normally
+      cleanStr = cleanStr.replace(',', '.');
+    }
     return new Big(cleanStr || 0);
   } catch (e) {
     console.warn('Error converting to Big:', val, e);
@@ -87,6 +94,34 @@ export const toFixed = (val: DecimalValue, dp: number = 2): string =>
  */
 export const compare = (a: DecimalValue, b: DecimalValue): number =>
   toBig(a).cmp(toBig(b));
+
+/**
+ * Compares two decimal values rounded to a specific precision (default 2).
+ * Returns 0 if they are equal when rounded.
+ */
+export const compareFinancial = (
+  a: DecimalValue,
+  b: DecimalValue,
+  precision: number = 2
+): number => {
+  const aRounded = toBig(a).toFixed(precision);
+  const bRounded = toBig(b).toFixed(precision);
+  if (aRounded === bRounded) return 0;
+  return toBig(aRounded).cmp(toBig(bRounded));
+};
+
+/**
+ * Checks if two decimal values are close enough within a given tolerance.
+ * Default tolerance is 5 units (e.g., 5 pesos).
+ */
+export const isMatchedFinancial = (
+  a: DecimalValue,
+  b: DecimalValue,
+  tolerance: number = 5
+): boolean => {
+  const diff = toBig(a).minus(toBig(b)).abs();
+  return diff.lte(tolerance);
+};
 
 /**
  * Checks if a value is greater than zero.

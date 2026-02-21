@@ -100,7 +100,9 @@ export default function CostCenterSelect({
         throw new Error(data.error || 'Error al crear centro de costo');
       }
 
-      setCostCenters([...costCenters, data.data]);
+      setCostCenters((prev) =>
+        [...prev, data.data].sort((a, b) => a.code.localeCompare(b.code))
+      );
       onValueChange(data.data.code);
 
       setShowNewModal(false);

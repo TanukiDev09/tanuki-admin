@@ -1,13 +1,6 @@
 'use client';
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/Table';
+import { DataTable, Column } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -132,6 +125,130 @@ export function InventoryMovementsList({
     }
   };
 
+  const canGeneratePDF = (type: string) => {
+    return type === 'REMISION' || type === 'DEVOLUCION';
+  };
+
+  const columns: Column<Movement>[] = [
+    {
+      header: 'Fecha',
+      accessorKey: 'date',
+      sortable: true,
+      cell: (movement) =>
+        format(new Date(movement.date), 'dd/MM/yyyy HH:mm', {
+          locale: es,
+        }),
+      className: 'inventory-movements-list__date',
+    },
+    {
+      header: 'Tipo',
+      accessorKey: 'type',
+      sortable: true,
+      cell: (movement) => <Badge variant="outline">{movement.type}</Badge>,
+    },
+    {
+      header: 'Origen / Destino',
+      accessorKey: 'fromWarehouseId.name',
+      sortable: true,
+      cell: (movement) => (
+        <div className="inventory-movements-list__route">
+          {movement.fromWarehouseId && (
+            <span className="inventory-movements-list__route-from">
+              De: {movement.fromWarehouseId.name}
+            </span>
+          )}
+          {movement.toWarehouseId && (
+            <span className="inventory-movements-list__route-to">
+              A: {movement.toWarehouseId.name}
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      header: 'Items',
+      accessorKey: 'items',
+      cell: (movement) => (
+        <div className="inventory-movements-list__items-list">
+          {movement.items.map((item, idx) => (
+            <div key={idx} className="inventory-movements-list__item">
+              {formatNumber(item.quantity)} x{' '}
+              {item.bookId?.title || 'Libro desconocido'}
+            </div>
+          ))}
+        </div>
+      ),
+    },
+    {
+      header: 'Usuario',
+      accessorKey: 'createdBy.name',
+      sortable: true,
+      cell: (movement) => movement.createdBy?.name || 'Sistema',
+      className: 'inventory-movements-list__user',
+    },
+    {
+      header: 'Acciones',
+      accessorKey: '_id',
+      className: 'inventory-movements-list__actions',
+      cell: (movement) => (
+        <div className="inventory-movements-list__actions-group">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push(`/dashboard/inventory/${movement._id}`)}
+            title="Ver Detalles"
+          >
+            <Eye className="inventory-movements-list__icon" />
+          </Button>
+
+          {canGeneratePDF(movement.type) && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                if (movement.fromWarehouseId && movement.toWarehouseId) {
+                  generateMovementPDF(
+                    movement as Parameters<typeof generateMovementPDF>[0],
+                    editorialSettings
+                  );
+                }
+              }}
+              title="Descargar PDF"
+            >
+              <FileText className="inventory-movements-list__icon" />
+            </Button>
+          )}
+          {movement.financialMovementId && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                const id =
+                  typeof movement.financialMovementId === 'object'
+                    ? movement.financialMovementId?._id
+                    : movement.financialMovementId;
+                if (id) window.open(`/dashboard/movements/${id}`, '_blank');
+              }}
+              title="Ver Movimiento Financiero"
+            >
+              <ExternalLink className="inventory-movements-list__icon text-primary" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-red-500 hover:text-red-700 hover:bg-red-50"
+            onClick={() => handleDelete(movement._id)}
+            disabled={isDeleting === movement._id}
+            title="Eliminar Movimiento"
+          >
+            <Trash2 className="inventory-movements-list__icon" />
+          </Button>
+        </div>
+      ),
+    },
+  ];
+
   if (isLoading) {
     return (
       <div className="inventory-movements-list__loading">
@@ -148,124 +265,13 @@ export function InventoryMovementsList({
     );
   }
 
-  const canGeneratePDF = (type: string) => {
-    return type === 'REMISION' || type === 'DEVOLUCION';
-  };
-
   return (
     <div className="inventory-movements-list">
-      <Table className="inventory-movements-list__table">
-        <TableHeader>
-          <TableRow>
-            <TableHead>Fecha</TableHead>
-            <TableHead>Tipo</TableHead>
-            <TableHead>Origen / Destino</TableHead>
-            <TableHead>Items</TableHead>
-            <TableHead>Usuario</TableHead>
-            <TableHead className="inventory-movements-list__actions-head">
-              Acciones
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {movements.map((movement) => (
-            <TableRow key={movement._id}>
-              <TableCell className="inventory-movements-list__date">
-                {format(new Date(movement.date), 'dd/MM/yyyy HH:mm', {
-                  locale: es,
-                })}
-              </TableCell>
-              <TableCell>
-                <Badge variant="outline">{movement.type}</Badge>
-              </TableCell>
-              <TableCell>
-                <div className="inventory-movements-list__route">
-                  {movement.fromWarehouseId && (
-                    <span className="inventory-movements-list__route-from">
-                      De: {movement.fromWarehouseId.name}
-                    </span>
-                  )}
-                  {movement.toWarehouseId && (
-                    <span className="inventory-movements-list__route-to">
-                      A: {movement.toWarehouseId.name}
-                    </span>
-                  )}
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="inventory-movements-list__items-list">
-                  {movement.items.map((item, idx) => (
-                    <div key={idx} className="inventory-movements-list__item">
-                      {formatNumber(item.quantity)} x{' '}
-                      {item.bookId?.title || 'Libro desconocido'}
-                    </div>
-                  ))}
-                </div>
-              </TableCell>
-              <TableCell className="inventory-movements-list__user">
-                {movement.createdBy?.name || 'Sistema'}
-              </TableCell>
-              <TableCell className="inventory-movements-list__actions">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() =>
-                    router.push(`/dashboard/inventory/${movement._id}`)
-                  }
-                  title="Ver Detalles"
-                >
-                  <Eye className="inventory-movements-list__icon" />
-                </Button>
-
-                {canGeneratePDF(movement.type) && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      if (movement.fromWarehouseId && movement.toWarehouseId) {
-                        generateMovementPDF(
-                          movement as Parameters<typeof generateMovementPDF>[0],
-                          editorialSettings
-                        );
-                      }
-                    }}
-                    title="Descargar PDF"
-                  >
-                    <FileText className="inventory-movements-list__icon" />
-                  </Button>
-                )}
-                {movement.financialMovementId && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      const id =
-                        typeof movement.financialMovementId === 'object'
-                          ? movement.financialMovementId?._id
-                          : movement.financialMovementId;
-                      if (id)
-                        window.open(`/dashboard/movements/${id}`, '_blank');
-                    }}
-                    title="Ver Movimiento Financiero"
-                  >
-                    <ExternalLink className="inventory-movements-list__icon text-primary" />
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                  onClick={() => handleDelete(movement._id)}
-                  disabled={isDeleting === movement._id}
-                  title="Eliminar Movimiento"
-                >
-                  <Trash2 className="inventory-movements-list__icon" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <DataTable
+        data={movements}
+        columns={columns}
+        emptyMessage="No hay movimientos recientes"
+      />
     </div>
   );
 }
