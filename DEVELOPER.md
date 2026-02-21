@@ -8,10 +8,10 @@ Esta guía proporciona la información necesaria para configurar el entorno de d
 
 Para poner en marcha el proyecto localmente, sigue estos pasos:
 
-1.  **Requisitos**: Node.js 20+ y una instancia de MongoDB.
+1.  **Requisitos**: Node.js 20+, MongoDB, Python 3.10+ (para scripts de automatización).
 2.  **Instalación**: `npm install`
 3.  **Configuración**:
-    - `cp .env.example .env` y configura tus credenciales de MongoDB y JWT.
+    - `cp .env.example .env.local` y configura tus credenciales de MongoDB y JWT.
 4.  **Base de Datos**:
     - `npm run seed:permissions` para inicializar la matriz de permisos.
 5.  **Servidor de Desarrollo**: `npm run dev`
@@ -26,6 +26,7 @@ El proyecto está construido con un stack moderno y escalable:
 - **Backend**: Next.js API Routes, Mongoose (MongoDB).
 - **Estilos**: Sistema híbrido SASS (BEM) + Tailwind CSS.
 - **Estado**: TanStack Query para sincronización de servidor.
+- **Automatización**: Python 3 para procesamiento masivo de facturas XML.
 
 > [!NOTE]
 > Para un análisis profundo de la estructura técnica, consulta la [**Arquitectura del Sistema**](./docs/ARCHITECTURE.md).

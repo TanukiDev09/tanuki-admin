@@ -14,6 +14,7 @@ import { Separator } from '@/components/ui/Separator';
 import { CreatorResponse } from '@/types/creator';
 import BookFinancials from '@/components/books/BookFinancials';
 import BookInventorySummary from '@/components/books/BookInventorySummary';
+import BookSalesStats from '@/components/books/BookSalesStats';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency, formatNumber } from '@/lib/utils';
@@ -302,6 +303,10 @@ export default function BookDetailPage(props: {
 
           {/* Single Column Section - Financials, Inventory, Credits, and Agreements */}
           <div className="book-detail__extra-section">
+            <Separator />
+
+            {/* Sales Stats and Historical Chart */}
+            <BookSalesStats bookId={book._id} />
             <Separator />
 
             {/* Cost Center Financials */}

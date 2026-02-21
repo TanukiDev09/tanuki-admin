@@ -5,11 +5,14 @@
   display: flex;
   flex-direction: column;
   gap: $spacing-xl;
+  padding-bottom: $spacing-2xl;
 
   &__header {
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
+    border-bottom: 1px solid $border;
+    padding-bottom: $spacing-xl;
 
     @include md {
       flex-direction: row;
@@ -26,9 +29,9 @@
 
   &__title {
     color: $foreground;
-    font-size: 2rem;
+    font-size: 2.25rem;
     font-weight: $font-weight-bold;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.025em;
   }
 
   &__subtitle {
@@ -36,19 +39,209 @@
     font-size: $font-size-base;
   }
 
-  &__icon {
-    width: 18px;
-    height: 18px;
-    margin-right: $spacing-xs;
+  &__stats-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+
+    @include md {
+      grid-template-columns: repeat(3, 1fr);
+    }
   }
 
-  &__controls {
+  &__participation-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+
+    @include lg {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    min-width: 0;
+  }
+
+  &__charts-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+
+    @include lg {
+      grid-template-columns: 3fr 2fr;
+    }
+
+    min-width: 0;
+  }
+
+  &__chart-card {
+    background-color: $card;
+    border-radius: $radius-lg;
+    border: 1px solid $border;
+    box-shadow: $shadow-sm;
+    transition: $transition-base;
+
+    &:hover {
+      box-shadow: $shadow-md;
+    }
+  }
+
+  &__chart-container {
+    height: 300px;
+    padding: $spacing-lg;
+    padding-top: 0;
+    min-width: 0;
+    overflow: hidden;
+
+    &--pie {
+      height: auto;
+      min-height: 400px;
+      padding: $spacing-xl;
+    }
+  }
+
+  &__pie-wrapper {
     display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+    height: 100%;
+    align-items: center;
+
+    @include md {
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+    }
+  }
+
+  &__pie-main {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    flex-shrink: 0;
+  }
+
+  &__pie-center {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+
+  &__custom-legend {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    flex: 1;
+    min-width: 200px;
+  }
+
+  &__legend-item {
+    display: flex;
+    align-items: center;
     gap: $spacing-md;
+    padding: $spacing-xs $spacing-sm;
+    border-radius: $radius-md;
+    transition: $transition-fast;
+
+    &:hover {
+      background-color: $muted;
+    }
+  }
+
+  &__legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
+  &__legend-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__legend-name {
+    font-size: $font-size-sm;
+    color: $foreground;
+    font-weight: $font-weight-medium;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+  }
+
+  &__legend-percentage {
+    font-size: $font-size-sm;
+    color: $muted-foreground;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__table-section {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+    background-color: $card;
+    border-radius: $radius-lg;
+    border: 1px solid $border;
+    padding: $spacing-lg;
+    box-shadow: $shadow-sm;
+  }
+
+  &__table-header {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+
+    @include md {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  &__search-container {
+    position: relative;
+    width: 100%;
     max-width: 400px;
   }
 
+  &__search-icon {
+    position: absolute;
+    left: $spacing-md;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    color: $muted-foreground;
+    pointer-events: none;
+    z-index: 1;
+  }
+
   &__search {
-    background-color: $card;
+    padding-left: 2.5rem;
+    background-color: $muted;
+    border-color: transparent;
+    transition: $transition-fast;
+
+    &:focus {
+      background-color: $card;
+      border-color: $primary;
+    }
+  }
+
+  &__new-btn {
+    box-shadow: $shadow-sm;
+    transition: $transition-base;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: $shadow-md;
+    }
   }
 }

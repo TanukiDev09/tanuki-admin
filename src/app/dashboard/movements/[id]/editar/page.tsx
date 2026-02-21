@@ -17,16 +17,14 @@ import {
 import { useToast } from '@/components/ui/Toast';
 import { ArrowLeft } from 'lucide-react';
 import { UpdateMovementDTO } from '@/types/movement';
-import { CategorySelect } from '@/components/finance/CategorySelect';
-import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
 import { POSSelect } from '@/components/admin/POSSelect/POSSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency } from '@/lib/utils';
-import { multiply, divide, gtZero, add, toNumber, compare } from '@/lib/math';
+import { multiply, divide, gtZero, add, toNumber, isMatchedFinancial } from '@/lib/math';
 import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
-import { AllocationTable } from '@/components/finance/AllocationTable';
-import { DebtSelect } from '@/components/finance/DebtSelect';
+import { MovementItemsTable } from '@/components/finance/MovementItemsTable';
+import { GeneralInfoSection, AllocationSection } from '@/components/finance/MovementFormSections';
 import '../../movement-form.scss';
 
 export default function EditMovementPage() {
@@ -36,6 +34,7 @@ export default function EditMovementPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState<Partial<UpdateMovementDTO>>({});
+  const [useItems, setUseItems] = useState(false);
   const [useMultiCostCenter, setUseMultiCostCenter] = useState(false);
   const [allocationError, setAllocationError] = useState<string | null>(null);
   const { hasPermission } = usePermission();
@@ -60,9 +59,11 @@ export default function EditMovementPage() {
         const m = data.data;
 
         // Determine if we should start in multi-cost center mode
-        const hasMultipleAllocations =
-          m.allocations && m.allocations.length > 1;
+        const hasMultipleAllocations = m.allocations && m.allocations.length > 1;
         setUseMultiCostCenter(hasMultipleAllocations);
+
+        const hasItems = m.items && m.items.length > 0;
+        setUseItems(hasItems);
 
         setFormData({
           ...m,
@@ -141,6 +142,71 @@ export default function EditMovementPage() {
     });
   };
 
+  const addItem = () => {
+    setFormData((prev) => ({
+      ...prev,
+      items: [
+        ...(prev.items || []),
+        {
+          type: 'servicio',
+          description: '',
+          quantity: 1,
+          unitValue: 0,
+          total: 0,
+          costCenter: prev.costCenter || '',
+        },
+      ],
+    }));
+  };
+
+  const removeItem = (index: number) => {
+    setFormData((prev) => {
+      const newItems = (prev.items || []).filter((_, i) => i !== index);
+
+
+      return {
+        ...prev,
+        items: newItems,
+      };
+    });
+  };
+
+  const handleItemChange = (
+    index: number,
+    field: string,
+    value: string | number | boolean | null | undefined
+  ) => {
+    setFormData((prev) => {
+      const newItems = [...(prev.items || [])];
+      newItems[index] = { ...newItems[index], [field]: value };
+
+
+      const newQuantity = newItems.reduce((sum, item) => add(sum, item.quantity || '0'), '0');
+
+      // Auto-generate allocations from items if using items
+      const ccMap: Record<string, string> = {};
+      newItems.forEach(item => {
+        if (item.costCenter) {
+          ccMap[item.costCenter] = add(ccMap[item.costCenter] || '0', item.total || '0');
+        }
+      });
+
+      const newAllocations = Object.entries(ccMap).map(([costCenter, amount]) => ({
+        costCenter,
+        amount
+      }));
+
+      setUseMultiCostCenter(newAllocations.length > 1);
+
+      return {
+        ...prev,
+        items: newItems,
+        quantity: newQuantity,
+        allocations: newAllocations,
+      };
+    });
+  };
+
   const addAllocation = () => {
     setFormData((prev) => ({
       ...prev,
@@ -161,7 +227,7 @@ export default function EditMovementPage() {
   };
 
   const validateAllocations = () => {
-    if (!useMultiCostCenter) return true;
+    if (!useMultiCostCenter && !useItems) return true;
 
     const allocations = formData.allocations || [];
     if (allocations.length === 0) {
@@ -175,7 +241,7 @@ export default function EditMovementPage() {
     );
     const totalAmount = formData.amount || '0';
 
-    if (compare(totalAllocated, totalAmount) !== 0) {
+    if (!isMatchedFinancial(totalAllocated, totalAmount, 10)) {
       setAllocationError(
         `La suma de asignaciones (${formatCurrency(toNumber(totalAllocated), formData.currency)}) no coincide con el total (${formatCurrency(toNumber(totalAmount), formData.currency)})`
       );
@@ -219,15 +285,15 @@ export default function EditMovementPage() {
         fiscalYear: formData.date
           ? new Date(formData.date).getFullYear()
           : new Date().getFullYear(),
-        allocations: useMultiCostCenter
+        allocations: (useMultiCostCenter || useItems)
           ? formData.allocations
           : [
-              {
-                costCenter: formData.costCenter || '01T001',
-                amount: Number(formData.amount) || 0,
-              },
-            ],
-        costCenter: useMultiCostCenter
+            {
+              costCenter: formData.costCenter || '01T001',
+              amount: Number(formData.amount) || 0,
+            },
+          ],
+        costCenter: (useMultiCostCenter || useItems)
           ? formData.allocations?.[0]?.costCenter || ''
           : formData.costCenter,
       };
@@ -276,141 +342,7 @@ export default function EditMovementPage() {
     );
   }
 
-  const renderGeneralInfo = () => (
-    <div className="movement-form__section">
-      <h2 className="movement-form__section-title">Información General</h2>
-      <div className="movement-form__grid movement-form__grid--2">
-        <div className="movement-form__field-group">
-          <Label htmlFor="type">Tipo</Label>
-          <Select
-            value={formData.type}
-            onValueChange={(val) => handleSelectChange('type', val)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona tipo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="INCOME">Ingreso</SelectItem>
-              <SelectItem value="EXPENSE">Egreso</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
 
-        <div className="movement-form__field-group">
-          <Label htmlFor="date">Fecha</Label>
-          <Input
-            id="date"
-            name="date"
-            type="date"
-            value={formData.date?.toString().split('T')[0]}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </div>
-
-      <div className="movement-form__field-group">
-        <Label htmlFor="description">Descripción</Label>
-        <Input
-          id="description"
-          name="description"
-          placeholder="Descripción breve del movimiento"
-          value={formData.description || ''}
-          onChange={handleChange}
-          required
-        />
-      </div>
-    </div>
-  );
-
-  const renderAllocationSection = () => (
-    <>
-      <div className="movement-form__field-group">
-        <Label htmlFor="category">Categoría</Label>
-        <CategorySelect
-          value={formData.category}
-          onValueChange={(val) => handleSelectChange('category', val)}
-          type={formData.type as 'INCOME' | 'EXPENSE'}
-        />
-      </div>
-
-      <div className="movement-form__field-group">
-        <Label>Deuda Relacionada (Opcional)</Label>
-        <DebtSelect
-          value={formData.debtId as string}
-          alwaysIncludeId={formData.debtId as string}
-          onValueChange={(val) => {
-            setFormData((prev) => ({
-              ...prev,
-              debtId: val,
-            }));
-          }}
-          type={
-            formData.type === 'INCOME'
-              ? 'Cuenta por Cobrar'
-              : 'Cuenta por Pagar'
-          }
-          currentAmount={formData.amount}
-          currentConcept={formData.description}
-          currentCurrency={formData.currency}
-        />
-        <p className="text-[10px] text-muted-foreground mt-1">
-          Vincular este movimiento a una deuda pendiente para actualizar su
-          saldo.
-        </p>
-      </div>
-
-      <div className="flex items-center justify-between mb-2">
-        <Label htmlFor="costCenter">Centro de Costo</Label>
-        <div className="movement-form__toggle-group">
-          <button
-            type="button"
-            onClick={() => setUseMultiCostCenter(false)}
-            className={`movement-form__toggle-group-btn ${!useMultiCostCenter ? 'movement-form__toggle-group-btn--active' : ''}`}
-          >
-            Único
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setUseMultiCostCenter(true);
-              if (!formData.allocations || formData.allocations.length === 0) {
-                setFormData((prev) => ({
-                  ...prev,
-                  allocations: [
-                    {
-                      costCenter: prev.costCenter || '',
-                      amount: prev.amount || 0,
-                    },
-                  ],
-                }));
-              }
-            }}
-            className={`movement-form__toggle-group-btn movement-form__toggle-group-btn--multiple ${useMultiCostCenter ? 'movement-form__toggle-group-btn--active' : ''}`}
-          >
-            Múltiple
-          </button>
-        </div>
-      </div>
-
-      {!useMultiCostCenter ? (
-        <CostCenterSelect
-          value={formData.costCenter}
-          onValueChange={(val) => handleSelectChange('costCenter', val)}
-        />
-      ) : (
-        <AllocationTable
-          allocations={formData.allocations || []}
-          totalAmount={formData.amount || '0'}
-          currency={formData.currency || 'COP'}
-          onAllocationChange={handleAllocationChange}
-          onAddAllocation={addAllocation}
-          onRemoveAllocation={removeAllocation}
-          error={allocationError}
-        />
-      )}
-    </>
-  );
 
   if (loading) return <div className="movement-form__loading">Cargando...</div>;
 
@@ -433,7 +365,12 @@ export default function EditMovementPage() {
       </div>
 
       <form onSubmit={handleSubmit} className="movement-form__container">
-        {renderGeneralInfo()}
+        <GeneralInfoSection
+          formData={formData}
+          handleChange={handleChange}
+          handleSelectChange={handleSelectChange}
+          setFormData={setFormData}
+        />
 
         <div className="movement-form__section">
           <h2 className="movement-form__section-title">
@@ -568,44 +505,91 @@ export default function EditMovementPage() {
         </div>
 
         <div className="movement-form__section">
-          <h2 className="movement-form__section-title">Cantidades e Items</h2>
-          <div className="movement-form__grid movement-form__grid--3">
-            <div className="movement-form__field-group">
-              <Label htmlFor="unit">Unidad de Medida</Label>
-              <Input
-                id="unit"
-                name="unit"
-                placeholder="Ej. Items, Horas, Kilos"
-                value={formData.unit || ''}
-                onChange={handleChange}
-              />
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="movement-form__section-title">Cantidades e Items</h2>
+            <div className="movement-form__toggle-group">
+              <button
+                type="button"
+                onClick={() => setUseItems(false)}
+                className={`movement-form__toggle-group-btn ${!useItems ? 'movement-form__toggle-group-btn--active' : ''}`}
+              >
+                Simple
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUseItems(true);
+                  if (!formData.items || formData.items.length === 0) {
+                    setFormData((prev) => ({
+                      ...prev,
+                      items: [
+                        {
+                          type: 'servicio',
+                          description: prev.description || '',
+                          quantity: prev.quantity || 1,
+                          unitValue: divide(prev.amount || 0, prev.quantity || 1),
+                          total: prev.amount || 0,
+                          costCenter: prev.costCenter || '',
+                        },
+                      ],
+                    }));
+                  }
+                }}
+                className={`movement-form__toggle-group-btn movement-form__toggle-group-btn--multiple ${useItems ? 'movement-form__toggle-group-btn--active' : ''}`}
+              >
+                Detallado
+              </button>
             </div>
+          </div>
 
-            <div className="movement-form__field-group">
-              <Label htmlFor="quantity">Cantidad</Label>
-              <NumericInput
-                id="quantity"
-                name="quantity"
-                placeholder="0"
-                value={formData.quantity}
-                onValueChange={(val) =>
-                  setFormData((prev) => ({ ...prev, quantity: val }))
-                }
-              />
-            </div>
+          {!useItems ? (
+            <div className="movement-form__grid movement-form__grid--3">
+              <div className="movement-form__field-group">
+                <Label htmlFor="unit">Unidad de Medida</Label>
+                <Input
+                  id="unit"
+                  name="unit"
+                  placeholder="Ej. Items, Horas, Kilos"
+                  value={formData.unit || ''}
+                  onChange={handleChange}
+                />
+              </div>
 
-            <div className="movement-form__field-group">
-              <Label>Valor Unitario (Calculado)</Label>
-              <div className="movement-form__calculated-value">
-                {gtZero(formData.amount) && gtZero(formData.quantity)
-                  ? formatCurrency(
+              <div className="movement-form__field-group">
+                <Label htmlFor="quantity">Cantidad</Label>
+                <NumericInput
+                  id="quantity"
+                  name="quantity"
+                  placeholder="0"
+                  value={formData.quantity}
+                  onValueChange={(val) =>
+                    setFormData((prev) => ({ ...prev, quantity: val }))
+                  }
+                />
+              </div>
+
+              <div className="movement-form__field-group">
+                <Label>Valor Unitario (Calculado)</Label>
+                <div className="movement-form__calculated-value">
+                  {gtZero(formData.amount) && gtZero(formData.quantity)
+                    ? formatCurrency(
                       toNumber(divide(formData.amount, formData.quantity)),
                       formData.currency
                     )
-                  : '$ 0'}
+                    : '$ 0'}
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <MovementItemsTable
+              items={formData.items || []}
+              currency={formData.currency || 'COP'}
+              targetAmount={formData.amount}
+              onItemChange={handleItemChange}
+              onAddItem={addItem}
+              onRemoveItem={removeItem}
+            />
+          )}
         </div>
 
         <div className="movement-form__section">
@@ -614,7 +598,18 @@ export default function EditMovementPage() {
           </h2>
 
           <div className="movement-form__field-group">
-            {renderAllocationSection()}
+            <AllocationSection
+              formData={formData}
+              handleSelectChange={handleSelectChange}
+              setFormData={setFormData}
+              useMultiCostCenter={useMultiCostCenter}
+              setUseMultiCostCenter={setUseMultiCostCenter}
+              handleAllocationChange={handleAllocationChange}
+              addAllocation={addAllocation}
+              removeAllocation={removeAllocation}
+              allocationError={allocationError}
+              alwaysIncludeId={formData.debtId as string}
+            />
           </div>
 
           <div className="movement-form__grid movement-form__grid--2">

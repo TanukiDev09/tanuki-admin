@@ -1,8 +1,11 @@
 const mongoose = require('mongoose');
 
-const MONGODB_URI =
-  process.env.MONGODB_URI ||
-  'mongodb+srv://juan_o:tenken80@accounting.o7z2iay.mongodb.net/accounting';
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+  console.error('Error: MONGODB_URI is not defined in environment variables.');
+  process.exit(1);
+}
 
 async function updateValidator() {
   await mongoose.connect(MONGODB_URI);

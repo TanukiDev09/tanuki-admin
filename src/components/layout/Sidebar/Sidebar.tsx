@@ -93,7 +93,9 @@ export function Sidebar() {
         {!isCollapsed && (
           <div className="sidebar__footer">
             <div className="sidebar__footer-line" />
-            <p className="sidebar__footer-text">Tanuki Libros v1.0.3</p>
+            <div className="sidebar__footer-brand">
+              <p className="sidebar__footer-text">Tanuki Libros v1.0.4</p>
+            </div>
           </div>
         )}
       </aside>

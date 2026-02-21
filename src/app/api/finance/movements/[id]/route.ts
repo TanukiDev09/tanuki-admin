@@ -9,11 +9,11 @@ import {
   add,
   multiply,
   divide,
-  compare,
   toNumber,
   gtZero,
   subtract,
   DecimalValue,
+  isMatchedFinancial,
 } from '@/lib/math';
 import Debt from '@/models/Debt';
 
@@ -64,6 +64,16 @@ export async function GET(
         ...a,
         amount: a.amount ? toNumber(a.amount) : 0,
       })),
+      items: (movement.items as Item[])?.map((item) => ({
+        ...item,
+        quantity: item.quantity ? toNumber(item.quantity) : 0,
+        unitValue: item.unitValue ? toNumber(item.unitValue) : 0,
+        total: item.total ? toNumber(item.total) : 0,
+        catalogPrice: item.catalogPrice
+          ? toNumber(item.catalogPrice)
+          : undefined,
+        discount: item.discount ? toNumber(item.discount) : 0,
+      })),
       _id: movement._id.toString(),
     };
 
@@ -92,6 +102,18 @@ interface Allocation {
   amount: { toString: () => string } | number | string;
 }
 
+interface Item {
+  type: 'libro' | 'servicio' | 'otro';
+  description: string;
+  quantity: { toString: () => string } | number;
+  unitValue: { toString: () => string } | number;
+  catalogPrice?: { toString: () => string } | number;
+  discount?: { toString: () => string } | number;
+  total: { toString: () => string } | number;
+  costCenter: string;
+  bookId?: string | { toString: () => string } | null;
+}
+
 interface MovementDoc {
   _id: { toString: () => string };
   amount: { toString: () => string } | number | string;
@@ -100,6 +122,7 @@ interface MovementDoc {
   quantity?: { toString: () => string } | number | string;
   unitValue?: { toString: () => string } | number | string;
   allocations?: Allocation[];
+  items?: Item[];
   [key: string]: unknown;
 }
 
@@ -190,6 +213,14 @@ function formatMovement(
       ...a,
       amount: a.amount ? toNumber(a.amount) : 0,
     })),
+    items: (obj.items as Item[])?.map((item) => ({
+      ...item,
+      quantity: item.quantity ? toNumber(item.quantity) : 0,
+      unitValue: item.unitValue ? toNumber(item.unitValue) : 0,
+      total: item.total ? toNumber(item.total) : 0,
+      catalogPrice: item.catalogPrice ? toNumber(item.catalogPrice) : undefined,
+      discount: item.discount ? toNumber(item.discount) : 0,
+    })),
     _id: movement._id.toString(),
   } as FormattedMovement;
 }
@@ -209,7 +240,7 @@ function checkAllocations(
     sumAllocations = add(sumAllocations, allocation.amount);
   }
 
-  if (compare(totalAmount, sumAllocations) !== 0) {
+  if (!isMatchedFinancial(totalAmount, sumAllocations, 10)) {
     return {
       error: `La suma de los detalles (${sumAllocations}) debe ser igual al total del movimiento (${totalAmount})`,
       status: 400,
@@ -309,6 +340,85 @@ async function syncInventoryLink(
   }
 }
 
+function normalizePUTBody(body: MovementBody) {
+  const totalAmount = body.amount || '0';
+  body.amount = totalAmount.toString();
+
+  // Normalize type for database storage
+  const normalizedType =
+    body.type === 'INCOME' || body.type === 'Ingreso' ? 'Ingreso' : 'Egreso';
+  body.type = normalizedType;
+
+  // Set JSON Schema Validator required fields
+  body.flowDirection = normalizedType === 'Ingreso' ? 'inflow' : 'outflow';
+  body.movementType =
+    normalizedType === 'Ingreso' ? 'factura_emitida' : 'factura_recibida';
+
+  // Set default fiscal year if missing
+  if (!body.fiscalYear && body.date) {
+    body.fiscalYear = new Date(body.date as string).getFullYear();
+  }
+
+  // Ensure metadata exists for DB validator
+  if (!body.metadata) {
+    body.metadata = {
+      source: 'manual',
+      createdAt: new Date(),
+    };
+  }
+
+  // Set issuer/receiver fields (often required by DB validator)
+  if (!body.issuerId) {
+    body.issuerId = (body.beneficiary as string) || null;
+  }
+  if (!body.issuerName) {
+    body.issuerName = (body.beneficiary as string) || 'Persona no especificada';
+  }
+  if (!body.receiverId) {
+    body.receiverId = 'Tanuki Admin';
+  }
+  if (!body.receiverName) {
+    body.receiverName = 'Tanuki Admin Hub';
+  }
+
+  // Sanitize ObjectIDs - Convert empty strings to null to avoid casting errors
+  const objectIdFields = [
+    'category',
+    'pointOfSale',
+    'debtId',
+    'inventoryMovementId',
+  ];
+  objectIdFields.forEach((field) => {
+    if (body[field] === '' || body[field] === undefined) {
+      body[field] = null;
+    } else if (
+      typeof body[field] === 'string' &&
+      !mongoose.isValidObjectId(body[field])
+    ) {
+      // If it's an invalid ID (like a placeholder), null it to avoid CastError
+      body[field] = null;
+    }
+  });
+
+  // Normalize items if present
+  if (body.items && Array.isArray(body.items)) {
+    body.items = body.items.map((item: Item) => ({
+      ...item,
+      quantity: toNumber(item.quantity).toString(),
+      unitValue: toNumber(item.unitValue).toString(),
+      total: toNumber(item.total).toString(),
+      catalogPrice: item.catalogPrice
+        ? toNumber(item.catalogPrice).toString()
+        : undefined,
+      discount: toNumber(item.discount || 0).toString(),
+      bookId:
+        item.bookId && mongoose.isValidObjectId(item.bookId)
+          ? item.bookId
+          : null,
+    }));
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   props: { params: Promise<{ id: string }> }
@@ -326,12 +436,9 @@ export async function PUT(
   try {
     const rawBody = await request.json();
     const body = sanitizeBody(rawBody);
-    const totalAmount = body.amount || '0';
-    body.amount = totalAmount.toString();
 
-    // Normalize type for database storage
-    if (body.type === 'INCOME') body.type = 'Ingreso';
-    else if (body.type === 'EXPENSE') body.type = 'Egreso';
+    normalizePUTBody(body);
+    const totalAmount = body.amount as string;
 
     const allocationError = validateAndNormalizeAllocations(body, totalAmount);
     if (allocationError) {
@@ -387,12 +494,21 @@ export async function PUT(
 
     return NextResponse.json({ data: formatMovement(movement) });
   } catch (err: unknown) {
-    const error = err as { name?: string; errors?: unknown; message?: string };
+    const error = err as {
+      name?: string;
+      errors?: Record<string, { message: string }>;
+      message?: string;
+    };
     console.error('Update Movement Error:', error);
 
-    if (error.name === 'ValidationError') {
+    if (error.name === 'ValidationError' && error.errors) {
+      // Create a readable summary of validation errors
+      const details = Object.entries(error.errors)
+        .map(([field, info]) => `${field}: ${info.message}`)
+        .join(', ');
+
       return NextResponse.json(
-        { error: 'Validation Error', details: error.errors },
+        { error: `Validation Error: ${details}`, details: error.errors },
         { status: 400 }
       );
     }

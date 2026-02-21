@@ -55,12 +55,25 @@ export async function GET(request: NextRequest) {
             _id: '$entityId',
             entityName: { $first: '$entityName' },
             entityType: { $first: '$entityType' },
-            totalDebt: { $sum: { $toDouble: '$remainingBalance' } },
+            totalDebt: {
+              $sum: {
+                $cond: [
+                  { $eq: ['$type', 'Cuenta por Cobrar'] },
+                  { $toDouble: '$remainingBalance' },
+                  { $multiply: [{ $toDouble: '$remainingBalance' }, -1] },
+                ],
+              },
+            },
             debtCount: { $sum: 1 },
             debts: { $push: '$$ROOT' },
           },
         },
-        { $sort: { totalDebt: -1 } },
+        {
+          $addFields: {
+            absDebt: { $abs: '$totalDebt' },
+          },
+        },
+        { $sort: { absDebt: -1 } },
       ]);
 
       interface GroupedDebtResult {

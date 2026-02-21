@@ -24,6 +24,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/Dialog';
+import { toNumber } from '@/lib/math';
 import './invoice-detail.scss';
 
 interface Invoice {
@@ -144,6 +145,30 @@ export default function InvoiceDetailPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('¿Está seguro de que desea eliminar esta factura? Esta acción no se puede deshacer.')) return;
+
+    try {
+      const res = await fetch(`/api/invoices/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) throw new Error('Error deleting invoice');
+
+      toast({
+        title: 'Éxito',
+        description: 'Factura eliminada correctamente',
+      });
+      router.push('/dashboard/invoices');
+    } catch {
+      toast({
+        title: 'Error',
+        description: 'No se pudo eliminar la factura',
+        variant: 'destructive',
+      });
+    }
+  };
+
   if (loading)
     return <div className="invoice-detail__loading">Cargando...</div>;
   if (!invoice)
@@ -162,6 +187,13 @@ export default function InvoiceDetailPage() {
           <ArrowLeft className="invoice-detail__icon" /> Volver
         </Button>
         <div className="invoice-detail__header-actions">
+          <Button
+            variant="outline"
+            className="text-destructive hover:bg-destructive/10"
+            onClick={handleDelete}
+          >
+            <Trash2 className="invoice-detail__icon" /> Eliminar
+          </Button>
           <Button
             variant="outline"
             onClick={() => router.push(`/dashboard/invoices/${id}/editar`)}
@@ -200,7 +232,7 @@ export default function InvoiceDetailPage() {
                 variant={invoice.status === 'Paid' ? 'default' : 'outline'}
                 className="invoice-detail__status-badge"
               >
-                {invoice.status}
+                {invoice.status === 'Unchecked' ? 'Sin comprobar' : invoice.status}
               </Badge>
             </CardHeader>
             <CardContent>
@@ -358,7 +390,7 @@ export default function InvoiceDetailPage() {
                           {new Date(mov.date).toLocaleDateString()}
                         </div>
                         <div className="invoice-detail__movement-amount">
-                          {formatCurrency(mov.amount, 'COP')}
+                          {formatCurrency(toNumber(mov.amount), 'COP')}
                         </div>
                       </div>
                       <div className="invoice-detail__movement-actions">

@@ -1,6 +1,6 @@
 {
   "name": "dashboard",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "private": true,
   "scripts": {
     "dev": "set NODE_OPTIONS=--dns-result-order=ipv4first && next dev",
@@ -17,6 +17,9 @@
     "test:e2e:open": "cypress open",
     "discover-routes": "node scripts/dev/discover-routes.js",
     "seed:permissions": "npx tsx scripts/db/seed/seedPermissions.ts",
+    "db:create-indexes": "npx tsx scripts/db/create-indexes.ts",
+    "db:check-indexes": "npx tsx scripts/db/check-indexes.ts",
+    "db:benchmark": "npx tsx scripts/db/benchmark-queries.ts",
     "perf": "next build && echo 'Build complete. Start the server with \"npm start\" in a separate terminal then run: npx lighthouse http://localhost:3000/dashboard?audit=true --output=json --output-path=./lighthouse-report.json'"
   },
   "dependencies": {
@@ -36,6 +39,7 @@
     "@tanstack/react-query": "^5.90.18",
     "@tanstack/react-query-devtools": "^5.91.2",
     "@types/big.js": "^6.2.2",
+    "@types/xml2js": "^0.4.14",
     "@vercel/blob": "^2.0.0",
     "bcryptjs": "^3.0.3",
     "big.js": "^7.0.1",
@@ -44,6 +48,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "dotenv": "^17.2.3",
+    "framer-motion": "^12.29.2",
     "jsonwebtoken": "^9.0.3",
     "jspdf": "^4.0.0",
     "jspdf-autotable": "^5.0.7",
@@ -53,9 +58,11 @@
     "next": "16.1.5",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-dropzone": "^14.4.0",
     "react-hook-form": "^7.71.1",
     "recharts": "^3.6.0",
     "undici": "^6.23.0",
+    "xml2js": "^0.6.2",
     "zod": "^4.3.5"
   },
   "devDependencies": {
@@ -89,6 +96,13 @@
     "typescript": "^5"
   },
   "overrides": {
-    "lodash-es": "4.17.23"
+    "lodash-es": "4.17.23",
+    "braces": "3.0.3",
+    "form-data": "4.0.5",
+    "minimatch": "10.2.1",
+    "node-notifier": "8.0.1",
+    "qs": "6.15.0",
+    "tough-cookie": "4.1.3",
+    "micromatch": "4.0.8"
   }
 }

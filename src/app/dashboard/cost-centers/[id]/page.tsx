@@ -6,33 +6,39 @@ import {
   ArrowLeft,
   Calendar,
   Clock,
+  Pencil,
+  Trash2,
+  TrendingUp,
   TrendingDown,
-  ArrowUpRight,
-  ArrowDownRight,
-  Scale,
-  Activity,
+  DollarSign,
+  PieChart,
+  ChevronRight,
+  Tag,
+  Percent,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { StatCard } from '@/components/dashboard/StatCard';
 import { CostCenter } from '@/types/cost-center';
 import { Movement } from '@/types/movement';
 import { FinancialSummary } from '@/types/financial-summary';
 import { useToast } from '@/components/ui/Toast';
-import { RunwayCard } from '@/components/dashboard/RunwayCard';
 import dynamic from 'next/dynamic';
 import { formatCurrency } from '@/lib/utils';
-import './cost-center-detail.scss';
 import { RecentMovements } from '@/components/dashboard/RecentMovements';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
+import './cost-center-detail.scss';
 
-const IncomeExpenseChart = dynamic(
+const ScrollableIncomeExpenseChart = dynamic(
   () =>
-    import('@/components/dashboard/IncomeExpenseChart').then(
-      (mod) => mod.IncomeExpenseChart
+    import('@/components/dashboard/ScrollableIncomeExpenseChart').then(
+      (mod) => mod.ScrollableIncomeExpenseChart
     ),
   {
     ssr: false,
     loading: () => (
-      <div className="h-[300px] w-full bg-muted/10 animate-pulse rounded-lg" />
+      <div className="h-[400px] w-full bg-muted/10 animate-pulse rounded-lg" />
     ),
   }
 );
@@ -41,46 +47,39 @@ export default function CostCenterDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { toast } = useToast();
+  const { hasPermission } = usePermission();
   const [costCenter, setCostCenter] = useState<CostCenter | null>(null);
-  const [financialData, setFinancialData] = useState<FinancialSummary | null>(
-    null
-  );
+  const [financialData, setFinancialData] = useState<FinancialSummary | null>(null);
   const [movements, setMovements] = useState<Movement[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const canUpdate = hasPermission(ModuleName.COST_CENTERS, PermissionAction.UPDATE);
+  const canDelete = hasPermission(ModuleName.COST_CENTERS, PermissionAction.DELETE);
 
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
-        // 1. Fetch Cost Center Details
         const ccRes = await fetch(`/api/costcenters?id=${params.id}`);
         if (!ccRes.ok) throw new Error('Error al cargar el centro de costo');
         const ccData = await ccRes.json();
 
         let foundCC: CostCenter | null = null;
         if (Array.isArray(ccData.data)) {
-          foundCC =
-            ccData.data.find((c: CostCenter) => c._id === params.id) || null;
+          foundCC = ccData.data.find((c: CostCenter) => c._id === params.id) || null;
         } else {
           foundCC = ccData.data;
         }
         setCostCenter(foundCC);
 
-        // 2. Fetch Financial Data & Movements if CC found
         if (foundCC) {
-          // Summary
-          const summaryRes = await fetch(
-            `/api/finance/summary?costCenter=${foundCC.code}`
-          );
+          const summaryRes = await fetch(`/api/finance/summary?costCenter=${foundCC.code}`);
           if (summaryRes.ok) {
             const summaryData = await summaryRes.json();
             setFinancialData(summaryData);
           }
 
-          // Movements
-          const movementsRes = await fetch(
-            `/api/finance/movements?costCenter=${foundCC.code}&limit=10`
-          );
+          const movementsRes = await fetch(`/api/finance/movements?costCenter=${foundCC.code}&limit=10`);
           if (movementsRes.ok) {
             const movementsData = await movementsRes.json();
             setMovements(movementsData.data || []);
@@ -105,18 +104,28 @@ export default function CostCenterDetailPage() {
 
   if (loading) {
     return (
-      <div className="dashboard__container">
-        <p>Cargando información...</p>
+      <div className="flex h-[80vh] w-full items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <p className="text-muted-foreground font-medium">Cargando análisis detallado...</p>
+        </div>
       </div>
     );
   }
 
   if (!costCenter) {
     return (
-      <div className="dashboard__container">
-        <p>Centro de costo no encontrado.</p>
-        <Button variant="link" onClick={() => router.back()}>
-          Volver
+      <div className="flex h-[60vh] w-full flex-col items-center justify-center gap-4">
+        <div className="rounded-full bg-muted p-6">
+          <PieChart size={40} className="text-muted-foreground" />
+        </div>
+        <div className="text-center">
+          <h1 className="text-xl font-bold">Centro de costo no encontrado</h1>
+          <p className="text-muted-foreground">El recurso que buscas no existe o ha sido movido.</p>
+        </div>
+        <Button onClick={() => router.push('/dashboard/cost-centers')}>
+          <ArrowLeft size={16} className="mr-2" />
+          Volver al Dashboard
         </Button>
       </div>
     );
@@ -131,210 +140,181 @@ export default function CostCenterDetailPage() {
     });
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este centro de costo?')) return;
+    try {
+      const res = await fetch(`/api/costcenters?id=${costCenter._id}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast({ title: 'Éxito', description: 'Centro de costo eliminado' });
+        router.push('/dashboard/cost-centers');
+      } else {
+        throw new Error('Error al eliminar');
+      }
+    } catch {
+      toast({ title: 'Error', description: 'No se pudo eliminar el centro de costo', variant: 'destructive' });
+    }
+  };
+
   return (
     <div className="cost-center-detail">
-      <div className="cost-center-detail__header">
-        <Button
-          variant="ghost"
-          className="cost-center-detail__back-btn"
-          onClick={() => router.push('/dashboard/cost-centers')}
-        >
-          <ArrowLeft size={16} />
-          Volver a la lista
-        </Button>
-      </div>
-
-      <div className="cost-center-detail__title-group">
-        <h1 className="cost-center-detail__title">
-          {costCenter.name}
-          <span className="cost-center-detail__code-badge">
-            {costCenter.code}
-          </span>
-        </h1>
-      </div>
-
-      <div className="cost-center-detail__card">
-        <div className="cost-center-detail__section">
-          <span className="cost-center-detail__label">Descripción</span>
-          <p className="cost-center-detail__value">
-            {costCenter.description || 'Sin descripción disponible.'}
-          </p>
-        </div>
-
-        <div className="cost-center-detail__meta-grid">
-          <div className="cost-center-detail__meta-item">
-            <span className="cost-center-detail__label">
-              <Calendar
-                size={14}
-                style={{ display: 'inline', marginRight: '4px' }}
-              />
-              Fecha de Creación
+      {/* Header & Breadcrumbs */}
+      <header className="cost-center-detail__header">
+        <div className="flex flex-col gap-4">
+          <nav className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span
+              className="cursor-pointer hover:text-primary transition-colors"
+              onClick={() => router.push('/dashboard/cost-centers')}
+            >
+              Centros de Costo
             </span>
-            <p className="cost-center-detail__value">
-              {formatDate(costCenter.createdAt)}
-            </p>
+            <ChevronRight size={14} />
+            <span className="text-foreground font-medium">Detalle</span>
+          </nav>
+
+          <div className="cost-center-detail__title-area">
+            <h1 className="cost-center-detail__title">{costCenter.name}</h1>
+            <span className="cost-center-detail__code-badge">{costCenter.code}</span>
           </div>
-          {costCenter.updatedAt && (
-            <div className="cost-center-detail__meta-item">
-              <span className="cost-center-detail__label">
-                <Clock
-                  size={14}
-                  style={{ display: 'inline', marginRight: '4px' }}
-                />
-                Última Actualización
-              </span>
-              <p className="cost-center-detail__value">
-                {formatDate(costCenter.updatedAt)}
-              </p>
-            </div>
+        </div>
+
+        <div className="cost-center-detail__actions">
+          {canUpdate && (
+            <Button variant="outline" size="sm" onClick={() => toast({ title: 'Próximamente', description: 'La edición estará disponible pronto.' })}>
+              <Pencil size={16} className="mr-2" />
+              Editar
+            </Button>
+          )}
+          {canDelete && (
+            <Button variant="outline" size="sm" onClick={handleDelete} className="text-danger hover:bg-danger/10 hover:border-danger hover:text-danger">
+              <Trash2 size={16} className="mr-2" />
+              Eliminar
+            </Button>
           )}
         </div>
-      </div>
+      </header>
 
+      {/* Stats Overview */}
       {financialData && (
-        <div className="cost-center-detail__financial-section">
-          <h2 className="cost-center-detail__section-title">
-            Salud Financiera
-          </h2>
-
-          {/* 1. ACUMULADOS HISTÓRICOS */}
-          <h3 className="cost-center-detail__section-title subsection">
-            Acumulados Históricos
-          </h3>
-          <div className="cost-center-detail__hero-stats">
-            {/* Custom Wide Cards for Hero Stats */}
-            <div className="premium-stat-card">
-              <div className="premium-stat-card__header">
-                <span className="premium-stat-card__label">
-                  Ingresos Históricos
-                </span>
-                <ArrowUpRight className="premium-stat-card__icon" size={20} />
-              </div>
-              <div className="premium-stat-card__value">
-                {formatCurrency(financialData.totals?.income || 0)}
-              </div>
-              <div className="premium-stat-card__subtext">
-                Total facturado históricamente
-              </div>
-            </div>
-
-            <div className="premium-stat-card premium-stat-card--highlight">
-              <div className="premium-stat-card__header">
-                <span className="premium-stat-card__label">
-                  Caja Total Actual (Balance)
-                </span>
-                <Scale className="premium-stat-card__icon" size={20} />
-              </div>
-              <div className="premium-stat-card__value">
-                {formatCurrency(financialData.totals?.balance || 0)}
-              </div>
-              <div className="premium-stat-card__subtext">
-                Disponible real en cuentas hoy
-              </div>
-            </div>
-
-            <div className="premium-stat-card">
-              <div className="premium-stat-card__header">
-                <span className="premium-stat-card__label">
-                  Egresos Históricos
-                </span>
-                <ArrowDownRight className="premium-stat-card__icon" size={20} />
-              </div>
-              <div className="premium-stat-card__value">
-                {formatCurrency(financialData.totals?.expenses || 0)}
-              </div>
-              <div className="premium-stat-card__subtext">
-                Total gastos históricos
-              </div>
-            </div>
-          </div>
-
-          {/* 2. INDICADORES DE SOSTENIBILIDAD */}
-          <h3
-            className="cost-center-detail__section-title subsection"
-            style={{ marginTop: '2rem' }}
-          >
-            Indicadores de Sostenibilidad
-          </h3>
-          <div className="cost-center-detail__indicators-grid">
-            <RunwayCard runway={financialData.health?.runway || 0} />
-
-            {/* Burn Rate Card */}
-            <Card className="runway-card">
-              {' '}
-              {/* Reuse card style base */}
-              <CardHeader className="runway-card__header">
-                <CardTitle className="runway-card__title">
-                  GASTO MENSUAL PROMEDIO
-                </CardTitle>
-                <TrendingDown size={18} className="text-muted-foreground" />
-              </CardHeader>
-              <CardContent className="runway-card__content">
-                <div className="text-3xl font-bold text-foreground">
-                  {formatCurrency(financialData.health?.avgMonthlyExpense || 0)}
-                  <span className="text-sm font-normal text-muted-foreground ml-1">
-                    /mes
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground mt-2">
-                  Promedio últimos 6 meses
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Health Score Card */}
-            <Card className="runway-card runway-card--healthy">
-              {' '}
-              {/* Reuse green style */}
-              <CardHeader className="runway-card__header">
-                <CardTitle className="runway-card__title">
-                  PUNTUACIÓN DE SALUD
-                </CardTitle>
-                <Activity size={18} className="text-emerald-600" />
-              </CardHeader>
-              <CardContent className="runway-card__content flex items-center justify-between">
-                <div>
-                  <div className="text-3xl font-bold text-foreground">
-                    {financialData.health?.healthScore || 100}
-                    <span className="text-sm font-normal text-muted-foreground">
-                      /100
-                    </span>
-                  </div>
-                  <p className="text-sm text-emerald-600 font-medium mt-2">
-                    Excelente
-                  </p>
-                </div>
-                {/* Simple circular placeholder */}
-                <div className="h-16 w-16 rounded-full border-4 border-emerald-500 flex items-center justify-center text-emerald-700 font-bold">
-                  {financialData.health?.healthScore || 100}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* 3. HISTORIA FINANCIERA */}
-          <h3
-            className="cost-center-detail__section-title subsection"
-            style={{ marginTop: '2rem' }}
-          >
-            Historia Financiera
-          </h3>
-          <div className="cost-center-detail__chart-section">
-            <div style={{ height: '400px', width: '100%' }}>
-              <IncomeExpenseChart data={financialData.daily} />
-            </div>
-          </div>
-
-          {movements.length > 0 && (
-            <div className="cost-center-detail__movements-section">
-              <div className="cost-center-detail__section-title">
-                Últimos Movimientos
-              </div>
-              <RecentMovements movements={movements} />
-            </div>
-          )}
+        <div className="cost-center-detail__stats-grid">
+          <StatCard
+            title="Ingresos"
+            value={formatCurrency(financialData.totals?.income || 0)}
+            icon={TrendingUp}
+            variant="success"
+            subtext="Total histórico"
+          />
+          <StatCard
+            title="Egresos"
+            value={formatCurrency(financialData.totals?.expenses || 0)}
+            icon={TrendingDown}
+            variant="danger"
+            subtext="Total histórico"
+          />
+          <StatCard
+            title="Unidades Vendidas"
+            value={(financialData.totals?.totalQuantity || 0).toString()}
+            icon={Tag}
+            variant="default"
+            subtext="Volumen de ventas"
+          />
+          <StatCard
+            title="Balance Neto"
+            value={formatCurrency(financialData.totals?.balance || 0)}
+            icon={DollarSign}
+            variant="info"
+            subtext="Saldo disponible"
+          />
+          <StatCard
+            title="Rentabilidad"
+            value={`${(financialData.health?.profitMargin || 0).toFixed(1)}%`}
+            icon={Percent}
+            variant={financialData.health?.profitMargin >= 0 ? 'success' : 'danger'}
+            subtext="Margen sobre ingresos"
+          />
         </div>
       )}
+
+      {/* Main Grid: Analysis & Side Info */}
+      <div className="cost-center-detail__main-grid">
+        <div className="cost-center-detail__content-area">
+          {/* Main Chart */}
+          {financialData && (
+            <ScrollableIncomeExpenseChart
+              data={financialData.monthly}
+              variant="monthly"
+              scrollable={financialData.monthly.length > 8}
+            />
+          )}
+
+          {/* Recent Movements */}
+          <div className="cost-center-detail__movements-card">
+            <div className="flex justify-end p-2 pb-0">
+              <Button variant="link" size="sm" onClick={() => router.push(`/dashboard/movements?costCenter=${costCenter.code}`)}>
+                Ver todos
+              </Button>
+            </div>
+            <div className="p-2 pt-0">
+              <RecentMovements movements={movements} />
+            </div>
+          </div>
+        </div>
+
+        <aside className="cost-center-detail__side-area">
+          <Card className="cost-center-detail__info-card">
+            <CardHeader>
+              <CardTitle as="h2">Información General</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-6">
+              <div className="cost-center-detail__info-item">
+                <label>Descripción</label>
+                <p>{costCenter.description || 'Sin descripción disponible.'}</p>
+              </div>
+              <div className="cost-center-detail__info-item">
+                <label>Fecha de Creación</label>
+                <div className="flex items-center gap-2 text-foreground">
+                  <Calendar size={14} className="text-muted-foreground" />
+                  <p>{formatDate(costCenter.createdAt)}</p>
+                </div>
+              </div>
+              {costCenter.updatedAt && (
+                <div className="cost-center-detail__info-item">
+                  <label>Última Actualización</label>
+                  <div className="flex items-center gap-2 text-foreground">
+                    <Clock size={14} className="text-muted-foreground" />
+                    <p>{formatDate(costCenter.updatedAt)}</p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {financialData?.health && (
+            <Card className="cost-center-detail__info-card">
+              <CardHeader>
+                <CardTitle as="h2">Métricas de Gestión</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-6">
+                <div className="cost-center-detail__info-item">
+                  <label>Gasto Promedio Histórico</label>
+                  <p className="text-xl font-bold">{formatCurrency(financialData.health.avgMonthlyExpense)}</p>
+                </div>
+                <div className="cost-center-detail__info-item">
+                  <label>Score de Salud</label>
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${financialData.health.healthScore > 70 ? 'bg-success' : 'bg-warning'}`}
+                        style={{ width: `${financialData.health.healthScore}%` }}
+                      />
+                    </div>
+                    <span className="font-bold">{Math.floor(financialData.health.healthScore)}/100</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </aside>
+      </div>
     </div>
   );
 }

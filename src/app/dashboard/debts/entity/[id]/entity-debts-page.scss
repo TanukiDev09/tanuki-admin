@@ -5,639 +5,488 @@
 .entity-debts {
   min-height: 100vh;
   background-color: $background;
-  padding-bottom: 8rem;
+  padding-bottom: 5rem;
   padding-inline: $spacing-md;
-  animation: fade-in $transition-base ease-out;
 
   @include md {
-    padding-inline: $spacing-lg;
-  }
-
-  @include lg {
     padding-inline: $spacing-xl;
   }
 
   &__container {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
-    padding-top: $spacing-xl;
-    padding-bottom: $spacing-2xl;
     display: flex;
     flex-direction: column;
-    gap: $spacing-2xl;
+    gap: $spacing-xl;
+    padding-top: $spacing-lg;
+  }
+}
 
-    @include sm {
-      padding-top: $spacing-2xl;
+// --- ENTITY HEADER ---
+.entity-header {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+
+  &__back {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    cursor: pointer;
+    transition: color $transition-base;
+    padding: 0;
+
+    &:hover {
+      color: $primary;
     }
+
+    &-icon {
+      width: 1rem;
+      height: 1rem;
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+
+    @include md {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+
+  &__info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+  }
+
+  &__icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    background: white;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary;
+    box-shadow: $shadow-sm;
+
+    &-svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+
+  &__type-wrapper {
+    margin-bottom: 2px;
+  }
+
+  &__type {
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    font-weight: $font-weight-black;
+    text-transform: uppercase;
+    color: $muted-foreground;
+    background: rgba($primary, 0.05);
+    border: 1px solid rgba($primary, 0.1);
+  }
+
+  &__name {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-black;
+    letter-spacing: -0.04em;
+    color: $primary;
+    line-height: $line-height-none;
+  }
+
+  &__btn-primary {
+    height: 3rem;
+    padding-inline: $spacing-lg;
+    border-radius: $radius-lg;
+    background: $primary;
+    color: white;
+    font-weight: $font-weight-bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__btn-icon {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+// --- STATS CARDS ---
+.entity-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: $spacing-md;
+
+  @include md {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.stat-card {
+  background: white;
+  border-radius: $radius-xl;
+  border: 1px solid $border !important;
+  transition: all $transition-base;
+
+  &__content {
+    padding: $spacing-xl;
   }
 
   &__header {
     display: flex;
-    flex-direction: column;
-    gap: $spacing-lg;
-
-    @include md {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-md;
   }
 
-  &__header-left {
+  &__icon-box {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: $radius-md;
     display: flex;
     align-items: center;
-    gap: $spacing-md;
+    justify-content: center;
   }
 
-  &__back-btn {
-    width: 3rem;
-    height: 3rem;
-    border-radius: $radius-xl;
-
-    @include flex-center;
-
-    background: transparent;
-    border: 1px solid transparent;
-    transition: all $transition-base;
-
-    &:hover {
-      background: white;
-      border-color: $border;
-      box-shadow: $shadow-sm;
-    }
+  &__icon {
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
-  &__divider {
-    height: 3rem;
-    width: 1px;
-    background-color: $border;
-    display: none;
-
-    @include sm {
-      display: block;
-      margin-inline: $spacing-sm;
-    }
-  }
-
-  &__entity-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  &__entity-type {
-    @include badge-base(transparent, $primary);
-
-    border: 1px solid rgba($primary, 0.2);
-    font-size: 0.625rem;
-    padding: 0 0.75rem;
-    letter-spacing: 0.2em;
+  &__label {
+    font-size: $font-size-2xs;
+    font-weight: $font-weight-black;
     text-transform: uppercase;
-    font-weight: 900;
-  }
-
-  &__entity-name {
-    font-size: $font-size-3xl;
-    font-weight: 900;
-    letter-spacing: -0.025em;
-    color: $primary;
-
-    @include sm {
-      font-size: $font-size-4xl;
-    }
-  }
-
-  &__header-action {
-    width: 100%;
-
-    @include md {
-      width: auto;
-    }
-  }
-
-  &__btn-primary {
-    width: 100%;
-    height: 3rem;
-    padding-inline: $spacing-lg;
-    border-radius: $radius-xl;
-    font-weight: $font-weight-bold;
-
-    @include flex-center;
-
-    gap: 0.5rem;
-    background: #312e81; // indigo-900
-    color: white;
-    box-shadow: 0 10px 30px rgb(49 46 129 / 20%);
-
-    @include md {
-      width: auto;
-    }
-
-    svg {
-      transition: transform $transition-base;
-    }
-
-    &:hover svg {
-      transform: scale(1.2);
-    }
-  }
-
-  &__summary {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: $spacing-lg;
-
-    @include md {
-      grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  &__card {
-    border: none;
-    border-radius: 2rem;
-    background: white;
-    box-shadow: 0 8px 30px rgb(0 0 0 / 4%);
-    overflow: hidden;
-
-    &--balance {
-      background: $primary;
-      color: white;
-      position: relative;
-
-      &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        width: 8rem;
-        height: 8rem;
-        background: rgba($background, 0.2);
-        filter: blur(60px);
-        margin-right: -4rem;
-        margin-top: -4rem;
-      }
-    }
-  }
-
-  &__card-content {
-    padding: $spacing-xl;
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-lg;
-    position: relative;
-    z-index: 10;
-  }
-
-  &__card-icon {
-    width: 3.5rem;
-    height: 3.5rem;
-    border-radius: $radius-lg;
-
-    @include flex-center;
-
-    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 25%);
-
-    &--active {
-      background: #10b981; // emerald-500
-      color: white;
-      box-shadow: 0 15px 30px rgb(16 185 129 / 20%);
-    }
-
-    &--passive {
-      background: #ef4444; // rose-500
-      color: white;
-      box-shadow: 0 15px 30px rgb(239 68 68 / 20%);
-    }
-
-    &--balance {
-      background: rgb(white, 0.1);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgb(white, 0.1);
-      color: white;
-      box-shadow: none;
-    }
-  }
-
-  &__card-info {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  &__card-label {
-    font-size: 0.625rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.05em;
     color: $muted-foreground;
-
-    .entity-debts__card--balance & {
-      color: rgb(white, 0.5);
-    }
   }
 
-  &__card-value {
-    font-size: $font-size-3xl;
-    font-weight: 900;
-    letter-spacing: -0.025em;
+  &__value {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-black;
+    letter-spacing: -0.02em;
     color: $primary;
-
-    .entity-debts__card--balance & {
-      &--positive {
-        color: #34d399;
-      }
-
-      &--negative {
-        color: #f87171;
-      }
-    }
   }
 
-  &__card-sub {
+  &__indicator {
+    margin-top: 0.5rem;
     font-size: $font-size-xs;
     font-weight: $font-weight-semibold;
-    text-transform: uppercase;
-    letter-spacing: -0.025em;
-    font-style: italic;
+    color: $muted-foreground;
+  }
 
-    &--active {
-      color: #064e3b; // emerald-900
-    }
-
-    &--passive {
-      color: #991b1b; // rose-800
-    }
-
-    .entity-debts__card--balance & {
-      color: rgb(white, 0.4);
-      font-style: normal;
-      text-transform: none;
-      letter-spacing: normal;
+  &--income {
+    .stat-card__icon-box {
+      background: #f0fdf4;
+      color: #10b981;
     }
   }
 
-  &__history {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-lg;
-  }
-
-  &__history-header {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-md;
-
-    @include sm {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
+  &--expense {
+    .stat-card__icon-box {
+      background: #fef2f2;
+      color: #f43f5e;
     }
   }
 
-  &__history-title {
-    font-size: $font-size-2xl;
-    font-weight: 900;
-    letter-spacing: -0.025em;
-    color: $primary;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-
-    svg {
-      color: $primary;
+  &--balance {
+    .stat-card__icon-box {
+      background: #eff6ff;
+      color: #3b82f6;
     }
   }
 
-  &__history-search {
+  &--positive {
+    .stat-card__value {
+      color: #10b981;
+    }
+  }
+
+  &--negative {
+    .stat-card__value {
+      color: #e11d48;
+    }
+  }
+}
+
+// --- HISTORY SECTION ---
+.entity-history {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+  margin-top: $spacing-md;
+
+  &__search {
     position: relative;
-    width: 100%;
-
-    @include sm {
-      width: 20rem;
-    }
+    max-width: 400px;
 
     &-icon {
       position: absolute;
       left: 1rem;
       top: 50%;
       transform: translateY(-50%);
-      width: $icon-sm;
-      height: $icon-sm;
+      width: 1rem;
+      height: 1rem;
       color: $muted-foreground;
-      transition: color $transition-base;
+      z-index: 10;
     }
 
     &-input {
-      width: 100%;
       height: 2.75rem;
-      padding-left: 2.5rem;
-      background: white;
       border: 1px solid $border;
+      background: white;
+      padding-left: 2.75rem !important;
       border-radius: $radius-lg;
       font-size: $font-size-sm;
-      transition: all $transition-base;
 
       &:focus {
-        border-color: rgba($primary, 0.1);
-
-        @include focus-ring;
-      }
-    }
-
-    &:focus-within &-icon {
-      color: $primary;
-    }
-  }
-
-  &__history-list {
-    background: white;
-    border-radius: 2rem;
-    box-shadow: 0 8px 30px rgb(0 0 0 / 4%);
-    overflow: hidden;
-    border: 1px solid rgba($border, 0.5);
-    display: flex;
-    flex-direction: column;
-  }
-
-  &__item {
-    padding: $spacing-lg;
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-lg;
-    cursor: pointer;
-    transition: all $transition-base;
-
-    @include sm {
-      padding: $spacing-xl;
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    &:hover {
-      background: rgba($muted, 0.3);
-    }
-
-    & + & {
-      border-top: 1px solid rgba($border, 0.1);
-    }
-  }
-
-  &__item-left {
-    display: flex;
-    align-items: flex-start;
-    gap: $spacing-lg;
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__item-icon {
-    width: 3rem;
-    height: 3rem;
-    border-radius: $radius-lg;
-    flex-shrink: 0;
-
-    @include flex-center;
-
-    transition: all $transition-base;
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 10%);
-
-    .entity-debts__item:hover & {
-      transform: scale(1.1);
-    }
-
-    &--income {
-      background: #f0fdf4;
-      color: #166534; // emerald-800
-      box-shadow: 0 4px 10px rgb(22 101 52 / 10%);
-    }
-
-    &--expense {
-      background: #fef2f2;
-      color: #991b1b; // rose-800
-      box-shadow: 0 4px 10px rgb(153 27 27 / 10%);
-    }
-  }
-
-  &__item-info {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  &__item-title-group {
-    display: flex;
-    align-items: center;
-    gap: $spacing-md;
-  }
-
-  &__item-title {
-    font-size: $font-size-lg;
-    font-weight: 900;
-    color: $primary;
-
-    @include text-truncate;
-
-    transition: color $transition-base;
-
-    .entity-debts__item:hover & {
-      color: $primary;
-    }
-  }
-
-  &__badge {
-    @include badge-base(transparent, $primary);
-
-    font-size: 0.625rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    padding: 0.25rem 0.75rem;
-
-    &--success {
-      background: #ecfdf5;
-      color: #047857;
-    }
-
-    &--warning {
-      background: #fffbeb;
-      color: #b45309;
-    }
-
-    &--danger {
-      background: #fef2f2;
-      color: #b91c1c;
-    }
-
-    &--muted {
-      background: $muted;
-      color: $muted-foreground;
-    }
-  }
-
-  &__item-meta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: $spacing-md;
-    font-size: 0.75rem;
-    font-weight: $font-weight-bold;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: $muted-foreground;
-
-    &-item {
-      display: flex;
-      align-items: center;
-      gap: 0.375rem;
-
-      svg {
-        width: 0.875rem;
-        height: 0.875rem;
+        border-color: $primary;
+        box-shadow: 0 0 0 4px rgba($primary, 0.05);
       }
     }
   }
+}
 
-  &__item-right {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: $spacing-xl;
+.history-list {
+  background: white;
+  border-radius: $radius-2xl;
+  border: 1px solid $border;
+  overflow: hidden;
+  box-shadow: $shadow-sm;
 
-    @include sm {
-      justify-content: flex-end;
-      min-width: 17.5rem;
-    }
-  }
-
-  &__item-balance {
-    text-align: right;
-
-    &-label {
-      font-size: 0.625rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: $muted-foreground;
-      margin-bottom: 0.25rem;
-    }
-
-    &-value {
-      font-size: $font-size-xl;
-      font-weight: 900;
-      letter-spacing: -0.025em;
-
-      &--unpaid {
-        color: $primary;
-      }
-
-      &--paid {
-        color: #166534; // emerald-800
-      }
-    }
-  }
-
-  &__item-chevron {
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: $radius-full;
+  &__header {
     background: $muted;
+    border-bottom: 1px solid $border;
+    display: flex;
+    padding: 1rem $spacing-xl;
+  }
 
-    @include flex-center;
-
-    transition: all $transition-base;
+  &__column {
+    flex: 1;
+    font-size: $font-size-2xs;
+    font-weight: $font-weight-black;
+    letter-spacing: 0.1em;
     color: $muted-foreground;
 
-    .entity-debts__item:hover & {
-      background: $primary;
-      color: white;
-      transform: translateX(0.25rem);
+    &--hide-mobile {
+      @include sm-only {
+        display: none;
+      }
+    }
+
+    &--right {
+      text-align: right;
+    }
+
+    &--action {
+      width: 40px;
+      flex: 0 0 40px;
     }
   }
 
   &__loading {
-    padding-block: 8rem;
+    padding: 5rem;
+    text-align: center;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: $spacing-lg;
+    gap: 1rem;
   }
 
   &__spinner {
-    position: relative;
-    width: 3rem;
-    height: 3rem;
-
-    &-track {
-      position: absolute;
-      inset: 0;
-      border: 4px solid rgba($border, 0.5);
-      border-radius: $radius-full;
-    }
-
-    &-thumb {
-      position: absolute;
-      inset: 0;
-      border: 4px solid transparent;
-      border-top-color: $primary;
-      border-radius: $radius-full;
-      animation: spin 1s linear infinite;
-    }
-  }
-
-  &__loading-text {
-    font-size: 0.625rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    color: $muted-foreground;
+    width: 2rem;
+    height: 2rem;
+    border: 2px solid $border;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
   }
 
   &__empty {
-    padding-block: 8rem;
-    text-align: center;
-    max-width: 24rem;
-    margin: 0 auto;
+    padding: 5rem;
     display: flex;
     flex-direction: column;
-    gap: $spacing-lg;
-  }
-
-  &__empty-icon {
-    width: 5rem;
-    height: 5rem;
-    background: $muted;
-    border-radius: 1.5rem;
-
-    @include flex-center;
-
-    margin: 0 auto;
-    color: color.adjust($muted-foreground, $lightness: 20%);
-  }
-
-  &__empty-title {
-    font-size: $font-size-xl;
-    font-weight: 900;
-    color: $primary;
-  }
-
-  &__empty-desc {
-    font-size: $font-size-sm;
+    align-items: center;
     color: $muted-foreground;
     font-weight: $font-weight-medium;
+
+    &-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.2;
+    }
   }
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+.history-row {
+  display: flex;
+  align-items: center;
+  padding: 1.25rem $spacing-xl;
+  border-bottom: 1px solid $border;
+  transition: all $transition-base;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
   }
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  &:hover {
+    background: $muted;
+  }
+
+  &__main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    min-width: 0;
+  }
+
+  &__type-indicator {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    &--cobrar {
+      background: #f0fdf4;
+      color: #10b981;
+    }
+
+    &--pagar {
+      background: #fef2f2;
+      color: #f43f5e;
+    }
+  }
+
+  &__info {
+    min-width: 0;
+  }
+
+  &__title-group {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: 2px;
+  }
+
+  &__title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-black;
+    color: $primary;
+
+    @include text-truncate;
+  }
+
+  &__meta {
+    font-size: $font-size-xs;
+    color: $muted-foreground;
+    font-weight: $font-weight-medium;
+  }
+
+  &__date {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    color: $muted-foreground;
+
+    &--hide-mobile {
+      @include sm-only {
+        display: none;
+      }
+    }
+
+    &-icon {
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+  }
+
+  &__price {
+    flex: 1;
+    text-align: right;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-black;
+    color: $primary;
+  }
+
+  &__action {
+    width: 40px;
+    flex: 0 0 40px;
+    display: flex;
+    justify-content: flex-end;
+    color: $border;
+    transition: all $transition-base;
+
+    &-icon {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+
+    .history-row:hover & {
+      color: $primary;
+      transform: translateX(3px);
+    }
+  }
+}
+
+// --- STATUS BADGES ---
+.status-badge {
+  font-size: 0.6rem;
+  font-weight: $font-weight-black;
+  text-transform: uppercase;
+  padding: 0 0.5rem;
+  border-radius: $radius-xs;
+
+  &--success {
+    color: #10b981;
+    border-color: #10b981;
+  }
+
+  &--warning {
+    color: #d97706;
+    border-color: #d97706;
+  }
+
+  &--danger {
+    color: #e11d48;
+    border-color: #e11d48;
+  }
+
+  &--info {
+    color: #3b82f6;
+    border-color: #3b82f6;
   }
 }
 

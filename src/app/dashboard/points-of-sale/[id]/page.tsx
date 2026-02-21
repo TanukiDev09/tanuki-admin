@@ -5,12 +5,16 @@ import { Separator } from '@/components/ui/Separator';
 import { PointOfSaleForm } from '@/components/points-of-sale/PointOfSaleForm';
 import { PointOfSaleStock } from '@/components/points-of-sale/PointOfSaleStock';
 import { POSContactsAgenda } from '@/components/points-of-sale/POSContactsAgenda';
+import { POSStats } from '@/components/points-of-sale/POSStats';
 import dbConnect from '@/lib/mongodb';
 import PointOfSale from '@/models/PointOfSale';
 import { Types } from 'mongoose';
+import { formatNumber } from '@/lib/utils';
+import './pos-detail.scss';
 
 interface PageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 interface LeanPointOfSale {
@@ -41,6 +45,28 @@ interface LeanPointOfSale {
   }>;
 }
 
+async function getPointOfSale(id: string) {
+  await dbConnect();
+  const doc = (await PointOfSale.findById(id).lean()) as LeanPointOfSale | null;
+
+  if (!doc) return null;
+
+  // Serialize keys
+  return {
+    ...doc,
+    _id: doc._id.toString(),
+    warehouseId: doc.warehouseId ? doc.warehouseId.toString() : null,
+    createdAt: doc.createdAt?.toISOString(),
+    updatedAt: doc.updatedAt?.toISOString(),
+    contacts: doc.contacts
+      ? doc.contacts.map((c) => ({
+        ...c,
+        _id: c._id.toString(),
+      }))
+      : [],
+  };
+}
+
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
@@ -59,38 +85,16 @@ export async function generateMetadata({
   };
 }
 
-async function getPointOfSale(id: string) {
-  await dbConnect();
-  const doc = (await PointOfSale.findById(id).lean()) as LeanPointOfSale | null;
-
-  if (!doc) return null;
-
-  // Serialize keys
-  return {
-    ...doc,
-    _id: doc._id.toString(),
-    warehouseId: doc.warehouseId ? doc.warehouseId.toString() : null,
-    createdAt: doc.createdAt?.toISOString(),
-    updatedAt: doc.updatedAt?.toISOString(),
-    contacts: doc.contacts
-      ? doc.contacts.map((c) => ({
-          ...c,
-          _id: c._id.toString(),
-        }))
-      : [],
-  };
-}
-
-import { formatNumber } from '@/lib/utils';
-import './pos-detail.scss';
-
-export default async function PointOfSaleDetailPage({ params }: PageProps) {
+export default async function PointOfSaleDetailPage({ params, searchParams }: PageProps) {
   const { id } = await params;
+  const { tab } = await searchParams;
   const pos = await getPointOfSale(id);
 
   if (!pos) {
     notFound();
   }
+
+  const defaultTab = typeof tab === 'string' ? tab : 'info';
 
   return (
     <div className="pos-detail">
@@ -105,14 +109,12 @@ export default async function PointOfSaleDetailPage({ params }: PageProps) {
         </div>
       </div>
       <Separator />
-      <Tabs defaultValue="info" className="space-y-4">
+      <Tabs defaultValue={defaultTab} className="space-y-4">
         <TabsList>
           <TabsTrigger value="info">Información</TabsTrigger>
           <TabsTrigger value="contacts">Contactos</TabsTrigger>
           <TabsTrigger value="stock">Inventario</TabsTrigger>
-          <TabsTrigger value="sales" disabled>
-            Ventas (Próximamente)
-          </TabsTrigger>
+          <TabsTrigger value="ventas">Ventas</TabsTrigger>
         </TabsList>
         <TabsContent value="info" className="space-y-4">
           <div className="pos-detail__grid">
@@ -132,6 +134,13 @@ export default async function PointOfSaleDetailPage({ params }: PageProps) {
         </TabsContent>
         <TabsContent value="stock" className="space-y-4">
           <PointOfSaleStock warehouseId={pos.warehouseId?.toString()} />
+        </TabsContent>
+        <TabsContent value="ventas" className="space-y-4">
+          <POSStats
+            posId={pos._id}
+            posName={pos.name}
+            warehouseId={pos.warehouseId?.toString()}
+          />
         </TabsContent>
       </Tabs>
     </div>

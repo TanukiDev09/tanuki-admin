@@ -6,14 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/Table';
+import { DataTable, Column } from '@/components/ui/DataTable';
 import { CreatorResponse } from '@/types/creator';
 import { Edit, Trash2, Plus, Search } from 'lucide-react';
 import { CreatorForm } from './CreatorForm';
@@ -97,6 +90,56 @@ export default function CreatorList() {
     setIsModalOpen(true);
   };
 
+  const columns: Column<CreatorResponse>[] = [
+    {
+      header: 'Nombre',
+      accessorKey: 'name',
+      sortable: true,
+      cell: (creator) => (
+        <a
+          href={`/dashboard/creators/${creator._id}`}
+          className="creator-list__name-link"
+        >
+          {creator.name}
+        </a>
+      ),
+    },
+    {
+      header: 'Nacionalidad',
+      accessorKey: 'nationality',
+      sortable: true,
+      cell: (creator) => creator.nationality || '-',
+    },
+    {
+      header: 'Acciones',
+      accessorKey: '_id',
+      className: 'creator-list__actions-cell',
+      cell: (creator) => (
+        <div className="creator-list__actions-group">
+          {canUpdate && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleEdit(creator)}
+            >
+              <Edit className="creator-list__action-icon" />
+            </Button>
+          )}
+          {canDelete && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => handleDelete(creator._id)}
+              className="creator-list__delete-btn"
+            >
+              <Trash2 className="creator-list__action-icon" />
+            </Button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="creator-list">
       <div className="creator-list__header">
@@ -122,69 +165,12 @@ export default function CreatorList() {
       </div>
 
       <div className="creator-list__table-wrapper">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Nacionalidad</TableHead>
-              <TableHead className="creator-list__actions-head">
-                Acciones
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={3} className="creator-list__loading-cell">
-                  Cargando...
-                </TableCell>
-              </TableRow>
-            ) : creators.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={3} className="creator-list__loading-cell">
-                  No se encontraron creadores
-                </TableCell>
-              </TableRow>
-            ) : (
-              creators
-                .filter((c) => c)
-                .map((creator) => (
-                  <TableRow key={creator._id}>
-                    <TableCell className="creator-list__name-cell">
-                      <a
-                        href={`/dashboard/creators/${creator._id}`}
-                        className="creator-list__name-link"
-                      >
-                        {creator.name}
-                      </a>
-                    </TableCell>
-                    <TableCell>{creator.nationality || '-'}</TableCell>
-                    <TableCell className="creator-list__actions-cell">
-                      {canUpdate && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleEdit(creator)}
-                        >
-                          <Edit className="creator-list__action-icon" />
-                        </Button>
-                      )}
-                      {canDelete && (
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(creator._id)}
-                          className="creator-list__delete-btn"
-                        >
-                          <Trash2 className="creator-list__action-icon" />
-                        </Button>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
-            )}
-          </TableBody>
-        </Table>
+        <DataTable
+          data={creators.filter((c) => c)}
+          columns={columns}
+          loading={loading}
+          emptyMessage="No se encontraron creadores"
+        />
       </div>
 
       <CreatorForm
