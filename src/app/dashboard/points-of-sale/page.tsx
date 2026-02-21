@@ -3,8 +3,7 @@ import { Suspense } from 'react';
 import { PointOfSaleList } from '@/components/points-of-sale/PointOfSaleList';
 import { CreatePointOfSaleButton } from '@/components/points-of-sale/CreatePointOfSaleButton';
 import dbConnect from '@/lib/mongodb';
-import PointOfSale, { IPOSContact } from '@/models/PointOfSale';
-import { Types } from 'mongoose';
+import PointOfSale from '@/models/PointOfSale';
 
 // Force dynamic rendering to ensure fresh data
 export const dynamic = 'force-dynamic';

@@ -60,7 +60,7 @@
     &.active {
       opacity: 1;
 
-      .stepNumber {
+      .step-number {
         background: linear-gradient(
           135deg,
           hsl(260deg 80% 60%) 0%,
@@ -72,7 +72,7 @@
       }
     }
 
-    .stepNumber {
+    .step-number {
       width: 3rem;
       height: 3rem;
       border-radius: 50%;
@@ -86,7 +86,7 @@
       transition: all 0.3s ease;
     }
 
-    .stepLabel {
+    .step-label {
       font-size: 0.875rem;
       font-weight: 600;
       color: hsl(220deg 20% 40%);
@@ -95,7 +95,7 @@
 }
 
 // Upload Section
-.uploadSection {
+.upload-section {
   max-width: 800px;
   margin: 0 auto;
 }
@@ -128,10 +128,10 @@
   }
 }
 
-.dropzoneContent {
+.dropzone-content {
   text-align: center;
 
-  .uploadIcon {
+  .upload-icon {
     margin: 0 auto 1.5rem;
     width: 64px;
     height: 64px;
@@ -156,7 +156,7 @@
     margin-bottom: 1.5rem;
   }
 
-  .fileTypes {
+  .file-types {
     display: flex;
     gap: 0.5rem;
     justify-content: center;
@@ -177,12 +177,12 @@
 }
 
 // File List
-.fileList {
+.file-list {
   max-width: 900px;
   margin: 0 auto;
 }
 
-.fileListHeader {
+.file-list-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -195,13 +195,13 @@
   }
 }
 
-.fileListActions {
+.file-list-actions {
   display: flex;
   gap: 1rem;
   align-items: center;
 }
 
-.saveAllButton {
+.save-all-button {
   padding: 0.875rem 2rem;
   background: linear-gradient(
     135deg,
@@ -229,7 +229,7 @@
   }
 }
 
-.processButton {
+.process-button {
   padding: 0.875rem 2rem;
   background: linear-gradient(
     135deg,
@@ -262,7 +262,7 @@
   gap: 1rem;
 }
 
-.fileCard {
+.file-card {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -311,13 +311,13 @@
   }
 }
 
-.fileActions {
+.file-actions {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
-.reviewButton {
+.review-button {
   padding: 0.6rem 1.2rem;
   background: linear-gradient(
     135deg,
@@ -338,7 +338,7 @@
   }
 }
 
-.finishButton {
+.finish-button {
   padding: 0.875rem 2rem;
   background: linear-gradient(
     135deg,
@@ -360,7 +360,7 @@
   }
 }
 
-.importedBadge {
+.imported-badge {
   padding: 0.25rem 0.75rem;
   background: linear-gradient(
     135deg,
@@ -373,14 +373,14 @@
   font-size: 0.75rem;
 }
 
-.fileInfo {
+.file-info {
   display: flex;
   align-items: center;
   gap: 1rem;
   flex: 1;
 }
 
-.fileIcon {
+.file-icon {
   width: 3rem;
   height: 3rem;
   border-radius: 12px;
@@ -421,17 +421,17 @@
   }
 }
 
-.fileDetails {
+.file-details {
   flex: 1;
 }
 
-.fileName {
+.file-name {
   font-weight: 600;
   color: hsl(220deg 30% 30%);
   margin-bottom: 0.25rem;
 }
 
-.invoicePreview {
+.invoice-preview {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
@@ -444,7 +444,7 @@
   }
 }
 
-.newsletterBadge {
+.newsletter-badge {
   padding: 0.25rem 0.75rem;
   background: linear-gradient(
     135deg,
@@ -462,7 +462,7 @@
   font-size: 0.875rem;
 }
 
-.removeButton {
+.remove-button {
   width: 2rem;
   height: 2rem;
   border-radius: 8px;
@@ -484,12 +484,12 @@
 }
 
 // Review Section
-.reviewSection {
+.review-section {
   max-width: 1200px;
   margin: 0 auto;
 }
 
-.reviewHeader {
+.review-header {
   display: flex;
   align-items: flex-end;
   gap: 2rem;
@@ -497,7 +497,7 @@
   padding-bottom: 1rem;
   border-bottom: 2px solid hsl(220deg 20% 90%);
 
-  .backButton {
+  .back-button {
     background: none;
     border: none;
     color: hsl(240deg 60% 60%);
@@ -514,7 +514,7 @@
     }
   }
 
-  .reviewTitle {
+  .review-title {
     h2 {
       font-size: 1.75rem;
       font-weight: 700;
@@ -527,7 +527,7 @@
   }
 }
 
-.reviewFormContainer {
+.review-form-container {
   background: white;
   padding: 2rem;
   border-radius: 20px;
@@ -541,7 +541,7 @@
   margin: 0 auto;
 }
 
-.summaryCard {
+.summary-card {
   padding: 3rem;
   background: hsl(0deg 0% 100% / 80%);
   backdrop-filter: blur(10px);
@@ -550,19 +550,19 @@
   box-shadow: 0 8px 40px hsl(0deg 0% 0% / 8%);
 }
 
-.summaryIcon {
+.summary-icon {
   font-size: 4rem;
   margin-bottom: 1rem;
 }
 
-.summaryCard h2 {
+.summary-card h2 {
   font-size: 2rem;
   font-weight: 700;
   color: hsl(220deg 30% 30%);
   margin-bottom: 2rem;
 }
 
-.summaryStats {
+.summary-stats {
   display: flex;
   gap: 2rem;
   justify-content: center;
@@ -586,19 +586,19 @@
       hsl(0deg 60% 96%) 100%
     );
 
-    .statValue {
+    .stat-value {
       color: hsl(0deg 60% 50%);
     }
   }
 
-  .statValue {
+  .stat-value {
     font-size: 2.5rem;
     font-weight: 700;
     color: hsl(140deg 60% 40%);
     margin-bottom: 0.25rem;
   }
 
-  .statLabel {
+  .stat-label {
     font-size: 0.875rem;
     font-weight: 600;
     color: hsl(220deg 20% 50%);
@@ -613,8 +613,8 @@
   justify-content: center;
 }
 
-.primaryButton,
-.secondaryButton {
+.primary-button,
+.secondary-button {
   padding: 1rem 2rem;
   border-radius: 12px;
   font-weight: 600;
@@ -624,7 +624,7 @@
   border: none;
 }
 
-.primaryButton {
+.primary-button {
   background: linear-gradient(
     135deg,
     hsl(260deg 80% 60%) 0%,
@@ -639,7 +639,7 @@
   }
 }
 
-.secondaryButton {
+.secondary-button {
   background: hsl(0deg 0% 95%);
   color: hsl(220deg 30% 30%);
 

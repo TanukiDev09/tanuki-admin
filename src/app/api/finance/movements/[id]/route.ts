@@ -9,7 +9,6 @@ import {
   add,
   multiply,
   divide,
-  compare,
   toNumber,
   gtZero,
   subtract,

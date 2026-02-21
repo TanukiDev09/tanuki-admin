@@ -78,7 +78,7 @@ export function MailListTab() {
         description: 'Lista copiada al portapapeles correctamente',
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       toast({
         title: 'Error',
         description: 'No se pudo copiar al portapapeles',

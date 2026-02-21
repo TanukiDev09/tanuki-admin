@@ -10,13 +10,13 @@ interface StatCardProps {
   trend?: string;
   className?: string;
   variant?:
-    | 'flow'
-    | 'ebb'
-    | 'balance'
-    | 'default'
-    | 'success'
-    | 'info'
-    | 'danger';
+  | 'flow'
+  | 'ebb'
+  | 'balance'
+  | 'default'
+  | 'success'
+  | 'info'
+  | 'danger';
   sparklineData?: number[];
   trendDirection?: 'up' | 'down';
   trendValue?: string;
@@ -46,7 +46,7 @@ export function StatCard({
   return (
     <div className={`stat-card stat-card--${variant} ${className || ''}`}>
       <div className="stat-card__header">
-        <h3 className="stat-card__title">{title}</h3>
+        <h2 className="stat-card__title">{title}</h2>
         <Icon className="stat-card__icon" />
       </div>
       <div className="stat-card__content">

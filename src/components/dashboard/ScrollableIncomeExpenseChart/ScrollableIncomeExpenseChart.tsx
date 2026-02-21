@@ -60,7 +60,7 @@ export function ScrollableIncomeExpenseChart({
       className={`scrollable-income-expense-chart ${className || ''} ${scrollable ? 'scrollable-income-expense-chart--scrollable' : ''}`}
     >
       <CardHeader className="scrollable-income-expense-chart__header">
-        <CardTitle className="scrollable-income-expense-chart__title">
+        <CardTitle as="h2" className="scrollable-income-expense-chart__title">
           {isDaily ? 'Flujo de Efectivo Diario' : 'Flujo de Caja Histórico'}
         </CardTitle>
       </CardHeader>

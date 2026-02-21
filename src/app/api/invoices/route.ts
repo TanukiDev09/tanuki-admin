@@ -70,55 +70,55 @@ const createInvoiceSchema = z.object({
     .optional(),
 });
 
+function buildInvoiceQuery(searchParams: URLSearchParams) {
+  const startDate = searchParams.get('startDate');
+  const endDate = searchParams.get('endDate');
+  const status = searchParams.get('status');
+  const search = searchParams.get('search');
+  const bookId = searchParams.get('bookId');
+  const minAmount = searchParams.get('minAmount');
+  const maxAmount = searchParams.get('maxAmount');
+
+  const query: Record<string, unknown> = {};
+  if (startDate && endDate) {
+    query.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
+  }
+  if (status) {
+    query.status = status;
+  }
+  if (bookId) {
+    query['items.bookId'] = bookId;
+  }
+  if (search) {
+    query.$or = [
+      { number: { $regex: search, $options: 'i' } },
+      { customerName: { $regex: search, $options: 'i' } },
+      { customerTaxId: { $regex: search, $options: 'i' } },
+    ];
+  }
+
+  if (minAmount || maxAmount) {
+    const amountQuery: Record<string, number> = {};
+    if (minAmount) amountQuery.$gte = parseFloat(minAmount);
+    if (maxAmount) amountQuery.$lte = parseFloat(maxAmount);
+    query.total = amountQuery;
+  }
+
+  return query;
+}
+
 export async function GET(req: NextRequest) {
   try {
     await dbConnect();
 
-    // Basic Auth Check (Improve based on actual permissions system)
-    // const auth = await verifyAuth(req);
-    // if (!auth.user) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
-
     const { searchParams } = new URL(req.url);
-    const startDate = searchParams.get('startDate');
-    const endDate = searchParams.get('endDate');
-    const status = searchParams.get('status');
-    const search = searchParams.get('search');
-    const bookId = searchParams.get('bookId');
 
     // Pagination
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '50');
     const skip = (page - 1) * limit;
 
-    const minAmount = searchParams.get('minAmount');
-    const maxAmount = searchParams.get('maxAmount');
-
-    const query: Record<string, unknown> = {};
-    if (startDate && endDate) {
-      query.date = { $gte: new Date(startDate), $lte: new Date(endDate) };
-    }
-    if (status) {
-      query.status = status;
-    }
-    if (bookId) {
-      query['items.bookId'] = bookId;
-    }
-    if (search) {
-      query.$or = [
-        { number: { $regex: search, $options: 'i' } },
-        { customerName: { $regex: search, $options: 'i' } },
-        { customerTaxId: { $regex: search, $options: 'i' } },
-      ];
-    }
-
-    if (minAmount || maxAmount) {
-      const amountQuery: Record<string, number> = {};
-      if (minAmount) amountQuery.$gte = parseFloat(minAmount);
-      if (maxAmount) amountQuery.$lte = parseFloat(maxAmount);
-      query.total = amountQuery;
-    }
+    const query = buildInvoiceQuery(searchParams);
 
     // Sorting
     const sortField = searchParams.get('sortField') || 'date';

@@ -10,7 +10,6 @@ import {
   Trash2,
   TrendingUp,
   TrendingDown,
-  Activity,
   DollarSign,
   PieChart,
   ChevronRight,
@@ -121,7 +120,7 @@ export default function CostCenterDetailPage() {
           <PieChart size={40} className="text-muted-foreground" />
         </div>
         <div className="text-center">
-          <h3 className="text-xl font-bold">Centro de costo no encontrado</h3>
+          <h1 className="text-xl font-bold">Centro de costo no encontrado</h1>
           <p className="text-muted-foreground">El recurso que buscas no existe o ha sido movido.</p>
         </div>
         <Button onClick={() => router.push('/dashboard/cost-centers')}>
@@ -249,13 +248,12 @@ export default function CostCenterDetailPage() {
 
           {/* Recent Movements */}
           <div className="cost-center-detail__movements-card">
-            <div className="cost-center-detail__movements-card__header">
-              <h3 className="cost-center-detail__movements-card__title">Últimos Movimientos</h3>
+            <div className="flex justify-end p-2 pb-0">
               <Button variant="link" size="sm" onClick={() => router.push(`/dashboard/movements?costCenter=${costCenter.code}`)}>
                 Ver todos
               </Button>
             </div>
-            <div className="p-2">
+            <div className="p-2 pt-0">
               <RecentMovements movements={movements} />
             </div>
           </div>
@@ -264,7 +262,7 @@ export default function CostCenterDetailPage() {
         <aside className="cost-center-detail__side-area">
           <Card className="cost-center-detail__info-card">
             <CardHeader>
-              <CardTitle>Información General</CardTitle>
+              <CardTitle as="h2">Información General</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col gap-6">
               <div className="cost-center-detail__info-item">
@@ -293,7 +291,7 @@ export default function CostCenterDetailPage() {
           {financialData?.health && (
             <Card className="cost-center-detail__info-card">
               <CardHeader>
-                <CardTitle>Métricas de Gestión</CardTitle>
+                <CardTitle as="h2">Métricas de Gestión</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-6">
                 <div className="cost-center-detail__info-item">

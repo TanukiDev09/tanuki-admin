@@ -34,6 +34,6 @@ describe('StatCard', () => {
     );
 
     const card = container.firstChild;
-    expect(card).toHaveClass('zone-flow');
+    expect(card).toHaveClass('stat-card--flow');
   });
 });

@@ -21,7 +21,7 @@ import { POSSelect } from '@/components/admin/POSSelect/POSSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency } from '@/lib/utils';
-import { multiply, divide, gtZero, add, toNumber, compare, isMatchedFinancial } from '@/lib/math';
+import { multiply, divide, gtZero, add, toNumber, isMatchedFinancial } from '@/lib/math';
 import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import { MovementItemsTable } from '@/components/finance/MovementItemsTable';
 import { GeneralInfoSection, AllocationSection } from '@/components/finance/MovementFormSections';

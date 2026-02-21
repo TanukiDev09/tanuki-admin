@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
 import {
@@ -12,8 +12,9 @@ import {
   Search,
   ChevronRight,
   Calendar,
-  FileText,
+  Building2,
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { IDebt } from '@/types/debt';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -40,263 +41,231 @@ export default function EntityDebtsPage() {
     },
   });
 
-  const entityData = debts?.data?.[0]?.entityId;
-  const entityName =
-    debts?.data?.[0]?.entityName || entityData?.name || 'Cargando...';
-  const entityType = debts?.data?.[0]?.entityType;
+  const entityData = useMemo(() => {
+    return {
+      name: debts?.data?.[0]?.entityName || debts?.data?.[0]?.entityId?.name || 'Cargando...',
+      type: debts?.data?.[0]?.entityType || 'Entidad',
+    };
+  }, [debts]);
 
-  const summary = debts?.data?.reduce(
-    (acc: { cobrar: number; pagar: number }, debt: IDebt) => {
-      const amount = Number(debt.remainingBalance);
-      if (debt.type === 'Cuenta por Cobrar') acc.cobrar += amount;
-      else acc.pagar += amount;
-      return acc;
-    },
-    { cobrar: 0, pagar: 0 }
-  ) || { cobrar: 0, pagar: 0 };
+  const summary = useMemo(() => {
+    return debts?.data?.reduce(
+      (acc: { cobrar: number; pagar: number }, debt: IDebt) => {
+        const amount = Number(debt.remainingBalance);
+        if (debt.type === 'Cuenta por Cobrar') acc.cobrar += amount;
+        else acc.pagar += amount;
+        return acc;
+      },
+      { cobrar: 0, pagar: 0 }
+    ) || { cobrar: 0, pagar: 0 };
+  }, [debts]);
 
-  const filteredDebts = debts?.data?.filter(
-    (debt: IDebt) =>
-      debt.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      debt.source.reference?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredDebts = useMemo(() => {
+    return debts?.data?.filter(
+      (debt: IDebt) =>
+        debt.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        debt.source.reference?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [debts, searchTerm]);
 
   const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'Pagado':
-        return (
-          <Badge className="entity-debts__badge entity-debts__badge--success">
-            Pagado
-          </Badge>
-        );
-      case 'Pagado Parcial':
-        return (
-          <Badge className="entity-debts__badge entity-debts__badge--warning">
-            Parcial
-          </Badge>
-        );
-      case 'Vencido':
-        return (
-          <Badge className="entity-debts__badge entity-debts__badge--danger">
-            Vencido
-          </Badge>
-        );
-      default:
-        return (
-          <Badge className="entity-debts__badge entity-debts__badge--muted">
-            Pendiente
-          </Badge>
-        );
-    }
+    const statusMap: Record<string, { label: string; class: string }> = {
+      'Pagado': { label: 'Liquidado', class: 'status-badge--success' },
+      'Pagado Parcial': { label: 'Pago Parcial', class: 'status-badge--warning' },
+      'Vencido': { label: 'Vencido', class: 'status-badge--danger' },
+      'Pendiente': { label: 'Pendiente', class: 'status-badge--info' },
+    };
+
+    const config = statusMap[status] || statusMap['Pendiente'];
+    return (
+      <Badge variant="outline" className={cn('status-badge', config.class)}>
+        {config.label}
+      </Badge>
+    );
   };
 
   const netBalance = summary.cobrar - summary.pagar;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
+
   return (
     <div className="entity-debts">
       <div className="entity-debts__container">
-        {/* Dynamic Header */}
-        <div className="entity-debts__header">
-          <div className="entity-debts__header-left">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => router.back()}
-              className="entity-debts__back-btn"
-            >
-              <ArrowLeft className="w-5 h-5 text-slate-600" />
-            </Button>
-            <div className="entity-debts__divider" />
-            <div className="entity-debts__entity-info">
-              <Badge variant="outline" className="entity-debts__entity-type">
-                {entityType || 'Entidad'}
-              </Badge>
-              <h1 className="entity-debts__entity-name">{entityName}</h1>
+        {/* Modern Nav-Header */}
+        <header className="entity-header">
+          <div className="entity-header__breadcrumb">
+            <button onClick={() => router.push('/dashboard/debts')} className="entity-header__back">
+              <ArrowLeft className="entity-header__back-icon" />
+              <span>Volver a Deudas</span>
+            </button>
+          </div>
+
+          <div className="entity-header__main">
+            <div className="entity-header__info">
+              <div className="entity-header__icon">
+                <Building2 className="entity-header__icon-svg" />
+              </div>
+              <div className="entity-header__text">
+                <div className="entity-header__type-wrapper">
+                  <Badge variant="outline" className="entity-header__type">
+                    {entityData.type}
+                  </Badge>
+                </div>
+                <h1 className="entity-header__name">{entityData.name}</h1>
+              </div>
+            </div>
+
+            <div className="entity-header__actions">
+              <Button onClick={() => setIsModalOpen(true)} className="entity-header__btn-primary">
+                <Plus className="entity-header__btn-icon" />
+                Registrar Obligación
+              </Button>
             </div>
           </div>
+        </header>
 
-          <div className="entity-debts__header-action">
-            <Button
-              onClick={() => setIsModalOpen(true)}
-              className="entity-debts__btn-primary"
-            >
-              <Plus className="w-5 h-5" />
-              Registrar Obligación
-            </Button>
-          </div>
-        </div>
+        {/* Financial Highlights */}
+        <motion.section
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="entity-stats"
+        >
+          <motion.div variants={itemVariants}>
+            <Card className="stat-card stat-card--income">
+              <CardContent className="stat-card__content">
+                <div className="stat-card__header">
+                  <div className="stat-card__icon-box">
+                    <TrendingUp className="stat-card__icon" />
+                  </div>
+                  <span className="stat-card__label">Activos (Por Cobrar)</span>
+                </div>
+                <div className="stat-card__value">{formatCurrency(summary.cobrar, 'COP')}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-        {/* Detail Summary Cards */}
-        <div className="entity-debts__summary">
-          <Card className="entity-debts__card">
-            <CardContent className="entity-debts__card-content">
-              <div className="entity-debts__card-icon entity-debts__card-icon--active">
-                <TrendingUp className="w-7 h-7" />
-              </div>
-              <div className="entity-debts__card-info">
-                <p className="entity-debts__card-label">Activos Totales</p>
-                <p className="entity-debts__card-value">
-                  {formatCurrency(summary.cobrar, 'COP')}
-                </p>
-                <p className="entity-debts__card-sub entity-debts__card-sub--active">
-                  Cuentas por cobrar
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div variants={itemVariants}>
+            <Card className="stat-card stat-card--expense">
+              <CardContent className="stat-card__content">
+                <div className="stat-card__header">
+                  <div className="stat-card__icon-box">
+                    <TrendingDown className="stat-card__icon" />
+                  </div>
+                  <span className="stat-card__label">Pasivos (Por Pagar)</span>
+                </div>
+                <div className="stat-card__value">{formatCurrency(summary.pagar, 'COP')}</div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          <Card className="entity-debts__card">
-            <CardContent className="entity-debts__card-content">
-              <div className="entity-debts__card-icon entity-debts__card-icon--passive">
-                <TrendingDown className="w-7 h-7" />
-              </div>
-              <div className="entity-debts__card-info">
-                <p className="entity-debts__card-label">Pasivos Totales</p>
-                <p className="entity-debts__card-value">
-                  {formatCurrency(summary.pagar, 'COP')}
-                </p>
-                <p className="entity-debts__card-sub entity-debts__card-sub--passive">
-                  Cuentas por pagar
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <motion.div variants={itemVariants}>
+            <Card className={cn(
+              "stat-card stat-card--balance",
+              netBalance >= 0 ? "stat-card--positive" : "stat-card--negative"
+            )}>
+              <CardContent className="stat-card__content">
+                <div className="stat-card__header">
+                  <div className="stat-card__icon-box">
+                    <Receipt className="stat-card__icon" />
+                  </div>
+                  <span className="stat-card__label">Saldo Consolidado</span>
+                </div>
+                <div className="stat-card__value">{formatCurrency(Math.abs(netBalance), 'COP')}</div>
+                <div className="stat-card__indicator">
+                  {netBalance >= 0 ? 'A favor de la empresa' : 'Pendiente de pago'}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </motion.section>
 
-          <Card className="entity-debts__card entity-debts__card--balance">
-            <CardContent className="entity-debts__card-content">
-              <div className="entity-debts__card-icon entity-debts__card-icon--balance">
-                <Receipt className="w-7 h-7" />
-              </div>
-              <div className="entity-debts__card-info">
-                <p className="entity-debts__card-label">Saldo de la Entidad</p>
-                <p
-                  className={cn(
-                    'entity-debts__card-value',
-                    netBalance >= 0
-                      ? 'entity-debts__card-value--positive'
-                      : 'entity-debts__card-value--negative'
-                  )}
-                >
-                  {formatCurrency(Math.abs(netBalance), 'COP')}
-                </p>
-                <p className="entity-debts__card-sub">
-                  {netBalance >= 0
-                    ? 'A favor de la empresa'
-                    : 'Saldo pendiente de pago'}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Transaction History Section */}
-        <div className="entity-debts__history">
-          <div className="entity-debts__history-header">
-            <h2 className="entity-debts__history-title">
-              <FileText className="w-6 h-6" />
-              Historial de Documentos
-            </h2>
-            <div className="entity-debts__history-search">
-              <Search className="entity-debts__history-search-icon" />
+        {/* History / Transactions */}
+        <div className="entity-history">
+          <div className="entity-history__filters">
+            <div className="entity-history__search">
+              <Search className="entity-history__search-icon" />
               <Input
-                placeholder="Buscar por concepto o referencia..."
-                className="entity-debts__history-search-input"
+                placeholder="Filtrar por concepto o referencia..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                className="entity-history__search-input"
               />
             </div>
           </div>
 
-          <div className="entity-debts__history-list">
-            {isLoading ? (
-              <div className="entity-debts__loading">
-                <div className="entity-debts__spinner">
-                  <div className="entity-debts__spinner-track" />
-                  <div className="entity-debts__spinner-thumb" />
+          <div className="history-list">
+            <div className="history-list__header">
+              <div className="history-list__column">DOCUMENTO</div>
+              <div className="history-list__column history-list__column--hide-mobile">FECHA</div>
+              <div className="history-list__column history-list__column--right">BALANCE PENDIENTE</div>
+              <div className="history-list__column history-list__column--action" />
+            </div>
+
+            <AnimatePresence mode="popLayout">
+              {isLoading ? (
+                <div className="history-list__loading">
+                  <div className="history-list__spinner" />
+                  <p>Escaneando registros contables...</p>
                 </div>
-                <p className="entity-debts__loading-text">
-                  Cargando transacciones...
-                </p>
-              </div>
-            ) : filteredDebts?.length > 0 ? (
-              <>
-                {filteredDebts.map((debt: IDebt) => (
-                  <div
+              ) : filteredDebts?.length > 0 ? (
+                filteredDebts.map((debt: IDebt) => (
+                  <motion.div
                     key={debt._id}
+                    layout
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 10 }}
+                    className="history-row"
                     onClick={() => router.push(`/dashboard/debts/${debt._id}`)}
-                    className="entity-debts__item"
                   >
-                    <div className="entity-debts__item-left">
-                      <div
-                        className={cn(
-                          'entity-debts__item-icon',
-                          debt.type === 'Cuenta por Cobrar'
-                            ? 'entity-debts__item-icon--income'
-                            : 'entity-debts__item-icon--expense'
-                        )}
-                      >
-                        {debt.type === 'Cuenta por Cobrar' ? (
-                          <TrendingUp className="w-6 h-6" />
-                        ) : (
-                          <TrendingDown className="w-6 h-6" />
-                        )}
+                    <div className="history-row__main">
+                      <div className={cn(
+                        "history-row__type-indicator",
+                        debt.type === 'Cuenta por Cobrar' ? "history-row__type-indicator--cobrar" : "history-row__type-indicator--pagar"
+                      )}>
+                        {debt.type === 'Cuenta por Cobrar' ? <TrendingUp /> : <TrendingDown />}
                       </div>
-                      <div className="entity-debts__item-info">
-                        <div className="entity-debts__item-title-group">
-                          <h3 className="entity-debts__item-title">
-                            {debt.notes || 'Documento sin descripción'}
-                          </h3>
+                      <div className="history-row__info">
+                        <div className="history-row__title-group">
+                          <span className="history-row__title">{debt.notes || 'Sin concepto'}</span>
                           {getStatusBadge(debt.status)}
                         </div>
-                        <div className="entity-debts__item-meta">
-                          <span className="entity-debts__item-meta-item">
-                            <Calendar className="w-3.5 h-3.5" />
-                            {new Date(debt.createdAt).toLocaleDateString()}
-                          </span>
-                          <span className="entity-debts__item-meta-item">
-                            <FileText className="w-3.5 h-3.5" />
-                            {debt.source.type}: {debt.source.reference}
-                          </span>
+                        <div className="history-row__meta">
+                          <span>{debt.source.type}: {debt.source.reference}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="entity-debts__item-right">
-                      <div className="entity-debts__item-balance">
-                        <p className="entity-debts__item-balance-label">
-                          Saldo Pendiente
-                        </p>
-                        <p
-                          className={cn(
-                            'entity-debts__item-balance-value',
-                            Number(debt.remainingBalance) > 0
-                              ? 'entity-debts__item-balance-value--unpaid'
-                              : 'entity-debts__item-balance-value--paid'
-                          )}
-                        >
-                          {formatCurrency(Number(debt.remainingBalance), 'COP')}
-                        </p>
-                      </div>
-                      <div className="entity-debts__item-chevron">
-                        <ChevronRight className="w-5 h-5" />
-                      </div>
+                    <div className="history-row__date history-row__date--hide-mobile">
+                      <Calendar className="history-row__date-icon" />
+                      {new Date(debt.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>
-                  </div>
-                ))}
-              </>
-            ) : (
-              <div className="entity-debts__empty">
-                <div className="entity-debts__empty-icon">
-                  <Search className="w-10 h-10" />
+
+                    <div className="history-row__price">
+                      {formatCurrency(Number(debt.remainingBalance), 'COP')}
+                    </div>
+
+                    <div className="history-row__action">
+                      <ChevronRight className="history-row__action-icon" />
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                <div className="history-list__empty">
+                  <Search className="history-list__empty-icon" />
+                  <p>No se encontraron registros activos</p>
                 </div>
-                <div className="entity-debts__empty-info">
-                  <h3 className="entity-debts__empty-title">Historial vacío</h3>
-                  <p className="entity-debts__empty-desc">
-                    No se encontraron documentos registrados para esta entidad.
-                  </p>
-                </div>
-              </div>
-            )}
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -305,8 +274,8 @@ export default function EntityDebtsPage() {
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         entityId={entityId}
-        entityType={entityType}
-        entityName={entityName}
+        entityType={entityData.type}
+        entityName={entityData.name}
       />
     </div>
   );

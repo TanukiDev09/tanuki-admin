@@ -64,10 +64,10 @@ export default function FileCard({
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.05 }}
-      className={`${styles.fileCard} ${statusClassName}`}
+      className={`${styles['file-card']} ${statusClassName}`}
     >
-      <div className={styles.fileInfo}>
-        <div className={styles.fileIcon}>
+      <div className={styles['file-info']}>
+        <div className={styles['file-icon']}>
           {(status === 'success' || status === 'imported') && '✓'}
           {status === 'error' && '✗'}
           {(status === 'processing' || status === 'saving') && (
@@ -75,40 +75,40 @@ export default function FileCard({
           )}
           {status === 'pending' && '📄'}
         </div>
-        <div className={styles.fileDetails}>
-          <div className={styles.fileName}>{file.name}</div>
+        <div className={styles['file-details']}>
+          <div className={styles['file-name']}>{file.name}</div>
           {invoice && (
-            <div className={styles.invoicePreview}>
+            <div className={styles['invoice-preview']}>
               <span>#{invoice.number}</span>
               <span>{invoice.customerName}</span>
               <span className={styles.amount}>
                 ${(invoice.total || 0).toLocaleString()} COP
               </span>
               {invoice.newsletterSignup && (
-                <span className={styles.newsletterBadge}>📧 Newsletter</span>
+                <span className={styles['newsletter-badge']}>📧 Newsletter</span>
               )}
             </div>
           )}
           {error && <div className={styles.error}>{error}</div>}
         </div>
       </div>
-      <div className={styles.fileActions}>
+      <div className={styles['file-actions']}>
         {currentStep === 2 && status === 'pending' && (
           <button
             onClick={onRemove}
-            className={styles.removeButton}
+            className={styles['remove-button']}
             title="Eliminar"
           >
             ×
           </button>
         )}
         {currentStep === 3 && status === 'success' && (
-          <button onClick={onReview} className={styles.reviewButton}>
+          <button onClick={onReview} className={styles['review-button']}>
             Revisar
           </button>
         )}
         {status === 'imported' && (
-          <span className={styles.importedBadge}>Guardada ✓</span>
+          <span className={styles['imported-badge']}>Guardada ✓</span>
         )}
       </div>
     </motion.div>
