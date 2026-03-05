@@ -57,7 +57,7 @@ const MovementTableRow = ({
     let channelLabel = '';
     switch (movement.salesChannel) {
       case 'LIBRERIA':
-        channelLabel = `Librería: ${typeof movement.pointOfSale === 'object'
+        channelLabel = `Librería: ${movement.pointOfSale && typeof movement.pointOfSale === 'object'
           ? movement.pointOfSale.name
           : 'Varios'
           }`;
