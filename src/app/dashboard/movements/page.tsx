@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { usePermission } from '@/hooks/usePermissions';
 import { usePersistentFilters } from '@/hooks/usePersistentFilters';
-import { usePersistentFilters } from '@/hooks/usePersistentFilters';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import {
   Table,
@@ -128,28 +127,20 @@ const MovementTableRow = ({
       </TableCell>
       <TableCell data-label="Centro Costo">
         {((movement.allocations && movement.allocations.length > 1) || (movement.items && movement.items.length > 1)) ? (
-          {((movement.allocations && movement.allocations.length > 1) || (movement.items && movement.items.length > 1)) ? (
-            <Badge variant="secondary" className="opacity-80">
-              Múltiple ({(movement.allocations?.length || 0) || (movement.items?.length || 0)})
-              Múltiple ({(movement.allocations?.length || 0) || (movement.items?.length || 0)})
-            </Badge>
-          ) : (
-            movement.costCenter ||
-            movement.allocations?.[0]?.costCenter ||
-            movement.items?.[0]?.costCenter || (
-              movement.allocations?.[0]?.costCenter ||
-              movement.items?.[0]?.costCenter || (
-                <span className="movements-list__no-category">Sin definir</span>
-              )
-            )}
+          <Badge variant="secondary" className="opacity-80">
+            Múltiple ({(movement.allocations?.length || 0) || (movement.items?.length || 0)})
+          </Badge>
+        ) : (
+          movement.costCenter ||
+          movement.allocations?.[0]?.costCenter ||
+          movement.items?.[0]?.costCenter || (
+            <span className="movements-list__no-category">Sin definir</span>
+          )
+        )}
       </TableCell>
       <TableCell data-label="Monto">
         <div className="flex flex-col items-end">
           <span
-            className={`movements-list__amount ${movement.type === 'INCOME'
-              ? 'movements-list__amount--income'
-              : 'movements-list__amount--expense'
-              }`}
             className={`movements-list__amount ${movement.type === 'INCOME'
               ? 'movements-list__amount--income'
               : 'movements-list__amount--expense'
@@ -296,80 +287,11 @@ export default function MovementsPage() {
   const setSortOrder = useCallback((val: string) => updateFilters({ sortOrder: val }), [updateFilters]);
   const setPage = useCallback((val: number) => updateFilters({ page: val }), [updateFilters]);
 
-
-  const {
-    filters,
-    updateFilters,
-    clearFilters: resetAllFilters,
-    hasInitializedRef
-  } = usePersistentFilters({
-    key: 'movements_filters',
-    initialFilters: {
-      search: '',
-      type: 'ALL',
-      category: 'ALL',
-      costCenter: 'ALL',
-      minAmount: '' as string | number | undefined,
-      maxAmount: '' as string | number | undefined,
-      unit: 'ALL',
-      minQuantity: '' as string | number | undefined,
-      maxQuantity: '' as string | number | undefined,
-      quantityUndefined: false,
-      paymentChannel: 'ALL',
-      salesChannel: 'ALL',
-      startDate: '',
-      endDate: '',
-      sortOrder: 'newest',
-      page: 1,
-      showAdvanced: false,
-    }
-  });
-
-  const {
-    search,
-    type: typeFilter,
-    category: categoryFilter,
-    costCenter: costCenterFilter,
-    minAmount,
-    maxAmount,
-    unit: unitFilter,
-    minQuantity,
-    maxQuantity,
-    quantityUndefined,
-    paymentChannel: paymentChannelFilter,
-    salesChannel: salesChannelFilter,
-    startDate,
-    endDate,
-    sortOrder,
-    page,
-    showAdvanced: showAdvancedFilters,
-  } = filters;
-
-  const setShowAdvancedFilters = useCallback((val: boolean) => updateFilters({ showAdvanced: val }), [updateFilters]);
-  const setSearch = useCallback((val: string) => updateFilters({ search: val }), [updateFilters]);
-  const setTypeFilter = useCallback((val: string) => updateFilters({ type: val }), [updateFilters]);
-  const setCategoryFilter = useCallback((val: string) => updateFilters({ category: val }), [updateFilters]);
-  const setCostCenterFilter = useCallback((val: string) => updateFilters({ costCenter: val }), [updateFilters]);
-  const setMinAmount = useCallback((val: string | number | undefined) => updateFilters({ minAmount: val }), [updateFilters]);
-  const setMaxAmount = useCallback((val: string | number | undefined) => updateFilters({ maxAmount: val }), [updateFilters]);
-  const setUnitFilter = useCallback((val: string) => updateFilters({ unit: val }), [updateFilters]);
-  const setMinQuantity = useCallback((val: string | number | undefined) => updateFilters({ minQuantity: val }), [updateFilters]);
-  const setMaxQuantity = useCallback((val: string | number | undefined) => updateFilters({ maxQuantity: val }), [updateFilters]);
-  const setQuantityUndefined = useCallback((val: boolean) => updateFilters({ quantityUndefined: val }), [updateFilters]);
-  const setPaymentChannelFilter = useCallback((val: string) => updateFilters({ paymentChannel: val }), [updateFilters]);
-  const setSalesChannelFilter = useCallback((val: string) => updateFilters({ salesChannel: val }), [updateFilters]);
-  const setStartDate = useCallback((val: string) => updateFilters({ startDate: val }), [updateFilters]);
-  const setEndDate = useCallback((val: string) => updateFilters({ endDate: val }), [updateFilters]);
-  const setSortOrder = useCallback((val: string) => updateFilters({ sortOrder: val }), [updateFilters]);
-  const setPage = useCallback((val: number) => updateFilters({ page: val }), [updateFilters]);
-
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
-  const [availablePaymentChannels, setAvailablePaymentChannels] = useState<string[]>([]);
   const [availablePaymentChannels, setAvailablePaymentChannels] = useState<string[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const limit = 10;
-
 
   const { hasPermission } = usePermission();
   const canCreate = hasPermission(ModuleName.FINANCE, PermissionAction.CREATE);
@@ -380,32 +302,7 @@ export default function MovementsPage() {
     try {
       setLoading(true);
 
-
       const params = new URLSearchParams();
-      const normalize = (val: string) => val !== 'ALL' ? val : '';
-
-      const queryParams: Record<string, string> = {
-        search,
-        type: normalize(typeFilter),
-        category: normalize(categoryFilter),
-        costCenter: normalize(costCenterFilter),
-        paymentChannel: normalize(paymentChannelFilter),
-        salesChannel: normalize(salesChannelFilter),
-        minAmount: minAmount?.toString() || '',
-        maxAmount: maxAmount?.toString() || '',
-        unit: normalize(unitFilter),
-        startDate,
-        endDate,
-        sort: sortOrder,
-        page: page.toString(),
-        limit: limit.toString(),
-        minQuantity: quantityUndefined ? '__UNDEFINED__' : (minQuantity?.toString() || ''),
-        maxQuantity: quantityUndefined ? '' : (maxQuantity?.toString() || ''),
-      };
-
-      Object.entries(queryParams).forEach(([key, value]) => {
-        if (value) params.append(key, value);
-      });
       const normalize = (val: string) => val !== 'ALL' ? val : '';
 
       const queryParams: Record<string, string> = {
@@ -501,14 +398,10 @@ export default function MovementsPage() {
 
   const clearFilters = () => {
     resetAllFilters();
-    resetAllFilters();
   };
 
   // Reset to first page when filters change
   useEffect(() => {
-    if (!hasInitializedRef.current) {
-      return;
-    }
     if (!hasInitializedRef.current) {
       return;
     }
@@ -528,8 +421,6 @@ export default function MovementsPage() {
     endDate,
     quantityUndefined,
     sortOrder,
-    setPage,
-    hasInitializedRef
     setPage,
     hasInitializedRef
   ]);
@@ -680,7 +571,6 @@ export default function MovementsPage() {
               variant="outline"
               size="sm"
               onClick={() => setPage(Math.max(1, page - 1))}
-              onClick={() => setPage(Math.max(1, page - 1))}
               disabled={page === 1 || loading}
               className="movements-list__pagination-btn"
             >
@@ -693,7 +583,6 @@ export default function MovementsPage() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setPage(Math.min(totalPages, page + 1))}
               onClick={() => setPage(Math.min(totalPages, page + 1))}
               disabled={page === totalPages || loading}
               className="movements-list__pagination-btn"
