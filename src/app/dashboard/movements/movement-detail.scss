@@ -12,6 +12,9 @@
     margin-bottom: $spacing-xl;
     color: $muted-foreground;
     transition: all $transition-base;
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
 
     &:hover {
       color: $primary;
@@ -31,12 +34,6 @@
       flex-direction: column;
       align-items: flex-start;
     }
-  }
-
-  &__actions {
-    display: flex;
-    gap: $spacing-sm;
-    align-items: center;
   }
 
   &__title-group {
