@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft,
@@ -28,6 +28,7 @@ import { formatCurrency } from '@/lib/utils';
 import { RecentMovements } from '@/components/dashboard/RecentMovements';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
+import CostCenterModal from '@/components/admin/CostCenterModal';
 import './cost-center-detail.scss';
 
 const ScrollableIncomeExpenseChart = dynamic(
@@ -53,54 +54,57 @@ export default function CostCenterDetailPage() {
   const [movements, setMovements] = useState<Movement[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Estado para el modal de edición
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const canUpdate = hasPermission(ModuleName.COST_CENTERS, PermissionAction.UPDATE);
   const canDelete = hasPermission(ModuleName.COST_CENTERS, PermissionAction.DELETE);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true);
-        const ccRes = await fetch(`/api/costcenters?id=${params.id}`);
-        if (!ccRes.ok) throw new Error('Error al cargar el centro de costo');
-        const ccData = await ccRes.json();
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const ccRes = await fetch(`/api/costcenters/${params.id}`);
+      if (!ccRes.ok) throw new Error('Error al cargar el centro de costo');
+      const ccData = await ccRes.json();
 
-        let foundCC: CostCenter | null = null;
-        if (Array.isArray(ccData.data)) {
-          foundCC = ccData.data.find((c: CostCenter) => c._id === params.id) || null;
-        } else {
-          foundCC = ccData.data;
-        }
-        setCostCenter(foundCC);
-
-        if (foundCC) {
-          const summaryRes = await fetch(`/api/finance/summary?costCenter=${foundCC.code}`);
-          if (summaryRes.ok) {
-            const summaryData = await summaryRes.json();
-            setFinancialData(summaryData);
-          }
-
-          const movementsRes = await fetch(`/api/finance/movements?costCenter=${foundCC.code}&limit=10`);
-          if (movementsRes.ok) {
-            const movementsData = await movementsRes.json();
-            setMovements(movementsData.data || []);
-          }
-        }
-      } catch (error) {
-        console.error(error);
-        toast({
-          title: 'Error',
-          description: 'No se pudo cargar toda la información',
-          variant: 'destructive',
-        });
-      } finally {
-        setLoading(false);
+      let foundCC: CostCenter | null = null;
+      if (Array.isArray(ccData.data)) {
+        foundCC = ccData.data.find((c: CostCenter) => c._id === params.id) || null;
+      } else {
+        foundCC = ccData.data;
       }
-    }
+      setCostCenter(foundCC);
 
+      if (foundCC) {
+        const summaryRes = await fetch(`/api/finance/summary?costCenter=${foundCC.code}`);
+        if (summaryRes.ok) {
+          const summaryData = await summaryRes.json();
+          setFinancialData(summaryData);
+        }
+
+        const movementsRes = await fetch(`/api/finance/movements?costCenter=${foundCC.code}&limit=10`);
+        if (movementsRes.ok) {
+          const movementsData = await movementsRes.json();
+          setMovements(movementsData.data || []);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        title: 'Error',
+        description: 'No se pudo cargar toda la información',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [params.id, toast]);
+
+  useEffect(() => {
     if (params.id) {
       fetchData();
     }
-  }, [params.id, toast]);
+  }, [params.id, fetchData]);
 
   if (loading) {
     return (
@@ -141,17 +145,17 @@ export default function CostCenterDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar este centro de costo?')) return;
+    if (!window.confirm('¿Estás seguro de que deseas desactivar este centro de costo? Su historial financiero y relaciones se mantendrán intactos.')) return;
     try {
-      const res = await fetch(`/api/costcenters?id=${costCenter._id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/costcenters/${costCenter._id}`, { method: 'DELETE' });
       if (res.ok) {
-        toast({ title: 'Éxito', description: 'Centro de costo eliminado' });
+        toast({ title: 'Éxito', description: 'Centro de costo desactivado' });
         router.push('/dashboard/cost-centers');
       } else {
         throw new Error('Error al eliminar');
       }
     } catch {
-      toast({ title: 'Error', description: 'No se pudo eliminar el centro de costo', variant: 'destructive' });
+      toast({ title: 'Error', description: 'No se pudo desactivar el centro de costo', variant: 'destructive' });
     }
   };
 
@@ -179,7 +183,7 @@ export default function CostCenterDetailPage() {
 
         <div className="cost-center-detail__actions">
           {canUpdate && (
-            <Button variant="outline" size="sm" onClick={() => toast({ title: 'Próximamente', description: 'La edición estará disponible pronto.' })}>
+            <Button variant="outline" size="sm" onClick={() => setIsModalOpen(true)}>
               <Pencil size={16} className="mr-2" />
               Editar
             </Button>
@@ -315,6 +319,12 @@ export default function CostCenterDetailPage() {
           )}
         </aside>
       </div>
+      <CostCenterModal
+        isOpen={isModalOpen}
+        costCenter={costCenter}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchData}
+      />
     </div>
   );
 }

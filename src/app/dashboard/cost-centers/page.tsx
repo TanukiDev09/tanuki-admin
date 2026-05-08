@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button';
 import { Plus, Search, TrendingUp, DollarSign, PieChart as PieChartIcon } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import CostCentersTable from '@/components/admin/CostCentersTable/CostCentersTable';
+import CostCenterModal from '@/components/admin/CostCenterModal';
 import { CostCenter } from '@/types/cost-center';
 import { Input } from '@/components/ui/Input';
 import { usePermission } from '@/hooks/usePermissions';
@@ -87,6 +88,10 @@ export default function CostCentersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  // Estados para controlar el modal de creación/edición
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCostCenter, setSelectedCostCenter] = useState<CostCenter | null>(null);
+
   const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
@@ -111,18 +116,18 @@ export default function CostCentersPage() {
   }, [fetchStats]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('¿Estás seguro de que deseas eliminar este centro de costo?')) return;
+    if (!confirm('¿Estás seguro de que deseas desactivar este centro de costo? Su historial financiero y relaciones se mantendrán intactos.')) return;
 
     try {
-      const res = await fetch(`/api/costcenters?id=${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/costcenters/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Error al eliminar');
-      toast({ title: 'Éxito', description: 'Centro de costo eliminado correctamente' });
+      toast({ title: 'Éxito', description: 'Centro de costo desactivado correctamente' });
       fetchStats();
     } catch (error) {
       console.error(error);
       toast({
         title: 'Error',
-        description: 'No se pudo eliminar el centro de costo',
+        description: 'No se pudo desactivar el centro de costo',
         variant: 'destructive',
       });
     }
@@ -199,12 +204,10 @@ export default function CostCentersPage() {
         <div className="cost-centers-page__actions">
           {canCreate && (
             <Button
-              onClick={() =>
-                toast({
-                  title: 'Próximamente',
-                  description: 'La creación desde esta vista está en construcción.',
-                })
-              }
+              onClick={() => {
+                setSelectedCostCenter(null);
+                setIsModalOpen(true);
+              }}
               className="cost-centers-page__new-btn"
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -416,15 +419,20 @@ export default function CostCentersPage() {
         <CostCentersTable
           costCenters={filteredCostCenters}
           loading={loading}
-          onEdit={() =>
-            toast({
-              title: 'Próximamente',
-              description: 'La edición estará disponible pronto.',
-            })
-          }
+          onEdit={(cc) => {
+            setSelectedCostCenter(cc);
+            setIsModalOpen(true);
+          }}
           onDelete={handleDelete}
         />
       </div>
+
+      <CostCenterModal
+        isOpen={isModalOpen}
+        costCenter={selectedCostCenter}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchStats}
+      />
     </div>
   );
 }
