@@ -99,12 +99,17 @@ function MovementDetailContent({
             Ingreso Neto del Movimiento
           </div>
           <div
-            className={`movement-detail__amount-display-value ${isIncome
-              ? 'movement-detail__amount-display-value--income'
-              : 'movement-detail__amount-display-value--expense'
-              }`}
+            className={`movement-detail__amount-display-value ${
+              isIncome
+                ? 'movement-detail__amount-display-value--income'
+                : 'movement-detail__amount-display-value--expense'
+            }`}
           >
-            {isIncome ? '+' : '-'} {formatCurrency(toNumber(movement.amountInCOP || movement.amount), 'COP')}
+            {isIncome ? '+' : '-'}{' '}
+            {formatCurrency(
+              toNumber(movement.amountInCOP || movement.amount),
+              'COP'
+            )}
           </div>
           {movement.currency !== 'COP' && (
             <div className="movement-detail__amount-display-hint">
@@ -117,7 +122,9 @@ function MovementDetailContent({
         </div>
 
         <div className="movement-detail__section">
-          <h2 className="movement-detail__section-title">Información de la Transacción</h2>
+          <h2 className="movement-detail__section-title">
+            Información de la Transacción
+          </h2>
           <div className="movement-detail__info-grid">
             <div className="movement-detail__field">
               <span className="movement-detail__field-label">
@@ -146,28 +153,38 @@ function MovementDetailContent({
             </div>
             <div className="movement-detail__field">
               <span className="movement-detail__field-label">
-                <User className="inline-block w-3 h-3 mr-1 mb-0.5" /> Beneficiario / Pagador
-              </span>
-              <span className="movement-detail__field-value">{movement.beneficiary}</span>
-            </div>
-            <div className="movement-detail__field">
-              <span className="movement-detail__field-label">
-                <CreditCard className="inline-block w-3 h-3 mr-1 mb-0.5" /> Canal de Pago
-              </span>
-              <span className="movement-detail__field-value">{movement.paymentChannel}</span>
-            </div>
-            <div className="movement-detail__field">
-              <span className="movement-detail__field-label">
-                <Layers className="inline-block w-3 h-3 mr-1 mb-0.5" /> Centro de Costo
+                <User className="inline-block w-3 h-3 mr-1 mb-0.5" />{' '}
+                Beneficiario / Pagador
               </span>
               <span className="movement-detail__field-value">
-                {movement.costCenter || movement.allocations?.[0]?.costCenter || '-'}
+                {movement.beneficiary}
+              </span>
+            </div>
+            <div className="movement-detail__field">
+              <span className="movement-detail__field-label">
+                <CreditCard className="inline-block w-3 h-3 mr-1 mb-0.5" />{' '}
+                Canal de Pago
+              </span>
+              <span className="movement-detail__field-value">
+                {movement.paymentChannel}
+              </span>
+            </div>
+            <div className="movement-detail__field">
+              <span className="movement-detail__field-label">
+                <Layers className="inline-block w-3 h-3 mr-1 mb-0.5" /> Centro
+                de Costo
+              </span>
+              <span className="movement-detail__field-value">
+                {movement.costCenter ||
+                  movement.allocations?.[0]?.costCenter ||
+                  '-'}
               </span>
             </div>
             {movement.invoiceRef && (
               <div className="movement-detail__field">
                 <span className="movement-detail__field-label">
-                  <Hash className="inline-block w-3 h-3 mr-1 mb-0.5" /> Ref. Factura
+                  <Hash className="inline-block w-3 h-3 mr-1 mb-0.5" /> Ref.
+                  Factura
                 </span>
                 <span className="movement-detail__field-value movement-detail__field-value--mono">
                   {movement.invoiceRef}
@@ -179,7 +196,9 @@ function MovementDetailContent({
 
         {movement.notes && (
           <div className="movement-detail__section">
-            <h2 className="movement-detail__section-title">Notas Adicionales</h2>
+            <h2 className="movement-detail__section-title">
+              Notas Adicionales
+            </h2>
             <div className="movement-detail__notes-box">{movement.notes}</div>
           </div>
         )}
@@ -195,9 +214,15 @@ function MovementDetailContent({
               {movement.items.map((item, idx) => (
                 <div key={idx} className="movement-detail__item-row">
                   <div className="movement-detail__item-row-info">
-                    <span className="movement-detail__item-row-name">{item.description}</span>
+                    <span className="movement-detail__item-row-name">
+                      {item.description}
+                    </span>
                     <span className="movement-detail__item-row-details">
-                      {formatNumber(toNumber(item.quantity))} x {formatCurrency(toNumber(item.unitValue), movement.currency)}
+                      {formatNumber(toNumber(item.quantity))} x{' '}
+                      {formatCurrency(
+                        toNumber(item.unitValue),
+                        movement.currency
+                      )}
                     </span>
                   </div>
                   <div className="movement-detail__item-row-total">
@@ -225,7 +250,8 @@ function MovementDetailContent({
             >
               <div className="movement-detail__link-card-content">
                 <span className="movement-detail__link-card-title">
-                  {(movement.debtId as unknown as IDebt).source?.reference || 'Documento de Deuda'}
+                  {(movement.debtId as unknown as IDebt).source?.reference ||
+                    'Documento de Deuda'}
                 </span>
                 <span className="movement-detail__link-card-subtitle">
                   Haga clic para ver detalles de la obligación
@@ -247,7 +273,9 @@ function MovementDetailContent({
               style={{ cursor: 'pointer' }}
             >
               <div className="movement-detail__link-card-content">
-                <span className="movement-detail__link-card-title">Gestión de Stock</span>
+                <span className="movement-detail__link-card-title">
+                  Gestión de Stock
+                </span>
                 <span className="movement-detail__link-card-subtitle">
                   Este movimiento afectó el inventario de libros
                 </span>
@@ -338,12 +366,24 @@ export default function MovementDetailPage() {
     }
   };
 
-  if (loading) return <div className="movement-detail__loading">Preparando vista premium...</div>;
-  if (!movement) return <div className="movement-detail__error">Movimiento no encontrado</div>;
+  if (loading)
+    return (
+      <div className="movement-detail__loading">
+        Preparando vista premium...
+      </div>
+    );
+  if (!movement)
+    return (
+      <div className="movement-detail__error">Movimiento no encontrado</div>
+    );
 
   return (
     <div className="movement-detail">
-      <Button variant="ghost" onClick={() => router.back()} className="movement-detail__back-btn">
+      <Button
+        variant="ghost"
+        onClick={() => router.back()}
+        className="movement-detail__back-btn"
+      >
         <ArrowLeft className="w-4 h-4 mr-2" />
         Volver al Listado
       </Button>
@@ -354,7 +394,9 @@ export default function MovementDetailPage() {
         canUpdate={canUpdate}
         canDelete={canDelete}
         onDelete={handleDelete}
-        onEdit={() => router.push(`/dashboard/movements/${movement._id}/editar`)}
+        onEdit={() =>
+          router.push(`/dashboard/movements/${movement._id}/editar`)
+        }
       />
 
       <MovementDetailContent movement={movement} router={router} />

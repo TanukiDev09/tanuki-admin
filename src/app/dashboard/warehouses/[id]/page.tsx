@@ -277,7 +277,9 @@ export default function WarehouseDetailPage() {
               <InventoryList
                 data={inventory}
                 onAdjust={handleAdjustStock}
-                onDelete={canDeleteInventory ? handleDeleteInventoryItem : undefined}
+                onDelete={
+                  canDeleteInventory ? handleDeleteInventoryItem : undefined
+                }
               />
             </CardContent>
           </Card>

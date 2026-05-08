@@ -49,12 +49,20 @@ export default function CostCenterDetailPage() {
   const { toast } = useToast();
   const { hasPermission } = usePermission();
   const [costCenter, setCostCenter] = useState<CostCenter | null>(null);
-  const [financialData, setFinancialData] = useState<FinancialSummary | null>(null);
+  const [financialData, setFinancialData] = useState<FinancialSummary | null>(
+    null
+  );
   const [movements, setMovements] = useState<Movement[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const canUpdate = hasPermission(ModuleName.COST_CENTERS, PermissionAction.UPDATE);
-  const canDelete = hasPermission(ModuleName.COST_CENTERS, PermissionAction.DELETE);
+  const canUpdate = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.UPDATE
+  );
+  const canDelete = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.DELETE
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -66,20 +74,25 @@ export default function CostCenterDetailPage() {
 
         let foundCC: CostCenter | null = null;
         if (Array.isArray(ccData.data)) {
-          foundCC = ccData.data.find((c: CostCenter) => c._id === params.id) || null;
+          foundCC =
+            ccData.data.find((c: CostCenter) => c._id === params.id) || null;
         } else {
           foundCC = ccData.data;
         }
         setCostCenter(foundCC);
 
         if (foundCC) {
-          const summaryRes = await fetch(`/api/finance/summary?costCenter=${foundCC.code}`);
+          const summaryRes = await fetch(
+            `/api/finance/summary?costCenter=${foundCC.code}`
+          );
           if (summaryRes.ok) {
             const summaryData = await summaryRes.json();
             setFinancialData(summaryData);
           }
 
-          const movementsRes = await fetch(`/api/finance/movements?costCenter=${foundCC.code}&limit=10`);
+          const movementsRes = await fetch(
+            `/api/finance/movements?costCenter=${foundCC.code}&limit=10`
+          );
           if (movementsRes.ok) {
             const movementsData = await movementsRes.json();
             setMovements(movementsData.data || []);
@@ -107,7 +120,9 @@ export default function CostCenterDetailPage() {
       <div className="flex h-[80vh] w-full items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-muted-foreground font-medium">Cargando análisis detallado...</p>
+          <p className="text-muted-foreground font-medium">
+            Cargando análisis detallado...
+          </p>
         </div>
       </div>
     );
@@ -121,7 +136,9 @@ export default function CostCenterDetailPage() {
         </div>
         <div className="text-center">
           <h1 className="text-xl font-bold">Centro de costo no encontrado</h1>
-          <p className="text-muted-foreground">El recurso que buscas no existe o ha sido movido.</p>
+          <p className="text-muted-foreground">
+            El recurso que buscas no existe o ha sido movido.
+          </p>
         </div>
         <Button onClick={() => router.push('/dashboard/cost-centers')}>
           <ArrowLeft size={16} className="mr-2" />
@@ -141,9 +158,16 @@ export default function CostCenterDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('¿Estás seguro de que deseas eliminar este centro de costo?')) return;
+    if (
+      !window.confirm(
+        '¿Estás seguro de que deseas eliminar este centro de costo?'
+      )
+    )
+      return;
     try {
-      const res = await fetch(`/api/costcenters?id=${costCenter._id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/costcenters?id=${costCenter._id}`, {
+        method: 'DELETE',
+      });
       if (res.ok) {
         toast({ title: 'Éxito', description: 'Centro de costo eliminado' });
         router.push('/dashboard/cost-centers');
@@ -151,7 +175,11 @@ export default function CostCenterDetailPage() {
         throw new Error('Error al eliminar');
       }
     } catch {
-      toast({ title: 'Error', description: 'No se pudo eliminar el centro de costo', variant: 'destructive' });
+      toast({
+        title: 'Error',
+        description: 'No se pudo eliminar el centro de costo',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -173,19 +201,35 @@ export default function CostCenterDetailPage() {
 
           <div className="cost-center-detail__title-area">
             <h1 className="cost-center-detail__title">{costCenter.name}</h1>
-            <span className="cost-center-detail__code-badge">{costCenter.code}</span>
+            <span className="cost-center-detail__code-badge">
+              {costCenter.code}
+            </span>
           </div>
         </div>
 
         <div className="cost-center-detail__actions">
           {canUpdate && (
-            <Button variant="outline" size="sm" onClick={() => toast({ title: 'Próximamente', description: 'La edición estará disponible pronto.' })}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                toast({
+                  title: 'Próximamente',
+                  description: 'La edición estará disponible pronto.',
+                })
+              }
+            >
               <Pencil size={16} className="mr-2" />
               Editar
             </Button>
           )}
           {canDelete && (
-            <Button variant="outline" size="sm" onClick={handleDelete} className="text-danger hover:bg-danger/10 hover:border-danger hover:text-danger">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDelete}
+              className="text-danger hover:bg-danger/10 hover:border-danger hover:text-danger"
+            >
               <Trash2 size={16} className="mr-2" />
               Eliminar
             </Button>
@@ -228,7 +272,9 @@ export default function CostCenterDetailPage() {
             title="Rentabilidad"
             value={`${(financialData.health?.profitMargin || 0).toFixed(1)}%`}
             icon={Percent}
-            variant={financialData.health?.profitMargin >= 0 ? 'success' : 'danger'}
+            variant={
+              financialData.health?.profitMargin >= 0 ? 'success' : 'danger'
+            }
             subtext="Margen sobre ingresos"
           />
         </div>
@@ -249,7 +295,15 @@ export default function CostCenterDetailPage() {
           {/* Recent Movements */}
           <div className="cost-center-detail__movements-card">
             <div className="flex justify-end p-2 pb-0">
-              <Button variant="link" size="sm" onClick={() => router.push(`/dashboard/movements?costCenter=${costCenter.code}`)}>
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() =>
+                  router.push(
+                    `/dashboard/movements?costCenter=${costCenter.code}`
+                  )
+                }
+              >
                 Ver todos
               </Button>
             </div>
@@ -296,7 +350,9 @@ export default function CostCenterDetailPage() {
               <CardContent className="flex flex-col gap-6">
                 <div className="cost-center-detail__info-item">
                   <label>Gasto Promedio Histórico</label>
-                  <p className="text-xl font-bold">{formatCurrency(financialData.health.avgMonthlyExpense)}</p>
+                  <p className="text-xl font-bold">
+                    {formatCurrency(financialData.health.avgMonthlyExpense)}
+                  </p>
                 </div>
                 <div className="cost-center-detail__info-item">
                   <label>Score de Salud</label>
@@ -304,10 +360,14 @@ export default function CostCenterDetailPage() {
                     <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
                       <div
                         className={`h-full rounded-full ${financialData.health.healthScore > 70 ? 'bg-success' : 'bg-warning'}`}
-                        style={{ width: `${financialData.health.healthScore}%` }}
+                        style={{
+                          width: `${financialData.health.healthScore}%`,
+                        }}
                       />
                     </div>
-                    <span className="font-bold">{Math.floor(financialData.health.healthScore)}/100</span>
+                    <span className="font-bold">
+                      {Math.floor(financialData.health.healthScore)}/100
+                    </span>
                   </div>
                 </div>
               </CardContent>

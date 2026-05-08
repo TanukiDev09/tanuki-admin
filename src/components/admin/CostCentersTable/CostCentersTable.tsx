@@ -41,8 +41,14 @@ export default function CostCentersTable({
 }: CostCentersTableProps) {
   const router = useRouter();
   const { hasPermission } = usePermission();
-  const canUpdate = hasPermission(ModuleName.COST_CENTERS, PermissionAction.UPDATE);
-  const canDelete = hasPermission(ModuleName.COST_CENTERS, PermissionAction.DELETE);
+  const canUpdate = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.UPDATE
+  );
+  const canDelete = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.DELETE
+  );
 
   if (loading) {
     return (
@@ -57,7 +63,11 @@ export default function CostCentersTable({
   }
 
   if (costCenters.length === 0) {
-    return <div className="cost-centers-table__empty">No hay centros de costo registrados.</div>;
+    return (
+      <div className="cost-centers-table__empty">
+        No hay centros de costo registrados.
+      </div>
+    );
   }
 
   return (
@@ -71,7 +81,9 @@ export default function CostCentersTable({
             <TableHead className="text-right">Egresos</TableHead>
             <TableHead className="text-right">Resultado</TableHead>
             <TableHead className="w-[120px]">Tendencia</TableHead>
-            <TableHead className="cost-centers-table__actions-head">Acciones</TableHead>
+            <TableHead className="cost-centers-table__actions-head">
+              Acciones
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -105,7 +117,13 @@ export default function CostCentersTable({
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-1.5 tabular-nums">
-                  <span className={cc.balance >= 0 ? 'text-success font-bold' : 'text-danger font-bold'}>
+                  <span
+                    className={
+                      cc.balance >= 0
+                        ? 'text-success font-bold'
+                        : 'text-danger font-bold'
+                    }
+                  >
                     {formatCurrency(cc.balance)}
                   </span>
                   {cc.balance >= 0 ? (
@@ -119,7 +137,11 @@ export default function CostCentersTable({
                 <div className="h-8 w-full min-w-[100px] flex items-center">
                   <Sparkline
                     data={cc.history}
-                    color={cc.balance >= 0 ? 'hsl(142, 76%, 36%)' : 'hsl(0, 72%, 51%)'}
+                    color={
+                      cc.balance >= 0
+                        ? 'hsl(142, 76%, 36%)'
+                        : 'hsl(0, 72%, 51%)'
+                    }
                     height={24}
                   />
                 </div>
@@ -129,7 +151,9 @@ export default function CostCentersTable({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => router.push(`/dashboard/cost-centers/${cc._id}`)}
+                    onClick={() =>
+                      router.push(`/dashboard/cost-centers/${cc._id}`)
+                    }
                     title="Ver Detalle"
                     className="h-8 w-8 hover:bg-muted"
                   >
