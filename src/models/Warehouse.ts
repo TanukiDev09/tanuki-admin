@@ -10,6 +10,7 @@ export interface IWarehouse extends Document {
   city?: string;
   description?: string;
   status: 'active' | 'inactive';
+  isDeleted?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -55,6 +56,10 @@ const WarehouseSchema: Schema = new Schema(
       type: String,
       enum: ['active', 'inactive'],
       default: 'active',
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
   {
