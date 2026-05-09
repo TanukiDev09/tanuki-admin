@@ -1,0 +1,480 @@
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.inventory-detail {
+  min-height: 100vh;
+  background-color: $background;
+  padding: $spacing-md;
+
+  @media (min-width: $breakpoint-md) {
+    padding: $spacing-xl;
+  }
+
+  &__container {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  // --- HEADER SECTION ---
+  &__header {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $spacing-md;
+    background-color: $card;
+    padding: $spacing-lg;
+    border-radius: $radius-lg;
+    border: 1px solid $border;
+    box-shadow: $shadow-sm;
+
+    @media (min-width: $breakpoint-md) {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+
+  &__header-left {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  &__back-btn {
+    border-radius: $radius-full;
+    width: 2.5rem;
+    height: 2.5rem;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $muted-foreground;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: $muted;
+      color: $foreground;
+      transform: translateX(-2px);
+    }
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xs;
+  }
+
+  &__title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacing-sm;
+  }
+
+  &__title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $foreground;
+    letter-spacing: -0.02em;
+
+    @media (min-width: $breakpoint-md) {
+      font-size: $font-size-2xl;
+    }
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    font-size: $font-size-sm;
+    color: $muted-foreground;
+    margin-top: $spacing-2xs;
+  }
+
+  &__meta-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2xs;
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    width: 100%;
+
+    @media (min-width: $breakpoint-md) {
+      width: auto;
+    }
+
+    button {
+      flex: 1;
+
+      @media (min-width: $breakpoint-md) {
+        flex: none;
+      }
+    }
+  }
+
+  // --- LAYOUT GRID ---
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+
+    @media (min-width: $breakpoint-lg) {
+      grid-template-columns: 2fr 1fr;
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  &__sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-lg;
+  }
+
+  // --- LOGISTIC ROUTE CARD ---
+  &__route-card {
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    background-color: $card;
+    box-shadow: $shadow-sm;
+    overflow: hidden;
+  }
+
+  &__route-header {
+    background-color: hsl(210deg 40% 98%);
+    border-b: 1px solid $border;
+    padding: $spacing-md $spacing-lg;
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+  }
+
+  &__route-title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $muted-foreground;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: $spacing-2xs;
+  }
+
+  &__route-content {
+    padding: $spacing-lg;
+  }
+
+  &__route-flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md;
+
+    @media (min-width: $breakpoint-md) {
+      flex-direction: row;
+      gap: $spacing-xl;
+    }
+  }
+
+  &__route-node {
+    flex: 1;
+    width: 100%;
+    padding: $spacing-md;
+    border-radius: $radius-md;
+    border: 1px solid $border;
+    background-color: hsl(210deg 40% 99%);
+    transition: all 0.2s ease;
+
+    &:hover {
+      border-color: hsl(214deg 32% 86%);
+      box-shadow: $shadow-sm;
+    }
+  }
+
+  &__route-label {
+    display: block;
+    font-size: $font-size-2xs;
+    font-weight: $font-weight-bold;
+    color: $muted-foreground;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: $spacing-sm;
+  }
+
+  &__route-info {
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  &__route-icon-wrapper {
+    background-color: $card;
+    padding: $spacing-sm;
+    border-radius: $radius-sm;
+    border: 1px solid $border;
+    box-shadow: $shadow-xs;
+    color: $muted-foreground;
+  }
+
+  &__route-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  &__route-name {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    color: $foreground;
+  }
+
+  &__route-type {
+    font-size: $font-size-2xs;
+    color: $muted-foreground;
+    text-transform: capitalize;
+  }
+
+  &__route-city {
+    font-size: $font-size-2xs;
+    color: $muted-foreground;
+  }
+
+  &__route-node-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-lg;
+    color: $muted-foreground;
+    font-style: italic;
+    font-size: $font-size-sm;
+    background-color: hsl(210deg 40% 99%);
+    border: 1px dashed $border;
+    border-radius: $radius-md;
+    flex: 1;
+    width: 100%;
+  }
+
+  &__route-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $muted-foreground;
+    padding: 0 $spacing-sm;
+    animation: pulseDirection 2s infinite ease-in-out;
+
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      transform: rotate(90deg);
+
+      @media (min-width: $breakpoint-md) {
+        transform: none;
+      }
+    }
+  }
+
+  // --- ITEMS LIST CARD ---
+  &__items-card {
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    background-color: $card;
+    box-shadow: $shadow-sm;
+    overflow: hidden;
+  }
+
+  &__items-header {
+    padding: $spacing-lg;
+    border-bottom: 1px solid $border;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+  }
+
+  &__items-title {
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $foreground;
+  }
+
+  &__items-badge {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    padding: $spacing-xs $spacing-sm;
+    background-color: $muted;
+    color: $muted-foreground;
+    border-radius: $radius-full;
+  }
+
+  &__items-table-container {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // --- GENERAL INFO SIDEBAR ---
+  &__info-card {
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    background-color: $card;
+    box-shadow: $shadow-sm;
+    overflow: hidden;
+  }
+
+  &__info-header {
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid $border;
+  }
+
+  &__info-title {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $muted-foreground;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: $spacing-2xs;
+  }
+
+  &__info-content {
+    display: flex;
+    flex-direction: column;
+    divide-y: 1px solid $border;
+  }
+
+  &__info-item {
+    padding: $spacing-md $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    border-bottom: 1px solid hsl(210deg 40% 96%);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  &__info-label {
+    font-size: $font-size-2xs;
+    font-weight: $font-weight-semibold;
+    color: $muted-foreground;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  &__info-value {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $foreground;
+
+    &--mono {
+      font-family: $font-family-mono;
+      font-size: $font-size-xs;
+      background-color: $muted;
+      padding: $spacing-2xs $spacing-xs;
+      border-radius: $radius-xs;
+      width: fit-content;
+      user-select: all;
+    }
+  }
+
+  &__status-indicator {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $success;
+    background-color: hsl(142deg 76% 97%);
+    border: 1px solid hsl(142deg 76% 93%);
+    padding: $spacing-xs $spacing-md;
+    border-radius: $radius-md;
+    width: fit-content;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__status-dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: $success;
+    border-radius: $radius-full;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: $success;
+      border-radius: $radius-full;
+      animation: pulseDot 1.5s infinite ease-in-out;
+    }
+  }
+
+  // --- OBSERVATIONS SIDEBAR ---
+  &__observations-card {
+    border: 1px solid hsl(38deg 92% 90%);
+    background-color: hsl(38deg 92% 98%);
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    padding: $spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__observations-title {
+    font-size: $font-size-2xs;
+    font-weight: $font-weight-bold;
+    color: hsl(38deg 92% 35%);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  &__observations-text {
+    font-size: $font-size-sm;
+    font-style: italic;
+    color: hsl(38deg 92% 25%);
+    line-height: 1.5;
+  }
+}
+
+// --- ANIMATIONS ---
+@keyframes pulseDirection {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+    color: $foreground;
+  }
+}
+
+@keyframes pulseDot {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}

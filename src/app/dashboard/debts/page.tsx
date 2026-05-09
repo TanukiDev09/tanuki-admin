@@ -211,7 +211,11 @@ export default function DebtsPage() {
               </button>
             ))}
             <div className="debts-toolbar__divider" />
-            <Button variant="ghost" size="icon" className="debts-toolbar__action-btn">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="debts-toolbar__action-btn"
+            >
               <Filter className="debts-toolbar__action-icon" />
             </Button>
           </div>
@@ -277,7 +281,9 @@ export default function DebtsPage() {
                                 variant="outline"
                                 className={cn(
                                   'debt-card__type-badge',
-                                  isPositive ? 'debt-card__type-badge--cobrar' : 'debt-card__type-badge--pagar'
+                                  isPositive
+                                    ? 'debt-card__type-badge--cobrar'
+                                    : 'debt-card__type-badge--pagar'
                                 )}
                               >
                                 {isPositive ? 'Por Cobrar' : 'Por Pagar'}

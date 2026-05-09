@@ -1,7 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../Table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../Table';
 import { useDataTable, SortDirection } from '@/hooks/useDataTable';
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
 
@@ -24,7 +31,10 @@ interface DataTableProps<T> {
   loading?: boolean;
 }
 
-function getNestedValue(obj: Record<string, unknown> | null | undefined, path: string) {
+function getNestedValue(
+  obj: Record<string, unknown> | null | undefined,
+  path: string
+) {
   if (!obj || !path) return undefined;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return path.split('.').reduce((prev: any, curr) => prev && prev[curr], obj);
@@ -39,7 +49,11 @@ export function DataTable<T>({
   emptyMessage = 'No se encontraron resultados.',
   loading = false,
 }: DataTableProps<T>) {
-  const { data: sortedData, sortConfig, toggleSort } = useDataTable(data, initialSort);
+  const {
+    data: sortedData,
+    sortConfig,
+    toggleSort,
+  } = useDataTable(data, initialSort);
 
   return (
     <DataTableContainer className={className}>
@@ -53,16 +67,20 @@ export function DataTable<T>({
               return (
                 <TableHead
                   key={column.accessorKey}
-                  className={`${column.sortable ? 'table__head--sortable' : ''} ${isSorted ? 'table__head--active' : ''
-                    } ${column.headerClassName || ''}`}
-                  onClick={() => column.sortable && toggleSort(column.accessorKey)}
+                  className={`${column.sortable ? 'table__head--sortable' : ''} ${
+                    isSorted ? 'table__head--active' : ''
+                  } ${column.headerClassName || ''}`}
+                  onClick={() =>
+                    column.sortable && toggleSort(column.accessorKey)
+                  }
                 >
                   <div className="table__head-content">
                     {column.header}
                     {column.sortable && (
                       <span
-                        className={`table__head-sort-icon ${isSorted ? 'table__head-sort-icon--active' : ''
-                          }`}
+                        className={`table__head-sort-icon ${
+                          isSorted ? 'table__head-sort-icon--active' : ''
+                        }`}
                       >
                         {direction === 'asc' ? (
                           <ChevronUp className="w-3.5 h-3.5" />
@@ -109,11 +127,18 @@ export function DataTable<T>({
                 className={onRowClick ? 'cursor-pointer' : ''}
               >
                 {columns.map((column) => (
-                  <TableCell key={column.accessorKey} className={column.className}>
+                  <TableCell
+                    key={column.accessorKey}
+                    className={column.className}
+                  >
                     {column.cell
                       ? column.cell(item)
-                      : // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                      String(getNestedValue(item as any, column.accessorKey) ?? '')}
+                      : String(
+                          getNestedValue(
+                            item as unknown as Record<string, unknown>,
+                            column.accessorKey
+                          ) ?? ''
+                        )}
                   </TableCell>
                 ))}
               </TableRow>
@@ -126,6 +151,14 @@ export function DataTable<T>({
 }
 
 // Wrapper to ensure table styling applies correctly
-function DataTableContainer({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <div className={`data-table-container ${className || ''}`}>{children}</div>;
+function DataTableContainer({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`data-table-container ${className || ''}`}>{children}</div>
+  );
 }

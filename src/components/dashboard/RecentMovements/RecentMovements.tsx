@@ -82,8 +82,8 @@ export function RecentMovements({ movements }: RecentMovementsProps) {
                     {formatCurrency(
                       toNumber(
                         movement.relevantAmount ??
-                        movement.amountInCOP ??
-                        movement.amount
+                          movement.amountInCOP ??
+                          movement.amount
                       ),
                       'COP'
                     )}

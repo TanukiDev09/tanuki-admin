@@ -142,13 +142,16 @@ export function FinanceMovementsTable({
                     <span className="font-bold">
                       {m.type === 'INCOME' ? '+' : '-'}{' '}
                       {formatCurrency(
-                        toNumber(m.relevantAmount ?? m.amountInCOP ?? m.amount ?? 0),
+                        toNumber(
+                          m.relevantAmount ?? m.amountInCOP ?? m.amount ?? 0
+                        ),
                         'COP'
                       )}
                     </span>
                     {m.relevantAmount !== undefined &&
                       m.amountInCOP !== undefined &&
-                      toNumber(m.relevantAmount) !== toNumber(m.amountInCOP) && (
+                      toNumber(m.relevantAmount) !==
+                        toNumber(m.amountInCOP) && (
                         <span className="text-[10px] opacity-60 italic">
                           de {formatCurrency(toNumber(m.amountInCOP), 'COP')}
                         </span>

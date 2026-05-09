@@ -207,12 +207,12 @@ export default function AgreementList({
         <Badge
           variant={
             getStatusVariant(agreement.status) as
-            | 'default'
-            | 'secondary'
-            | 'destructive'
-            | 'outline'
-            | 'success'
-            | 'warning'
+              | 'default'
+              | 'secondary'
+              | 'destructive'
+              | 'outline'
+              | 'success'
+              | 'warning'
           }
         >
           {getStatusLabel(agreement.status)}

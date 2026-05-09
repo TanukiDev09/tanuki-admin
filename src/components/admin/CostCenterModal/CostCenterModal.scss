@@ -1,0 +1,80 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.cost-center-modal {
+  max-width: 480px;
+  width: 95%;
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    margin-top: $spacing-md;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+
+    &--checkbox {
+      padding: $spacing-md;
+      background-color: hsl(var(--muted) / 20%);
+      border-radius: $radius-md;
+      border: 1px solid hsl(var(--border));
+      margin-top: $spacing-xs;
+      margin-bottom: $spacing-xs;
+    }
+  }
+
+  &__hint {
+    font-size: $font-size-xs;
+    color: hsl(var(--muted-foreground));
+    line-height: 1.4;
+  }
+
+  &__error {
+    padding: $spacing-sm $spacing-md;
+    background-color: rgba($destructive, 0.1);
+    color: $destructive;
+    font-size: $font-size-sm;
+    border: 1px solid rgba($destructive, 0.3);
+    border-radius: $radius-md;
+    font-weight: 500;
+  }
+
+  &__footer {
+    gap: $spacing-sm;
+    padding-top: $spacing-md;
+
+    @media (width <= 640px) {
+      flex-direction: column-reverse;
+
+      & > * {
+        width: 100%;
+      }
+    }
+  }
+
+  &__submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgb(255 255 255 / 30%);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: cc-modal-spin 0.8s linear infinite;
+    margin-right: 8px;
+  }
+}
+
+@keyframes cc-modal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
