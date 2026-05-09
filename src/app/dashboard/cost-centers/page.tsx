@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import CostCentersTable from '@/components/admin/CostCentersTable/CostCentersTable';
+import CostCenterModal from '@/components/admin/CostCenterModal';
 import { CostCenter } from '@/types/cost-center';
 import { Input } from '@/components/ui/Input';
 import { usePermission } from '@/hooks/usePermissions';
@@ -108,6 +109,10 @@ export default function CostCentersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 
+  // Estados para controlar el modal de creación/edición
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCostCenter, setSelectedCostCenter] = useState<CostCenter | null>(null);
+
   const fetchStats = useCallback(async () => {
     try {
       setLoading(true);
@@ -150,7 +155,7 @@ export default function CostCentersPage() {
       console.error(error);
       toast({
         title: 'Error',
-        description: 'No se pudo eliminar el centro de costo',
+        description: 'No se pudo desactivar el centro de costo',
         variant: 'destructive',
       });
     }
@@ -615,15 +620,20 @@ export default function CostCentersPage() {
         <CostCentersTable
           costCenters={filteredCostCenters}
           loading={loading}
-          onEdit={() =>
-            toast({
-              title: 'Próximamente',
-              description: 'La edición estará disponible pronto.',
-            })
-          }
+          onEdit={(cc) => {
+            setSelectedCostCenter(cc);
+            setIsModalOpen(true);
+          }}
           onDelete={handleDelete}
         />
       </div>
+
+      <CostCenterModal
+        isOpen={isModalOpen}
+        costCenter={selectedCostCenter}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={fetchStats}
+      />
     </div>
   );
 }
