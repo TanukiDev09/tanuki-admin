@@ -43,21 +43,26 @@ export default function EntityDebtsPage() {
 
   const entityData = useMemo(() => {
     return {
-      name: debts?.data?.[0]?.entityName || debts?.data?.[0]?.entityId?.name || 'Cargando...',
+      name:
+        debts?.data?.[0]?.entityName ||
+        debts?.data?.[0]?.entityId?.name ||
+        'Cargando...',
       type: debts?.data?.[0]?.entityType || 'Entidad',
     };
   }, [debts]);
 
   const summary = useMemo(() => {
-    return debts?.data?.reduce(
-      (acc: { cobrar: number; pagar: number }, debt: IDebt) => {
-        const amount = Number(debt.remainingBalance);
-        if (debt.type === 'Cuenta por Cobrar') acc.cobrar += amount;
-        else acc.pagar += amount;
-        return acc;
-      },
-      { cobrar: 0, pagar: 0 }
-    ) || { cobrar: 0, pagar: 0 };
+    return (
+      debts?.data?.reduce(
+        (acc: { cobrar: number; pagar: number }, debt: IDebt) => {
+          const amount = Number(debt.remainingBalance);
+          if (debt.type === 'Cuenta por Cobrar') acc.cobrar += amount;
+          else acc.pagar += amount;
+          return acc;
+        },
+        { cobrar: 0, pagar: 0 }
+      ) || { cobrar: 0, pagar: 0 }
+    );
   }, [debts]);
 
   const filteredDebts = useMemo(() => {
@@ -70,10 +75,13 @@ export default function EntityDebtsPage() {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; class: string }> = {
-      'Pagado': { label: 'Liquidado', class: 'status-badge--success' },
-      'Pagado Parcial': { label: 'Pago Parcial', class: 'status-badge--warning' },
-      'Vencido': { label: 'Vencido', class: 'status-badge--danger' },
-      'Pendiente': { label: 'Pendiente', class: 'status-badge--info' },
+      Pagado: { label: 'Liquidado', class: 'status-badge--success' },
+      'Pagado Parcial': {
+        label: 'Pago Parcial',
+        class: 'status-badge--warning',
+      },
+      Vencido: { label: 'Vencido', class: 'status-badge--danger' },
+      Pendiente: { label: 'Pendiente', class: 'status-badge--info' },
     };
 
     const config = statusMap[status] || statusMap['Pendiente'];
@@ -102,7 +110,10 @@ export default function EntityDebtsPage() {
         {/* Modern Nav-Header */}
         <header className="entity-header">
           <div className="entity-header__breadcrumb">
-            <button onClick={() => router.push('/dashboard/debts')} className="entity-header__back">
+            <button
+              onClick={() => router.push('/dashboard/debts')}
+              className="entity-header__back"
+            >
               <ArrowLeft className="entity-header__back-icon" />
               <span>Volver a Deudas</span>
             </button>
@@ -124,7 +135,10 @@ export default function EntityDebtsPage() {
             </div>
 
             <div className="entity-header__actions">
-              <Button onClick={() => setIsModalOpen(true)} className="entity-header__btn-primary">
+              <Button
+                onClick={() => setIsModalOpen(true)}
+                className="entity-header__btn-primary"
+              >
                 <Plus className="entity-header__btn-icon" />
                 Registrar Obligación
               </Button>
@@ -148,7 +162,9 @@ export default function EntityDebtsPage() {
                   </div>
                   <span className="stat-card__label">Activos (Por Cobrar)</span>
                 </div>
-                <div className="stat-card__value">{formatCurrency(summary.cobrar, 'COP')}</div>
+                <div className="stat-card__value">
+                  {formatCurrency(summary.cobrar, 'COP')}
+                </div>
               </CardContent>
             </Card>
           </motion.div>
@@ -162,16 +178,20 @@ export default function EntityDebtsPage() {
                   </div>
                   <span className="stat-card__label">Pasivos (Por Pagar)</span>
                 </div>
-                <div className="stat-card__value">{formatCurrency(summary.pagar, 'COP')}</div>
+                <div className="stat-card__value">
+                  {formatCurrency(summary.pagar, 'COP')}
+                </div>
               </CardContent>
             </Card>
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <Card className={cn(
-              "stat-card stat-card--balance",
-              netBalance >= 0 ? "stat-card--positive" : "stat-card--negative"
-            )}>
+            <Card
+              className={cn(
+                'stat-card stat-card--balance',
+                netBalance >= 0 ? 'stat-card--positive' : 'stat-card--negative'
+              )}
+            >
               <CardContent className="stat-card__content">
                 <div className="stat-card__header">
                   <div className="stat-card__icon-box">
@@ -179,9 +199,13 @@ export default function EntityDebtsPage() {
                   </div>
                   <span className="stat-card__label">Saldo Consolidado</span>
                 </div>
-                <div className="stat-card__value">{formatCurrency(Math.abs(netBalance), 'COP')}</div>
+                <div className="stat-card__value">
+                  {formatCurrency(Math.abs(netBalance), 'COP')}
+                </div>
                 <div className="stat-card__indicator">
-                  {netBalance >= 0 ? 'A favor de la empresa' : 'Pendiente de pago'}
+                  {netBalance >= 0
+                    ? 'A favor de la empresa'
+                    : 'Pendiente de pago'}
                 </div>
               </CardContent>
             </Card>
@@ -205,8 +229,12 @@ export default function EntityDebtsPage() {
           <div className="history-list">
             <div className="history-list__header">
               <div className="history-list__column">DOCUMENTO</div>
-              <div className="history-list__column history-list__column--hide-mobile">FECHA</div>
-              <div className="history-list__column history-list__column--right">BALANCE PENDIENTE</div>
+              <div className="history-list__column history-list__column--hide-mobile">
+                FECHA
+              </div>
+              <div className="history-list__column history-list__column--right">
+                BALANCE PENDIENTE
+              </div>
               <div className="history-list__column history-list__column--action" />
             </div>
 
@@ -228,26 +256,42 @@ export default function EntityDebtsPage() {
                     onClick={() => router.push(`/dashboard/debts/${debt._id}`)}
                   >
                     <div className="history-row__main">
-                      <div className={cn(
-                        "history-row__type-indicator",
-                        debt.type === 'Cuenta por Cobrar' ? "history-row__type-indicator--cobrar" : "history-row__type-indicator--pagar"
-                      )}>
-                        {debt.type === 'Cuenta por Cobrar' ? <TrendingUp /> : <TrendingDown />}
+                      <div
+                        className={cn(
+                          'history-row__type-indicator',
+                          debt.type === 'Cuenta por Cobrar'
+                            ? 'history-row__type-indicator--cobrar'
+                            : 'history-row__type-indicator--pagar'
+                        )}
+                      >
+                        {debt.type === 'Cuenta por Cobrar' ? (
+                          <TrendingUp />
+                        ) : (
+                          <TrendingDown />
+                        )}
                       </div>
                       <div className="history-row__info">
                         <div className="history-row__title-group">
-                          <span className="history-row__title">{debt.notes || 'Sin concepto'}</span>
+                          <span className="history-row__title">
+                            {debt.notes || 'Sin concepto'}
+                          </span>
                           {getStatusBadge(debt.status)}
                         </div>
                         <div className="history-row__meta">
-                          <span>{debt.source.type}: {debt.source.reference}</span>
+                          <span>
+                            {debt.source.type}: {debt.source.reference}
+                          </span>
                         </div>
                       </div>
                     </div>
 
                     <div className="history-row__date history-row__date--hide-mobile">
                       <Calendar className="history-row__date-icon" />
-                      {new Date(debt.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {new Date(debt.createdAt).toLocaleDateString(undefined, {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
                     </div>
 
                     <div className="history-row__price">

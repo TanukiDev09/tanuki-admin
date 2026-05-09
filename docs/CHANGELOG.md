@@ -5,9 +5,35 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2026-05-08
+
+### ✨ Nuevas Características (1.0.5)
+
+- **Gestión Avanzada de Centros de Costo (Dashboard de Rendimiento)**:
+  - **Visualización Analítica**: Gráficos interactivos de participación de ingresos y egresos (Pie Charts) y evolución histórica (Area Charts) utilizando Recharts con diseño responsivo y adaptativo.
+  - **KPIs de Rendimiento**: Métricas dinámicas por Centro de Costo (Ingresos, Egresos, Balance Neto) que facilitan el análisis detallado de la rentabilidad del negocio.
+- **Historial de Movimientos de Inventario & Bodegas**:
+  - **Trazabilidad de Traslados**: Tabla interactiva premium de movimientos físicos de stock con filtros avanzados de fecha, bodega de origen, bodega de destino, y tipo de traslado para auditar la logística.
+
+### 🚀 Mejoras & UX (1.0.5)
+
+- **Refactorización de Alta Mantenibilidad en Facturas**:
+  - **Desacople de Lógica y UI**: Extracción de `invoice-schema.ts` (esquema Zod, tipado unificado `InvoiceFormValues` e inicializadores) y `InvoiceCustomerSection.tsx` (tarjeta de cliente autocontenida).
+  - **Reducción de Código**: Reducción de `InvoiceForm.tsx` de 921 a 598 líneas (reducción del 35%), logrando un estricto cumplimiento del límite de la regla `max-lines` (máximo 700 líneas) sin utilizar directivas de elusión de linter.
+- **Robustez en Tablas de Datos**:
+  - **Casteo Seguro**: Sustitución de directivas de exclusión de linter y tipado laxo (`item as any`) en `DataTable.tsx` por tipos robustos de TypeScript (`item as unknown as Record<string, unknown>`), eliminando advertencias y errores en la capa visual.
+
+### 🛠️ Calidad Técnica (1.0.5)
+
+- **Pipeline de Automatización de Calidad (`release-production`)**:
+  - **Skill de Cierre**: Creación del módulo agéntico reutilizable que automatiza: auditorías de seguridad en archivos `.env` (fuga de secretos en `NEXT_PUBLIC_`), chequeos de estilo con Prettier y Stylelint, análisis linter de ESLint con tolerancia cero, ejecución de pruebas unitarias con Jest, validaciones de índices de MongoDB y benchmarks de consultas, y compilación final de Next.js.
+  - **Pruebas de Accesibilidad Automatizadas**: Integración completa con Cypress + Axe-core para validar automáticamente 40 rutas del sistema, garantizando el cumplimiento estricto del estándar de accesibilidad premium **WCAG AAA** (relación de contraste 7:1, reflow responsivo, navegación semántica y landmarks correctos).
+- **Compilador y Caché Limpios**:
+  - **Prevención de Tipos Huérfanos**: Saneamiento automático del directorio `.next/` antes del paso a producción para eliminar referencias e interfaces de rutas obsoletas heredadas de otras ramas del repositorio.
+
 ## [1.0.4] - 2026-02-20
 
-### ✨ Nuevas Características
+### ✨ Nuevas Características (1.0.4)
 
 - **Importación de Facturas XML (DIAN)**:
   - **Procesamiento UBL 2.1**: Soporte completo para el estándar de factura electrónica de la DIAN Colombia.
@@ -22,13 +48,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Gráficos de Participación**: Nuevas visualizaciones (Donut Charts) para la contribución de centros de costo en ingresos y gastos.
   - **Métricas de Sostenibilidad**: Integración de Runway y Burn Rate por centro de costo.
 
-### 🚀 Mejoras & UX
+### 🚀 Mejoras & UX (1.0.4)
 
 - **Refactor de Interfaz (Two-Line Layout)**: Optimización del listado de ítems en facturas para mejorar la legibilidad y evitar truncado de texto.
 - **Automatización Inteligente**: Auto-asignación de Centro de Costo al seleccionar libros del catálogo.
 - **Persistencia de Sesión**: Mejoras en el middleware para una experiencia de usuario más fluida entre pestañas.
 
-### 🛠️ Calidad Técnica
+### 🛠️ Calidad Técnica (1.0.4)
 
 - **Seguridad "Zero Hardcode"**: Auditoría y limpieza total de credenciales en el código fuente.
 - **Optimización de Base de Datos**: Estrategia de índices y search indexes para consultas masivas en movimientos y deudas.
@@ -38,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.3] - 2026-01-31
 
-### ✨ Nuevas Características
+### ✨ Nuevas Características (1.0.3)
 
 - **Módulo de Deudas (Lanzamiento)**:
   - **Dashboard Consolidado**: Seguimiento en tiempo real de activos (Por Cobrar) y pasivos (Por Pagar) con balance neto.
@@ -48,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Borrado Mandatorio**: Funcionalidad de eliminación de movimientos condicionada al permiso `DELETE` del módulo `FINANCE`.
   - **Navegación Inteligente (Smart Back)**: Redirección automática basada en el contexto de origen del usuario al eliminar registros.
 
-### 🚀 Mejoras & UX
+### 🚀 Mejoras & UX (1.0.3)
 
 - **Experiencia Visual Premium**:
   - **Estética "Premium Light"**: Nuevo lenguaje visual de alta claridad y profesionalismo, optimizado para legibilidad.
@@ -60,7 +86,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Confirmación de Seguridad**: Diálogos preventivos en acciones destructivas.
   - **Reseteo Automático**: Reinicio de paginación al cambiar de periodo para evitar listas vacías.
 
-### 🛠️ Calidad Técnica
+### 🛠️ Calidad Técnica (1.0.3)
 
 - **Accesibilidad WCAG AAA Nativa**:
   - **Contraste Enriquecido**: Certificación de contraste 7:1 en todo el módulo de deudas.
@@ -76,7 +102,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Next.js v16.1.5**: Actualización crítica para mitigar vulnerabilidades DoS y fugas de memoria.
   - **Parche de Dependencias**: Override forzado de `lodash-es` a la versión 4.17.23 para prevenir Prototype Pollution.
 
-### 🐛 Correcciones
+### 🐛 Correcciones (1.0.3)
 
 - **Precisión Financiera**: Corregido el inicio del histórico anual ($0) mediante la integración del Saldo Inicial del periodo previo.
 - **Sincronización Temporal**: Solución a condiciones de carrera en la URL que impedían la actualización correcta del año al pasar de diciembre a enero.
@@ -85,7 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.0.2] - 2026-01-27
 
-### ✨ Nuevas Características
+### ✨ Nuevas Características (1.0.2)
 
 - **Inteligencia Financiera & Control**:
   - **Visualización Flexible**: Toggle para alternar entre ingresos y gastos en gráficas de categorías y centros de costo.
@@ -96,7 +122,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Segmentación por Bodega**: Visualización discriminada de stock entre Bodega Editorial y puntos de venta externos.
   - **Resolución de Identidades**: Sustitución de hashes técnicos por nombres de categorías y libros legibles en todo el sistema.
 
-### 🚀 Mejoras & UX
+### 🚀 Mejoras & UX (1.0.2)
 
 - **Experiencia Visual Premium**:
   - **Flujo de Caja Rediseñado**: Nueva gráfica de saldo acumulado con gradientes, Tooltips interactivos y escala optimizada.
@@ -107,7 +133,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Legibilidad de Divisas**: Formateo mejorado de montos secundarios para evitar recortes en dispositivos móviles.
   - **Simplificación Estética**: Optimización de StatCards y eliminación de efectos distractores para un enfoque profesional en los datos.
 
-### 🛠️ Calidad Técnica
+### 🛠️ Calidad Técnica (1.0.2)
 
 - **Robustez de Datos & Precisión**:
   - **Aritmética de Alta Precisión**: Migración a `big.js` y `Decimal128` (MongoDB) para eliminar errores de redondeo financiero.
@@ -118,7 +144,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Arquitectura Limpia**: Límite estricto de 700 líneas por componente `.tsx` y desacople del dashboard en sub-vistas especializadas.
   - **Accesibilidad WCAG AAA**: Cumplimiento del estándar 1.4.9 (Imágenes de texto) y automatización de 210 pruebas de a11y.
 
-### 🐛 Correcciones
+### 🐛 Correcciones (1.0.2)
 
 - **Estabilidad**: Corregida regresión crítica `toFixed` en detalles de libro y errores 500 en el API de resumen.
 - **Lógica Financiera**: Arreglado error en cálculos históricos de saldo inicial y visualización de categorías de 2019.
@@ -181,4 +207,5 @@ Lanzamiento oficial de la plataforma **Tanuki Admin**, un sistema integral de ge
 
 ---
 
+[1.0.5]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v1.0.5
 [1.0.0]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v1.0.0

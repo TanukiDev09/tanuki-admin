@@ -66,7 +66,10 @@ export function PointOfSaleStock({ warehouseId }: PointOfSaleStockProps) {
 
   const { hasPermission } = usePermission();
   const { toast } = useToast();
-  const canDeleteInventory = hasPermission(ModuleName.INVENTORY, PermissionAction.DELETE);
+  const canDeleteInventory = hasPermission(
+    ModuleName.INVENTORY,
+    PermissionAction.DELETE
+  );
 
   const fetchData = useCallback(async () => {
     if (!warehouseId) {
@@ -119,7 +122,9 @@ export function PointOfSaleStock({ warehouseId }: PointOfSaleStockProps) {
         return;
       }
     } else {
-      if (!window.confirm(`¿Eliminar "${item.bookId.title}" de este inventario?`)) {
+      if (
+        !window.confirm(`¿Eliminar "${item.bookId.title}" de este inventario?`)
+      ) {
         return;
       }
     }
@@ -247,7 +252,9 @@ export function PointOfSaleStock({ warehouseId }: PointOfSaleStockProps) {
           <InventoryList
             data={inventory}
             onAdjust={(item) => handleAdjustStock(item, 'set')}
-            onDelete={canDeleteInventory ? handleDeleteInventoryItem : undefined}
+            onDelete={
+              canDeleteInventory ? handleDeleteInventoryItem : undefined
+            }
           />
         </CardContent>
       </Card>

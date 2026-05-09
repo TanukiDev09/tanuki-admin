@@ -57,10 +57,11 @@ const MovementTableRow = ({
     let channelLabel = '';
     switch (movement.salesChannel) {
       case 'LIBRERIA':
-        channelLabel = `Librería: ${movement.pointOfSale && typeof movement.pointOfSale === 'object'
-          ? movement.pointOfSale.name
-          : 'Varios'
-          }`;
+        channelLabel = `Librería: ${
+          movement.pointOfSale && typeof movement.pointOfSale === 'object'
+            ? movement.pointOfSale.name
+            : 'Varios'
+        }`;
         break;
       case 'DIRECTA':
         channelLabel = 'Directa';
@@ -126,9 +127,11 @@ const MovementTableRow = ({
         )}
       </TableCell>
       <TableCell data-label="Centro Costo">
-        {((movement.allocations && movement.allocations.length > 1) || (movement.items && movement.items.length > 1)) ? (
+        {(movement.allocations && movement.allocations.length > 1) ||
+        (movement.items && movement.items.length > 1) ? (
           <Badge variant="secondary" className="opacity-80">
-            Múltiple ({(movement.allocations?.length || 0) || (movement.items?.length || 0)})
+            Múltiple (
+            {movement.allocations?.length || 0 || movement.items?.length || 0})
           </Badge>
         ) : (
           movement.costCenter ||
@@ -141,10 +144,11 @@ const MovementTableRow = ({
       <TableCell data-label="Monto">
         <div className="flex flex-col items-end">
           <span
-            className={`movements-list__amount ${movement.type === 'INCOME'
-              ? 'movements-list__amount--income'
-              : 'movements-list__amount--expense'
-              }`}
+            className={`movements-list__amount ${
+              movement.type === 'INCOME'
+                ? 'movements-list__amount--income'
+                : 'movements-list__amount--expense'
+            }`}
           >
             {movement.type === 'INCOME' ? '+' : '-'}
             {formatCurrency(
@@ -225,7 +229,7 @@ export default function MovementsPage() {
     filters,
     updateFilters,
     clearFilters: resetAllFilters,
-    hasInitializedRef
+    hasInitializedRef,
   } = usePersistentFilters({
     key: 'movements_filters',
     initialFilters: {
@@ -246,7 +250,7 @@ export default function MovementsPage() {
       sortOrder: 'newest',
       page: 1,
       showAdvanced: false,
-    }
+    },
   });
 
   const {
@@ -269,26 +273,79 @@ export default function MovementsPage() {
     showAdvanced: showAdvancedFilters,
   } = filters;
 
-  const setShowAdvancedFilters = useCallback((val: boolean) => updateFilters({ showAdvanced: val }), [updateFilters]);
-  const setSearch = useCallback((val: string) => updateFilters({ search: val }), [updateFilters]);
-  const setTypeFilter = useCallback((val: string) => updateFilters({ type: val }), [updateFilters]);
-  const setCategoryFilter = useCallback((val: string) => updateFilters({ category: val }), [updateFilters]);
-  const setCostCenterFilter = useCallback((val: string) => updateFilters({ costCenter: val }), [updateFilters]);
-  const setMinAmount = useCallback((val: string | number | undefined) => updateFilters({ minAmount: val }), [updateFilters]);
-  const setMaxAmount = useCallback((val: string | number | undefined) => updateFilters({ maxAmount: val }), [updateFilters]);
-  const setUnitFilter = useCallback((val: string) => updateFilters({ unit: val }), [updateFilters]);
-  const setMinQuantity = useCallback((val: string | number | undefined) => updateFilters({ minQuantity: val }), [updateFilters]);
-  const setMaxQuantity = useCallback((val: string | number | undefined) => updateFilters({ maxQuantity: val }), [updateFilters]);
-  const setQuantityUndefined = useCallback((val: boolean) => updateFilters({ quantityUndefined: val }), [updateFilters]);
-  const setPaymentChannelFilter = useCallback((val: string) => updateFilters({ paymentChannel: val }), [updateFilters]);
-  const setSalesChannelFilter = useCallback((val: string) => updateFilters({ salesChannel: val }), [updateFilters]);
-  const setStartDate = useCallback((val: string) => updateFilters({ startDate: val }), [updateFilters]);
-  const setEndDate = useCallback((val: string) => updateFilters({ endDate: val }), [updateFilters]);
-  const setSortOrder = useCallback((val: string) => updateFilters({ sortOrder: val }), [updateFilters]);
-  const setPage = useCallback((val: number) => updateFilters({ page: val }), [updateFilters]);
+  const setShowAdvancedFilters = useCallback(
+    (val: boolean) => updateFilters({ showAdvanced: val }),
+    [updateFilters]
+  );
+  const setSearch = useCallback(
+    (val: string) => updateFilters({ search: val }),
+    [updateFilters]
+  );
+  const setTypeFilter = useCallback(
+    (val: string) => updateFilters({ type: val }),
+    [updateFilters]
+  );
+  const setCategoryFilter = useCallback(
+    (val: string) => updateFilters({ category: val }),
+    [updateFilters]
+  );
+  const setCostCenterFilter = useCallback(
+    (val: string) => updateFilters({ costCenter: val }),
+    [updateFilters]
+  );
+  const setMinAmount = useCallback(
+    (val: string | number | undefined) => updateFilters({ minAmount: val }),
+    [updateFilters]
+  );
+  const setMaxAmount = useCallback(
+    (val: string | number | undefined) => updateFilters({ maxAmount: val }),
+    [updateFilters]
+  );
+  const setUnitFilter = useCallback(
+    (val: string) => updateFilters({ unit: val }),
+    [updateFilters]
+  );
+  const setMinQuantity = useCallback(
+    (val: string | number | undefined) => updateFilters({ minQuantity: val }),
+    [updateFilters]
+  );
+  const setMaxQuantity = useCallback(
+    (val: string | number | undefined) => updateFilters({ maxQuantity: val }),
+    [updateFilters]
+  );
+  const setQuantityUndefined = useCallback(
+    (val: boolean) => updateFilters({ quantityUndefined: val }),
+    [updateFilters]
+  );
+  const setPaymentChannelFilter = useCallback(
+    (val: string) => updateFilters({ paymentChannel: val }),
+    [updateFilters]
+  );
+  const setSalesChannelFilter = useCallback(
+    (val: string) => updateFilters({ salesChannel: val }),
+    [updateFilters]
+  );
+  const setStartDate = useCallback(
+    (val: string) => updateFilters({ startDate: val }),
+    [updateFilters]
+  );
+  const setEndDate = useCallback(
+    (val: string) => updateFilters({ endDate: val }),
+    [updateFilters]
+  );
+  const setSortOrder = useCallback(
+    (val: string) => updateFilters({ sortOrder: val }),
+    [updateFilters]
+  );
+  const setPage = useCallback(
+    (val: number) => updateFilters({ page: val }),
+    [updateFilters]
+  );
 
   const [availableUnits, setAvailableUnits] = useState<string[]>([]);
-  const [availablePaymentChannels, setAvailablePaymentChannels] = useState<string[]>([]);
+  const [availablePaymentChannels, setAvailablePaymentChannels] = useState<
+    string[]
+  >([]);
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const limit = 10;
@@ -303,7 +360,7 @@ export default function MovementsPage() {
       setLoading(true);
 
       const params = new URLSearchParams();
-      const normalize = (val: string) => val !== 'ALL' ? val : '';
+      const normalize = (val: string) => (val !== 'ALL' ? val : '');
 
       const queryParams: Record<string, string> = {
         search,
@@ -320,8 +377,10 @@ export default function MovementsPage() {
         sort: sortOrder,
         page: page.toString(),
         limit: limit.toString(),
-        minQuantity: quantityUndefined ? '__UNDEFINED__' : (minQuantity?.toString() || ''),
-        maxQuantity: quantityUndefined ? '' : (maxQuantity?.toString() || ''),
+        minQuantity: quantityUndefined
+          ? '__UNDEFINED__'
+          : minQuantity?.toString() || '',
+        maxQuantity: quantityUndefined ? '' : maxQuantity?.toString() || '',
       };
 
       Object.entries(queryParams).forEach(([key, value]) => {
@@ -422,7 +481,7 @@ export default function MovementsPage() {
     quantityUndefined,
     sortOrder,
     setPage,
-    hasInitializedRef
+    hasInitializedRef,
   ]);
 
   const handleDelete = async (id: string) => {

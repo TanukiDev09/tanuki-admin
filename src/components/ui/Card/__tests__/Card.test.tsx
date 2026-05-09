@@ -35,10 +35,7 @@ describe('Card', () => {
     expect(title.tagName).toBe('H3');
 
     const description = screen.getByText('Description');
-    expect(description).toHaveClass(
-      'card__description',
-      'custom-desc'
-    );
+    expect(description).toHaveClass('card__description', 'custom-desc');
     expect(description.tagName).toBe('P');
 
     const content = screen.getByText('Content');
