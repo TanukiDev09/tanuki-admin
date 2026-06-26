@@ -14,39 +14,61 @@ export interface IRoyaltyLine {
   totalRoyalty: number;
 }
 
+/** Un movimiento financiero detectado como anticipo al creador. */
+export interface IAdvanceBreakdownLine {
+  movementId: string;
+  date: Date | string;
+  description: string;
+  beneficiary?: string;
+  amount: number;
+  /** Obra a la que corresponde el anticipo (la liquidación es por persona). */
+  bookTitle?: string;
+}
+
+/** Sección de una obra dentro de la liquidación de un creador. */
+export interface IRoyaltyBookSection {
+  agreement: string | object;
+  book: string | object;
+  bookTitle: string;
+  role: string;
+  royaltyPercentage: number;
+  lines: IRoyaltyLine[];
+  totalCopies: number;
+  totalInvoiced: number | string;
+  totalRoyalties: number | string;
+}
+
 export interface IRoyaltyStatement {
   _id: string;
 
-  // Relaciones
-  agreement: string | object;
-  book: string | object;
+  // El creador (la persona) es el sujeto de la liquidación.
   creator: string | object;
-
-  // Datos denormalizados (snapshot, para que el documento histórico no cambie)
-  bookTitle: string;
   creatorName: string;
   creatorEmail?: string;
+  creatorIdentification?: string;
 
-  // Periodo
+  // Periodo (aplica a todas las obras)
   periodStart: Date | string;
   periodEnd: Date | string;
 
-  // Parámetros del cálculo (snapshot del contrato al generar)
-  royaltyPercentage: number;
-  advancePayment: number | string;
-  /** "Saldo de periodos anteriores". Negativo = a favor de la editorial (anticipo no recuperado). */
+  // Obras del creador con ventas en el período (una sección por obra)
+  books: IRoyaltyBookSection[];
+
+  // Parámetros a nivel de la persona
+  /** "Saldo de periodos anteriores" del creador. Negativo = a favor de la editorial. */
   previousBalance: number | string;
+  /** Anticipo total del creador (suma de anticipos detectados por obra). */
+  advancePayment: number | string;
+  /** Desglose de los movimientos detectados como anticipo (por obra). */
+  advanceBreakdown?: IAdvanceBreakdownLine[];
 
-  // Detalle
-  lines: IRoyaltyLine[];
-
-  // Totales
+  // Totales agregados (por persona)
   totalCopies: number;
   totalInvoiced: number | string;
   totalRoyalties: number | string;
   /** previousBalance + totalRoyalties − advancePayment. */
   netSettlement: number | string;
-  /** Lo que se arrastra a la próxima liquidación (negativo si queda a favor de la editorial; 0 si fue a deuda). */
+  /** Arrastre a la próxima liquidación del creador. */
   carryoverToNext: number | string;
   balanceInFavorOf: BalanceFavor;
 
@@ -66,27 +88,42 @@ export interface IRoyaltyStatement {
   updatedAt: Date;
 }
 
-/** Body para generar una liquidación. */
+/**
+ * Body para generar una liquidación (por creador).
+ *
+ * NO incluye saldo anterior ni anticipo: son cálculos del sistema (arrastre de
+ * la liquidación previa y detección en movimientos). Permitir ajustarlos a mano
+ * sería un encubrimiento contable.
+ */
 export interface CreateRoyaltyStatementDTO {
-  agreementId: string;
+  creatorId: string;
   periodStart: string;
   periodEnd: string;
-  /** Override opcional; si se omite se toma del arrastre de la liquidación previa. */
-  previousBalance?: number;
-  /** Override opcional; si se omite se usa el anticipo del contrato (o 0 si ya hubo una liquidación previa). */
-  advancePayment?: number;
   notes?: string;
 }
 
-/** Resultado del cálculo (sin persistir), usado por el preview. */
-export interface RoyaltyComputation {
+/** Sección de obra calculada (sin persistir). */
+export interface RoyaltyBookComputation {
+  agreement: string;
+  book: string;
+  bookTitle: string;
+  role: string;
+  royaltyPercentage: number;
   lines: IRoyaltyLine[];
+  totalCopies: number;
+  totalInvoiced: number;
+  totalRoyalties: number;
+}
+
+/** Resultado del cálculo por creador (sin persistir), usado por el preview. */
+export interface RoyaltyComputation {
+  books: RoyaltyBookComputation[];
   totalCopies: number;
   totalInvoiced: number;
   totalRoyalties: number;
   previousBalance: number;
   advancePayment: number;
-  royaltyPercentage: number;
+  advanceBreakdown: IAdvanceBreakdownLine[];
   netSettlement: number;
   carryoverToNext: number;
   balanceInFavorOf: BalanceFavor;

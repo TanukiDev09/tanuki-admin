@@ -99,7 +99,13 @@
   &__section-title {
     font-size: 1rem;
     font-weight: 700;
-    margin: 0 0 0.5rem;
+    margin: 1rem 0 0.5rem;
+  }
+
+  &__book-meta {
+    font-weight: 400;
+    font-size: 0.82rem;
+    color: var(--color-text-muted, #6b7280);
   }
 
   &__table-wrap {
@@ -175,6 +181,26 @@
       border-top: 2px solid var(--color-border, #111);
       padding-top: 0.4rem;
       margin-top: 0.2rem;
+    }
+  }
+
+  &__advances {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0.5rem 0 0;
+    border-top: 1px dashed var(--color-border, #e5e7eb);
+
+    li {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--color-text-muted, #6b7280);
+
+      span:last-child {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
     }
   }
 

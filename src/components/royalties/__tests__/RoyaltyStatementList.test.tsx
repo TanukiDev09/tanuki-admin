@@ -9,7 +9,6 @@ const statements = [
   {
     _id: 's1',
     creatorName: 'Nathaly Sánchez',
-    bookTitle: 'La cólera en los tiempos del amor',
     periodStart: '2021-10-01T00:00:00.000Z',
     periodEnd: '2025-05-25T00:00:00.000Z',
     netSettlement: 1386628,
@@ -20,7 +19,6 @@ const statements = [
   {
     _id: 's2',
     creatorName: 'Otro Autor',
-    bookTitle: 'Otro libro',
     periodStart: '2024-01-01T00:00:00.000Z',
     periodEnd: '2024-12-31T00:00:00.000Z',
     netSettlement: -5600,
@@ -45,11 +43,8 @@ describe('RoyaltyStatementList', () => {
   it('pide las liquidaciones y las pinta con su estado', async () => {
     render(<RoyaltyStatementList />);
 
-    // Filas
+    // Filas (por creador)
     expect(await screen.findByText('Nathaly Sánchez')).toBeInTheDocument();
-    expect(
-      screen.getByText('La cólera en los tiempos del amor')
-    ).toBeInTheDocument();
     expect(screen.getByText('Otro Autor')).toBeInTheDocument();
 
     // Estados traducidos

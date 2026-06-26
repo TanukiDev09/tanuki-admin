@@ -22,15 +22,15 @@ export function serializeStatement<T extends Record<string, unknown>>(
 }
 
 /**
- * Saldo anterior por defecto: el arrastre de la liquidación previa más reciente
- * (aprobada o pagada) del mismo contrato. Permite encadenar el estado de cuenta.
+ * Liquidación previa más reciente (aprobada o pagada) del mismo CREADOR.
+ * Permite encadenar el estado de cuenta de la persona.
  */
 export async function getPreviousStatement(
-  agreementId: string,
+  creatorId: string,
   beforeDate?: Date
 ) {
   const query: Record<string, unknown> = {
-    agreement: agreementId,
+    creator: creatorId,
     status: { $in: ['approved', 'paid'] },
   };
   if (beforeDate) {
@@ -39,25 +39,34 @@ export async function getPreviousStatement(
   return RoyaltyStatement.findOne(query).sort({ periodEnd: -1, createdAt: -1 });
 }
 
+export interface RoyaltyDefaults {
+  previousBalance: number;
+  /** true si es la primera liquidación del creador → se detecta el anticipo. */
+  detectAdvances: boolean;
+  /** De dónde sale el saldo de partida. */
+  source: 'first' | 'carryover';
+}
+
 /**
- * Calcula los valores por defecto de saldo anterior y anticipo a aplicar para
- * una nueva liquidación de un contrato.
+ * Valores por defecto de una nueva liquidación de un creador.
  *
- * - Si ya existe una liquidación previa: el saldo anterior es su arrastre y el
- *   anticipo ya fue aplicado, así que por defecto es 0.
- * - Si es la primera liquidación: saldo anterior 0 y anticipo = el del contrato.
+ * - Si ya existe una liquidación previa del creador: el saldo de partida es su
+ *   arrastre y el anticipo NO se vuelve a aplicar (ya se aplicó en la primera).
+ * - Si es la primera: saldo 0 y el anticipo se detecta en los movimientos.
  */
-export async function resolveDefaults(
-  agreementId: string,
-  contractAdvance: number,
-  periodStart?: Date
-): Promise<{ previousBalance: number; advancePayment: number }> {
-  const prior = await getPreviousStatement(agreementId, periodStart);
+export async function resolveDefaults(params: {
+  creatorId: string;
+  periodStart?: Date;
+}): Promise<RoyaltyDefaults> {
+  const { creatorId, periodStart } = params;
+
+  const prior = await getPreviousStatement(creatorId, periodStart);
   if (prior) {
     return {
       previousBalance: toNumber(prior.carryoverToNext),
-      advancePayment: 0,
+      detectAdvances: false,
+      source: 'carryover',
     };
   }
-  return { previousBalance: 0, advancePayment: contractAdvance };
+  return { previousBalance: 0, detectAdvances: true, source: 'first' };
 }

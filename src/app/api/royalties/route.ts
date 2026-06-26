@@ -3,11 +3,11 @@ import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
 import RoyaltyStatement from '@/models/RoyaltyStatement';
-import Agreement from '@/models/Agreement';
+import Creator from '@/models/Creator';
 import '@/models/Book';
-import '@/models/Creator';
-import { toNumber } from '@/lib/math';
-import { buildComputation } from '@/lib/royalties/calculate';
+import '@/models/Agreement';
+import { buildCreatorComputation } from '@/lib/royalties/calculate';
+import { loadCreatorAgreements } from '@/lib/royalties/agreements';
 import { resolveDefaults, serializeStatement } from '@/lib/royalties/statement';
 import { CreateRoyaltyStatementDTO } from '@/types/royalty';
 
@@ -25,19 +25,14 @@ export async function GET(request: NextRequest) {
     await dbConnect();
     const { searchParams } = new URL(request.url);
     const creatorId = searchParams.get('creatorId');
-    const bookId = searchParams.get('bookId');
-    const agreementId = searchParams.get('agreementId');
     const status = searchParams.get('status');
 
     const query: Record<string, unknown> = {};
     if (creatorId) query.creator = creatorId;
-    if (bookId) query.book = bookId;
-    if (agreementId) query.agreement = agreementId;
     if (status) query.status = status;
 
     const statements = await RoyaltyStatement.find(query)
-      .select('-lines') // El listado no necesita el detalle de facturas
-      .populate('book', 'title isbn')
+      .select('-books -advanceBreakdown') // El listado no necesita el detalle
       .populate('creator', 'name')
       .sort({ createdAt: -1 });
 
@@ -65,9 +60,9 @@ export async function POST(request: NextRequest) {
     await dbConnect();
     const body: CreateRoyaltyStatementDTO = await request.json();
 
-    if (!body.agreementId || !body.periodStart || !body.periodEnd) {
+    if (!body.creatorId || !body.periodStart || !body.periodEnd) {
       return NextResponse.json(
-        { error: 'Contrato y periodo (desde/hasta) son obligatorios' },
+        { error: 'Creador y periodo (desde/hasta) son obligatorios' },
         { status: 400 }
       );
     }
@@ -81,64 +76,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const agreement = await Agreement.findById(body.agreementId)
-      .populate('book', 'title isbn')
-      .populate('creator', 'name email identification');
-
-    if (!agreement) {
+    const creator = await Creator.findById(body.creatorId).select(
+      'name email identification'
+    );
+    if (!creator) {
       return NextResponse.json(
-        { error: 'Contrato no encontrado' },
+        { error: 'Creador no encontrado' },
         { status: 404 }
       );
     }
 
-    const book = agreement.book as unknown as {
-      _id: object;
-      title: string;
-    };
-    const creator = agreement.creator as unknown as {
-      _id: object;
-      name: string;
-      email?: string;
-    };
+    const agreements = await loadCreatorAgreements(body.creatorId);
 
-    // Defaults de saldo anterior y anticipo según el historial del contrato
-    const defaults = await resolveDefaults(
-      body.agreementId,
-      toNumber(agreement.advancePayment),
-      periodStart
-    );
-    const previousBalance =
-      body.previousBalance !== undefined
-        ? body.previousBalance
-        : defaults.previousBalance;
-    const advancePayment =
-      body.advancePayment !== undefined
-        ? body.advancePayment
-        : defaults.advancePayment;
+    const defaults = await resolveDefaults({
+      creatorId: body.creatorId,
+      periodStart,
+    });
 
-    const computation = await buildComputation({
-      bookId: book._id.toString(),
+    const computation = await buildCreatorComputation({
+      agreements,
       periodStart,
       periodEnd,
-      royaltyPercentage: agreement.royaltyPercentage,
-      previousBalance,
-      advancePayment,
+      previousBalance: defaults.previousBalance,
+      detectAdvances: defaults.detectAdvances,
     });
 
     const statement = await RoyaltyStatement.create({
-      agreement: agreement._id,
-      book: book._id,
       creator: creator._id,
-      bookTitle: book.title,
       creatorName: creator.name,
       creatorEmail: creator.email,
+      creatorIdentification: creator.identification,
       periodStart,
       periodEnd,
-      royaltyPercentage: computation.royaltyPercentage,
-      advancePayment: computation.advancePayment,
+      books: computation.books,
       previousBalance: computation.previousBalance,
-      lines: computation.lines,
+      advancePayment: computation.advancePayment,
+      advanceBreakdown: computation.advanceBreakdown,
       totalCopies: computation.totalCopies,
       totalInvoiced: computation.totalInvoiced,
       totalRoyalties: computation.totalRoyalties,

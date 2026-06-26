@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
-import Agreement from '@/models/Agreement';
+import Creator from '@/models/Creator';
 import '@/models/Book';
-import '@/models/Creator';
-import { toNumber } from '@/lib/math';
-import { buildComputation } from '@/lib/royalties/calculate';
+import '@/models/Agreement';
+import { buildCreatorComputation } from '@/lib/royalties/calculate';
+import { loadCreatorAgreements } from '@/lib/royalties/agreements';
 import { resolveDefaults } from '@/lib/royalties/statement';
 
 export const dynamic = 'force-dynamic';
@@ -22,15 +22,13 @@ export async function GET(request: NextRequest) {
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
-    const agreementId = searchParams.get('agreementId');
+    const creatorId = searchParams.get('creatorId');
     const periodStartRaw = searchParams.get('periodStart');
     const periodEndRaw = searchParams.get('periodEnd');
-    const previousBalanceRaw = searchParams.get('previousBalance');
-    const advancePaymentRaw = searchParams.get('advancePayment');
 
-    if (!agreementId || !periodStartRaw || !periodEndRaw) {
+    if (!creatorId || !periodStartRaw || !periodEndRaw) {
       return NextResponse.json(
-        { error: 'Contrato y periodo (desde/hasta) son obligatorios' },
+        { error: 'Creador y periodo (desde/hasta) son obligatorios' },
         { status: 400 }
       );
     }
@@ -38,58 +36,41 @@ export async function GET(request: NextRequest) {
     const periodStart = new Date(periodStartRaw);
     const periodEnd = new Date(periodEndRaw);
 
-    const agreement = await Agreement.findById(agreementId)
-      .populate('book', 'title isbn')
-      .populate('creator', 'name email identification');
-
-    if (!agreement) {
+    const creator = await Creator.findById(creatorId).select(
+      'name email identification'
+    );
+    if (!creator) {
       return NextResponse.json(
-        { error: 'Contrato no encontrado' },
+        { error: 'Creador no encontrado' },
         { status: 404 }
       );
     }
 
-    const book = agreement.book as unknown as { _id: object; title: string };
-    const creator = agreement.creator as unknown as {
-      name: string;
-      email?: string;
-      identification?: string;
-    };
+    const agreements = await loadCreatorAgreements(creatorId);
 
-    const defaults = await resolveDefaults(
-      agreementId,
-      toNumber(agreement.advancePayment),
-      periodStart
-    );
-    const previousBalance =
-      previousBalanceRaw !== null
-        ? Number(previousBalanceRaw)
-        : defaults.previousBalance;
-    const advancePayment =
-      advancePaymentRaw !== null
-        ? Number(advancePaymentRaw)
-        : defaults.advancePayment;
+    const defaults = await resolveDefaults({ creatorId, periodStart });
 
-    const computation = await buildComputation({
-      bookId: book._id.toString(),
+    const computation = await buildCreatorComputation({
+      agreements,
       periodStart,
       periodEnd,
-      royaltyPercentage: agreement.royaltyPercentage,
-      previousBalance,
-      advancePayment,
+      previousBalance: defaults.previousBalance,
+      detectAdvances: defaults.detectAdvances,
     });
+
+    const advanceSource = defaults.detectAdvances
+      ? computation.advanceBreakdown.length > 0
+        ? 'movements'
+        : 'none'
+      : 'carryover';
 
     return NextResponse.json({
       data: {
         ...computation,
-        bookTitle: book.title,
         creatorName: creator.name,
         creatorEmail: creator.email,
         creatorIdentification: creator.identification,
-        royaltyPercentage: agreement.royaltyPercentage,
-        // Defaults sugeridos (para que la UI los muestre como punto de partida)
-        defaultPreviousBalance: defaults.previousBalance,
-        defaultAdvancePayment: defaults.advancePayment,
+        advanceSource,
       },
     });
   } catch (error) {

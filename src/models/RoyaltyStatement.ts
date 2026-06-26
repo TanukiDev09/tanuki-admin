@@ -18,40 +18,53 @@ const RoyaltyLineSchema = new Schema(
   { _id: false }
 );
 
+const RoyaltyBookSectionSchema = new Schema(
+  {
+    agreement: { type: Schema.Types.ObjectId, ref: 'Agreement' },
+    book: { type: Schema.Types.ObjectId, ref: 'Book' },
+    bookTitle: { type: String, required: true },
+    role: { type: String },
+    royaltyPercentage: { type: Number, required: true },
+    lines: { type: [RoyaltyLineSchema], default: [] },
+    totalCopies: { type: Number, default: 0 },
+    totalInvoiced: { type: Number, default: 0 },
+    totalRoyalties: { type: Number, default: 0 },
+  },
+  { _id: false }
+);
+
+const AdvanceBreakdownSchema = new Schema(
+  {
+    movementId: { type: Schema.Types.ObjectId, ref: 'Movement' },
+    date: { type: Date },
+    description: { type: String },
+    beneficiary: { type: String },
+    amount: { type: Number },
+    bookTitle: { type: String },
+  },
+  { _id: false }
+);
+
 const RoyaltyStatementSchema: Schema = new Schema(
   {
-    agreement: {
-      type: Schema.Types.ObjectId,
-      ref: 'Agreement',
-      required: true,
-      index: true,
-    },
-    book: {
-      type: Schema.Types.ObjectId,
-      ref: 'Book',
-      required: true,
-      index: true,
-    },
     creator: {
       type: Schema.Types.ObjectId,
       ref: 'Creator',
       required: true,
       index: true,
     },
-
-    // Snapshot denormalizado
-    bookTitle: { type: String, required: true },
     creatorName: { type: String, required: true },
     creatorEmail: { type: String },
+    creatorIdentification: { type: String },
 
     periodStart: { type: Date, required: true },
     periodEnd: { type: Date, required: true },
 
-    royaltyPercentage: { type: Number, required: true },
-    advancePayment: { type: Schema.Types.Decimal128, default: 0 },
-    previousBalance: { type: Schema.Types.Decimal128, default: 0 },
+    books: { type: [RoyaltyBookSectionSchema], default: [] },
 
-    lines: { type: [RoyaltyLineSchema], default: [] },
+    previousBalance: { type: Schema.Types.Decimal128, default: 0 },
+    advancePayment: { type: Schema.Types.Decimal128, default: 0 },
+    advanceBreakdown: { type: [AdvanceBreakdownSchema], default: [] },
 
     totalCopies: { type: Number, default: 0 },
     totalInvoiced: { type: Schema.Types.Decimal128, default: 0 },
@@ -83,7 +96,7 @@ const RoyaltyStatementSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-RoyaltyStatementSchema.index({ agreement: 1, periodEnd: -1 });
+RoyaltyStatementSchema.index({ creator: 1, periodEnd: -1 });
 RoyaltyStatementSchema.index({ creator: 1, status: 1 });
 
 export default mongoose.models.RoyaltyStatement ||

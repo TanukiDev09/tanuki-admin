@@ -45,6 +45,21 @@ jest.mock('@/models/Invoice', () => ({
   default: { aggregate: jest.fn() },
 }));
 
+jest.mock('@/models/Movement', () => ({
+  __esModule: true,
+  default: { find: jest.fn() },
+}));
+
+jest.mock('@/models/Category', () => ({
+  __esModule: true,
+  default: { findOne: jest.fn() },
+}));
+
+jest.mock('@/models/Agreement', () => ({
+  __esModule: true,
+  default: { find: jest.fn() },
+}));
+
 jest.mock('@/models/RoyaltyStatement', () => ({
   __esModule: true,
   default: { findById: jest.fn() },

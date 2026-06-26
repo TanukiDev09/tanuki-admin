@@ -18,19 +18,22 @@ import { useToast } from '@/components/ui/Toast';
 import { formatCurrency } from '@/lib/utils';
 import { generateRoyaltyPDF } from '@/lib/royalties/pdfGenerator';
 import { EditorialSettings } from '@/types/settings';
-import { IRoyaltyLine, RoyaltyStatementStatus, BalanceFavor } from '@/types/royalty';
-import { STATUS_META, FAVOR_META } from '../statusMeta';
+import {
+  IRoyaltyBookSection,
+  IAdvanceBreakdownLine,
+  RoyaltyStatementStatus,
+  BalanceFavor,
+} from '@/types/royalty';
+import { STATUS_META, FAVOR_META, roleLabel } from '../statusMeta';
 import './RoyaltyStatementDetail.scss';
 
 interface StatementDetail {
   _id: string;
-  bookTitle: string;
   creatorName: string;
   creatorEmail?: string;
-  creator?: { identification?: string };
+  creatorIdentification?: string;
   periodStart: string;
   periodEnd: string;
-  royaltyPercentage: number;
   previousBalance: number;
   advancePayment: number;
   totalCopies: number;
@@ -45,7 +48,8 @@ interface StatementDetail {
   generatedAt: string;
   approvedAt?: string;
   paidAt?: string;
-  lines: IRoyaltyLine[];
+  books: IRoyaltyBookSection[];
+  advanceBreakdown?: IAdvanceBreakdownLine[];
 }
 
 export default function RoyaltyStatementDetail({ id }: { id: string }) {
@@ -146,13 +150,7 @@ export default function RoyaltyStatementDetail({ id }: { id: string }) {
 
   const downloadPdf = () => {
     if (!statement) return;
-    generateRoyaltyPDF(
-      {
-        ...statement,
-        creatorIdentification: statement.creator?.identification,
-      },
-      editorial
-    );
+    generateRoyaltyPDF(statement, editorial);
   };
 
   if (loading) return <p className="royalty-detail__loading">Cargando…</p>;
@@ -277,7 +275,6 @@ export default function RoyaltyStatementDetail({ id }: { id: string }) {
           {s.creatorEmail && (
             <Row label="Correo electrónico" value={s.creatorEmail} />
           )}
-          <Row label="Libro" value={s.bookTitle} />
           <Row
             label="Fecha"
             value={format(new Date(s.generatedAt), 'dd/MM/yyyy')}
@@ -293,55 +290,55 @@ export default function RoyaltyStatementDetail({ id }: { id: string }) {
             label="Saldo de periodos anteriores"
             value={formatCurrency(s.previousBalance)}
           />
-          <Row
-            label="Porcentaje de regalías"
-            value={`${s.royaltyPercentage}%`}
-          />
         </div>
 
-        <h3 className="royalty-detail__section-title">Ventas en papel</h3>
-        <div className="royalty-detail__table-wrap">
-          <table className="royalty-detail__table">
-            <thead>
-              <tr>
-                <th>Factura</th>
-                <th>Ejemplares</th>
-                <th>PVP</th>
-                <th>Fecha</th>
-                <th>Total facturado</th>
-                <th>Total a liquidar</th>
-              </tr>
-            </thead>
-            <tbody>
-              {s.lines.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="royalty-detail__empty-cell">
-                    Sin ventas en el período.
-                  </td>
-                </tr>
-              ) : (
-                s.lines.map((l) => (
-                  <tr key={l.invoiceId}>
-                    <td>{l.invoiceNumber}</td>
-                    <td>{l.quantity}</td>
-                    <td>{formatCurrency(l.pvp)}</td>
-                    <td>{format(new Date(l.date), 'dd/MM/yyyy')}</td>
-                    <td>{formatCurrency(l.totalInvoiced)}</td>
-                    <td>{formatCurrency(l.totalRoyalty)}</td>
+        {/* Una sección de ventas en papel por obra */}
+        {s.books.map((b) => (
+          <div key={String(b.agreement)} className="royalty-detail__book">
+            <h3 className="royalty-detail__section-title">
+              {b.bookTitle}{' '}
+              <span className="royalty-detail__book-meta">
+                ({roleLabel(b.role)} · {b.royaltyPercentage}%)
+              </span>
+            </h3>
+            <div className="royalty-detail__table-wrap">
+              <table className="royalty-detail__table">
+                <thead>
+                  <tr>
+                    <th>Factura</th>
+                    <th>Ejemplares</th>
+                    <th>PVP</th>
+                    <th>Fecha</th>
+                    <th>Total facturado</th>
+                    <th>Total a liquidar</th>
                   </tr>
-                ))
-              )}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td className="royalty-detail__foot-label">TOTALES</td>
-                <td>{s.totalCopies}</td>
-                <td colSpan={3}></td>
-                <td>{formatCurrency(s.totalRoyalties)}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
+                </thead>
+                <tbody>
+                  {b.lines.map((l) => (
+                    <tr key={l.invoiceId}>
+                      <td>{l.invoiceNumber}</td>
+                      <td>{l.quantity}</td>
+                      <td>{formatCurrency(l.pvp)}</td>
+                      <td>{format(new Date(l.date), 'dd/MM/yyyy')}</td>
+                      <td>{formatCurrency(Number(l.totalInvoiced))}</td>
+                      <td>{formatCurrency(l.totalRoyalty)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr>
+                    <td className="royalty-detail__foot-label">
+                      Subtotal {b.bookTitle}
+                    </td>
+                    <td>{b.totalCopies}</td>
+                    <td colSpan={3}></td>
+                    <td>{formatCurrency(Number(b.totalRoyalties))}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </div>
+        ))}
 
         {/* Resumen */}
         <div className="royalty-detail__summary">
@@ -357,6 +354,20 @@ export default function RoyaltyStatementDetail({ id }: { id: string }) {
             label="Anticipo"
             value={`- ${formatCurrency(s.advancePayment)}`}
           />
+          {s.advanceBreakdown && s.advanceBreakdown.length > 0 && (
+            <ul className="royalty-detail__advances">
+              {s.advanceBreakdown.map((a) => (
+                <li key={a.movementId}>
+                  <span>{format(new Date(a.date), 'dd/MM/yyyy')}</span>
+                  <span>
+                    {a.bookTitle ? `${a.bookTitle} · ` : ''}
+                    {a.beneficiary || a.description}
+                  </span>
+                  <span>{formatCurrency(a.amount)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
           <SummaryRow
             label="TOTAL A LIQUIDAR"
             value={formatCurrency(s.netSettlement)}
@@ -379,7 +390,7 @@ export default function RoyaltyStatementDetail({ id }: { id: string }) {
           <div className="royalty-detail__sign-line" />
           <p>Firma</p>
           <p>Nombre: {s.creatorName}</p>
-          <p>Identificación: {s.creator?.identification || ''}</p>
+          <p>Identificación: {s.creatorIdentification || ''}</p>
         </div>
       </div>
     </div>
