@@ -45,6 +45,8 @@ export function CreatorForm({
     defaultValues: {
       name: '',
       bio: '',
+      email: '',
+      identification: '',
       nationality: '',
       website: '',
       photo: '',
@@ -56,6 +58,8 @@ export function CreatorForm({
       form.reset({
         name: creatorToEdit.name,
         bio: creatorToEdit.bio || '',
+        email: creatorToEdit.email || '',
+        identification: creatorToEdit.identification || '',
         nationality: creatorToEdit.nationality || '',
         website: creatorToEdit.website || '',
         photo: creatorToEdit.photo || '',
@@ -64,6 +68,8 @@ export function CreatorForm({
       form.reset({
         name: '',
         bio: '',
+        email: '',
+        identification: '',
         nationality: '',
         website: '',
         photo: '',
@@ -148,6 +154,38 @@ export function CreatorForm({
                   <FormLabel>Nacionalidad</FormLabel>
                   <FormControl>
                     <Input placeholder="Ej: Japonesa" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Correo electrónico</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="autor@correo.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="identification"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Identificación</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Cédula / NIT" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
