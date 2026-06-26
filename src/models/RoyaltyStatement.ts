@@ -51,6 +51,21 @@ const RoyaltyStatementSchema: Schema = new Schema(
     advancePayment: { type: Schema.Types.Decimal128, default: 0 },
     previousBalance: { type: Schema.Types.Decimal128, default: 0 },
 
+    // Movimientos financieros detectados como anticipo (auditoría/transparencia)
+    advanceBreakdown: {
+      type: [
+        {
+          _id: false,
+          movementId: { type: Schema.Types.ObjectId, ref: 'Movement' },
+          date: { type: Date },
+          description: { type: String },
+          beneficiary: { type: String },
+          amount: { type: Number },
+        },
+      ],
+      default: [],
+    },
+
     lines: { type: [RoyaltyLineSchema], default: [] },
 
     totalCopies: { type: Number, default: 0 },

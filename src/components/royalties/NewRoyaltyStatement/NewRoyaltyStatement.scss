@@ -36,6 +36,47 @@
     padding: 1rem 0;
   }
 
+  &__hint {
+    font-size: 0.78rem;
+    color: var(--color-text-muted, #6b7280);
+  }
+
+  &__advances {
+    margin: 0.5rem 0 1.25rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-surface-muted, #f3f4f6);
+    border-radius: 0.5rem;
+  }
+
+  &__advances-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+  }
+
+  &__advances-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    li {
+      display: grid;
+      grid-template-columns: 90px 1fr auto;
+      gap: 0.75rem;
+      font-size: 0.83rem;
+      align-items: center;
+
+      span:last-child {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+      }
+    }
+  }
+
   &__summary {
     display: flex;
     flex-wrap: wrap;

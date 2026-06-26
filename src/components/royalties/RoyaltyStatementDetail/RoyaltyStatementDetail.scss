@@ -178,6 +178,26 @@
     }
   }
 
+  &__advances {
+    list-style: none;
+    margin: 0.25rem 0 0;
+    padding: 0.5rem 0 0;
+    border-top: 1px dashed var(--color-border, #e5e7eb);
+
+    li {
+      display: grid;
+      grid-template-columns: 80px 1fr auto;
+      gap: 0.5rem;
+      font-size: 0.78rem;
+      color: var(--color-text-muted, #6b7280);
+
+      span:last-child {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+    }
+  }
+
   &__favor {
     display: flex;
     flex-direction: column;

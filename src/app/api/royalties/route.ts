@@ -6,7 +6,6 @@ import RoyaltyStatement from '@/models/RoyaltyStatement';
 import Agreement from '@/models/Agreement';
 import '@/models/Book';
 import '@/models/Creator';
-import { toNumber } from '@/lib/math';
 import { buildComputation } from '@/lib/royalties/calculate';
 import { resolveDefaults, serializeStatement } from '@/lib/royalties/statement';
 import { CreateRoyaltyStatementDTO } from '@/types/royalty';
@@ -82,7 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     const agreement = await Agreement.findById(body.agreementId)
-      .populate('book', 'title isbn')
+      .populate('book', 'title isbn costCenter')
       .populate('creator', 'name email identification');
 
     if (!agreement) {
@@ -95,6 +94,7 @@ export async function POST(request: NextRequest) {
     const book = agreement.book as unknown as {
       _id: object;
       title: string;
+      costCenter?: string;
     };
     const creator = agreement.creator as unknown as {
       _id: object;
@@ -102,12 +102,15 @@ export async function POST(request: NextRequest) {
       email?: string;
     };
 
-    // Defaults de saldo anterior y anticipo según el historial del contrato
-    const defaults = await resolveDefaults(
-      body.agreementId,
-      toNumber(agreement.advancePayment),
-      periodStart
-    );
+    // Defaults: saldo anterior por arrastre y anticipo detectado automáticamente
+    // en los movimientos financieros (pagos al creador por este libro/rol).
+    const defaults = await resolveDefaults({
+      agreementId: body.agreementId,
+      role: agreement.role,
+      bookCostCenter: book.costCenter,
+      periodStart,
+      periodEnd,
+    });
     const previousBalance =
       body.previousBalance !== undefined
         ? body.previousBalance
@@ -137,6 +140,10 @@ export async function POST(request: NextRequest) {
       periodEnd,
       royaltyPercentage: computation.royaltyPercentage,
       advancePayment: computation.advancePayment,
+      // Guardamos el desglose solo si el anticipo viene de la detección automática
+      // (no fue sobrescrito manualmente).
+      advanceBreakdown:
+        body.advancePayment === undefined ? defaults.advanceLines : [],
       previousBalance: computation.previousBalance,
       lines: computation.lines,
       totalCopies: computation.totalCopies,

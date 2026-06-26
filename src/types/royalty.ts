@@ -14,6 +14,15 @@ export interface IRoyaltyLine {
   totalRoyalty: number;
 }
 
+/** Un movimiento financiero detectado como anticipo al creador. */
+export interface IAdvanceBreakdownLine {
+  movementId: string;
+  date: Date | string;
+  description: string;
+  beneficiary?: string;
+  amount: number;
+}
+
 export interface IRoyaltyStatement {
   _id: string;
 
@@ -34,6 +43,8 @@ export interface IRoyaltyStatement {
   // Parámetros del cálculo (snapshot del contrato al generar)
   royaltyPercentage: number;
   advancePayment: number | string;
+  /** Movimientos detectados como anticipo (origen del valor de advancePayment). */
+  advanceBreakdown?: IAdvanceBreakdownLine[];
   /** "Saldo de periodos anteriores". Negativo = a favor de la editorial (anticipo no recuperado). */
   previousBalance: number | string;
 

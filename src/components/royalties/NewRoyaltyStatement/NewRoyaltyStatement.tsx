@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { useToast } from '@/components/ui/Toast';
 import { formatCurrency } from '@/lib/utils';
-import { RoyaltyComputation } from '@/types/royalty';
+import { RoyaltyComputation, IAdvanceBreakdownLine } from '@/types/royalty';
 import { FAVOR_META } from '../statusMeta';
 import './NewRoyaltyStatement.scss';
 
@@ -35,6 +35,8 @@ type PreviewData = RoyaltyComputation & {
   creatorName: string;
   defaultPreviousBalance: number;
   defaultAdvancePayment: number;
+  advanceBreakdown: IAdvanceBreakdownLine[];
+  advanceSource: 'movements' | 'carryover' | 'none';
 };
 
 const roleLabel = (role: string) =>
@@ -230,6 +232,15 @@ export default function NewRoyaltyStatement() {
               onChange={onOverrideChange(setAdvancePayment)}
               placeholder="0"
             />
+            {preview && !touchedOverrides && (
+              <span className="new-royalty__hint">
+                {preview.advanceSource === 'movements'
+                  ? `Detectado automáticamente en ${preview.advanceBreakdown.length} movimiento(s) financiero(s).`
+                  : preview.advanceSource === 'carryover'
+                    ? 'Ya aplicado en una liquidación anterior (ver saldo anterior).'
+                    : 'No se hallaron pagos al creador para este libro en los movimientos.'}
+              </span>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -275,6 +286,23 @@ export default function NewRoyaltyStatement() {
                   </Badge>
                 </div>
               </div>
+
+              {preview.advanceBreakdown.length > 0 && (
+                <div className="new-royalty__advances">
+                  <h4 className="new-royalty__advances-title">
+                    Anticipo detectado en movimientos financieros
+                  </h4>
+                  <ul className="new-royalty__advances-list">
+                    {preview.advanceBreakdown.map((a) => (
+                      <li key={a.movementId}>
+                        <span>{format(new Date(a.date), 'dd/MM/yyyy')}</span>
+                        <span>{a.beneficiary || a.description}</span>
+                        <span>{formatCurrency(a.amount)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {preview.lines.length === 0 ? (
                 <p className="new-royalty__empty">

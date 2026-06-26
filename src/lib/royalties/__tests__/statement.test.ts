@@ -1,16 +1,28 @@
-import { serializeStatement, resolveDefaults } from '../statement';
-
 jest.mock('@/models/RoyaltyStatement', () => ({
   __esModule: true,
   default: { findOne: jest.fn() },
 }));
 
+// Mock de la detección de anticipos para aislar resolveDefaults.
+jest.mock('../advances', () => ({
+  findAdvanceMovements: jest.fn(),
+  ROLE_CATEGORY: {
+    author: 'regalías por derechos de autor',
+    translator: 'traducción',
+    illustrator: 'Ilustración',
+  },
+}));
+
+import { serializeStatement, resolveDefaults } from '../statement';
 import RoyaltyStatement from '@/models/RoyaltyStatement';
+import { findAdvanceMovements } from '../advances';
 
 const findOneMock = RoyaltyStatement.findOne as unknown as jest.Mock;
+const findAdvanceMock = findAdvanceMovements as unknown as jest.Mock;
 
 beforeEach(() => {
   findOneMock.mockReset();
+  findAdvanceMock.mockReset();
 });
 
 describe('serializeStatement', () => {
@@ -66,25 +78,69 @@ describe('resolveDefaults', () => {
   const mockPrior = (prior: unknown) =>
     findOneMock.mockReturnValue({ sort: () => Promise.resolve(prior) });
 
-  it('primera liquidación: saldo 0 y anticipo del contrato', async () => {
+  const baseParams = {
+    agreementId: 'agr1',
+    role: 'translator',
+    bookCostCenter: '01T009',
+    periodStart: new Date('2024-01-01'),
+    periodEnd: new Date('2024-12-31'),
+  };
+
+  it('primera liquidación: detecta el anticipo en los movimientos financieros', async () => {
     mockPrior(null);
+    findAdvanceMock.mockResolvedValue({
+      total: 3402000,
+      lines: [
+        {
+          movementId: 'm1',
+          date: new Date('2024-05-07'),
+          description: 'Traducción Resignación',
+          beneficiary: 'Ariana Vallejo',
+          amount: 3402000,
+        },
+      ],
+      unavailable: false,
+    });
 
-    const res = await resolveDefaults('agr1', 30000, new Date('2024-01-01'));
+    const res = await resolveDefaults(baseParams);
 
-    expect(res).toEqual({ previousBalance: 0, advancePayment: 30000 });
+    expect(res.previousBalance).toBe(0);
+    expect(res.advancePayment).toBe(3402000);
+    expect(res.advanceSource).toBe('movements');
+    expect(res.advanceLines).toHaveLength(1);
+    // Buscó por libro/rol/fin de período
+    expect(findAdvanceMock).toHaveBeenCalledWith({
+      bookCostCenter: '01T009',
+      role: 'translator',
+      periodEnd: baseParams.periodEnd,
+    });
   });
 
-  it('liquidación posterior: arrastra el saldo previo y el anticipo es 0', async () => {
+  it('sin movimientos: anticipo 0 y fuente "none"', async () => {
+    mockPrior(null);
+    findAdvanceMock.mockResolvedValue({ total: 0, lines: [], unavailable: false });
+
+    const res = await resolveDefaults(baseParams);
+
+    expect(res.advancePayment).toBe(0);
+    expect(res.advanceSource).toBe('none');
+  });
+
+  it('liquidación posterior: arrastra el saldo previo, anticipo 0, sin buscar movimientos', async () => {
     mockPrior({ carryoverToNext: { $numberDecimal: '-5600' } });
 
-    const res = await resolveDefaults('agr1', 30000, new Date('2025-01-01'));
+    const res = await resolveDefaults(baseParams);
 
-    expect(res).toEqual({ previousBalance: -5600, advancePayment: 0 });
+    expect(res.previousBalance).toBe(-5600);
+    expect(res.advancePayment).toBe(0);
+    expect(res.advanceSource).toBe('carryover');
+    expect(findAdvanceMock).not.toHaveBeenCalled();
   });
 
   it('filtra por contrato y por estados aprobada/pagada', async () => {
     mockPrior(null);
-    await resolveDefaults('agr1', 0, new Date('2024-06-01'));
+    findAdvanceMock.mockResolvedValue({ total: 0, lines: [], unavailable: false });
+    await resolveDefaults({ ...baseParams, periodStart: new Date('2024-06-01') });
 
     const query = findOneMock.mock.calls[0][0];
     expect(query.agreement).toBe('agr1');

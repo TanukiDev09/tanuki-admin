@@ -5,7 +5,6 @@ import dbConnect from '@/lib/mongodb';
 import Agreement from '@/models/Agreement';
 import '@/models/Book';
 import '@/models/Creator';
-import { toNumber } from '@/lib/math';
 import { buildComputation } from '@/lib/royalties/calculate';
 import { resolveDefaults } from '@/lib/royalties/statement';
 
@@ -39,7 +38,7 @@ export async function GET(request: NextRequest) {
     const periodEnd = new Date(periodEndRaw);
 
     const agreement = await Agreement.findById(agreementId)
-      .populate('book', 'title isbn')
+      .populate('book', 'title isbn costCenter')
       .populate('creator', 'name email identification');
 
     if (!agreement) {
@@ -49,18 +48,24 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const book = agreement.book as unknown as { _id: object; title: string };
+    const book = agreement.book as unknown as {
+      _id: object;
+      title: string;
+      costCenter?: string;
+    };
     const creator = agreement.creator as unknown as {
       name: string;
       email?: string;
       identification?: string;
     };
 
-    const defaults = await resolveDefaults(
+    const defaults = await resolveDefaults({
       agreementId,
-      toNumber(agreement.advancePayment),
-      periodStart
-    );
+      role: agreement.role,
+      bookCostCenter: book.costCenter,
+      periodStart,
+      periodEnd,
+    });
     const previousBalance =
       previousBalanceRaw !== null
         ? Number(previousBalanceRaw)
@@ -90,6 +95,9 @@ export async function GET(request: NextRequest) {
         // Defaults sugeridos (para que la UI los muestre como punto de partida)
         defaultPreviousBalance: defaults.previousBalance,
         defaultAdvancePayment: defaults.advancePayment,
+        // Anticipos detectados automáticamente en los movimientos financieros
+        advanceBreakdown: defaults.advanceLines,
+        advanceSource: defaults.advanceSource,
       },
     });
   } catch (error) {

@@ -18,7 +18,12 @@ import { useToast } from '@/components/ui/Toast';
 import { formatCurrency } from '@/lib/utils';
 import { generateRoyaltyPDF } from '@/lib/royalties/pdfGenerator';
 import { EditorialSettings } from '@/types/settings';
-import { IRoyaltyLine, RoyaltyStatementStatus, BalanceFavor } from '@/types/royalty';
+import {
+  IRoyaltyLine,
+  IAdvanceBreakdownLine,
+  RoyaltyStatementStatus,
+  BalanceFavor,
+} from '@/types/royalty';
 import { STATUS_META, FAVOR_META } from '../statusMeta';
 import './RoyaltyStatementDetail.scss';
 
@@ -46,6 +51,7 @@ interface StatementDetail {
   approvedAt?: string;
   paidAt?: string;
   lines: IRoyaltyLine[];
+  advanceBreakdown?: IAdvanceBreakdownLine[];
 }
 
 export default function RoyaltyStatementDetail({ id }: { id: string }) {
@@ -357,6 +363,17 @@ export default function RoyaltyStatementDetail({ id }: { id: string }) {
             label="Anticipo"
             value={`- ${formatCurrency(s.advancePayment)}`}
           />
+          {s.advanceBreakdown && s.advanceBreakdown.length > 0 && (
+            <ul className="royalty-detail__advances">
+              {s.advanceBreakdown.map((a) => (
+                <li key={a.movementId}>
+                  <span>{format(new Date(a.date), 'dd/MM/yyyy')}</span>
+                  <span>{a.beneficiary || a.description}</span>
+                  <span>{formatCurrency(a.amount)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
           <SummaryRow
             label="TOTAL A LIQUIDAR"
             value={formatCurrency(s.netSettlement)}
