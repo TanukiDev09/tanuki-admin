@@ -3,13 +3,15 @@ import Invoice from '@/models/Invoice';
 import { add, subtract, multiply, divide, toNumber, compare } from '@/lib/math';
 import {
   IRoyaltyLine,
+  IAdvanceBreakdownLine,
+  RoyaltyBookComputation,
   RoyaltyComputation,
   BalanceFavor,
 } from '@/types/royalty';
+import { findAdvanceMovements } from './advances';
 
 /**
  * Estados de factura que NO cuentan como venta emitida para regalías.
- * (Coherente con las estadísticas de venta por libro, pero excluyendo borradores.)
  */
 const EXCLUDED_INVOICE_STATUSES = ['Cancelled', 'Draft'];
 
@@ -24,7 +26,6 @@ interface InvoiceLineAgg {
 
 /**
  * Calcula las líneas de regalías (ventas en papel) de un libro en un periodo.
- * Una fila por factura: suma ejemplares y total facturado (PVP × ejemplares) del libro en esa factura.
  */
 export async function computeRoyaltyLines(
   bookId: string,
@@ -55,7 +56,6 @@ export async function computeRoyaltyLines(
         invoiceNumber: { $first: '$number' },
         date: { $first: '$date' },
         quantity: { $sum: '$items.quantity' },
-        // Base de regalías = PVP × ejemplares (bruto, sin descuentos de factura)
         totalInvoiced: {
           $sum: { $multiply: ['$items.unitPrice', '$items.quantity'] },
         },
@@ -102,9 +102,7 @@ export async function computeRoyaltyLines(
   };
 }
 
-/**
- * Determina a favor de quién queda el saldo neto.
- */
+/** Determina a favor de quién queda el saldo neto. */
 export function resolveFavor(netSettlement: number | string): BalanceFavor {
   const cmp = compare(netSettlement, 0);
   if (cmp > 0) return 'author';
@@ -112,54 +110,101 @@ export function resolveFavor(netSettlement: number | string): BalanceFavor {
   return 'none';
 }
 
+/** Un contrato del creador con su libro (poblado) para el cálculo. */
+export interface AgreementForComputation {
+  _id: string;
+  role: string;
+  royaltyPercentage: number;
+  book: { _id: string; title: string; costCenter?: string };
+}
+
 /**
- * Construye el cálculo completo de una liquidación, incluyendo saldo anterior,
- * anticipo, neto y arrastre para la siguiente liquidación.
+ * Construye el cálculo completo de la liquidación de un CREADOR: una sección por
+ * obra con ventas en el período, anticipos detectados por obra y totales
+ * agregados a nivel de la persona (saldo anterior, anticipo, neto y arrastre).
+ *
+ * Solo se incluyen obras con ventas en el período (las demás se omiten).
  */
-export async function buildComputation(params: {
-  bookId: string;
+export async function buildCreatorComputation(params: {
+  agreements: AgreementForComputation[];
   periodStart: Date;
   periodEnd: Date;
-  royaltyPercentage: number;
   previousBalance: number;
-  advancePayment: number;
+  /** true en la primera liquidación del creador (se detecta el anticipo). */
+  detectAdvances: boolean;
 }): Promise<RoyaltyComputation> {
-  const {
-    bookId,
-    periodStart,
-    periodEnd,
-    royaltyPercentage,
-    previousBalance,
-    advancePayment,
-  } = params;
+  const { agreements, periodStart, periodEnd, previousBalance, detectAdvances } =
+    params;
 
-  const { lines, totalCopies, totalInvoiced, totalRoyalties } =
-    await computeRoyaltyLines(
-      bookId,
-      periodStart,
-      periodEnd,
-      royaltyPercentage
-    );
+  const books: RoyaltyBookComputation[] = [];
+  const advanceBreakdown: IAdvanceBreakdownLine[] = [];
 
-  // netSettlement = saldo anterior + regalías generadas − anticipo
+  let totalCopies = 0;
+  let totalInvoicedStr = '0';
+  let totalRoyaltiesStr = '0';
+  let detectedAdvanceStr = '0';
+
+  for (const agreement of agreements) {
+    const book = agreement.book;
+    const { lines, totalCopies: copies, totalInvoiced, totalRoyalties } =
+      await computeRoyaltyLines(
+        book._id,
+        periodStart,
+        periodEnd,
+        agreement.royaltyPercentage
+      );
+
+    // Omitir obras sin ventas en el período.
+    if (lines.length === 0) continue;
+
+    books.push({
+      agreement: agreement._id,
+      book: book._id,
+      bookTitle: book.title,
+      role: agreement.role,
+      royaltyPercentage: agreement.royaltyPercentage,
+      lines,
+      totalCopies: copies,
+      totalInvoiced,
+      totalRoyalties,
+    });
+
+    totalCopies += copies;
+    totalInvoicedStr = add(totalInvoicedStr, totalInvoiced);
+    totalRoyaltiesStr = add(totalRoyaltiesStr, totalRoyalties);
+
+    // Anticipo detectado para esta obra (solo en la primera liquidación).
+    if (detectAdvances) {
+      const adv = await findAdvanceMovements({
+        bookCostCenter: book.costCenter,
+        role: agreement.role,
+        periodEnd,
+      });
+      for (const line of adv.lines) {
+        advanceBreakdown.push({ ...line, bookTitle: book.title });
+        detectedAdvanceStr = add(detectedAdvanceStr, line.amount);
+      }
+    }
+  }
+
+  const totalRoyalties = toNumber(totalRoyaltiesStr);
+  const advancePayment = toNumber(detectedAdvanceStr);
+
+  // net = saldo anterior + regalías generadas − anticipo
   const netSettlement = toNumber(
     subtract(add(previousBalance, totalRoyalties), advancePayment)
   );
-
   const balanceInFavorOf = resolveFavor(netSettlement);
-
-  // Si queda a favor de la editorial (negativo), se arrastra; si es a favor del
-  // autor, se salda con una deuda y el arrastre es 0.
   const carryoverToNext = balanceInFavorOf === 'publisher' ? netSettlement : 0;
 
   return {
-    lines,
+    books,
     totalCopies,
-    totalInvoiced,
+    totalInvoiced: toNumber(totalInvoicedStr),
     totalRoyalties,
     previousBalance,
     advancePayment,
-    royaltyPercentage,
+    advanceBreakdown,
     netSettlement,
     carryoverToNext,
     balanceInFavorOf,

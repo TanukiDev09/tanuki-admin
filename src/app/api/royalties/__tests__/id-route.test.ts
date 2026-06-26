@@ -55,6 +55,11 @@ jest.mock('@/models/Category', () => ({
   default: { findOne: jest.fn() },
 }));
 
+jest.mock('@/models/Agreement', () => ({
+  __esModule: true,
+  default: { find: jest.fn() },
+}));
+
 jest.mock('@/models/RoyaltyStatement', () => ({
   __esModule: true,
   default: { findById: jest.fn() },

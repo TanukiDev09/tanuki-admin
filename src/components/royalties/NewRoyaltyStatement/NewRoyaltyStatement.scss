@@ -98,6 +98,22 @@
     letter-spacing: 0.03em;
   }
 
+  &__book {
+    margin-bottom: 1.5rem;
+  }
+
+  &__book-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+  }
+
+  &__book-meta {
+    font-weight: 400;
+    font-size: 0.8rem;
+    color: var(--color-text-muted, #6b7280);
+  }
+
   &__table-wrap {
     max-height: 420px;
     overflow: auto;

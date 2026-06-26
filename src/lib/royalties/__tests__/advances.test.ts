@@ -3,7 +3,7 @@ jest.mock('mongoose', () => ({ __esModule: true, default: {} }));
 
 jest.mock('@/models/Movement', () => ({
   __esModule: true,
-  default: { find: jest.fn() },
+  default: { collection: { find: jest.fn() } },
 }));
 
 jest.mock('@/models/Category', () => ({
@@ -15,12 +15,13 @@ import { findAdvanceMovements, ROLE_CATEGORY } from '../advances';
 import Movement from '@/models/Movement';
 import Category from '@/models/Category';
 
-const findMock = Movement.find as unknown as jest.Mock;
+const findMock = (Movement as unknown as { collection: { find: jest.Mock } })
+  .collection.find;
 const catFindOneMock = Category.findOne as unknown as jest.Mock;
 
 const mockMovements = (movs: unknown[]) =>
   findMock.mockReturnValue({
-    sort: () => ({ lean: () => Promise.resolve(movs) }),
+    sort: () => ({ toArray: () => Promise.resolve(movs) }),
   });
 
 const mockCategory = (cat: unknown) =>
@@ -104,9 +105,9 @@ describe('findAdvanceMovements', () => {
 
     const query = findMock.mock.calls[0][0];
     expect(query.costCenter).toBe('01T009');
-    expect(query.category.$in).toEqual(
-      expect.arrayContaining(['traducción', 'cat-id'])
-    );
+    // Matchea el _id de la categoría (en sus dos formas), nunca el nombre.
+    expect(query.category.$in).toEqual(expect.arrayContaining(['cat-id']));
+    expect(query.category.$in).not.toContain('traducción');
     expect(query.date.$lte).toEqual(periodEnd);
     expect(query.$or).toEqual(
       expect.arrayContaining([

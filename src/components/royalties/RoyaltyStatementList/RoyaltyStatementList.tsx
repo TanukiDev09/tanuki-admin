@@ -46,13 +46,8 @@ export default function RoyaltyStatementList() {
 
   const columns: Column<StatementRow>[] = [
     {
-      header: 'Autor',
+      header: 'Creador',
       accessorKey: 'creatorName',
-      sortable: true,
-    },
-    {
-      header: 'Libro',
-      accessorKey: 'bookTitle',
       sortable: true,
     },
     {

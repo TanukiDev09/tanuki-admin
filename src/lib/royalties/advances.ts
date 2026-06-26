@@ -53,43 +53,46 @@ export async function findAdvanceMovements(params: {
     return { total: 0, lines: [], categoryName, unavailable: true };
   }
 
-  // La categoría puede estar guardada como ObjectId, como string-hex o (legacy)
-  // como el propio nombre. Cubrimos las tres formas.
   const category = await Category.findOne({ name: categoryName }).lean<{
     _id: mongoose.Types.ObjectId;
   } | null>();
-  const categoryMatch: unknown[] = [categoryName];
-  if (category?._id) {
-    categoryMatch.push(category._id, category._id.toString());
+  if (!category?._id) {
+    // La categoría no existe en este entorno → no hay nada que detectar.
+    return { total: 0, lines: [], categoryName, unavailable: true };
   }
 
-  const movements = await Movement.find({
-    costCenter: bookCostCenter,
-    category: { $in: categoryMatch },
-    $or: [{ type: 'Egreso' }, { flowDirection: 'outflow' }],
-    date: { $lte: periodEnd },
-  })
+  // `category` está guardada de forma mixta en los datos (a veces ObjectId, a
+  // veces el hex como string). Usamos la colección nativa para evitar el casteo
+  // de Mongoose (que rompe con el string) y matcheamos ambas formas.
+  const categoryMatch = [category._id, category._id.toString()];
+
+  const movements = (await Movement.collection
+    .find({
+      costCenter: bookCostCenter,
+      category: { $in: categoryMatch },
+      $or: [{ type: 'Egreso' }, { flowDirection: 'outflow' }],
+      date: { $lte: periodEnd },
+    })
     .sort({ date: 1 })
-    .lean();
+    .toArray()) as unknown as Array<{
+    _id: { toString(): string };
+    date: Date;
+    description?: string;
+    beneficiary?: string;
+    amountInCOP?: DecimalValue;
+    amount?: DecimalValue;
+  }>;
 
   let total = '0';
   const lines: AdvanceLine[] = movements.map((m) => {
-    const mov = m as unknown as {
-      _id: mongoose.Types.ObjectId;
-      date: Date;
-      description?: string;
-      beneficiary?: string;
-      amountInCOP?: DecimalValue;
-      amount?: DecimalValue;
-    };
-    const cop = toNumber(mov.amountInCOP);
-    const amount = cop > 0 ? cop : toNumber(mov.amount);
+    const cop = toNumber(m.amountInCOP);
+    const amount = cop > 0 ? cop : toNumber(m.amount);
     total = add(total, amount);
     return {
-      movementId: mov._id.toString(),
-      date: mov.date,
-      description: mov.description || '',
-      beneficiary: mov.beneficiary,
+      movementId: m._id.toString(),
+      date: m.date,
+      description: m.description || '',
+      beneficiary: m.beneficiary,
       amount,
     };
   });

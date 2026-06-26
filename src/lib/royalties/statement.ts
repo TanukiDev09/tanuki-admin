@@ -1,6 +1,5 @@
 import RoyaltyStatement from '@/models/RoyaltyStatement';
 import { toNumber } from '@/lib/math';
-import { findAdvanceMovements, AdvanceLine } from './advances';
 
 /**
  * Convierte los campos Decimal128 de una liquidación a números planos para la respuesta.
@@ -23,15 +22,15 @@ export function serializeStatement<T extends Record<string, unknown>>(
 }
 
 /**
- * Saldo anterior por defecto: el arrastre de la liquidación previa más reciente
- * (aprobada o pagada) del mismo contrato. Permite encadenar el estado de cuenta.
+ * Liquidación previa más reciente (aprobada o pagada) del mismo CREADOR.
+ * Permite encadenar el estado de cuenta de la persona.
  */
 export async function getPreviousStatement(
-  agreementId: string,
+  creatorId: string,
   beforeDate?: Date
 ) {
   const query: Record<string, unknown> = {
-    agreement: agreementId,
+    creator: creatorId,
     status: { $in: ['approved', 'paid'] },
   };
   if (beforeDate) {
@@ -42,47 +41,32 @@ export async function getPreviousStatement(
 
 export interface RoyaltyDefaults {
   previousBalance: number;
-  advancePayment: number;
-  /** Movimientos financieros detectados como anticipo (vacío si no aplica). */
-  advanceLines: AdvanceLine[];
-  /** De dónde sale el anticipo sugerido. */
-  advanceSource: 'movements' | 'carryover' | 'none';
+  /** true si es la primera liquidación del creador → se detecta el anticipo. */
+  detectAdvances: boolean;
+  /** De dónde sale el saldo de partida. */
+  source: 'first' | 'carryover';
 }
 
 /**
- * Calcula los valores por defecto de saldo anterior y anticipo para una nueva
- * liquidación de un contrato.
+ * Valores por defecto de una nueva liquidación de un creador.
  *
- * - Si ya existe una liquidación previa: el saldo anterior es su arrastre y el
- *   anticipo ya fue aplicado, así que por defecto es 0.
- * - Si es la primera liquidación: saldo anterior 0 y el anticipo se **detecta
- *   automáticamente** en los movimientos financieros (pagos al creador por ese
- *   libro/rol), no del campo del contrato ni de la memoria del usuario.
+ * - Si ya existe una liquidación previa del creador: el saldo de partida es su
+ *   arrastre y el anticipo NO se vuelve a aplicar (ya se aplicó en la primera).
+ * - Si es la primera: saldo 0 y el anticipo se detecta en los movimientos.
  */
 export async function resolveDefaults(params: {
-  agreementId: string;
-  role: string;
-  bookCostCenter?: string;
+  creatorId: string;
   periodStart?: Date;
-  periodEnd: Date;
 }): Promise<RoyaltyDefaults> {
-  const { agreementId, role, bookCostCenter, periodStart, periodEnd } = params;
+  const { creatorId, periodStart } = params;
 
-  const prior = await getPreviousStatement(agreementId, periodStart);
+  const prior = await getPreviousStatement(creatorId, periodStart);
   if (prior) {
     return {
       previousBalance: toNumber(prior.carryoverToNext),
-      advancePayment: 0,
-      advanceLines: [],
-      advanceSource: 'carryover',
+      detectAdvances: false,
+      source: 'carryover',
     };
   }
-
-  const advance = await findAdvanceMovements({ bookCostCenter, role, periodEnd });
-  return {
-    previousBalance: 0,
-    advancePayment: advance.total,
-    advanceLines: advance.lines,
-    advanceSource: advance.lines.length > 0 ? 'movements' : 'none',
-  };
+  return { previousBalance: 0, detectAdvances: true, source: 'first' };
 }

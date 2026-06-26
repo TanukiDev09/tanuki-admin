@@ -21,3 +21,12 @@ export const FAVOR_META: Record<
   publisher: { label: 'A favor de la editorial', variant: 'outline' },
   none: { label: 'Saldo en cero', variant: 'outline' },
 };
+
+export const roleLabel = (role: string) =>
+  role === 'author'
+    ? 'Autor'
+    : role === 'illustrator'
+      ? 'Ilustrador'
+      : role === 'translator'
+        ? 'Traductor'
+        : role;

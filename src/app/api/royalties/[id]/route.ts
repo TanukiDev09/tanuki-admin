@@ -7,26 +7,18 @@ import RoyaltyStatement from '@/models/RoyaltyStatement';
 import Debt from '@/models/Debt';
 import '@/models/Book';
 import '@/models/Creator';
-import {
-  add,
-  subtract,
-  multiply,
-  divide,
-  toNumber,
-  compare,
-  gtZero,
-} from '@/lib/math';
-import { buildComputation, resolveFavor } from '@/lib/royalties/calculate';
-import { serializeStatement } from '@/lib/royalties/statement';
+import '@/models/Agreement';
+import { add, subtract, toNumber, compare, gtZero } from '@/lib/math';
+import { buildCreatorComputation } from '@/lib/royalties/calculate';
+import { loadCreatorAgreements } from '@/lib/royalties/agreements';
+import { resolveDefaults, serializeStatement } from '@/lib/royalties/statement';
 import { RoyaltyComputation } from '@/types/royalty';
 
 export const dynamic = 'force-dynamic';
 
 async function loadStatement(id: string) {
   if (!mongoose.Types.ObjectId.isValid(id)) return null;
-  return RoyaltyStatement.findById(id)
-    .populate('book', 'title isbn')
-    .populate('creator', 'name email identification');
+  return RoyaltyStatement.findById(id);
 }
 
 export async function GET(
@@ -176,9 +168,9 @@ async function approveStatement(statement: any) {
       source: {
         type: 'Regalías',
         id: statement._id,
-        reference: `Regalías ${statement.bookTitle}`,
+        reference: `Regalías ${statement.creatorName}`,
       },
-      notes: `Liquidación de regalías — ${statement.bookTitle} (${statement.creatorName})`,
+      notes: `Liquidación de regalías — ${statement.creatorName}`,
       currency: statement.currency,
     });
     statement.debtId = debt._id;
@@ -270,13 +262,18 @@ async function regenerateDraft(statement: any) {
   if (statement.status !== 'draft') {
     throw new Error('Solo se pueden recalcular borradores');
   }
-  const computation = await buildComputation({
-    bookId: statement.book._id.toString(),
+  const creatorId = statement.creator.toString();
+  const agreements = await loadCreatorAgreements(creatorId);
+  const defaults = await resolveDefaults({
+    creatorId,
+    periodStart: statement.periodStart,
+  });
+  const computation = await buildCreatorComputation({
+    agreements,
     periodStart: statement.periodStart,
     periodEnd: statement.periodEnd,
-    royaltyPercentage: statement.royaltyPercentage,
-    previousBalance: toNumber(statement.previousBalance),
-    advancePayment: toNumber(statement.advancePayment),
+    previousBalance: defaults.previousBalance,
+    detectAdvances: defaults.detectAdvances,
   });
   applyComputation(statement, computation);
   await statement.save();
@@ -284,74 +281,25 @@ async function regenerateDraft(statement: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function editDraft(statement: any, body: Record<string, unknown>) {
-  // Notas se pueden editar en cualquier estado.
+  // Solo las notas son editables. El saldo anterior, el anticipo y los totales
+  // son cálculos del sistema y NO se pueden ajustar a mano (sería encubrimiento
+  // contable); para recalcular desde los datos se usa la acción "regenerate".
   if (typeof body.notes === 'string') {
     statement.notes = body.notes;
   }
-
-  // En estados no-borrador solo permitimos editar notas.
-  if (statement.status === 'draft' && applyDraftOverrides(statement, body)) {
-    recomputeTotals(statement);
-  }
-
   await statement.save();
-}
-
-/** Aplica overrides editables del borrador. Devuelve true si algo cambió. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function applyDraftOverrides(statement: any, body: Record<string, unknown>) {
-  const fields: Array<keyof typeof body> = [
-    'previousBalance',
-    'advancePayment',
-    'royaltyPercentage',
-  ];
-  let changed = false;
-  for (const field of fields) {
-    if (body[field] !== undefined) {
-      statement[field] = Number(body[field]);
-      changed = true;
-    }
-  }
-  return changed;
-}
-
-/** Recalcula regalías y neto sobre las líneas actuales (sin re-consultar facturas). */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function recomputeTotals(statement: any) {
-  const totalRoyalties = recomputeRoyalties(statement);
-  const net = toNumber(
-    subtract(
-      add(toNumber(statement.previousBalance), totalRoyalties),
-      toNumber(statement.advancePayment)
-    )
-  );
-  statement.totalRoyalties = totalRoyalties;
-  statement.netSettlement = net;
-  statement.balanceInFavorOf = resolveFavor(net);
-  statement.carryoverToNext =
-    statement.balanceInFavorOf === 'publisher' ? net : 0;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function applyComputation(statement: any, computation: RoyaltyComputation) {
-  statement.lines = computation.lines;
+  statement.books = computation.books;
+  statement.advanceBreakdown = computation.advanceBreakdown;
+  statement.previousBalance = computation.previousBalance;
+  statement.advancePayment = computation.advancePayment;
   statement.totalCopies = computation.totalCopies;
   statement.totalInvoiced = computation.totalInvoiced;
   statement.totalRoyalties = computation.totalRoyalties;
   statement.netSettlement = computation.netSettlement;
   statement.carryoverToNext = computation.carryoverToNext;
   statement.balanceInFavorOf = computation.balanceInFavorOf;
-}
-
-// Recalcula el % sobre las líneas existentes (si cambió el porcentaje en el borrador).
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function recomputeRoyalties(statement: any): number {
-  const pct = statement.royaltyPercentage;
-  let total = '0';
-  for (const line of statement.lines) {
-    const royalty = toNumber(divide(multiply(line.totalInvoiced, pct), 100));
-    line.totalRoyalty = royalty;
-    total = add(total, royalty);
-  }
-  return toNumber(total);
 }
