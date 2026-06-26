@@ -1,0 +1,41 @@
+.royalties-page {
+  padding: 1.5rem;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  &__description {
+    color: var(--color-text-muted, #6b7280);
+    margin: 0.25rem 0 0;
+  }
+
+  &__btn-icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.4rem;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-text-muted, #6b7280);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+
+    &:hover {
+      color: var(--color-text, #111827);
+    }
+  }
+}

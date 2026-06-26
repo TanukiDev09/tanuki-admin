@@ -25,6 +25,7 @@ import {
   Calculator,
   UserCog,
   Wallet,
+  BookMarked,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePermission } from '@/hooks/usePermissions';
@@ -51,6 +52,7 @@ export const navItems = [
   { href: '/dashboard/points-of-sale', label: 'Puntos de Venta', icon: Store },
   { href: '/dashboard/warehouses', label: 'Bodegas', icon: Warehouse },
   { href: '/dashboard/agreements', label: 'Contratos', icon: FileText },
+  { href: '/dashboard/royalties', label: 'Regalías', icon: BookMarked },
   { href: '/dashboard/categories', label: 'Categorías', icon: Tags },
   {
     href: '/dashboard/financial-health',
@@ -109,6 +111,7 @@ export function NavLinks({
       '/dashboard/points-of-sale': ModuleName.POINTS_OF_SALE,
       '/dashboard/warehouses': ModuleName.WAREHOUSES,
       '/dashboard/agreements': ModuleName.AGREEMENTS,
+      '/dashboard/royalties': ModuleName.ROYALTIES,
       '/dashboard/movements': ModuleName.FINANCE,
       '/dashboard/financial-health': ModuleName.FINANCE,
       '/dashboard/inventory': ModuleName.INVENTORY,

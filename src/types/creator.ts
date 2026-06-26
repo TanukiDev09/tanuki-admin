@@ -3,6 +3,8 @@ import { Document } from 'mongoose';
 export interface ICreator extends Document {
   name: string;
   bio?: string;
+  email?: string;
+  identification?: string;
   nationality?: string;
   website?: string;
   photo?: string;
@@ -13,6 +15,8 @@ export interface ICreator extends Document {
 export interface CreateCreatorDTO {
   name: string;
   bio?: string;
+  email?: string;
+  identification?: string;
   nationality?: string;
   website?: string;
   photo?: string;
@@ -21,6 +25,8 @@ export interface CreateCreatorDTO {
 export interface UpdateCreatorDTO {
   name?: string;
   bio?: string;
+  email?: string;
+  identification?: string;
   nationality?: string;
   website?: string;
   photo?: string;
@@ -30,6 +36,8 @@ export interface CreatorResponse {
   _id: string;
   name: string;
   bio?: string;
+  email?: string;
+  identification?: string;
   nationality?: string;
   website?: string;
   photo?: string;
