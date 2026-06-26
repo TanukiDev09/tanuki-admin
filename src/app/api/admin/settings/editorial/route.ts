@@ -21,12 +21,18 @@ const DEFAULT_EDITORIAL_DATA = {
 
 export async function GET(req: NextRequest) {
   try {
-    const authError = await requirePermission(
-      req,
-      ModuleName.USERS,
-      PermissionAction.READ
-    );
-    if (authError) return authError;
+    // Editorial data is non-sensitive company info that must be identical for
+    // every user across remisiones, devoluciones y liquidaciones. It must NOT
+    // depend on module permissions: any authenticated user receives the real
+    // stored data instead of silently falling back to hardcoded defaults in the
+    // PDF generators. Only authentication is required here.
+    const userId = await getUserIdFromRequest(req);
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'No autenticado. Por favor inicia sesión.' },
+        { status: 401 }
+      );
+    }
 
     await dbConnect();
     const settings = await SystemSettings.findOne({ key: SETTINGS_KEY });

@@ -1,4 +1,4 @@
-# Tanuki Admin – Gestión Editorial Profesional
+# 🐾 Tanuki Admin – Gestión Editorial Profesional
 
 **Tanuki Admin** es la plataforma definitiva diseñada para transformar la administración de editoriales y distribuidoras. Hemos centralizado el control de inventario, la salud financiera y la gestión de catálogo en una interfaz intuitiva y potente, permitiéndote tomar decisiones estratégicas basadas en datos reales.
 

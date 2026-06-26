@@ -370,46 +370,78 @@ export async function GET(request: NextRequest) {
   try {
     await dbConnect();
     const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
+    const skip = (page - 1) * limit;
+
     const type = searchParams.get('type');
     const warehouseId = searchParams.get('warehouseId');
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
 
-    const query: Record<string, unknown> = {};
+    const query: Record<string, any> = {};
+
     if (type && type !== 'ALL') {
       query.type = type;
     }
-    if (warehouseId) {
+
+    if (warehouseId && warehouseId !== 'ALL') {
       query.$or = [
         { fromWarehouseId: warehouseId },
         { toWarehouseId: warehouseId },
       ];
     }
 
-    const movements = await InventoryMovement.find(query)
-      .sort({ date: -1 })
-      .limit(limit)
-      .populate({
-        path: 'fromWarehouseId',
-        select: 'name type address city pointOfSaleId',
-        populate: {
-          path: 'pointOfSaleId',
-          select:
-            'name identificationType identificationNumber address city discountPercentage',
-        },
-      })
-      .populate({
-        path: 'toWarehouseId',
-        select: 'name type address city pointOfSaleId',
-        populate: {
-          path: 'pointOfSaleId',
-          select:
-            'name identificationType identificationNumber address city discountPercentage',
-        },
-      })
-      .populate('items.bookId', 'title isbn price')
-      .populate('createdBy', 'name');
+    if (startDate || endDate) {
+      query.date = {};
+      if (startDate) {
+        query.date.$gte = new Date(startDate);
+      }
+      if (endDate) {
+        const end = new Date(endDate);
+        end.setHours(23, 59, 59, 999);
+        query.date.$lte = end;
+      }
+    }
 
-    return NextResponse.json({ success: true, data: movements });
+    const [movements, total] = await Promise.all([
+      InventoryMovement.find(query)
+        .sort({ date: -1 })
+        .skip(skip)
+        .limit(limit)
+        .populate({
+          path: 'fromWarehouseId',
+          select: 'name type address city pointOfSaleId',
+          populate: {
+            path: 'pointOfSaleId',
+            select:
+              'name identificationType identificationNumber address city discountPercentage',
+          },
+        })
+        .populate({
+          path: 'toWarehouseId',
+          select: 'name type address city pointOfSaleId',
+          populate: {
+            path: 'pointOfSaleId',
+            select:
+              'name identificationType identificationNumber address city discountPercentage',
+          },
+        })
+        .populate('items.bookId', 'title isbn price')
+        .populate('createdBy', 'name'),
+      InventoryMovement.countDocuments(query),
+    ]);
+
+    return NextResponse.json({
+      success: true,
+      data: movements,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
   } catch (error) {
     console.error('Error fetching inventory movements:', error);
     return NextResponse.json(

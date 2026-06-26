@@ -10,13 +10,13 @@ interface StatCardProps {
   trend?: string;
   className?: string;
   variant?:
-  | 'flow'
-  | 'ebb'
-  | 'balance'
-  | 'default'
-  | 'success'
-  | 'info'
-  | 'danger';
+    | 'flow'
+    | 'ebb'
+    | 'balance'
+    | 'default'
+    | 'success'
+    | 'info'
+    | 'danger';
   sparklineData?: number[];
   trendDirection?: 'up' | 'down';
   trendValue?: string;

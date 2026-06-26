@@ -1,0 +1,92 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.warehouse-movements-table {
+  margin-top: $spacing-xl;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  background-color: $background;
+  box-shadow: $shadow-sm;
+  transition: box-shadow 0.2s ease-in-out;
+
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+
+  // Adjust table container overflow
+  .data-table-container {
+    overflow-x: auto;
+    width: 100%;
+    
+    // Prohibit unnecessary horizontal scrolling but make sure it handles responsiveness cleanly
+    -webkit-overflow-scrolling: touch;
+  }
+
+  // Column specific styling
+  &__col-date {
+    width: 16%;
+    white-space: nowrap;
+  }
+
+  &__col-type {
+    width: 12%;
+    white-space: nowrap;
+  }
+
+  &__col-flow {
+    width: 25%;
+    min-width: 180px;
+  }
+
+  &__col-books {
+    width: 22%;
+    min-width: 180px;
+  }
+
+  &__col-units {
+    width: 8%;
+    text-align: right;
+  }
+
+  &__col-billing {
+    width: 12%;
+    text-align: right;
+  }
+
+  &__col-invoice {
+    width: 10%;
+    white-space: nowrap;
+  }
+
+  &__col-actions {
+    width: 10%;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  // Visual style enhancements
+  .table__head-content {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2xs;
+    font-weight: $font-weight-semibold;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  // Hover animations for action buttons
+  .btn-ghost {
+    transition: all 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+
+  // Style for the flow details container
+  .shrink-0 {
+    flex-shrink: 0;
+  }
+}

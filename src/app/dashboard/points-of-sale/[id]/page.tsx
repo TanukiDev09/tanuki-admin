@@ -60,9 +60,9 @@ async function getPointOfSale(id: string) {
     updatedAt: doc.updatedAt?.toISOString(),
     contacts: doc.contacts
       ? doc.contacts.map((c) => ({
-        ...c,
-        _id: c._id.toString(),
-      }))
+          ...c,
+          _id: c._id.toString(),
+        }))
       : [],
   };
 }
@@ -85,7 +85,10 @@ export async function generateMetadata({
   };
 }
 
-export default async function PointOfSaleDetailPage({ params, searchParams }: PageProps) {
+export default async function PointOfSaleDetailPage({
+  params,
+  searchParams,
+}: PageProps) {
   const { id } = await params;
   const { tab } = await searchParams;
   const pos = await getPointOfSale(id);
