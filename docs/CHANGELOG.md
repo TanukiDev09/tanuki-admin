@@ -22,12 +22,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Reducción de Código**: Reducción de `InvoiceForm.tsx` de 921 a 598 líneas (reducción del 35%), logrando un estricto cumplimiento del límite de la regla `max-lines` (máximo 700 líneas) sin utilizar directivas de elusión de linter.
 - **Robustez en Tablas de Datos**:
   - **Casteo Seguro**: Sustitución de directivas de exclusión de linter y tipado laxo (`item as any`) en `DataTable.tsx` por tipos robustos de TypeScript (`item as unknown as Record<string, unknown>`), eliminando advertencias y errores en la capa visual.
+- **Edición Interactiva en Detalle de Centro de Costo**:
+  - **Integración de Modales**: Activación e integración directa del componente modal `CostCenterModal` en la vista de análisis detallado (`/dashboard/cost-centers/[id]`), habilitando la edición de atributos clave y el refresco dinámico de datos financieros al guardar.
 
 ### 🛠️ Calidad Técnica (1.0.5)
 
 - **Pipeline de Automatización de Calidad (`release-production`)**:
   - **Skill de Cierre**: Creación del módulo agéntico reutilizable que automatiza: auditorías de seguridad en archivos `.env` (fuga de secretos en `NEXT_PUBLIC_`), chequeos de estilo con Prettier y Stylelint, análisis linter de ESLint con tolerancia cero, ejecución de pruebas unitarias con Jest, validaciones de índices de MongoDB y benchmarks de consultas, y compilación final de Next.js.
   - **Pruebas de Accesibilidad Automatizadas**: Integración completa con Cypress + Axe-core para validar automáticamente 40 rutas del sistema, garantizando el cumplimiento estricto del estándar de accesibilidad premium **WCAG AAA** (relación de contraste 7:1, reflow responsivo, navegación semántica y landmarks correctos).
+- **Saneamiento de Ciclo de Vida y Tipados**:
+  - **Estructuración de React Hooks**: Refactorización de la vista detallada de centros de costo para garantizar el cumplimiento de las reglas de hooks de React (evitando anidamientos no válidos) y el saneamiento completo de tipos TypeScript de cara a producción.
 - **Compilador y Caché Limpios**:
   - **Prevención de Tipos Huérfanos**: Saneamiento automático del directorio `.next/` antes del paso a producción para eliminar referencias e interfaces de rutas obsoletas heredadas de otras ramas del repositorio.
 

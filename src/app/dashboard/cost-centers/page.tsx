@@ -244,13 +244,10 @@ export default function CostCentersPage() {
         <div className="cost-centers-page__actions">
           {canCreate && (
             <Button
-              onClick={() =>
-                toast({
-                  title: 'Próximamente',
-                  description:
-                    'La creación desde esta vista está en construcción.',
-                })
-              }
+              onClick={() => {
+                setSelectedCostCenter(null);
+                setIsModalOpen(true);
+              }}
               className="cost-centers-page__new-btn"
             >
               <Plus className="mr-2 h-4 w-4" />
