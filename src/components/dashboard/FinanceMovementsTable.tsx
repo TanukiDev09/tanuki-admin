@@ -107,13 +107,14 @@ export function FinanceMovementsTable({
                   <div className="flex flex-wrap gap-1">
                     {(() => {
                       const ccs = new Set<string>();
-                      if (m.costCenter) ccs.add(m.costCenter);
-                      m.items?.forEach((it) => {
-                        if (it.costCenter) ccs.add(it.costCenter);
-                      });
-                      m.allocations?.forEach((al) => {
-                        if (al.costCenter) ccs.add(al.costCenter);
-                      });
+                      const addCC = (cc: unknown) => {
+                        if (!cc) return;
+                        if (Array.isArray(cc)) cc.forEach((c) => c && ccs.add(String(c)));
+                        else ccs.add(String(cc));
+                      };
+                      addCC(m.costCenter);
+                      m.items?.forEach((it) => addCC(it.costCenter));
+                      m.allocations?.forEach((al) => addCC(al.costCenter));
 
                       const ccList = Array.from(ccs);
                       if (ccList.length === 0)
