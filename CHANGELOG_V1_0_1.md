@@ -207,7 +207,7 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 ### 🎨 Rediseño UX/UI de Inventario
 
 - **Detalle de Movimiento Premium**: Transformación total de la vista de detalle (`/dashboard/inventory/[id]`) con un diseño basado en tarjetas y grids.
-  - **Diagrama de Flujo Logístico**: Visualización gráfica de la ruta *Origen -> Destino* con indicadores de tipo de bodega.
+  - **Diagrama de Flujo Logístico**: Visualización gráfica de la ruta _Origen -> Destino_ con indicadores de tipo de bodega.
   - **Tabla de Items Limpia**: Diseño simplificado para fácil lectura, con metadatos (ISBN, Precios) jerarquizados.
   - **Panel de Metadatos**: Barra lateral dedicada para información clave (ID, Factura, Estado) y Observaciones destacados.
   - **Iconografía Unificada**: Implementación consistente de iconos `lucide-react` para mejorar la escaneabilidad.

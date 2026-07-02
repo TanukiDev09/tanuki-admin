@@ -3,6 +3,7 @@
 ## Descripción General
 
 Este sistema permite importar facturas electrónicas de la DIAN en formato XML (UBL 2.1) de dos maneras:
+
 1. **Script de Python**: Para procesamiento masivo de carpetas completas
 2. **Interfaz Web**: Para carga manual individual o por lotes
 
@@ -11,17 +12,19 @@ Este sistema permite importar facturas electrónicas de la DIAN en formato XML (
 ### Instalación
 
 1. Instalar dependencias:
+
 ```bash
 cd scripts
 pip install -r requirements.txt
 ```
 
 2. Configurar variables de entorno:
-Asegúrate de tener `MONGODB_URI` en tu archivo `.env`
+   Asegúrate de tener `MONGODB_URI` en tu archivo `.env`
 
 ### Uso Básico
 
 #### Modo Dry-Run (Sin Importar)
+
 ```bash
 python process_dian_invoices.py --folder data/Facturas-2025 --dry-run
 ```
@@ -29,6 +32,7 @@ python process_dian_invoices.py --folder data/Facturas-2025 --dry-run
 Este modo procesa los XMLs y muestra ejemplos sin importar a la base de datos.
 
 #### Importar a Base de Datos
+
 ```bash
 python process_dian_invoices.py --folder data/Facturas-2025 --import
 ```
@@ -48,6 +52,7 @@ El script pedirá confirmación antes de importar.
 ### Salida del Script
 
 El script muestra:
+
 - Progreso de procesamiento archivo por archivo
 - Resumen de éxitos y errores
 - 2 ejemplos de facturas procesadas con detalles
@@ -62,17 +67,20 @@ Navega a: `/dashboard/invoices/upload-xml`
 ### Proceso de Carga
 
 #### Paso 1: Cargar Archivos
+
 - Arrastra archivos XML a la zona de carga
 - O haz clic para seleccionar archivos
 - Soporta carga individual o múltiple
 
 #### Paso 2: Procesar
+
 - Revisa la lista de archivos cargados
 - Haz clic en "Procesar Archivos"
 - El sistema procesará cada archivo automáticamente
 - Verás el progreso en tiempo real
 
 #### Paso 3: Confirmar
+
 - Revisa el resumen de importación
 - Ver estadísticas de éxitos/errores
 - Opciones:
@@ -93,51 +101,52 @@ Navega a: `/dashboard/invoices/upload-xml`
 
 ### Datos Básicos de Factura
 
-| Campo DIAN XML | Campo Interno | Notas |
-|----------------|---------------|-------|
-| `cbc:ID` | `number` | Número de factura |
-| `cbc:UUID` | `cufe` | Código Único de Factura Electrónica |
-| `cbc:IssueDate` | `date` | Fecha de emisión |
-| `cbc:DueDate` | `dueDate` | Fecha de vencimiento |
-| `cac:LegalMonetaryTotal/cbc:PayableAmount` | `total` | Total a pagar |
-| `cac:LegalMonetaryTotal/cbc:LineExtensionAmount` | `subtotal` | Subtotal |
-| `cac:TaxTotal/cbc:TaxAmount` | `tax` | Impuestos |
+| Campo DIAN XML                                   | Campo Interno | Notas                               |
+| ------------------------------------------------ | ------------- | ----------------------------------- |
+| `cbc:ID`                                         | `number`      | Número de factura                   |
+| `cbc:UUID`                                       | `cufe`        | Código Único de Factura Electrónica |
+| `cbc:IssueDate`                                  | `date`        | Fecha de emisión                    |
+| `cbc:DueDate`                                    | `dueDate`     | Fecha de vencimiento                |
+| `cac:LegalMonetaryTotal/cbc:PayableAmount`       | `total`       | Total a pagar                       |
+| `cac:LegalMonetaryTotal/cbc:LineExtensionAmount` | `subtotal`    | Subtotal                            |
+| `cac:TaxTotal/cbc:TaxAmount`                     | `tax`         | Impuestos                           |
 
 ### Datos del Cliente
 
-| Campo DIAN XML | Campo Interno | Notas |
-|----------------|---------------|-------|
-| `cac:PartyTaxScheme/cbc:RegistrationName` | `customerName` | Nombre del cliente |
-| `cac:PartyTaxScheme/cbc:CompanyID` | `customerTaxId` | NIT o Cédula |
-| `cbc:CompanyID@schemeID` | `customerDocumentType` | Tipo de documento (1=CC, 3=NIT) |
-| `cac:Contact/cbc:ElectronicMail` | `customerEmail` | Email |
-| `cac:Contact/cbc:Telephone` | `customerPhone` | Teléfono |
-| `cac:Address/cac:AddressLine/cbc:Line` | `customerAddress` | Dirección |
-| `cac:Address/cbc:CityName` | `customerCity` | Ciudad |
+| Campo DIAN XML                            | Campo Interno          | Notas                           |
+| ----------------------------------------- | ---------------------- | ------------------------------- |
+| `cac:PartyTaxScheme/cbc:RegistrationName` | `customerName`         | Nombre del cliente              |
+| `cac:PartyTaxScheme/cbc:CompanyID`        | `customerTaxId`        | NIT o Cédula                    |
+| `cbc:CompanyID@schemeID`                  | `customerDocumentType` | Tipo de documento (1=CC, 3=NIT) |
+| `cac:Contact/cbc:ElectronicMail`          | `customerEmail`        | Email                           |
+| `cac:Contact/cbc:Telephone`               | `customerPhone`        | Teléfono                        |
+| `cac:Address/cac:AddressLine/cbc:Line`    | `customerAddress`      | Dirección                       |
+| `cac:Address/cbc:CityName`                | `customerCity`         | Ciudad                          |
 
 ### Líneas de Factura
 
-| Campo DIAN XML | Campo Interno | Notas |
-|----------------|---------------|-------|
-| `cac:Item/cbc:Description` | `items[].description` | Descripción del producto |
-| `cbc:InvoicedQuantity` | `items[].quantity` | Cantidad |
-| `cac:Price/cbc:PriceAmount` | `items[].unitPrice` | Precio unitario |
-| `cbc:LineExtensionAmount` | `items[].total` | Total de la línea |
+| Campo DIAN XML              | Campo Interno         | Notas                    |
+| --------------------------- | --------------------- | ------------------------ |
+| `cac:Item/cbc:Description`  | `items[].description` | Descripción del producto |
+| `cbc:InvoicedQuantity`      | `items[].quantity`    | Cantidad                 |
+| `cac:Price/cbc:PriceAmount` | `items[].unitPrice`   | Precio unitario          |
+| `cbc:LineExtensionAmount`   | `items[].total`       | Total de la línea        |
 
 ### Datos DIAN Específicos
 
-| Campo DIAN XML | Campo Interno | Notas |
-|----------------|---------------|-------|
-| `sts:InvoiceAuthorization` | `dianData.invoiceAuthorization` | Autorización DIAN |
-| `sts:AuthorizationPeriod` | `dianData.authorizationPeriod` | Período de autorización |
-| `sts:SoftwareProvider/sts:ProviderID` | `dianData.softwareProvider` | Proveedor de software |
-| `sts:SoftwareProvider/sts:SoftwareID` | `dianData.softwareId` | ID del software |
+| Campo DIAN XML                        | Campo Interno                   | Notas                   |
+| ------------------------------------- | ------------------------------- | ----------------------- |
+| `sts:InvoiceAuthorization`            | `dianData.invoiceAuthorization` | Autorización DIAN       |
+| `sts:AuthorizationPeriod`             | `dianData.authorizationPeriod`  | Período de autorización |
+| `sts:SoftwareProvider/sts:ProviderID` | `dianData.softwareProvider`     | Proveedor de software   |
+| `sts:SoftwareProvider/sts:SoftwareID` | `dianData.softwareId`           | ID del software         |
 
 ## Detección de Newsletter
 
 ### Regla de Negocio
 
 Una factura indica suscripción al newsletter cuando:
+
 1. El cliente es **persona natural** (`schemeID="1"` = Cédula de Ciudadanía)
 2. **Y** la factura tiene una **orden de compra** (`cac:OrderReference/cbc:ID`)
 
@@ -220,13 +229,13 @@ Processing: invalid.xml... ✗
 
 ```javascript
 // Contar facturas DIAN importadas
-db.invoices.countDocuments({ cufe: { $exists: true } })
+db.invoices.countDocuments({ cufe: { $exists: true } });
 
 // Ver facturas con newsletter
-db.invoices.find({ newsletterSignup: true })
+db.invoices.find({ newsletterSignup: true });
 
 // Ver una factura completa
-db.invoices.findOne({ number: "FE1278" })
+db.invoices.findOne({ number: 'FE1278' });
 ```
 
 ### Verificar en la Interfaz

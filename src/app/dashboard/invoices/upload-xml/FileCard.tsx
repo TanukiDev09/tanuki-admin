@@ -34,7 +34,13 @@ export interface ParsedInvoice {
 
 export interface UploadedFile {
   file: File;
-  status: 'pending' | 'processing' | 'success' | 'error' | 'imported' | 'saving';
+  status:
+    | 'pending'
+    | 'processing'
+    | 'success'
+    | 'error'
+    | 'imported'
+    | 'saving';
   invoice?: ParsedInvoice;
   error?: string;
 }
@@ -57,7 +63,8 @@ export default function FileCard({
   const { status, file, invoice, error } = fileObj;
 
   // Use processing style for saving status to show the spinner
-  const statusClassName = status === 'saving' ? styles.processing : styles[status];
+  const statusClassName =
+    status === 'saving' ? styles.processing : styles[status];
 
   return (
     <motion.div
@@ -85,7 +92,9 @@ export default function FileCard({
                 ${(invoice.total || 0).toLocaleString()} COP
               </span>
               {invoice.newsletterSignup && (
-                <span className={styles['newsletter-badge']}>📧 Newsletter</span>
+                <span className={styles['newsletter-badge']}>
+                  📧 Newsletter
+                </span>
               )}
             </div>
           )}

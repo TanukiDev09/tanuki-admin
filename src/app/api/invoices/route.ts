@@ -32,7 +32,7 @@ const createInvoiceSchema = z.object({
   status: z
     .enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked'])
     .default('Unchecked'),
-  costCenters: z.array(z.string()).optional(), // Array of ObjectIds as strings
+  costCenters: z.array(z.object({ code: z.string(), amount: z.number() })).optional(),
   movements: z.array(z.string()).optional(), // Array of ObjectIds
   inventoryMovement: z.string().optional().nullable(), // ObjectId
   notes: z.string().optional(),
@@ -134,7 +134,6 @@ export async function GET(req: NextRequest) {
       .sort(sort)
       .skip(skip)
       .limit(limit)
-      .populate('costCenters', 'name code')
       .populate('inventoryMovement', 'consecutive type');
 
     const total = await Invoice.countDocuments(query);

@@ -34,7 +34,11 @@ interface InventoryListProps {
   onDelete?: (item: InventoryItem) => void;
 }
 
-export function InventoryList({ data, onAdjust, onDelete }: InventoryListProps) {
+export function InventoryList({
+  data,
+  onAdjust,
+  onDelete,
+}: InventoryListProps) {
   const [search, setSearch] = useState('');
   const [imageError, setImageError] = useState<Record<string, boolean>>({});
 

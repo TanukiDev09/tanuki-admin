@@ -21,6 +21,8 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/Label';
 import { Textarea } from '@/components/ui/Textarea';
+import { usePermission } from '@/hooks/usePermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import './CostCenterSelect.scss';
 
 interface CostCenter {
@@ -48,6 +50,9 @@ export default function CostCenterSelect({
   allowCreation = true,
   hideLabel = false,
 }: CostCenterSelectProps) {
+  const { hasPermission } = usePermission();
+  const canCreate = hasPermission(ModuleName.COST_CENTERS, PermissionAction.CREATE);
+
   const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNewModal, setShowNewModal] = useState(false);
@@ -147,7 +152,7 @@ export default function CostCenterSelect({
                   {cc.code} - {cc.name}
                 </SelectItem>
               ))}
-              {allowCreation && (
+              {allowCreation && canCreate && (
                 <>
                   <SelectSeparator />
                   <SelectItem

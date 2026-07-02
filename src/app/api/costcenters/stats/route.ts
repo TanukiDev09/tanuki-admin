@@ -124,6 +124,15 @@ export async function GET(request: NextRequest) {
     // 4. Per Cost Center Stats
     const incomeTypes = ['Ingreso', 'INCOME', 'factura_emitida'];
 
+    // Helper: normalize a costCenter field that may be a string or an array
+    const normCC = (expr: unknown) => ({
+      $cond: [
+        { $isArray: expr },
+        { $ifNull: [{ $arrayElemAt: [expr, 0] }, '00'] },
+        { $ifNull: [expr, '00'] },
+      ],
+    });
+
     const basePortionsPipeline: PipelineStage[] = [
       {
         $project: {
@@ -140,7 +149,9 @@ export async function GET(request: NextRequest) {
                   input: '$items',
                   as: 'item',
                   in: {
-                    cc: { $ifNull: ['$$item.costCenter', '$costCenter'] },
+                    cc: normCC({
+                      $ifNull: ['$$item.costCenter', '$costCenter'],
+                    }),
                     val: {
                       $multiply: [
                         { $ifNull: ['$$item.total', 0] },
@@ -163,7 +174,7 @@ export async function GET(request: NextRequest) {
                       input: '$allocations',
                       as: 'alloc',
                       in: {
-                        cc: '$$alloc.costCenter',
+                        cc: normCC('$$alloc.costCenter'),
                         val: {
                           $multiply: [
                             { $ifNull: ['$$alloc.amount', 0] },
@@ -175,7 +186,7 @@ export async function GET(request: NextRequest) {
                   },
                   else: [
                     {
-                      cc: { $ifNull: ['$costCenter', '00'] },
+                      cc: normCC('$costCenter'),
                       val: GET_AMOUNT_COP_EXPR,
                     },
                   ],

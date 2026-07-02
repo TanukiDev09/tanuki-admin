@@ -9,7 +9,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/Table';
-import { Search, Mail, User, Fingerprint, BookOpen, Copy, Layout, FileText, Check } from 'lucide-react';
+import {
+  Search,
+  Mail,
+  User,
+  Fingerprint,
+  BookOpen,
+  Copy,
+  Layout,
+  FileText,
+  Check,
+} from 'lucide-react';
 import { Input } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -60,7 +70,8 @@ export function MailListTab() {
       item.customerTaxId?.toLowerCase().includes(search.toLowerCase()) ||
       (item.booksPurchased?.some((book) =>
         book.toLowerCase().includes(search.toLowerCase())
-      ) ?? false)
+      ) ??
+        false)
   );
 
   const getCsvContent = () => {
@@ -124,7 +135,9 @@ export function MailListTab() {
             title={`Copiar ${filteredItems.length} correos`}
           >
             {copied ? <Check /> : <Copy />}
-            <span>{copied ? '¡Copiado!' : `Copiar ${filteredItems.length} líneas`}</span>
+            <span>
+              {copied ? '¡Copiado!' : `Copiar ${filteredItems.length} líneas`}
+            </span>
           </button>
         </div>
 
@@ -175,7 +188,10 @@ export function MailListTab() {
                       ))
                     ) : filteredItems.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={5} className="invoices-list__empty-state">
+                        <TableCell
+                          colSpan={5}
+                          className="invoices-list__empty-state"
+                        >
                           <div className="empty-content">
                             <Search className="w-12 h-12 mb-2 opacity-20" />
                             <p>No se encontraron correos</p>
@@ -203,18 +219,24 @@ export function MailListTab() {
                           <TableCell>
                             <div className="invoices-list__books-list">
                               {item.booksPurchased?.map((book, i) => (
-                                <span key={i} className="invoices-list__book-badge">
+                                <span
+                                  key={i}
+                                  className="invoices-list__book-badge"
+                                >
                                   {book}
                                 </span>
                               ))}
                             </div>
                           </TableCell>
                           <TableCell className="text-muted-foreground whitespace-nowrap">
-                            {new Date(item.lastSignupDate).toLocaleDateString('es-CO', {
-                              day: '2-digit',
-                              month: 'short',
-                              year: 'numeric',
-                            })}
+                            {new Date(item.lastSignupDate).toLocaleDateString(
+                              'es-CO',
+                              {
+                                day: '2-digit',
+                                month: 'short',
+                                year: 'numeric',
+                              }
+                            )}
                           </TableCell>
                         </motion.tr>
                       ))

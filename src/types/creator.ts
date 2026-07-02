@@ -1,8 +1,13 @@
 import { Document } from 'mongoose';
 
+export type CreatorRole = 'author' | 'translator' | 'illustrator';
+
 export interface ICreator extends Document {
   name: string;
+  roles: CreatorRole[];
   bio?: string;
+  email?: string;
+  identification?: string;
   nationality?: string;
   website?: string;
   photo?: string;
@@ -12,7 +17,10 @@ export interface ICreator extends Document {
 
 export interface CreateCreatorDTO {
   name: string;
+  roles?: CreatorRole[];
   bio?: string;
+  email?: string;
+  identification?: string;
   nationality?: string;
   website?: string;
   photo?: string;
@@ -20,7 +28,10 @@ export interface CreateCreatorDTO {
 
 export interface UpdateCreatorDTO {
   name?: string;
+  roles?: CreatorRole[];
   bio?: string;
+  email?: string;
+  identification?: string;
   nationality?: string;
   website?: string;
   photo?: string;
@@ -29,7 +40,10 @@ export interface UpdateCreatorDTO {
 export interface CreatorResponse {
   _id: string;
   name: string;
+  roles: CreatorRole[];
   bio?: string;
+  email?: string;
+  identification?: string;
   nationality?: string;
   website?: string;
   photo?: string;

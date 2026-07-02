@@ -18,7 +18,7 @@ export function PawClickEffect() {
     // Only trigger on desktop/large screens as requested
     if (window.innerWidth < 1024) return;
 
-    // Don't trigger on buttons or interactive elements if desired, 
+    // Don't trigger on buttons or interactive elements if desired,
     // but usually click effects look better everywhere.
     // We can filter if needed.
 
@@ -43,10 +43,16 @@ export function PawClickEffect() {
         {paws.map((paw) => (
           <motion.div
             key={paw.id}
-            initial={{ opacity: 0, scale: 0.5, x: paw.x - 16, y: paw.y - 16, rotate: paw.rotation }}
+            initial={{
+              opacity: 0,
+              scale: 0.5,
+              x: paw.x - 16,
+              y: paw.y - 16,
+              rotate: paw.rotation,
+            }}
             animate={{ opacity: 0.4, scale: 1 }}
             exit={{ opacity: 0, scale: 1.2, y: paw.y - 40 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
             onAnimationComplete={() => {
               setPaws((prev) => prev.filter((p) => p.id !== paw.id));
             }}

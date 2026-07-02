@@ -4,7 +4,13 @@ import { NumericInput } from '@/components/ui/Input/NumericInput';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
 import { Trash2, Plus } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
-import { add, subtract, compare, toNumber, isMatchedFinancial } from '@/lib/math';
+import {
+  add,
+  subtract,
+  compare,
+  toNumber,
+  isMatchedFinancial,
+} from '@/lib/math';
 
 interface Allocation {
   costCenter: string;
@@ -97,7 +103,9 @@ export function AllocationTable({
 
       <div className="movement-form__summary-bar">
         <div className="movement-form__summary-bar-content">
-          <span className="movement-form__summary-bar-label">Total a Distribuir</span>
+          <span className="movement-form__summary-bar-label">
+            Total a Distribuir
+          </span>
           <span className="movement-form__summary-bar-value">
             {formatCurrency(toNumber(totalAmount || 0), currency)}
           </span>
@@ -107,10 +115,9 @@ export function AllocationTable({
           <div className="flex gap-2 items-center text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             <span>Asignado:</span>
             <span
-              className={`font-mono text-sm ${isMatched
-                ? 'text-success'
-                : 'text-danger'
-                }`}
+              className={`font-mono text-sm ${
+                isMatched ? 'text-success' : 'text-danger'
+              }`}
             >
               {formatCurrency(toNumber(sumAllocations), currency)}
             </span>

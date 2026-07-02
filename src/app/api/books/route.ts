@@ -172,11 +172,42 @@ export async function GET(request: NextRequest) {
             },
           },
         },
+        // Lookup total sales from invoices
+        {
+          $lookup: {
+            from: 'invoices',
+            let: { bookId: '$_id' },
+            pipeline: [
+              { $match: { status: { $ne: 'Cancelled' } } },
+              { $unwind: '$items' },
+              { $match: { $expr: { $eq: ['$items.bookId', '$$bookId'] } } },
+              {
+                $group: {
+                  _id: null,
+                  totalSold: { $sum: '$items.quantity' },
+                  totalRevenue: { $sum: '$items.total' }
+                }
+              }
+            ],
+            as: 'salesData'
+          }
+        },
+        {
+          $addFields: {
+            soldCopies: {
+              $ifNull: [{ $arrayElemAt: ['$salesData.totalSold', 0] }, 0]
+            },
+            totalRevenue: {
+              $ifNull: [{ $arrayElemAt: ['$salesData.totalRevenue', 0] }, 0]
+            }
+          }
+        },
         // Remove inventory arrays from response
         {
           $project: {
             inventory: 0,
             volumesInventory: 0,
+            salesData: 0,
           },
         },
       ]);

@@ -9,7 +9,21 @@ const CreatorSchema: Schema = new Schema(
       trim: true,
       index: true,
     },
+    roles: {
+      type: [String],
+      enum: ['author', 'translator', 'illustrator'],
+      default: [],
+    },
     bio: {
+      type: String,
+      trim: true,
+    },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
+    identification: {
       type: String,
       trim: true,
     },

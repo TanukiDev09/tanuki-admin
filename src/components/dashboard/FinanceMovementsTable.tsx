@@ -107,13 +107,14 @@ export function FinanceMovementsTable({
                   <div className="flex flex-wrap gap-1">
                     {(() => {
                       const ccs = new Set<string>();
-                      if (m.costCenter) ccs.add(m.costCenter);
-                      m.items?.forEach((it) => {
-                        if (it.costCenter) ccs.add(it.costCenter);
-                      });
-                      m.allocations?.forEach((al) => {
-                        if (al.costCenter) ccs.add(al.costCenter);
-                      });
+                      const addCC = (cc: unknown) => {
+                        if (!cc) return;
+                        if (Array.isArray(cc)) cc.forEach((c) => c && ccs.add(String(c)));
+                        else ccs.add(String(cc));
+                      };
+                      addCC(m.costCenter);
+                      m.items?.forEach((it) => addCC(it.costCenter));
+                      m.allocations?.forEach((al) => addCC(al.costCenter));
 
                       const ccList = Array.from(ccs);
                       if (ccList.length === 0)
@@ -142,13 +143,16 @@ export function FinanceMovementsTable({
                     <span className="font-bold">
                       {m.type === 'INCOME' ? '+' : '-'}{' '}
                       {formatCurrency(
-                        toNumber(m.relevantAmount ?? m.amountInCOP ?? m.amount ?? 0),
+                        toNumber(
+                          m.relevantAmount ?? m.amountInCOP ?? m.amount ?? 0
+                        ),
                         'COP'
                       )}
                     </span>
                     {m.relevantAmount !== undefined &&
                       m.amountInCOP !== undefined &&
-                      toNumber(m.relevantAmount) !== toNumber(m.amountInCOP) && (
+                      toNumber(m.relevantAmount) !==
+                        toNumber(m.amountInCOP) && (
                         <span className="text-[10px] opacity-60 italic">
                           de {formatCurrency(toNumber(m.amountInCOP), 'COP')}
                         </span>

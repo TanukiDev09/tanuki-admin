@@ -35,7 +35,7 @@ interface Invoice {
   customerName: string;
   customerTaxId?: string;
   status: string;
-  costCenters?: Array<{ _id: string; name: string; code: string }>;
+  costCenters?: Array<{ code: string; amount: number }>;
   items: Array<{
     type: 'libro' | 'servicio';
     description: string;
@@ -146,7 +146,12 @@ export default function InvoiceDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('¿Está seguro de que desea eliminar esta factura? Esta acción no se puede deshacer.')) return;
+    if (
+      !window.confirm(
+        '¿Está seguro de que desea eliminar esta factura? Esta acción no se puede deshacer.'
+      )
+    )
+      return;
 
     try {
       const res = await fetch(`/api/invoices/${id}`, {
@@ -232,7 +237,9 @@ export default function InvoiceDetailPage() {
                 variant={invoice.status === 'Paid' ? 'default' : 'outline'}
                 className="invoice-detail__status-badge"
               >
-                {invoice.status === 'Unchecked' ? 'Sin comprobar' : invoice.status}
+                {invoice.status === 'Unchecked'
+                  ? 'Sin comprobar'
+                  : invoice.status}
               </Badge>
             </CardHeader>
             <CardContent>
@@ -256,11 +263,11 @@ export default function InvoiceDetailPage() {
                     <div className="invoice-detail__cost-centers">
                       {invoice.costCenters.map((cc) => (
                         <Badge
-                          key={cc._id}
+                          key={cc.code}
                           variant="secondary"
                           style={{ fontSize: '10px' }}
                         >
-                          {cc.code} - {cc.name}
+                          {cc.code}
                         </Badge>
                       ))}
                     </div>

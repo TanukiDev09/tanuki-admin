@@ -358,11 +358,11 @@ function MonthlyView({
             pagination={
               data.pagination
                 ? {
-                  ...data.pagination,
-                  hasPrevPage: data.pagination.page > 1,
-                  hasNextPage:
-                    data.pagination.page < data.pagination.totalPages,
-                }
+                    ...data.pagination,
+                    hasPrevPage: data.pagination.page > 1,
+                    hasNextPage:
+                      data.pagination.page < data.pagination.totalPages,
+                  }
                 : undefined
             }
             onPageChange={onPageChange}
@@ -480,11 +480,11 @@ function AnnualView({
             pagination={
               data.pagination
                 ? {
-                  ...data.pagination,
-                  hasPrevPage: data.pagination.page > 1,
-                  hasNextPage:
-                    data.pagination.page < data.pagination.totalPages,
-                }
+                    ...data.pagination,
+                    hasPrevPage: data.pagination.page > 1,
+                    hasNextPage:
+                      data.pagination.page < data.pagination.totalPages,
+                  }
                 : undefined
             }
             onPageChange={onPageChange}
@@ -599,7 +599,8 @@ export default function FinancialHealthPage() {
         <div className="financial-health__title-group">
           <h1 className="financial-health__title">Salud Financiera</h1>
           <p className="financial-health__subtitle">
-            Resumen de movimientos, indicadores de sostenibilidad y proyecciones.
+            Resumen de movimientos, indicadores de sostenibilidad y
+            proyecciones.
           </p>
         </div>
 
@@ -613,9 +614,7 @@ export default function FinancialHealthPage() {
               if (params.year !== undefined)
                 newParams.year = params.year.toString();
               if (params.month !== undefined)
-                newParams.month = params.month
-                  ? params.month.toString()
-                  : null;
+                newParams.month = params.month ? params.month.toString() : null;
               updateParams(newParams);
             }}
           />
