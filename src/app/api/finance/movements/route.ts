@@ -20,7 +20,7 @@ import {
 export const dynamic = 'force-dynamic';
 
 interface Allocation {
-  costCenter: string;
+  costCenter: string | string[];
   amount: { toString: () => string } | number;
 }
 
@@ -32,8 +32,20 @@ interface Item {
   catalogPrice?: { toString: () => string } | number;
   discount?: { toString: () => string } | number;
   total: { toString: () => string } | number;
-  costCenter: string;
+  costCenter: string | string[];
   bookId?: string | { toString: () => string };
+}
+
+function matchesCC(cc: string | string[] | undefined, code: string): boolean {
+  if (!cc) return false;
+  if (Array.isArray(cc)) return cc.includes(code);
+  return cc === code;
+}
+
+function normalizeCC(cc: string | string[] | undefined): string {
+  if (!cc) return '';
+  if (Array.isArray(cc)) return cc[0] ?? '';
+  return cc;
 }
 
 interface MovementDoc {
@@ -47,7 +59,7 @@ interface MovementDoc {
   unitValue?: { toString: () => string };
   allocations?: Allocation[];
   items?: Item[];
-  costCenter?: string;
+  costCenter?: string | string[];
   [key: string]: unknown;
 }
 
@@ -235,7 +247,7 @@ function formatMovements(
       if (m.items && m.items.length > 0) {
         const matchingTotal = m.items.reduce((sum, item) => {
           const itemCC = item.costCenter || m.costCenter;
-          if (itemCC === costCenterCode) {
+          if (matchesCC(itemCC, costCenterCode)) {
             return add(sum, item.total?.toString() || '0');
           }
           return sum;
@@ -245,7 +257,7 @@ function formatMovements(
         );
       } else if (m.allocations && m.allocations.length > 0) {
         const matchingTotal = m.allocations.reduce((sum, alloc) => {
-          if (alloc.costCenter === costCenterCode) {
+          if (matchesCC(alloc.costCenter, costCenterCode)) {
             return add(sum, alloc.amount?.toString() || '0');
           }
           return sum;
@@ -253,7 +265,7 @@ function formatMovements(
         relevantAmount = toNumber(
           multiply(matchingTotal, m.exchangeRate?.toString() || '1')
         );
-      } else if (m.costCenter !== costCenterCode) {
+      } else if (!matchesCC(m.costCenter, costCenterCode)) {
         relevantAmount = 0;
       }
     }
@@ -270,10 +282,13 @@ function formatMovements(
       unitValue: m.unitValue ? toNumber(m.unitValue) : undefined,
       allocations: m.allocations?.map((a) => ({
         ...a,
+        costCenter: normalizeCC(a.costCenter),
         amount: a.amount ? toNumber(a.amount) : 0,
       })),
+      costCenter: normalizeCC(m.costCenter),
       items: m.items?.map((item) => ({
         ...item,
+        costCenter: normalizeCC(item.costCenter),
         quantity: item.quantity ? toNumber(item.quantity) : 0,
         unitValue: item.unitValue ? toNumber(item.unitValue) : 0,
         total: item.total ? toNumber(item.total) : 0,

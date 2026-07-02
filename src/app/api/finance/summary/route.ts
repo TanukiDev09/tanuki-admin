@@ -156,10 +156,16 @@ const GET_CC_PORTION_EXPR = (ccCode: string) => ({
                 {
                   $cond: [
                     {
-                      $eq: [
-                        { $ifNull: ['$$this.costCenter', '$costCenter'] },
-                        ccCode,
-                      ],
+                      $let: {
+                        vars: { cc: { $ifNull: ['$$this.costCenter', '$costCenter'] } },
+                        in: {
+                          $cond: [
+                            { $isArray: '$$cc' },
+                            { $in: [ccCode, '$$cc'] },
+                            { $eq: ['$$cc', ccCode] },
+                          ],
+                        },
+                      },
                     },
                     { $ifNull: ['$$this.total', 0] },
                     0,
@@ -186,7 +192,13 @@ const GET_CC_PORTION_EXPR = (ccCode: string) => ({
                     '$$value',
                     {
                       $cond: [
-                        { $eq: ['$$this.costCenter', ccCode] },
+                        {
+                          $cond: [
+                            { $isArray: '$$this.costCenter' },
+                            { $in: [ccCode, '$$this.costCenter'] },
+                            { $eq: ['$$this.costCenter', ccCode] },
+                          ],
+                        },
                         { $ifNull: ['$$this.amount', 0] },
                         0,
                       ],
@@ -196,7 +208,17 @@ const GET_CC_PORTION_EXPR = (ccCode: string) => ({
               },
             },
             else: {
-              $cond: [{ $eq: ['$costCenter', ccCode] }, GET_AMOUNT_COP_EXPR, 0],
+              $cond: [
+                {
+                  $cond: [
+                    { $isArray: '$costCenter' },
+                    { $in: [ccCode, '$costCenter'] },
+                    { $eq: ['$costCenter', ccCode] },
+                  ],
+                },
+                GET_AMOUNT_COP_EXPR,
+                0,
+              ],
             },
           },
         },
@@ -225,20 +247,26 @@ const GET_CC_PORTION_EXPR = (ccCode: string) => ({
 });
 
 interface MovementItem {
-  costCenter?: string;
+  costCenter?: string | string[];
   total?: { toString(): string } | string | number;
 }
 
 interface MovementAllocation {
-  costCenter?: string;
+  costCenter?: string | string[];
   amount?: { toString(): string } | string | number;
+}
+
+function matchesCC(cc: string | string[] | undefined, code: string): boolean {
+  if (!cc) return false;
+  if (Array.isArray(cc)) return cc.includes(code);
+  return cc === code;
 }
 
 function calculateRelevantAmount(
   plain: {
     items?: MovementItem[];
     allocations?: MovementAllocation[];
-    costCenter?: string;
+    costCenter?: string | string[];
     exchangeRate?: { toString(): string } | string | number;
   },
   amountInCOP: number,
@@ -250,7 +278,7 @@ function calculateRelevantAmount(
     const matchingItemsTotal = plain.items.reduce(
       (sum: string, item: MovementItem) => {
         const itemCC = item.costCenter || plain.costCenter;
-        if (itemCC === costCenterCode) {
+        if (matchesCC(itemCC, costCenterCode)) {
           return add(sum, item.total?.toString() || '0');
         }
         return sum;
@@ -265,7 +293,7 @@ function calculateRelevantAmount(
   if (plain.allocations && plain.allocations.length > 0) {
     const matchingAllocTotal = plain.allocations.reduce(
       (sum: string, alloc: MovementAllocation) => {
-        if (alloc.costCenter === costCenterCode) {
+        if (matchesCC(alloc.costCenter, costCenterCode)) {
           return add(sum, alloc.amount?.toString() || '0');
         }
         return sum;
@@ -277,7 +305,7 @@ function calculateRelevantAmount(
     );
   }
 
-  if (plain.costCenter !== costCenterCode) {
+  if (!matchesCC(plain.costCenter, costCenterCode)) {
     return 0;
   }
 
@@ -302,6 +330,22 @@ async function getMovements(
 
   const formatted = movements.map((m) => {
     const plain = m.toObject();
+
+    // DB stores costCenter as array (e.g. ["03"]); normalize to string
+    if (Array.isArray(plain.costCenter)) {
+      plain.costCenter = plain.costCenter[0] ?? '';
+    }
+    if (Array.isArray(plain.allocations)) {
+      plain.allocations = plain.allocations.map(
+        (al: { costCenter?: unknown; [key: string]: unknown }) => ({
+          ...al,
+          costCenter: Array.isArray(al.costCenter)
+            ? al.costCenter[0] ?? ''
+            : al.costCenter,
+        })
+      );
+    }
+
     let normalizedType = plain.type;
 
     if (
@@ -625,6 +669,17 @@ async function getCategoryBreakdown(
   }));
 }
 
+// Normalizes a costCenter value that may be stored as array ["03"] or string "03"
+function normalizeCCExpr(expr: unknown): unknown {
+  return {
+    $cond: [
+      { $isArray: expr },
+      { $ifNull: [{ $arrayElemAt: [expr, 0] }, 'Sin definir'] },
+      { $ifNull: [expr, 'Sin definir'] },
+    ],
+  };
+}
+
 async function getCostCenterBreakdown(
   matchStage: Record<string, unknown>,
   startDate: Date | undefined,
@@ -656,7 +711,7 @@ async function getCostCenterBreakdown(
                 input: '$items',
                 as: 'item',
                 in: {
-                  cc: { $ifNull: ['$$item.costCenter', '$costCenter'] },
+                  cc: normalizeCCExpr({ $ifNull: ['$$item.costCenter', '$costCenter'] }),
                   val: {
                     $multiply: [
                       { $ifNull: ['$$item.total', 0] },
@@ -679,7 +734,7 @@ async function getCostCenterBreakdown(
                     input: '$allocations',
                     as: 'alloc',
                     in: {
-                      cc: '$$alloc.costCenter',
+                      cc: normalizeCCExpr('$$alloc.costCenter'),
                       val: {
                         $multiply: [
                           { $ifNull: ['$$alloc.amount', 0] },
@@ -691,7 +746,7 @@ async function getCostCenterBreakdown(
                 },
                 else: [
                   {
-                    cc: { $ifNull: ['$costCenter', 'Sin definir'] },
+                    cc: normalizeCCExpr('$costCenter'),
                     val: GET_AMOUNT_COP_EXPR,
                   },
                 ],

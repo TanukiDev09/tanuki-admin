@@ -32,6 +32,12 @@ import { MovementFilters } from './components/MovementFilters';
 import { getSemanticCategoryColor } from '@/styles/category-utils';
 import './movements-list.scss';
 
+function firstCC(cc: unknown): string {
+  if (!cc) return '';
+  if (Array.isArray(cc)) return cc[0] ?? '';
+  return String(cc);
+}
+
 interface MovementTableRowProps {
   movement: Movement;
   canUpdate: boolean;
@@ -137,9 +143,9 @@ const MovementTableRow = ({
             {movement.allocations?.length || 0 || movement.items?.length || 0})
           </Badge>
         ) : (
-          movement.costCenter ||
-          movement.allocations?.[0]?.costCenter ||
-          movement.items?.[0]?.costCenter || (
+          firstCC(movement.costCenter) ||
+          firstCC(movement.allocations?.[0]?.costCenter) ||
+          firstCC(movement.items?.[0]?.costCenter) || (
             <span className="movements-list__no-category">Sin definir</span>
           )
         )}

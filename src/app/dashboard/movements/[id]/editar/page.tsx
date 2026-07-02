@@ -78,6 +78,9 @@ export default function EditMovementPage() {
 
         setFormData({
           ...m,
+          costCenter: Array.isArray(m.costCenter)
+            ? m.costCenter[0] ?? ''
+            : m.costCenter,
           currency: m.currency || 'COP', // Default to COP
           exchangeRate: m.exchangeRate,
           date: m.date ? m.date.split('T')[0] : '', // Format date for input
@@ -95,11 +98,12 @@ export default function EditMovementPage() {
           allocations:
             m.allocations?.map(
               (a: {
-                costCenter: string | { _id: string };
+                costCenter: string | string[] | { _id: string };
                 amount: number | string;
               }) => ({
-                costCenter:
-                  typeof a.costCenter === 'object'
+                costCenter: Array.isArray(a.costCenter)
+                  ? a.costCenter[0] ?? ''
+                  : typeof a.costCenter === 'object'
                     ? a.costCenter?._id
                     : a.costCenter,
                 amount: a.amount?.toString() || '0',
