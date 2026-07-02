@@ -29,7 +29,7 @@ export const invoiceSchema = z.object({
     'Cancelled',
     'Unchecked',
   ]),
-  costCenters: z.array(z.string()).optional(),
+  costCenters: z.array(z.object({ code: z.string(), amount: z.number() })).optional(),
   inventoryMovement: z.string().optional(),
   notes: z.string().optional(),
   subtotal: z.number(),

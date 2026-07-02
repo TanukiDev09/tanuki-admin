@@ -42,65 +42,6 @@ import {
 import InvoiceCustomerSection from './InvoiceCustomerSection';
 import './invoice-form.scss';
 
-const invoiceSchema = z.object({
-  number: z.string().min(1, 'El número es requerido'),
-  date: z.string().min(1, 'La fecha es requerida'),
-  dueDate: z.string().optional(),
-  customerName: z.string().min(1, 'El cliente es requerido'),
-  customerTaxId: z.string().optional(),
-  items: z
-    .array(
-      z.object({
-        type: z.enum(['libro', 'servicio']),
-        description: z.string().min(1, 'Descripción requerida'),
-        quantity: z.number().min(0, 'Cantidad inválida'),
-        unitPrice: z.number().min(0, 'Precio inválido'),
-        discount: z.number(),
-        total: z.number(),
-        bookId: z.string().optional(),
-        costCenter: z.string().min(1, 'Centro de costo requerido'),
-      })
-    )
-    .min(1, 'Debe agregar al menos un ítem'),
-  status: z.enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked']),
-  costCenters: z.array(z.object({ code: z.string(), amount: z.number() })).optional(),
-  inventoryMovement: z.string().optional(),
-  notes: z.string().optional(),
-  subtotal: z.number(),
-  tax: z.number(),
-  discount: z.number(),
-  total: z.number(),
-  fileUrl: z.string().optional(),
-  currency: z.string().optional().default('COP'),
-  exchangeRate: z.number().optional(),
-  amountInCOP: z.number().optional(),
-  // DIAN fields
-  cufe: z.string().optional(),
-  orderReference: z.string().optional(),
-  newsletterSignup: z.boolean().optional(),
-  customerEmail: z.string().optional(),
-  customerPhone: z.string().optional(),
-  customerAddress: z.string().optional(),
-  customerCity: z.string().optional(),
-  customerDocumentType: z.string().optional(),
-  dianData: z.object({
-    invoiceAuthorization: z.string().optional(),
-    authorizationPeriod: z.object({
-      start: z.string().optional(),
-      end: z.string().optional(),
-    }).optional(),
-    softwareProvider: z.string().optional(),
-    softwareId: z.string().optional(),
-    validationResponse: z.object({
-      code: z.string().optional(),
-      description: z.string().optional(),
-      validatedAt: z.string().optional(),
-    }).optional(),
-  }).optional(),
-});
-
-type InvoiceFormValues = z.infer<typeof invoiceSchema>;
-
 interface InvoiceFormProps {
   initialData?: Partial<InvoiceFormValues> & { _id?: string };
   isEditing?: boolean;
