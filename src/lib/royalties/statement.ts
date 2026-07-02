@@ -8,9 +8,32 @@ export function serializeStatement<T extends Record<string, unknown>>(
   doc: T & { toObject?: () => Record<string, unknown> }
 ): Record<string, unknown> {
   const obj = typeof doc.toObject === 'function' ? doc.toObject() : doc;
+  const books = Array.isArray(obj.books)
+    ? (obj.books as Record<string, unknown>[]).map((book) => ({
+        ...book,
+        totalInvoiced: toNumber(book.totalInvoiced as never),
+        totalRoyalties: toNumber(book.totalRoyalties as never),
+        lines: Array.isArray(book.lines)
+          ? (book.lines as Record<string, unknown>[]).map((line) => ({
+              ...line,
+              totalInvoiced: toNumber(line.totalInvoiced as never),
+              totalRoyalty: toNumber(line.totalRoyalty as never),
+            }))
+          : book.lines,
+      }))
+    : obj.books;
+  const advanceBreakdown = Array.isArray(obj.advanceBreakdown)
+    ? (obj.advanceBreakdown as Record<string, unknown>[]).map((line) => ({
+        ...line,
+        amount: toNumber(line.amount as never),
+      }))
+    : obj.advanceBreakdown;
+
   return {
     ...obj,
     _id: obj._id?.toString?.() ?? obj._id,
+    books,
+    advanceBreakdown,
     advancePayment: toNumber(obj.advancePayment as never),
     previousBalance: toNumber(obj.previousBalance as never),
     totalInvoiced: toNumber(obj.totalInvoiced as never),
