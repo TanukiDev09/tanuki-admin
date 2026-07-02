@@ -175,9 +175,14 @@ function MovementDetailContent({
                 de Costo
               </span>
               <span className="movement-detail__field-value">
-                {movement.costCenter ||
-                  movement.allocations?.[0]?.costCenter ||
-                  '-'}
+                {[
+                  movement.costCenter,
+                  movement.allocations?.[0]?.costCenter,
+                ]
+                  .map((cc) =>
+                    Array.isArray(cc) ? cc[0] ?? '' : cc ?? ''
+                  )
+                  .find(Boolean) || '-'}
               </span>
             </div>
             {movement.invoiceRef && (

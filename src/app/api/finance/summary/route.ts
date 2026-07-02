@@ -247,20 +247,26 @@ const GET_CC_PORTION_EXPR = (ccCode: string) => ({
 });
 
 interface MovementItem {
-  costCenter?: string;
+  costCenter?: string | string[];
   total?: { toString(): string } | string | number;
 }
 
 interface MovementAllocation {
-  costCenter?: string;
+  costCenter?: string | string[];
   amount?: { toString(): string } | string | number;
+}
+
+function matchesCC(cc: string | string[] | undefined, code: string): boolean {
+  if (!cc) return false;
+  if (Array.isArray(cc)) return cc.includes(code);
+  return cc === code;
 }
 
 function calculateRelevantAmount(
   plain: {
     items?: MovementItem[];
     allocations?: MovementAllocation[];
-    costCenter?: string;
+    costCenter?: string | string[];
     exchangeRate?: { toString(): string } | string | number;
   },
   amountInCOP: number,
@@ -272,7 +278,7 @@ function calculateRelevantAmount(
     const matchingItemsTotal = plain.items.reduce(
       (sum: string, item: MovementItem) => {
         const itemCC = item.costCenter || plain.costCenter;
-        if (itemCC === costCenterCode) {
+        if (matchesCC(itemCC, costCenterCode)) {
           return add(sum, item.total?.toString() || '0');
         }
         return sum;
@@ -287,7 +293,7 @@ function calculateRelevantAmount(
   if (plain.allocations && plain.allocations.length > 0) {
     const matchingAllocTotal = plain.allocations.reduce(
       (sum: string, alloc: MovementAllocation) => {
-        if (alloc.costCenter === costCenterCode) {
+        if (matchesCC(alloc.costCenter, costCenterCode)) {
           return add(sum, alloc.amount?.toString() || '0');
         }
         return sum;
@@ -299,7 +305,7 @@ function calculateRelevantAmount(
     );
   }
 
-  if (plain.costCenter !== costCenterCode) {
+  if (!matchesCC(plain.costCenter, costCenterCode)) {
     return 0;
   }
 

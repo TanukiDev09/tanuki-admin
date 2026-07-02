@@ -48,9 +48,16 @@ export async function GET(
     if (movement.type === 'Ingreso') normalizedType = 'INCOME';
     else if (movement.type === 'Egreso') normalizedType = 'EXPENSE';
 
+    const normCC = (cc: unknown): string => {
+      if (!cc) return '';
+      if (Array.isArray(cc)) return cc[0] ?? '';
+      return String(cc);
+    };
+
     const formattedMovement = {
       ...movement,
       type: normalizedType,
+      costCenter: normCC(movement.costCenter),
       amount: toNumber(movement.amount),
       amountInCOP: movement.amountInCOP
         ? toNumber(movement.amountInCOP)
@@ -62,10 +69,12 @@ export async function GET(
       unitValue: movement.unitValue ? toNumber(movement.unitValue) : undefined,
       allocations: (movement.allocations as Allocation[])?.map((a) => ({
         ...a,
+        costCenter: normCC(a.costCenter),
         amount: a.amount ? toNumber(a.amount) : 0,
       })),
       items: (movement.items as Item[])?.map((item) => ({
         ...item,
+        costCenter: normCC(item.costCenter),
         quantity: item.quantity ? toNumber(item.quantity) : 0,
         unitValue: item.unitValue ? toNumber(item.unitValue) : 0,
         total: item.total ? toNumber(item.total) : 0,
