@@ -21,10 +21,20 @@ import { POSSelect } from '@/components/admin/POSSelect/POSSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency } from '@/lib/utils';
-import { multiply, divide, gtZero, add, toNumber, isMatchedFinancial } from '@/lib/math';
+import {
+  multiply,
+  divide,
+  gtZero,
+  add,
+  toNumber,
+  isMatchedFinancial,
+} from '@/lib/math';
 import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import { MovementItemsTable } from '@/components/finance/MovementItemsTable';
-import { GeneralInfoSection, AllocationSection } from '@/components/finance/MovementFormSections';
+import {
+  GeneralInfoSection,
+  AllocationSection,
+} from '@/components/finance/MovementFormSections';
 import '../../movement-form.scss';
 
 export default function EditMovementPage() {
@@ -59,7 +69,8 @@ export default function EditMovementPage() {
         const m = data.data;
 
         // Determine if we should start in multi-cost center mode
-        const hasMultipleAllocations = m.allocations && m.allocations.length > 1;
+        const hasMultipleAllocations =
+          m.allocations && m.allocations.length > 1;
         setUseMultiCostCenter(hasMultipleAllocations);
 
         const hasItems = m.items && m.items.length > 0;
@@ -163,7 +174,6 @@ export default function EditMovementPage() {
     setFormData((prev) => {
       const newItems = (prev.items || []).filter((_, i) => i !== index);
 
-
       return {
         ...prev,
         items: newItems,
@@ -180,21 +190,28 @@ export default function EditMovementPage() {
       const newItems = [...(prev.items || [])];
       newItems[index] = { ...newItems[index], [field]: value };
 
-
-      const newQuantity = newItems.reduce((sum, item) => add(sum, item.quantity || '0'), '0');
+      const newQuantity = newItems.reduce(
+        (sum, item) => add(sum, item.quantity || '0'),
+        '0'
+      );
 
       // Auto-generate allocations from items if using items
       const ccMap: Record<string, string> = {};
-      newItems.forEach(item => {
+      newItems.forEach((item) => {
         if (item.costCenter) {
-          ccMap[item.costCenter] = add(ccMap[item.costCenter] || '0', item.total || '0');
+          ccMap[item.costCenter] = add(
+            ccMap[item.costCenter] || '0',
+            item.total || '0'
+          );
         }
       });
 
-      const newAllocations = Object.entries(ccMap).map(([costCenter, amount]) => ({
-        costCenter,
-        amount
-      }));
+      const newAllocations = Object.entries(ccMap).map(
+        ([costCenter, amount]) => ({
+          costCenter,
+          amount,
+        })
+      );
 
       setUseMultiCostCenter(newAllocations.length > 1);
 
@@ -285,17 +302,19 @@ export default function EditMovementPage() {
         fiscalYear: formData.date
           ? new Date(formData.date).getFullYear()
           : new Date().getFullYear(),
-        allocations: (useMultiCostCenter || useItems)
-          ? formData.allocations
-          : [
-            {
-              costCenter: formData.costCenter || '01T001',
-              amount: Number(formData.amount) || 0,
-            },
-          ],
-        costCenter: (useMultiCostCenter || useItems)
-          ? formData.allocations?.[0]?.costCenter || ''
-          : formData.costCenter,
+        allocations:
+          useMultiCostCenter || useItems
+            ? formData.allocations
+            : [
+                {
+                  costCenter: formData.costCenter || '01T001',
+                  amount: Number(formData.amount) || 0,
+                },
+              ],
+        costCenter:
+          useMultiCostCenter || useItems
+            ? formData.allocations?.[0]?.costCenter || ''
+            : formData.costCenter,
       };
 
       const res = await fetch(`/api/finance/movements/${params.id}`, {
@@ -341,8 +360,6 @@ export default function EditMovementPage() {
       <div className="movement-form__loading">Verificando permisos...</div>
     );
   }
-
-
 
   if (loading) return <div className="movement-form__loading">Cargando...</div>;
 
@@ -527,7 +544,10 @@ export default function EditMovementPage() {
                           type: 'servicio',
                           description: prev.description || '',
                           quantity: prev.quantity || 1,
-                          unitValue: divide(prev.amount || 0, prev.quantity || 1),
+                          unitValue: divide(
+                            prev.amount || 0,
+                            prev.quantity || 1
+                          ),
                           total: prev.amount || 0,
                           costCenter: prev.costCenter || '',
                         },
@@ -573,9 +593,9 @@ export default function EditMovementPage() {
                 <div className="movement-form__calculated-value">
                   {gtZero(formData.amount) && gtZero(formData.quantity)
                     ? formatCurrency(
-                      toNumber(divide(formData.amount, formData.quantity)),
-                      formData.currency
-                    )
+                        toNumber(divide(formData.amount, formData.quantity)),
+                        formData.currency
+                      )
                     : '$ 0'}
                 </div>
               </div>

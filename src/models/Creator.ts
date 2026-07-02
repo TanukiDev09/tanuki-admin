@@ -18,6 +18,15 @@ const CreatorSchema: Schema = new Schema(
       type: String,
       trim: true,
     },
+    email: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
+    identification: {
+      type: String,
+      trim: true,
+    },
     nationality: {
       type: String,
       trim: true,

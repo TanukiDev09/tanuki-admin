@@ -4,7 +4,10 @@ import * as React from 'react';
 import { Input, InputProps } from './Input';
 import { formatNumber } from '@/lib/utils';
 
-export interface NumericInputProps extends Omit<InputProps, 'value' | 'onChange'> {
+export interface NumericInputProps extends Omit<
+  InputProps,
+  'value' | 'onChange'
+> {
   value?: number | string;
   onValueChange?: (value: number | undefined) => void;
   allowDecimals?: boolean;

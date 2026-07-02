@@ -133,6 +133,7 @@ function getModuleLabel(module: ModuleName): string {
     [ModuleName.PERMISSIONS]: 'permisos',
     [ModuleName.INVOICES]: 'facturas',
     [ModuleName.DEBTS]: 'deudas',
+    [ModuleName.ROYALTIES]: 'regalías',
   } as Record<ModuleName, string>;
   return labels[module] || module;
 }

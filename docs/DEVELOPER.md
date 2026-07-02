@@ -37,6 +37,11 @@ Bienvenido a la documentación completa del proyecto Tanuki Admin. Esta guía te
 - [**Referencia Rápida del Sistema de Diseño**](./design/quick-reference.md)
   Guía rápida para consulta de tokens, colores y estilos
 
+### 🚀 Despliegue y Calidad
+
+- [**Estándares de Producción y Checklist**](./release-production-standards.md)
+  Estándares de rendimiento, base de datos y seguridad para el lanzamiento de versiones (Releases).
+
 ### 🔄 Historial y Evolución
 
 - [**Proceso de Reorganización**](./reorganization/RESUMEN_REORGANIZACION.md)

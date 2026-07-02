@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { Separator } from '@/components/ui/Separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/Toast';
+import { Badge } from '@/components/ui/Badge';
 import {
   Card,
   CardContent,
@@ -18,6 +19,7 @@ import { InventoryList } from '@/components/inventory/InventoryList';
 import dynamic from 'next/dynamic';
 import { WarehouseTypeBadge } from '@/components/warehouses/WarehouseTypeBadge';
 import { WarehouseStatusBadge } from '@/components/warehouses/WarehouseStatusBadge';
+import { WarehouseMovementsTable } from '@/components/warehouses/WarehouseMovementsTable';
 
 const AddBookToInventoryModal = dynamic(
   () =>
@@ -41,7 +43,16 @@ const InventoryAdjustModal = dynamic(
   { ssr: false }
 );
 
-import { Package, MapPin, Building2, ArrowLeft, Plus } from 'lucide-react';
+import { 
+  Package, 
+  MapPin, 
+  Building2, 
+  ArrowLeft, 
+  Plus, 
+  Edit, 
+  Trash2, 
+  Loader2 
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
@@ -53,6 +64,7 @@ interface WarehouseData {
   code: string;
   type: 'editorial' | 'pos' | 'general';
   status: 'active' | 'inactive';
+  isDeleted?: boolean;
   city?: string;
   address?: string;
   description?: string;
@@ -79,6 +91,7 @@ interface InventoryItem {
 
 export default function WarehouseDetailPage() {
   const { id } = useParams();
+  const router = useRouter();
   const [warehouse, setWarehouse] = useState<WarehouseData | null>(null);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -86,12 +99,19 @@ export default function WarehouseDetailPage() {
   const [movementModalOpen, setMovementModalOpen] = useState(false);
   const [adjustModalOpen, setAdjustModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [activeTab, setActiveTab] = useState('inventory');
+  const [isDeletingWarehouse, setIsDeletingWarehouse] = useState(false);
   const { toast } = useToast();
 
   const { hasPermission } = usePermission();
   const canUpdateWarehouse = hasPermission(
     ModuleName.WAREHOUSES,
     PermissionAction.UPDATE
+  );
+  const canDeleteWarehouse = hasPermission(
+    ModuleName.WAREHOUSES,
+    PermissionAction.DELETE
   );
   const canCreateInventory = hasPermission(
     ModuleName.INVENTORY,
@@ -168,12 +188,63 @@ export default function WarehouseDetailPage() {
       if (inventoryRes.ok) {
         setInventory(await inventoryRes.json());
       }
+
+      setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   }, [id]);
+
+  const handleDeleteWarehouse = async () => {
+    // Calculate total quantity of items currently in inventory
+    const totalQty = inventory.reduce((acc, curr) => acc + (curr.quantity || 0), 0);
+    if (totalQty > 0) {
+      toast({
+        title: 'Error',
+        description: 'No se puede eliminar una bodega con inventario activo (unidades > 0)',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (
+      !window.confirm(
+        `¿Está seguro de que desea eliminar la bodega "${warehouse?.name}"? Esta es una eliminación lógica y preservará los históricos, pero no estará disponible para nuevos movimientos.`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setIsDeletingWarehouse(true);
+      const res = await fetch(`/api/warehouses/${id}`, {
+        method: 'DELETE',
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Error al eliminar la bodega');
+      }
+
+      toast({
+        title: 'Éxito',
+        description: 'La bodega ha sido eliminada correctamente (eliminación lógica)',
+      });
+      router.push('/dashboard/warehouses');
+    } catch (error) {
+      console.error('Error deleting warehouse:', error);
+      toast({
+        title: 'Error',
+        description: (error as Error).message || 'No se pudo eliminar la bodega',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeletingWarehouse(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -206,13 +277,51 @@ export default function WarehouseDetailPage() {
             <div className="warehouse-detail__title-row">
               <h2 className="warehouse-detail__title">{warehouse.name}</h2>
               <WarehouseTypeBadge type={warehouse.type} />
-              <WarehouseStatusBadge status={warehouse.status} />
+              {warehouse.isDeleted ? (
+                <Badge
+                  variant="destructive"
+                  className="bg-red-50 text-red-700 border-red-200 font-bold uppercase"
+                >
+                  Eliminada (Histórica)
+                </Badge>
+              ) : (
+                <WarehouseStatusBadge status={warehouse.status} />
+              )}
             </div>
             <p className="warehouse-detail__code">Código: {warehouse.code}</p>
           </div>
         </div>
         <div className="warehouse-detail__header-actions">
-          {canCreateInventory && (
+          {/* Edit & Delete Actions (adjusted to permission matrix) */}
+          {!warehouse.isDeleted && canUpdateWarehouse && (
+            <Button
+              variant="outline"
+              onClick={() => setActiveTab('info')}
+              className="hover:bg-slate-50"
+            >
+              <Edit className="w-4 h-4 mr-2 text-slate-500" />
+              Editar Bodega
+            </Button>
+          )}
+
+          {!warehouse.isDeleted && canDeleteWarehouse && (
+            <Button
+              variant="outline"
+              onClick={handleDeleteWarehouse}
+              disabled={isDeletingWarehouse}
+              className="text-red-600 border-red-100 hover:bg-red-50 hover:text-red-700"
+            >
+              {isDeletingWarehouse ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Trash2 className="w-4 h-4 mr-2" />
+              )}
+              Eliminar
+            </Button>
+          )}
+
+          {/* New movements are restricted on soft-deleted warehouses */}
+          {!warehouse.isDeleted && canCreateInventory && (
             <Button
               variant="outline"
               onClick={() => setMovementModalOpen(true)}
@@ -220,7 +329,7 @@ export default function WarehouseDetailPage() {
               Registrar Movimiento
             </Button>
           )}
-          {canUpdateInventory && (
+          {!warehouse.isDeleted && canUpdateInventory && (
             <Button onClick={() => setAddBookModalOpen(true)}>
               <Plus className="warehouse-detail__icon" /> Agregar Libro
             </Button>
@@ -230,7 +339,7 @@ export default function WarehouseDetailPage() {
 
       <Separator />
 
-      <Tabs defaultValue="inventory" className="warehouse-detail__tabs">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="warehouse-detail__tabs">
         <TabsList>
           <TabsTrigger value="inventory">Inventario Actual</TabsTrigger>
           <TabsTrigger value="info">Información General</TabsTrigger>
@@ -277,10 +386,14 @@ export default function WarehouseDetailPage() {
               <InventoryList
                 data={inventory}
                 onAdjust={handleAdjustStock}
-                onDelete={canDeleteInventory ? handleDeleteInventoryItem : undefined}
+                onDelete={
+                  canDeleteInventory ? handleDeleteInventoryItem : undefined
+                }
               />
             </CardContent>
           </Card>
+
+          <WarehouseMovementsTable key={refreshTrigger} warehouseId={id as string} />
         </TabsContent>
 
         <TabsContent value="info" className="warehouse-detail__section">

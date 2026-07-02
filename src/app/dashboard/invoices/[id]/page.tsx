@@ -146,7 +146,12 @@ export default function InvoiceDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm('¿Está seguro de que desea eliminar esta factura? Esta acción no se puede deshacer.')) return;
+    if (
+      !window.confirm(
+        '¿Está seguro de que desea eliminar esta factura? Esta acción no se puede deshacer.'
+      )
+    )
+      return;
 
     try {
       const res = await fetch(`/api/invoices/${id}`, {
@@ -232,7 +237,9 @@ export default function InvoiceDetailPage() {
                 variant={invoice.status === 'Paid' ? 'default' : 'outline'}
                 className="invoice-detail__status-badge"
               >
-                {invoice.status === 'Unchecked' ? 'Sin comprobar' : invoice.status}
+                {invoice.status === 'Unchecked'
+                  ? 'Sin comprobar'
+                  : invoice.status}
               </Badge>
             </CardHeader>
             <CardContent>
