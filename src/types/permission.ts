@@ -16,6 +16,7 @@ export enum ModuleName {
   USERS = 'users',
   PERMISSIONS = 'permissions',
   DEBTS = 'debts',
+  ROYALTY_STATEMENTS = 'royalty-statements',
   ROYALTIES = 'royalties',
 }
 
@@ -143,9 +144,13 @@ export const MODULE_METADATA: Record<
     label: 'Deudas',
     description: 'Gestión de deudas por cobrar y pagar',
   },
-  [ModuleName.ROYALTIES]: {
+  [ModuleName.ROYALTY_STATEMENTS]: {
     label: 'Regalías',
-    description: 'Liquidación de regalías a autores',
+    description: 'Liquidaciones de regalías a creadores',
+  },
+  [ModuleName.ROYALTIES]: {
+    label: 'Regalías (módulo)',
+    description: 'Módulo de liquidación de regalías a autores',
   },
 };
 

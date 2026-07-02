@@ -646,6 +646,7 @@ export default function EditMovementPage() {
                   <SelectItem value="DIRECTA">Venta Directa</SelectItem>
                   <SelectItem value="LIBRERIA">Librería</SelectItem>
                   <SelectItem value="FERIA">Feria</SelectItem>
+                  <SelectItem value="WEB">Tienda Web</SelectItem>
                   <SelectItem value="OTRO">Otro / No Aplica</SelectItem>
                 </SelectContent>
               </Select>

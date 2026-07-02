@@ -379,7 +379,12 @@ export async function GET(request: NextRequest) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
 
-    const query: Record<string, any> = {};
+    interface MovementQuery {
+      type?: string;
+      $or?: Array<Record<string, string>>;
+      date?: { $gte?: Date; $lte?: Date };
+    }
+    const query: MovementQuery = {};
 
     if (type && type !== 'ALL') {
       query.type = type;

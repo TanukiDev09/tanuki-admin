@@ -20,7 +20,7 @@ export interface IMovement extends Document {
   unit?: string;
   quantity?: mongoose.Types.Decimal128;
   unitValue?: mongoose.Types.Decimal128;
-  salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'OTRO';
+  salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'WEB' | 'OTRO';
   pointOfSale?: mongoose.Types.ObjectId | string;
 
   // Validation fields
@@ -72,7 +72,7 @@ const MovementSchema: Schema = new Schema(
     unitValue: { type: Schema.Types.Decimal128 },
     salesChannel: {
       type: String,
-      enum: ['LIBRERIA', 'FERIA', 'DIRECTA', 'OTRO'],
+      enum: ['LIBRERIA', 'FERIA', 'DIRECTA', 'WEB', 'OTRO'],
     },
     pointOfSale: { type: Schema.Types.ObjectId, ref: 'PointOfSale' },
 
@@ -90,6 +90,15 @@ const MovementSchema: Schema = new Schema(
       source: { type: String },
       createdAt: { type: Date, default: Date.now },
     },
+    status: {
+      type: String,
+      enum: ['COMPLETED', 'PENDING', 'CANCELLED'],
+      default: 'COMPLETED',
+    },
+    issuerId: { type: String },
+    issuerName: { type: String },
+    receiverId: { type: String },
+    receiverName: { type: String },
     inventoryMovementId: {
       type: Schema.Types.ObjectId,
       ref: 'InventoryMovement',

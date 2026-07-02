@@ -45,7 +45,7 @@ export interface IInvoice extends Document {
   status: 'Draft' | 'Sent' | 'Paid' | 'Partial' | 'Cancelled' | 'Unchecked';
 
   // Relations
-  costCenters?: mongoose.Types.ObjectId[]; // Deprecated in favor of per-item CC, but keeping for compatibility if needed
+  costCenters?: { code: string; amount: number }[];
   movements: mongoose.Types.ObjectId[]; // Associated Payments (Movements)
   inventoryMovement?: mongoose.Types.ObjectId; // Associated Settlement (Liquidacion)
 
@@ -138,8 +138,9 @@ const InvoiceSchema: Schema = new Schema(
     },
     costCenters: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'CostCenter',
+        _id: false,
+        code: { type: String },
+        amount: { type: Number },
       },
     ],
     movements: [
@@ -200,7 +201,7 @@ const InvoiceSchema: Schema = new Schema(
 // Indexes
 InvoiceSchema.index({ date: -1 });
 InvoiceSchema.index({ status: 1 });
-InvoiceSchema.index({ costCenters: 1 });
+InvoiceSchema.index({ 'costCenters.code': 1 });
 InvoiceSchema.index({ inventoryMovement: 1 });
 InvoiceSchema.index({ newsletterSignup: 1 }); // For newsletter queries
 

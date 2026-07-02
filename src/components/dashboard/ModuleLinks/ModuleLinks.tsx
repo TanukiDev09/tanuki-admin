@@ -17,7 +17,7 @@ import {
   Receipt,
   PenTool,
   Wallet,
-  BookMarked,
+  ScrollText,
 } from 'lucide-react';
 import {
   ModuleName,
@@ -43,7 +43,8 @@ const MODULE_ICONS: Record<ModuleName, LucideIcon> = {
   [ModuleName.USERS]: UserCog,
   [ModuleName.PERMISSIONS]: Shield,
   [ModuleName.DEBTS]: Wallet,
-  [ModuleName.ROYALTIES]: BookMarked,
+  [ModuleName.ROYALTY_STATEMENTS]: ScrollText,
+  [ModuleName.ROYALTIES]: ScrollText,
 };
 
 // Map module names to routes
@@ -62,6 +63,7 @@ const MODULE_ROUTES: Record<ModuleName, string> = {
   [ModuleName.USERS]: '/dashboard/users',
   [ModuleName.PERMISSIONS]: '/dashboard/permissions',
   [ModuleName.DEBTS]: '/dashboard/debts',
+  [ModuleName.ROYALTY_STATEMENTS]: '/dashboard/royalty-statements',
   [ModuleName.ROYALTIES]: '/dashboard/royalties',
 };
 

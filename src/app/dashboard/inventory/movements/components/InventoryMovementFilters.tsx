@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/Select';
-import { Filter, X, Calendar } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { InventoryMovementType } from '@/types/inventory-movement';
 
 interface Warehouse {
@@ -44,7 +44,6 @@ export function InventoryMovementFilters({
   clearFilters,
 }: InventoryMovementFiltersProps) {
   const [warehouses, setWarehouses] = useState<Warehouse[]>([]);
-  const [showFilters, setShowFilters] = useState(true);
 
   useEffect(() => {
     const fetchWarehouses = async () => {

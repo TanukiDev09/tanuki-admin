@@ -23,8 +23,7 @@ export default function EditInvoicePage() {
           data.date = new Date(data.date).toISOString().split('T')[0];
         if (data.dueDate)
           data.dueDate = new Date(data.dueDate).toISOString().split('T')[0];
-        if (data.costCenter && typeof data.costCenter === 'object')
-          data.costCenter = data.costCenter._id;
+        // costCenters is now { code, amount }[] — no ObjectId extraction needed
 
         setInvoice(data);
       } catch (error) {
