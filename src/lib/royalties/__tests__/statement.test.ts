@@ -40,6 +40,47 @@ describe('serializeStatement', () => {
     expect(out.status).toBe('draft');
   });
 
+  it('convierte los Decimal128 anidados en books[].lines[] y advanceBreakdown', () => {
+    const doc = {
+      _id: '507f1f77bcf86cd799439011',
+      advancePayment: 0,
+      previousBalance: 0,
+      totalInvoiced: { $numberDecimal: '85000' },
+      totalRoyalties: { $numberDecimal: '17000' },
+      netSettlement: { $numberDecimal: '17000' },
+      carryoverToNext: 0,
+      paidAmount: 0,
+      books: [
+        {
+          bookTitle: 'Cromazoografías vol. 1',
+          totalInvoiced: { $numberDecimal: '85000' },
+          totalRoyalties: { $numberDecimal: '17000' },
+          lines: [
+            {
+              invoiceNumber: 'FE1743',
+              totalInvoiced: { $numberDecimal: '85000' },
+              totalRoyalty: { $numberDecimal: '17000' },
+            },
+          ],
+        },
+      ],
+      advanceBreakdown: [
+        { description: 'Anticipo', amount: { $numberDecimal: '5000' } },
+      ],
+    };
+
+    const out = serializeStatement(doc);
+    const books = out.books as Array<Record<string, unknown>>;
+    const lines = books[0].lines as Array<Record<string, unknown>>;
+    const advances = out.advanceBreakdown as Array<Record<string, unknown>>;
+
+    expect(books[0].totalInvoiced).toBe(85000);
+    expect(books[0].totalRoyalties).toBe(17000);
+    expect(lines[0].totalInvoiced).toBe(85000);
+    expect(lines[0].totalRoyalty).toBe(17000);
+    expect(advances[0].amount).toBe(5000);
+  });
+
   it('usa toObject() cuando el documento lo expone', () => {
     const doc = {
       toObject: () => ({

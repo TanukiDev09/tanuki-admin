@@ -3,8 +3,9 @@ import { cn, formatCurrency, formatNumber } from '../utils';
 describe('general utilities', () => {
   describe('cn (className merger)', () => {
     it('merges class names correctly', () => {
+      const falsyClass: string | undefined = undefined;
       expect(cn('class1', 'class2')).toBe('class1 class2');
-      expect(cn('class1', undefined && 'class2', 'class3')).toBe(
+      expect(cn('class1', falsyClass && 'class2', 'class3')).toBe(
         'class1 class3'
       );
       expect(cn('class1', { class2: true, class3: false })).toBe(
