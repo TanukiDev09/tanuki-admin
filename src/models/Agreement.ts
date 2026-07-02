@@ -76,4 +76,4 @@ AgreementSchema.index({ creator: 1 });
 
 // Sobrescribir el modelo si ya existe para evitar errores en hot reload
 export default mongoose.models.Agreement ||
-  mongoose.model<IAgreement>('Agreement', AgreementSchema);
+  mongoose.model<IAgreement>('Agreement', AgreementSchema, 'agreements');

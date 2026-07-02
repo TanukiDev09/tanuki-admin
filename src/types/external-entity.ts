@@ -4,6 +4,7 @@ export type ExternalEntityType =
   | 'Socio'
   | 'Banco'
   | 'Persona Natural'
+  | 'Empresa SAS'
   | 'Proveedor'
   | 'Otro';
 
@@ -16,6 +17,7 @@ export interface IExternalEntityBase {
     phone?: string;
     address?: string;
   };
+  notes?: string;
   status: 'active' | 'inactive';
 }
 
@@ -33,6 +35,7 @@ export interface CreateExternalEntityDTO {
     phone?: string;
     address?: string;
   };
+  notes?: string;
   status?: 'active' | 'inactive';
 }
 

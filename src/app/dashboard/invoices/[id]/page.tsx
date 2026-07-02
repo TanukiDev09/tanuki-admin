@@ -35,7 +35,7 @@ interface Invoice {
   customerName: string;
   customerTaxId?: string;
   status: string;
-  costCenters?: Array<{ _id: string; name: string; code: string }>;
+  costCenters?: Array<{ code: string; amount: number }>;
   items: Array<{
     type: 'libro' | 'servicio';
     description: string;
@@ -256,11 +256,11 @@ export default function InvoiceDetailPage() {
                     <div className="invoice-detail__cost-centers">
                       {invoice.costCenters.map((cc) => (
                         <Badge
-                          key={cc._id}
+                          key={cc.code}
                           variant="secondary"
                           style={{ fontSize: '10px' }}
                         >
-                          {cc.code} - {cc.name}
+                          {cc.code}
                         </Badge>
                       ))}
                     </div>

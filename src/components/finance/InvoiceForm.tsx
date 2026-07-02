@@ -48,7 +48,7 @@ const invoiceSchema = z.object({
     )
     .min(1, 'Debe agregar al menos un ítem'),
   status: z.enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked']),
-  costCenters: z.array(z.string()).optional(),
+  costCenters: z.array(z.object({ code: z.string(), amount: z.number() })).optional(),
   inventoryMovement: z.string().optional(),
   notes: z.string().optional(),
   subtotal: z.number(),

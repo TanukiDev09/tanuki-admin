@@ -68,6 +68,9 @@ const MovementTableRow = ({
       case 'FERIA':
         channelLabel = 'Feria';
         break;
+      case 'WEB':
+        channelLabel = 'Web';
+        break;
       default:
         channelLabel = 'Otro';
     }

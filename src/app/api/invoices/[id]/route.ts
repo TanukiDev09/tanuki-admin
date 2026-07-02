@@ -33,7 +33,7 @@ const updateInvoiceSchema = z.object({
   status: z
     .enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked'])
     .optional(),
-  costCenters: z.array(z.string()).optional(),
+  costCenters: z.array(z.object({ code: z.string(), amount: z.number() })).optional(),
   movements: z.array(z.string()).optional(),
   inventoryMovement: z.string().optional().nullable(),
   notes: z.string().optional(),
@@ -77,7 +77,6 @@ export async function GET(
     const { id } = await params;
 
     const invoice = await Invoice.findById(id)
-      .populate('costCenters', 'name code')
       .populate('movements')
       .populate('inventoryMovement');
 

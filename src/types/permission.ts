@@ -16,6 +16,7 @@ export enum ModuleName {
   USERS = 'users',
   PERMISSIONS = 'permissions',
   DEBTS = 'debts',
+  ROYALTY_STATEMENTS = 'royalty-statements',
 }
 
 // Enum para acciones CRUD
@@ -141,6 +142,10 @@ export const MODULE_METADATA: Record<
   [ModuleName.DEBTS]: {
     label: 'Deudas',
     description: 'Gestión de deudas por cobrar y pagar',
+  },
+  [ModuleName.ROYALTY_STATEMENTS]: {
+    label: 'Regalías',
+    description: 'Liquidaciones de regalías a creadores',
   },
 };
 
