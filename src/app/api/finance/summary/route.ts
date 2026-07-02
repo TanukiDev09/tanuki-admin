@@ -324,26 +324,42 @@ async function getMovements(
       .populate('category')
       .sort({ date: -1 })
       .skip(skip)
-      .limit(limit),
+      .limit(limit)
+      // .lean() avoids Mongoose casting costCenter (schema type String)
+      // from the array shape actually stored in the DB, which otherwise
+      // silently drops the value during document hydration.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .lean<any[]>(),
     Movement.countDocuments(query),
   ]);
 
   const formatted = movements.map((m) => {
-    const plain = m.toObject();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const plain: any = { ...m };
 
     // DB stores costCenter as array (e.g. ["03"]); normalize to string
     if (Array.isArray(plain.costCenter)) {
       plain.costCenter = plain.costCenter[0] ?? '';
     }
     if (Array.isArray(plain.allocations)) {
-      plain.allocations = plain.allocations.map(
-        (al: { costCenter?: unknown; [key: string]: unknown }) => ({
-          ...al,
-          costCenter: Array.isArray(al.costCenter)
-            ? al.costCenter[0] ?? ''
-            : al.costCenter,
-        })
-      );
+      plain.allocations = (
+        plain.allocations as { costCenter?: unknown; [key: string]: unknown }[]
+      ).map((al) => ({
+        ...al,
+        costCenter: Array.isArray(al.costCenter)
+          ? al.costCenter[0] ?? ''
+          : al.costCenter,
+      }));
+    }
+    if (Array.isArray(plain.items)) {
+      plain.items = (
+        plain.items as { costCenter?: unknown; [key: string]: unknown }[]
+      ).map((item) => ({
+        ...item,
+        costCenter: Array.isArray(item.costCenter)
+          ? item.costCenter[0] ?? ''
+          : item.costCenter,
+      }));
     }
 
     let normalizedType = plain.type;
