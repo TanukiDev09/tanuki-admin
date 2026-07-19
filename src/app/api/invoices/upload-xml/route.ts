@@ -3,6 +3,8 @@ import { parseStringPromise } from 'xml2js';
 import dbConnect from '@/lib/mongodb';
 import Invoice from '@/models/Invoice';
 import Book from '@/models/Book';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 
 // Helper to safely extract text from xml2js objects
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -306,6 +308,13 @@ function extractDianMetadata(invoice: any, attachedDoc: any) {
 }
 
 export async function POST(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.INVOICES,
+    PermissionAction.CREATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
