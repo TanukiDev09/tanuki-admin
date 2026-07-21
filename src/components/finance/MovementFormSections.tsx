@@ -18,12 +18,18 @@ import { toNumber } from '@/lib/math';
 
 interface SectionProps {
   formData: Partial<CreateMovementDTO>;
-  handleChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  handleChange?: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
   handleSelectChange: (name: string, value: string) => void;
   setFormData: React.Dispatch<React.SetStateAction<Partial<CreateMovementDTO>>>;
 }
 
-export function GeneralInfoSection({ formData, handleChange, handleSelectChange }: SectionProps) {
+export function GeneralInfoSection({
+  formData,
+  handleChange,
+  handleSelectChange,
+}: SectionProps) {
   return (
     <div className="movement-form__section">
       <h2 className="movement-form__section-title">Información General</h2>
@@ -75,7 +81,11 @@ export function GeneralInfoSection({ formData, handleChange, handleSelectChange 
 interface AllocationSectionProps extends SectionProps {
   useMultiCostCenter: boolean;
   setUseMultiCostCenter: (val: boolean) => void;
-  handleAllocationChange: (index: number, field: 'costCenter' | 'amount', value: string) => void;
+  handleAllocationChange: (
+    index: number,
+    field: 'costCenter' | 'amount',
+    value: string
+  ) => void;
   addAllocation: () => void;
   removeAllocation: (index: number) => void;
   allocationError: string | null;

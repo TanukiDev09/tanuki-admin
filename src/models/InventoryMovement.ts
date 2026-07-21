@@ -1,17 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { InventoryMovementType, InventoryMovementSubType } from '@/types/inventory-movement';
 
-export enum InventoryMovementType {
-  INGRESO = 'INGRESO',
-  REMISION = 'REMISION',
-  DEVOLUCION = 'DEVOLUCION',
-  LIQUIDACION = 'LIQUIDACION',
-}
-
-export enum InventoryMovementSubType {
-  INITIAL = 'INITIAL', // Estado inicial
-  UNEXPECTED = 'UNEXPECTED', // Ingreso inesperado
-  PURCHASE = 'PURCHASE', // Compra de libros
-}
+export { InventoryMovementType, InventoryMovementSubType };
 
 export interface IInventoryMovementItem {
   bookId: mongoose.Types.ObjectId;

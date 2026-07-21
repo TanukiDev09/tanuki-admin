@@ -12,9 +12,9 @@ import {
 
 // Mock ResizeObserver which is used by Radix UI
 global.ResizeObserver = class ResizeObserver {
-  observe() { }
-  unobserve() { }
-  disconnect() { }
+  observe() {}
+  unobserve() {}
+  disconnect() {}
 };
 
 // Mock scrollIntoView which is missing in JSDOM but used by Radix UI
@@ -81,7 +81,9 @@ describe('Select', () => {
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="custom-content">
-          <SelectItem value="test" className="custom-item">Test</SelectItem>
+          <SelectItem value="test" className="custom-item">
+            Test
+          </SelectItem>
         </SelectContent>
       </Select>
     );

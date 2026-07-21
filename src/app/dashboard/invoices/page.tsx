@@ -63,7 +63,9 @@ interface InvoiceFilters {
 
 export default function InvoicesPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center">Cargando facturación...</div>}>
+    <Suspense
+      fallback={<div className="p-8 text-center">Cargando facturación...</div>}
+    >
       <InvoicesList />
     </Suspense>
   );
@@ -107,7 +109,15 @@ function InvoicesList() {
     }
   }, [searchParams, updateFilters, filters.bookId, filters.search]);
 
-  const { search, bookId, statusFilter, sortField, sortOrder, amountRange, page } = filters;
+  const {
+    search,
+    bookId,
+    statusFilter,
+    sortField,
+    sortOrder,
+    amountRange,
+    page,
+  } = filters;
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const limit = 10;
@@ -121,8 +131,10 @@ function InvoicesList() {
       if (statusFilter && statusFilter !== 'ALL')
         params.append('status', statusFilter);
 
-      if (amountRange[0] > 0) params.append('minAmount', amountRange[0].toString());
-      if (amountRange[1] < 5000000) params.append('maxAmount', amountRange[1].toString());
+      if (amountRange[0] > 0)
+        params.append('minAmount', amountRange[0].toString());
+      if (amountRange[1] < 5000000)
+        params.append('maxAmount', amountRange[1].toString());
 
       params.append('sortField', sortField);
       params.append('sortOrder', sortOrder);
@@ -145,7 +157,17 @@ function InvoicesList() {
     } finally {
       setLoading(false);
     }
-  }, [search, bookId, statusFilter, amountRange, sortField, sortOrder, page, limit, toast]);
+  }, [
+    search,
+    bookId,
+    statusFilter,
+    amountRange,
+    sortField,
+    sortOrder,
+    page,
+    limit,
+    toast,
+  ]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -171,10 +193,7 @@ function InvoicesList() {
   };
 
   const getStatusBadge = (status: string) => {
-    const map: Record<
-      string,
-      string
-    > = {
+    const map: Record<string, string> = {
       Draft: 'secondary',
       Sent: 'sent',
       Paid: 'success',
@@ -191,7 +210,9 @@ function InvoicesList() {
       Unchecked: 'Sin comprobar',
     };
     return (
-      <span className={`invoice-badge invoice-badge--${map[status] || 'outline'}`}>
+      <span
+        className={`invoice-badge invoice-badge--${map[status] || 'outline'}`}
+      >
         {labels[status] || status}
       </span>
     );
@@ -203,7 +224,9 @@ function InvoicesList() {
         <header className="invoices-list__header">
           <div className="invoices-list__title-group">
             <h1 className="invoices-list__title">Facturación</h1>
-            <p className="invoices-list__subtitle">Control y seguimiento de facturas emitidas</p>
+            <p className="invoices-list__subtitle">
+              Control y seguimiento de facturas emitidas
+            </p>
           </div>
           <div className="invoices-list__actions">
             <Button
@@ -259,9 +282,12 @@ function InvoicesList() {
               <div className="invoices-list__controls">
                 <div className="invoices-list__control-item">
                   <Filter className="invoices-list__control-icon" />
-                  <Select value={statusFilter} onValueChange={(val) => {
-                    updateFilters({ statusFilter: val, page: 1 });
-                  }}>
+                  <Select
+                    value={statusFilter}
+                    onValueChange={(val) => {
+                      updateFilters({ statusFilter: val, page: 1 });
+                    }}
+                  >
                     <SelectTrigger className="invoices-list__select-trigger">
                       <SelectValue placeholder="Estado" />
                     </SelectTrigger>
@@ -280,7 +306,8 @@ function InvoicesList() {
                 <div className="invoices-list__control-item invoices-list__control-item--slider">
                   <div className="invoices-list__slider-container">
                     <div className="invoices-list__slider-label">
-                      Total hasta: <span>{formatCurrency(amountRange[1], 'COP')}</span>
+                      Total hasta:{' '}
+                      <span>{formatCurrency(amountRange[1], 'COP')}</span>
                     </div>
                     <input
                       type="range"
@@ -290,7 +317,10 @@ function InvoicesList() {
                       value={amountRange[1]}
                       onChange={(e) => {
                         const val = parseInt(e.target.value);
-                        updateFilters({ amountRange: [amountRange[0], val], page: 1 });
+                        updateFilters({
+                          amountRange: [amountRange[0], val],
+                          page: 1,
+                        });
                       }}
                       className="invoices-list__slider"
                     />
@@ -298,21 +328,40 @@ function InvoicesList() {
                 </div>
 
                 <div className="invoices-list__control-item">
-                  {sortOrder === 'asc' ? <SortAsc className="invoices-list__control-icon" /> : <SortDesc className="invoices-list__control-icon" />}
-                  <Select value={`${sortField}_${sortOrder}`} onValueChange={(val) => {
-                    const [field, order] = val.split('_');
-                    updateFilters({ sortField: field, sortOrder: order, page: 1 });
-                  }}>
+                  {sortOrder === 'asc' ? (
+                    <SortAsc className="invoices-list__control-icon" />
+                  ) : (
+                    <SortDesc className="invoices-list__control-icon" />
+                  )}
+                  <Select
+                    value={`${sortField}_${sortOrder}`}
+                    onValueChange={(val) => {
+                      const [field, order] = val.split('_');
+                      updateFilters({
+                        sortField: field,
+                        sortOrder: order,
+                        page: 1,
+                      });
+                    }}
+                  >
                     <SelectTrigger className="invoices-list__select-trigger">
                       <SelectValue placeholder="Ordenar por" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="date_desc">Más recientes primero</SelectItem>
-                      <SelectItem value="date_asc">Más antiguas primero</SelectItem>
+                      <SelectItem value="date_desc">
+                        Más recientes primero
+                      </SelectItem>
+                      <SelectItem value="date_asc">
+                        Más antiguas primero
+                      </SelectItem>
                       <SelectItem value="number_desc">Número (Z-A)</SelectItem>
                       <SelectItem value="number_asc">Número (A-Z)</SelectItem>
-                      <SelectItem value="total_desc">Total (Mayor a Menor)</SelectItem>
-                      <SelectItem value="total_asc">Total (Menor a Mayor)</SelectItem>
+                      <SelectItem value="total_desc">
+                        Total (Mayor a Menor)
+                      </SelectItem>
+                      <SelectItem value="total_asc">
+                        Total (Menor a Mayor)
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -337,12 +386,17 @@ function InvoicesList() {
                       {loading ? (
                         Array.from({ length: 5 }).map((_, i) => (
                           <TableRow key={`skeleton-${i}`}>
-                            <TableCell colSpan={6}><div className="skeleton-line" /></TableCell>
+                            <TableCell colSpan={6}>
+                              <div className="skeleton-line" />
+                            </TableCell>
                           </TableRow>
                         ))
                       ) : invoices.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={6} className="invoices-list__empty-state">
+                          <TableCell
+                            colSpan={6}
+                            className="invoices-list__empty-state"
+                          >
                             <div className="empty-content">
                               <Search className="w-12 h-12 mb-2 opacity-20" />
                               <p>No se encontraron facturas</p>
@@ -360,14 +414,25 @@ function InvoicesList() {
                           >
                             <TableCell className="font-bold">
                               <button
-                                onClick={() => router.push(`/dashboard/invoices/${invoice._id}`)}
+                                onClick={() =>
+                                  router.push(
+                                    `/dashboard/invoices/${invoice._id}`
+                                  )
+                                }
                                 className="invoices-list__invoice-link"
                               >
                                 {invoice.number}
                               </button>
                             </TableCell>
                             <TableCell className="text-muted-foreground whitespace-nowrap">
-                              {new Date(invoice.date).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })}
+                              {new Date(invoice.date).toLocaleDateString(
+                                'es-CO',
+                                {
+                                  day: '2-digit',
+                                  month: 'short',
+                                  year: 'numeric',
+                                }
+                              )}
                             </TableCell>
                             <TableCell>
                               <div className="invoices-list__customer">
@@ -375,20 +440,33 @@ function InvoicesList() {
                               </div>
                             </TableCell>
                             <TableCell className="font-semibold">
-                              {formatCurrency(invoice.total, invoice.currency || 'COP')}
+                              {formatCurrency(
+                                invoice.total,
+                                invoice.currency || 'COP'
+                              )}
                             </TableCell>
-                            <TableCell>{getStatusBadge(invoice.status)}</TableCell>
+                            <TableCell>
+                              {getStatusBadge(invoice.status)}
+                            </TableCell>
                             <TableCell className="text-right">
                               <div className="invoices-list__row-actions">
                                 <button
-                                  onClick={() => router.push(`/dashboard/invoices/${invoice._id}`)}
+                                  onClick={() =>
+                                    router.push(
+                                      `/dashboard/invoices/${invoice._id}`
+                                    )
+                                  }
                                   className="action-icon-btn action-icon-btn--view"
                                   title="Ver detalle"
                                 >
                                   <Eye />
                                 </button>
                                 <button
-                                  onClick={() => router.push(`/dashboard/invoices/${invoice._id}/editar`)}
+                                  onClick={() =>
+                                    router.push(
+                                      `/dashboard/invoices/${invoice._id}/editar`
+                                    )
+                                  }
                                   className="action-icon-btn action-icon-btn--edit"
                                   title="Editar"
                                 >
@@ -413,14 +491,17 @@ function InvoicesList() {
 
               <footer className="invoices-list__pagination">
                 <p className="invoices-list__pagination-summary">
-                  Mostrando <span>{invoices.length}</span> de <span>{totalResults}</span> resultados
+                  Mostrando <span>{invoices.length}</span> de{' '}
+                  <span>{totalResults}</span> resultados
                 </p>
                 <div className="invoices-list__pagination-nav">
                   <Button
                     variant="ghost"
                     size="sm"
                     className="pagination-btn"
-                    onClick={() => updateFilters({ page: Math.max(1, page - 1) })}
+                    onClick={() =>
+                      updateFilters({ page: Math.max(1, page - 1) })
+                    }
                     disabled={page === 1}
                   >
                     <ChevronLeft className="w-4 h-4 mr-1" /> Anterior
@@ -432,7 +513,9 @@ function InvoicesList() {
                     variant="ghost"
                     size="sm"
                     className="pagination-btn"
-                    onClick={() => updateFilters({ page: Math.min(totalPages, page + 1) })}
+                    onClick={() =>
+                      updateFilters({ page: Math.min(totalPages, page + 1) })
+                    }
                     disabled={page === totalPages}
                   >
                     Siguiente <ChevronRight className="w-4 h-4 ml-1" />

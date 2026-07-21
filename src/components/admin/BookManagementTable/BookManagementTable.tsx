@@ -13,7 +13,11 @@ import {
   BookCheck,
   Search,
   Image as ImageIcon,
+  ChevronDown,
+  ChevronUp,
+  ChevronsUpDown,
 } from 'lucide-react';
+import { useDataTable } from '@/hooks/useDataTable';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
@@ -116,6 +120,37 @@ export default function BookManagementTable({
     return true;
   });
 
+  const { data: sortedBooks, sortConfig, toggleSort } = useDataTable(filteredBooks);
+
+  const renderSortableHeader = (label: string, key: string, className?: string) => {
+    const isSorted = sortConfig.key === key;
+    const direction = isSorted ? sortConfig.direction : null;
+
+    return (
+      <TableHead
+        className={`table__head--sortable group ${isSorted ? 'table__head--active' : ''} ${className || ''}`}
+        onClick={() => toggleSort(key)}
+      >
+        <div className="table__head-content">
+          {label}
+          <span 
+            className={`inline-flex items-center transition-opacity duration-200 ${
+              isSorted ? 'opacity-100 text-blue-600' : 'opacity-0 group-hover:opacity-40'
+            }`}
+          >
+            {direction === 'asc' ? (
+              <ChevronUp className="w-3.5 h-3.5" />
+            ) : direction === 'desc' ? (
+              <ChevronDown className="w-3.5 h-3.5" />
+            ) : (
+              <ChevronsUpDown className="w-3.5 h-3.5" />
+            )}
+          </span>
+        </div>
+      </TableHead>
+    );
+  };
+
   if (loading) {
     return (
       <div className="book-management-table book-management-table--loading">
@@ -192,26 +227,20 @@ export default function BookManagementTable({
           <TableHeader>
             <TableRow>
               <TableHead>Portada</TableHead>
-              <TableHead className="book-management-table__hide-on-mobile">
-                ISBN
-              </TableHead>
-              <TableHead>Título</TableHead>
+              {renderSortableHeader('Título', 'title')}
               <TableHead>Autor</TableHead>
-              <TableHead className="book-management-table__hide-on-tablet">
-                Colección
-              </TableHead>
-              <TableHead>Precio</TableHead>
-              <TableHead>Stock</TableHead>
-              <TableHead className="book-management-table__hide-on-mobile">
-                Estado
-              </TableHead>
+              {renderSortableHeader('Colección', 'collectionName', 'book-management-table__hide-on-tablet')}
+              {renderSortableHeader('Precio', 'price')}
+              {renderSortableHeader('Stock', 'totalStock')}
+              {renderSortableHeader('Ventas', 'soldCopies', 'book-management-table__hide-on-mobile')}
+              {renderSortableHeader('Facturado', 'totalRevenue', 'book-management-table__hide-on-mobile')}
               <TableHead className="book-management-table__actions-head">
                 Acciones
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredBooks.length === 0 ? (
+            {sortedBooks.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={9}
@@ -223,7 +252,7 @@ export default function BookManagementTable({
                 </TableCell>
               </TableRow>
             ) : (
-              filteredBooks.map((book) => (
+              sortedBooks.map((book) => (
                 <TableRow key={book._id} className="book-management-table__row">
                   <TableCell>
                     {book.coverImage ? (
@@ -245,11 +274,6 @@ export default function BookManagementTable({
                       </div>
                     )}
                   </TableCell>
-                  <TableCell className="book-management-table__hide-on-mobile">
-                    <span className="book-management-table__isbn">
-                      {book.isbn}
-                    </span>
-                  </TableCell>
                   <TableCell>
                     <div className="book-management-table__title-cell">
                       <div className="book-management-table__title-wrapper">
@@ -269,7 +293,7 @@ export default function BookManagementTable({
                         )}
                       </div>
                       <div className="book-management-table__book-meta">
-                        {book.pages} págs • {book.language.toUpperCase()}
+                        {book.isbn} • {book.pages} págs • {book.language.toUpperCase()}
                       </div>
                     </div>
                   </TableCell>
@@ -339,9 +363,14 @@ export default function BookManagementTable({
                     </div>
                   </TableCell>
                   <TableCell className="book-management-table__hide-on-mobile">
-                    <Badge variant={book.isActive ? 'success' : 'destructive'}>
-                      {book.isActive ? 'Activo' : 'Inactivo'}
-                    </Badge>
+                    <span className="text-slate-600">
+                      {formatNumber(book.soldCopies ?? 0)}
+                    </span>
+                  </TableCell>
+                  <TableCell className="book-management-table__hide-on-mobile">
+                    <span className="text-slate-600">
+                      {formatCurrency(book.totalRevenue ?? 0)}
+                    </span>
                   </TableCell>
                   <TableCell className="book-management-table__actions-cell">
                     <div className="book-management-table__actions">

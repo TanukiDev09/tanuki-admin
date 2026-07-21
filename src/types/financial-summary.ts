@@ -13,6 +13,7 @@ export interface DailyData {
 export interface CategoryData {
   name: string;
   value: number;
+  color?: string;
 }
 
 export interface HealthMetrics {
@@ -44,6 +45,8 @@ export interface FinancialSummary {
   monthly: MonthlyData[];
   daily: DailyData[];
   categories: CategoryData[];
+  categoriesExpense?: CategoryData[];
+  categoriesIncome?: CategoryData[];
   health: HealthMetrics;
   // Alias for backward compatibility
   metrics?: HealthMetrics;

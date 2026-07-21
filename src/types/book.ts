@@ -122,6 +122,8 @@ export interface BookResponse {
   // Inventory integration fields
   totalStock?: number; // Calculated from all warehouses
   inventoryDetails?: InventoryByWarehouse[]; // Detailed inventory per warehouse
+  soldCopies?: number; // Calculated from invoices
+  totalRevenue?: number; // Calculated from invoices
 }
 
 // Función helper para sanitizar libro

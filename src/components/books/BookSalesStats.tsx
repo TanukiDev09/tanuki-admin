@@ -79,7 +79,9 @@ export default function BookSalesStats({ bookId }: BookSalesStatsProps) {
               <ShoppingBag size={20} />
             </div>
             <div className="book-sales-stats__summary-info">
-              <span className="book-sales-stats__summary-label">Ejemplares Vendidos</span>
+              <span className="book-sales-stats__summary-label">
+                Ejemplares Vendidos
+              </span>
               <div className="book-sales-stats__summary-value">
                 {formatNumber(data.totalSold)}
                 <span className="book-sales-stats__summary-unit">unds</span>
@@ -101,7 +103,9 @@ export default function BookSalesStats({ bookId }: BookSalesStatsProps) {
               <DollarSign size={20} />
             </div>
             <div className="book-sales-stats__summary-info">
-              <span className="book-sales-stats__summary-label">Total facturado</span>
+              <span className="book-sales-stats__summary-label">
+                Total facturado
+              </span>
               <div className="book-sales-stats__summary-value">
                 {formatCurrency(data.totalRevenue)}
               </div>
@@ -121,7 +125,10 @@ export default function BookSalesStats({ bookId }: BookSalesStatsProps) {
         <CardHeader className="book-sales-stats__chart-header">
           <div className="book-sales-stats__chart-header-content">
             <CardTitle className="book-sales-stats__chart-title">
-              <TrendingUp className="book-sales-stats__chart-title-icon" size={18} />
+              <TrendingUp
+                className="book-sales-stats__chart-title-icon"
+                size={18}
+              />
               Histórico de Ventas
             </CardTitle>
           </div>
@@ -130,28 +137,58 @@ export default function BookSalesStats({ bookId }: BookSalesStatsProps) {
           <div className="book-sales-stats__chart-scroll-container">
             <div
               className="book-sales-stats__chart-wrapper"
-              style={{ width: `${Math.max(100, data.history.length * 60)}px`, minWidth: '100%' }}
+              style={{
+                width: `${Math.max(100, data.history.length * 60)}px`,
+                minWidth: '100%',
+              }}
             >
               <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={data.history} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <AreaChart
+                  data={data.history}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
                   <defs>
-                    <linearGradient id="colorQuantity" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0} />
+                    <linearGradient
+                      id="colorQuantity"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="var(--color-primary)"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="var(--color-primary)"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid vertical={false} strokeDasharray="3 3" stroke="var(--color-border)" />
+                  <CartesianGrid
+                    vertical={false}
+                    strokeDasharray="3 3"
+                    stroke="var(--color-border)"
+                  />
                   <XAxis
                     dataKey="month"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }}
+                    tick={{
+                      fontSize: 11,
+                      fill: 'var(--color-muted-foreground)',
+                    }}
                     dy={10}
                   />
                   <YAxis
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 11, fill: 'var(--color-muted-foreground)' }}
+                    tick={{
+                      fontSize: 11,
+                      fill: 'var(--color-muted-foreground)',
+                    }}
                   />
                   <Tooltip
                     contentStyle={{
@@ -161,7 +198,11 @@ export default function BookSalesStats({ bookId }: BookSalesStatsProps) {
                       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
                     }}
                     itemStyle={{ fontSize: 13, fontWeight: 500 }}
-                    labelStyle={{ fontSize: 12, marginBottom: 4, color: 'var(--color-muted-foreground)' }}
+                    labelStyle={{
+                      fontSize: 12,
+                      marginBottom: 4,
+                      color: 'var(--color-muted-foreground)',
+                    }}
                   />
                   <Area
                     type="monotone"

@@ -3,6 +3,8 @@ import { parseStringPromise } from 'xml2js';
 import dbConnect from '@/lib/mongodb';
 import Invoice from '@/models/Invoice';
 import Book from '@/models/Book';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 
 // Helper to safely extract text from xml2js objects
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -305,27 +307,41 @@ function extractDianMetadata(invoice: any, attachedDoc: any) {
   };
 }
 
+const MAX_XML_SIZE = 5 * 1024 * 1024; // 5MB - las facturas XML de la DIAN son pequeñas
+
+function validateXmlFile(file: File | null, fileContent: string): string | null {
+  if (!file) return 'No file provided';
+  if (!file.name.endsWith('.xml')) {
+    return 'Invalid file type. Only XML files are accepted.';
+  }
+  if (file.size > MAX_XML_SIZE) {
+    return 'El archivo XML no debe superar los 5MB';
+  }
+  if (!fileContent.startsWith('<?xml') && !fileContent.startsWith('<')) {
+    return 'Archivo XML inválido: El archivo no comienza con una etiqueta XML válida.';
+  }
+  return null;
+}
+
 export async function POST(request: NextRequest) {
+  const permissionError = await requirePermission(
+    request,
+    ModuleName.INVOICES,
+    PermissionAction.CREATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get('file') as File | null;
+    const fileContent = file
+      ? (await file.text()).replace(/^\uFEFF/, '').trim()
+      : '';
 
-    if (!file)
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
-    if (!file.name.endsWith('.xml')) {
+    const validationError = validateXmlFile(file, fileContent);
+    if (validationError || !file) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only XML files are accepted.' },
-        { status: 400 }
-      );
-    }
-
-    const fileContent = (await file.text()).replace(/^\uFEFF/, '').trim();
-    if (!fileContent.startsWith('<?xml') && !fileContent.startsWith('<')) {
-      return NextResponse.json(
-        {
-          error:
-            'Archivo XML inválido: El archivo no comienza con una etiqueta XML válida.',
-        },
+        { error: validationError ?? 'No file provided' },
         { status: 400 }
       );
     }

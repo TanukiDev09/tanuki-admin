@@ -3,7 +3,10 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { NumericInput, type NumericInputProps } from '../NumericInput';
 
 // Test wrapper to manage state like a real parent component
-const NumericInputWrapper = ({ initialValue, ...props }: { initialValue?: number } & NumericInputProps) => {
+const NumericInputWrapper = ({
+  initialValue,
+  ...props
+}: { initialValue?: number } & NumericInputProps) => {
   const [value, setValue] = React.useState(initialValue);
   return (
     <NumericInput
@@ -19,7 +22,9 @@ const NumericInputWrapper = ({ initialValue, ...props }: { initialValue?: number
 
 describe('NumericInput', () => {
   it('renders correctly with initial numeric value', async () => {
-    render(<NumericInputWrapper initialValue={1234567.89} placeholder="Numeric" />);
+    render(
+      <NumericInputWrapper initialValue={1234567.89} placeholder="Numeric" />
+    );
     const input = screen.getByPlaceholderText(/numeric/i) as HTMLInputElement;
 
     await waitFor(() => {
@@ -29,7 +34,12 @@ describe('NumericInput', () => {
 
   it('updates value correctly on change', async () => {
     const onValueChange = jest.fn();
-    render(<NumericInputWrapper onValueChange={onValueChange} placeholder="Numeric" />);
+    render(
+      <NumericInputWrapper
+        onValueChange={onValueChange}
+        placeholder="Numeric"
+      />
+    );
     const input = screen.getByPlaceholderText(/numeric/i) as HTMLInputElement;
 
     fireEvent.change(input, { target: { value: '1234' } });
@@ -68,7 +78,13 @@ describe('NumericInput', () => {
 
   it('clears value when empty', async () => {
     const onValueChange = jest.fn();
-    render(<NumericInputWrapper initialValue={1234} onValueChange={onValueChange} placeholder="Numeric" />);
+    render(
+      <NumericInputWrapper
+        initialValue={1234}
+        onValueChange={onValueChange}
+        placeholder="Numeric"
+      />
+    );
     const input = screen.getByPlaceholderText(/numeric/i) as HTMLInputElement;
 
     fireEvent.change(input, { target: { value: '' } });
