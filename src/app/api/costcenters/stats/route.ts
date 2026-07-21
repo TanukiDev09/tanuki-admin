@@ -124,15 +124,6 @@ export async function GET(request: NextRequest) {
     // 4. Per Cost Center Stats
     const incomeTypes = ['Ingreso', 'INCOME', 'factura_emitida'];
 
-    // Helper: normalize a costCenter field that may be a string or an array
-    const normCC = (expr: unknown) => ({
-      $cond: [
-        { $isArray: expr },
-        { $ifNull: [{ $arrayElemAt: [expr, 0] }, '00'] },
-        { $ifNull: [expr, '00'] },
-      ],
-    });
-
     const basePortionsPipeline: PipelineStage[] = [
       {
         $project: {
@@ -149,9 +140,7 @@ export async function GET(request: NextRequest) {
                   input: '$items',
                   as: 'item',
                   in: {
-                    cc: normCC({
-                      $ifNull: ['$$item.costCenter', '$costCenter'],
-                    }),
+                    cc: { $ifNull: ['$$item.costCenter', '$costCenter'] },
                     val: {
                       $multiply: [
                         { $ifNull: ['$$item.total', 0] },
@@ -176,14 +165,14 @@ export async function GET(request: NextRequest) {
                       input: '$allocations',
                       as: 'alloc',
                       in: {
-                        cc: normCC('$$alloc.costCenter'),
+                        cc: '$$alloc.costCenter',
                         val: { $ifNull: ['$$alloc.amount', 0] },
                       },
                     },
                   },
                   else: [
                     {
-                      cc: normCC('$costCenter'),
+                      cc: { $ifNull: ['$costCenter', '00'] },
                       val: GET_AMOUNT_COP_EXPR,
                     },
                   ],
@@ -196,6 +185,21 @@ export async function GET(request: NextRequest) {
         },
       },
       { $unwind: '$portions' },
+      // portions.cc is an array of one or more codes (a movement/item/
+      // allocation can belong to several cost centers at once); unwind it
+      // too so each portion groups under its own individual code.
+      {
+        $addFields: {
+          'portions.cc': {
+            $cond: [
+              { $isArray: '$portions.cc' },
+              '$portions.cc',
+              ['$portions.cc'],
+            ],
+          },
+        },
+      },
+      { $unwind: '$portions.cc' },
       {
         $addFields: {
           finalAmount: { $toDouble: { $ifNull: ['$portions.val', 0] } },

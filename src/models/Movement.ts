@@ -11,7 +11,7 @@ export interface IMovement extends Document {
   amountInCOP: mongoose.Types.Decimal128;
   type: string; // 'Ingreso' or 'Egreso' (presumably)
   category: mongoose.Types.ObjectId | ICategory; // Populated Category or ObjectId string
-  costCenter: string;
+  costCenter: string[]; // One or more cost center codes
   beneficiary: string;
   paymentChannel: string;
   invoiceRef?: string;
@@ -27,7 +27,7 @@ export interface IMovement extends Document {
   flowDirection: string;
   movementType: string;
   allocations: {
-    costCenter: string;
+    costCenter: string[];
     amount: number | mongoose.Types.Decimal128;
   }[];
   metadata: { source: string; createdAt: Date };
@@ -46,7 +46,7 @@ export interface IMovement extends Document {
     catalogPrice?: mongoose.Types.Decimal128;
     discount?: mongoose.Types.Decimal128;
     total: mongoose.Types.Decimal128;
-    costCenter: string;
+    costCenter: string[];
     bookId?: mongoose.Types.ObjectId | string;
   }[];
 }
@@ -61,7 +61,7 @@ const MovementSchema: Schema = new Schema(
     amountInCOP: { type: Schema.Types.Decimal128, default: 0 },
     type: { type: String, required: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category' },
-    costCenter: { type: String },
+    costCenter: { type: [String], default: undefined },
     beneficiary: { type: String },
     paymentChannel: { type: String },
     invoiceRef: { type: String },
@@ -82,7 +82,7 @@ const MovementSchema: Schema = new Schema(
     allocations: [
       {
         _id: false, // Added _id: false here
-        costCenter: { type: String },
+        costCenter: { type: [String] },
         amount: { type: Schema.Types.Decimal128 },
       },
     ],
@@ -117,7 +117,7 @@ const MovementSchema: Schema = new Schema(
         catalogPrice: { type: Schema.Types.Decimal128 },
         discount: { type: Schema.Types.Decimal128, default: 0 },
         total: { type: Schema.Types.Decimal128 },
-        costCenter: { type: String },
+        costCenter: { type: [String] },
         bookId: { type: Schema.Types.ObjectId, ref: 'Book' },
       },
     ],

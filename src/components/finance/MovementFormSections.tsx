@@ -2,6 +2,7 @@
 
 import { Label } from '@/components/ui/Label';
 import { Input } from '@/components/ui/Input';
+import { NumericInput } from '@/components/ui/Input/NumericInput';
 import {
   Select,
   SelectContent,
@@ -14,22 +15,156 @@ import { DebtSelect } from '@/components/finance/DebtSelect';
 import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSelect';
 import { AllocationTable } from '@/components/finance/AllocationTable';
 import { CreateMovementDTO } from '@/types/movement';
-import { toNumber } from '@/lib/math';
+import { toNumber, gtZero, multiply, divide } from '@/lib/math';
 
 interface SectionProps {
   formData: Partial<CreateMovementDTO>;
-  handleChange?: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => void;
+  handleChange?: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   handleSelectChange: (name: string, value: string) => void;
   setFormData: React.Dispatch<React.SetStateAction<Partial<CreateMovementDTO>>>;
 }
 
-export function GeneralInfoSection({
+export function AmountCurrencySection({
   formData,
-  handleChange,
   handleSelectChange,
+  setFormData,
 }: SectionProps) {
+  return (
+    <div className="movement-form__section">
+      <h2 className="movement-form__section-title">
+        Detalles de la Transacción
+      </h2>
+      <div className="movement-form__grid movement-form__grid--3">
+        <div className="movement-form__field-group">
+          <Label htmlFor="amount">Monto</Label>
+          <NumericInput
+            id="amount"
+            name="amount"
+            placeholder="0.00"
+            value={formData.amount}
+            onValueChange={(val) =>
+              setFormData((prev) => {
+                const amount = val;
+                const rate = prev.exchangeRate;
+                const cop = prev.amountInCOP;
+
+                let nextCOP = prev.amountInCOP;
+                let nextRate = prev.exchangeRate;
+
+                if (gtZero(rate)) {
+                  nextCOP = multiply(amount, rate);
+                } else if (gtZero(cop) && gtZero(amount)) {
+                  nextRate = divide(cop, amount);
+                }
+
+                return {
+                  ...prev,
+                  amount: val,
+                  amountInCOP: nextCOP,
+                  exchangeRate: nextRate,
+                };
+              })
+            }
+          />
+        </div>
+
+        <div className="movement-form__field-group">
+          <Label htmlFor="currency">Moneda</Label>
+          <Select
+            value={formData.currency || 'COP'}
+            onValueChange={(val) => handleSelectChange('currency', val)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Selecciona moneda" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="COP">Peso Colombiano (COP)</SelectItem>
+              <SelectItem value="USD">Dólar (USD)</SelectItem>
+              <SelectItem value="EUR">Euro (EUR)</SelectItem>
+              <SelectItem value="JPY">Yen Japonés (JPY)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="movement-form__field-group">
+          {formData.currency !== 'COP' && (
+            <>
+              <Label htmlFor="exchangeRate">Tasa de Cambio (TRM)</Label>
+              <NumericInput
+                id="exchangeRate"
+                name="exchangeRate"
+                value={formData.exchangeRate}
+                onValueChange={(val) => {
+                  setFormData((prev) => {
+                    const rate = val;
+                    const amount = prev.amount;
+                    const cop = prev.amountInCOP;
+
+                    let nextCOP = prev.amountInCOP;
+                    let nextAmount = prev.amount;
+
+                    if (gtZero(amount)) {
+                      nextCOP = multiply(amount, rate);
+                    } else if (gtZero(cop) && gtZero(rate)) {
+                      nextAmount = divide(cop, rate);
+                    }
+
+                    return {
+                      ...prev,
+                      exchangeRate: val,
+                      amountInCOP: nextCOP,
+                      amount: nextAmount,
+                    };
+                  });
+                }}
+                placeholder="Ej: 4 000"
+              />
+            </>
+          )}
+        </div>
+      </div>
+
+      {formData.currency !== 'COP' && (
+        <div className="movement-form__grid movement-form__grid--3 mt-4">
+          <div className="movement-form__field-group">
+            <Label htmlFor="amountInCOP">Equivalente en COP</Label>
+            <NumericInput
+              id="amountInCOP"
+              name="amountInCOP"
+              placeholder="0.00"
+              value={formData.amountInCOP}
+              onValueChange={(val) => {
+                setFormData((prev) => {
+                  const cop = val;
+                  const amount = prev.amount;
+                  const rate = prev.exchangeRate;
+
+                  let nextAmount = prev.amount;
+                  let nextRate = prev.exchangeRate;
+
+                  if (gtZero(amount)) {
+                    nextRate = divide(cop, amount);
+                  } else if (gtZero(rate)) {
+                    nextAmount = divide(cop, rate);
+                  }
+
+                  return {
+                    ...prev,
+                    amountInCOP: val,
+                    exchangeRate: nextRate,
+                    amount: nextAmount,
+                  };
+                });
+              }}
+            />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function GeneralInfoSection({ formData, handleChange, handleSelectChange }: SectionProps) {
   return (
     <div className="movement-form__section">
       <h2 className="movement-form__section-title">Información General</h2>
@@ -81,11 +216,7 @@ export function GeneralInfoSection({
 interface AllocationSectionProps extends SectionProps {
   useMultiCostCenter: boolean;
   setUseMultiCostCenter: (val: boolean) => void;
-  handleAllocationChange: (
-    index: number,
-    field: 'costCenter' | 'amount',
-    value: string
-  ) => void;
+  handleAllocationChange: (index: number, field: 'costCenter' | 'amount', value: string) => void;
   addAllocation: () => void;
   removeAllocation: (index: number) => void;
   allocationError: string | null;

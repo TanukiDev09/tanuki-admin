@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyToken } from '@/lib/jwt';
 
-export default function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   // Rutas protegidas
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
     // Audit bypass (Development only)
@@ -27,6 +27,5 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  runtime: 'nodejs',
   matcher: ['/dashboard/:path*'],
 };
