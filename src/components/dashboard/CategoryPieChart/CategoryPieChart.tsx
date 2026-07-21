@@ -49,12 +49,12 @@ export function CategoryPieChart({
             No hay datos para mostrar
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={300}>
-            <PieChart>
+          <ResponsiveContainer width="100%" height={360}>
+            <PieChart margin={{ top: 8, right: 0, bottom: 0, left: 0 }}>
               <Pie
                 data={sortedData}
                 cx="50%"
-                cy="50%"
+                cy="46%"
                 innerRadius={60}
                 outerRadius={80}
                 paddingAngle={5}
@@ -84,13 +84,16 @@ export function CategoryPieChart({
                 itemStyle={{ color: 'var(--color-foreground)' }}
               />
               <Legend
-                layout="vertical"
-                verticalAlign="middle"
-                align="right"
+                layout="horizontal"
+                verticalAlign="bottom"
+                align="center"
+                iconSize={10}
+                iconType="circle"
                 wrapperStyle={{
                   fontFamily: 'var(--font-sans)',
                   fontSize: '12px',
-                  paddingLeft: '10px',
+                  paddingTop: '20px',
+                  lineHeight: '1.8',
                 }}
               />
             </PieChart>

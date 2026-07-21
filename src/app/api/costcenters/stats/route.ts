@@ -170,17 +170,14 @@ export async function GET(request: NextRequest) {
                     ],
                   },
                   then: {
+                    // NOTA: los allocations se guardan en COP (su suma =
+                    // amountInCOP), por eso NO se multiplican por exchangeRate.
                     $map: {
                       input: '$allocations',
                       as: 'alloc',
                       in: {
                         cc: normCC('$$alloc.costCenter'),
-                        val: {
-                          $multiply: [
-                            { $ifNull: ['$$alloc.amount', 0] },
-                            { $ifNull: ['$exchangeRate', 1] },
-                          ],
-                        },
+                        val: { $ifNull: ['$$alloc.amount', 0] },
                       },
                     },
                   },

@@ -72,7 +72,7 @@ const CategoryPieChart = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="chart-loading-placeholder" style={{ height: '300px' }} />
+      <div className="chart-loading-placeholder" style={{ height: '360px' }} />
     ),
   }
 );

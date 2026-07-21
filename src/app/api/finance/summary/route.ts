@@ -184,6 +184,8 @@ const GET_CC_PORTION_EXPR = (ccCode: string) => ({
               ],
             },
             then: {
+              // NOTA: los allocations se guardan en COP (su suma = amountInCOP),
+              // por eso NO deben multiplicarse por exchangeRate.
               $reduce: {
                 input: '$allocations',
                 initialValue: 0,
@@ -227,17 +229,7 @@ const GET_CC_PORTION_EXPR = (ccCode: string) => ({
     {
       $cond: [
         {
-          $or: [
-            {
-              $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }],
-            },
-            {
-              $and: [
-                { $isArray: '$allocations' },
-                { $gt: [{ $size: '$allocations' }, 0] },
-              ],
-            },
-          ],
+          $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }],
         },
         { $ifNull: ['$exchangeRate', 1] },
         1,
@@ -291,6 +283,8 @@ function calculateRelevantAmount(
   }
 
   if (plain.allocations && plain.allocations.length > 0) {
+    // NOTA: los allocations se guardan en COP (su suma = amountInCOP),
+    // por eso NO deben multiplicarse por exchangeRate.
     const matchingAllocTotal = plain.allocations.reduce(
       (sum: string, alloc: MovementAllocation) => {
         if (matchesCC(alloc.costCenter, costCenterCode)) {
@@ -300,9 +294,7 @@ function calculateRelevantAmount(
       },
       '0'
     );
-    return toNumber(
-      multiply(matchingAllocTotal, plain.exchangeRate?.toString() || '1')
-    );
+    return toNumber(matchingAllocTotal);
   }
 
   if (!matchesCC(plain.costCenter, costCenterCode)) {
@@ -746,17 +738,13 @@ async function getCostCenterBreakdown(
                   ],
                 },
                 then: {
+                  // NOTA: los allocations ya están en COP — sin exchangeRate.
                   $map: {
                     input: '$allocations',
                     as: 'alloc',
                     in: {
                       cc: normalizeCCExpr('$$alloc.costCenter'),
-                      val: {
-                        $multiply: [
-                          { $ifNull: ['$$alloc.amount', 0] },
-                          { $ifNull: ['$exchangeRate', 1] },
-                        ],
-                      },
+                      val: { $ifNull: ['$$alloc.amount', 0] },
                     },
                   },
                 },

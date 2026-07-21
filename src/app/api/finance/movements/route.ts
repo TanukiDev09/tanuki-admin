@@ -256,15 +256,15 @@ function formatMovements(
           multiply(matchingTotal, m.exchangeRate?.toString() || '1')
         );
       } else if (m.allocations && m.allocations.length > 0) {
+        // NOTA: los allocations se guardan en COP (su suma = amountInCOP),
+        // por eso NO deben multiplicarse por exchangeRate.
         const matchingTotal = m.allocations.reduce((sum, alloc) => {
           if (matchesCC(alloc.costCenter, costCenterCode)) {
             return add(sum, alloc.amount?.toString() || '0');
           }
           return sum;
         }, '0');
-        relevantAmount = toNumber(
-          multiply(matchingTotal, m.exchangeRate?.toString() || '1')
-        );
+        relevantAmount = toNumber(matchingTotal);
       } else if (!matchesCC(m.costCenter, costCenterCode)) {
         relevantAmount = 0;
       }
