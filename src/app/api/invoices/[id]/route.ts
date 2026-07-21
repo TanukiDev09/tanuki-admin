@@ -33,7 +33,10 @@ const updateInvoiceSchema = z.object({
   status: z
     .enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked'])
     .optional(),
-  costCenters: z.array(z.string()).optional(),
+  // Deprecated embedded repartition summary (legacy XML imports only)
+  costCenters: z
+    .array(z.object({ code: z.array(z.string()), amount: z.number() }))
+    .optional(),
   movements: z.array(z.string()).optional(),
   inventoryMovement: z.string().optional().nullable(),
   notes: z.string().optional(),
@@ -76,8 +79,9 @@ export async function GET(
     await dbConnect();
     const { id } = await params;
 
+    // costCenters is an embedded repartition summary (legacy XML imports),
+    // not a reference to the CostCenter collection, so it needs no populate.
     const invoice = await Invoice.findById(id)
-      .populate('costCenters', 'name code')
       .populate('movements')
       .populate('inventoryMovement');
 

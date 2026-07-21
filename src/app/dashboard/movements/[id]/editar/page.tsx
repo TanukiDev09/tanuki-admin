@@ -21,10 +21,10 @@ import { POSSelect } from '@/components/admin/POSSelect/POSSelect';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency } from '@/lib/utils';
-import { multiply, divide, gtZero, add, toNumber, isMatchedFinancial } from '@/lib/math';
+import { divide, gtZero, add, toNumber, isMatchedFinancial } from '@/lib/math';
 import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import { MovementItemsTable } from '@/components/finance/MovementItemsTable';
-import { GeneralInfoSection, AllocationSection } from '@/components/finance/MovementFormSections';
+import { GeneralInfoSection, AllocationSection, AmountCurrencySection } from '@/components/finance/MovementFormSections';
 import '../../movement-form.scss';
 
 export default function EditMovementPage() {
@@ -81,17 +81,33 @@ export default function EditMovementPage() {
             typeof m.inventoryMovementId === 'object'
               ? m.inventoryMovementId?._id
               : m.inventoryMovementId,
+          // costCenter is always an array in the DB; this form only supports
+          // a single cost center per movement/item/allocation, so take the
+          // first code (arrays predate this UI having multi-select).
+          costCenter: Array.isArray(m.costCenter)
+            ? m.costCenter[0] || ''
+            : m.costCenter,
           allocations:
             m.allocations?.map(
               (a: {
-                costCenter: string | { _id: string };
+                costCenter: string | string[] | { _id: string };
                 amount: number | string;
               }) => ({
-                costCenter:
-                  typeof a.costCenter === 'object'
+                costCenter: Array.isArray(a.costCenter)
+                  ? a.costCenter[0] || ''
+                  : typeof a.costCenter === 'object'
                     ? a.costCenter?._id
                     : a.costCenter,
                 amount: a.amount?.toString() || '0',
+              })
+            ) || [],
+          items:
+            m.items?.map(
+              (item: { costCenter: string | string[]; [key: string]: unknown }) => ({
+                ...item,
+                costCenter: Array.isArray(item.costCenter)
+                  ? item.costCenter[0] || ''
+                  : item.costCenter,
               })
             ) || [],
         });
@@ -372,137 +388,11 @@ export default function EditMovementPage() {
           setFormData={setFormData}
         />
 
-        <div className="movement-form__section">
-          <h2 className="movement-form__section-title">
-            Detalles de la Transacción
-          </h2>
-          <div className="movement-form__grid movement-form__grid--3">
-            <div className="movement-form__field-group">
-              <Label htmlFor="amount">Monto</Label>
-              <NumericInput
-                id="amount"
-                name="amount"
-                placeholder="0.00"
-                value={formData.amount}
-                onValueChange={(val) =>
-                  setFormData((prev) => {
-                    const amount = val;
-                    const rate = prev.exchangeRate;
-                    const cop = prev.amountInCOP;
-
-                    let nextCOP = prev.amountInCOP;
-                    let nextRate = prev.exchangeRate;
-
-                    if (gtZero(rate)) {
-                      nextCOP = multiply(amount, rate);
-                    } else if (gtZero(cop) && gtZero(amount)) {
-                      nextRate = divide(cop, amount);
-                    }
-
-                    return {
-                      ...prev,
-                      amount: val,
-                      amountInCOP: nextCOP,
-                      exchangeRate: nextRate,
-                    };
-                  })
-                }
-              />
-            </div>
-
-            <div className="movement-form__field-group">
-              <Label htmlFor="currency">Moneda</Label>
-              <Select
-                value={formData.currency || 'COP'}
-                onValueChange={(val) => handleSelectChange('currency', val)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona moneda" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="COP">Peso Colombiano (COP)</SelectItem>
-                  <SelectItem value="USD">Dólar (USD)</SelectItem>
-                  <SelectItem value="EUR">Euro (EUR)</SelectItem>
-                  <SelectItem value="JPY">Yen Japonés (JPY)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="movement-form__field-group">
-              {formData.currency !== 'COP' && (
-                <>
-                  <Label htmlFor="exchangeRate">Tasa de Cambio (TRM)</Label>
-                  <NumericInput
-                    id="exchangeRate"
-                    name="exchangeRate"
-                    value={formData.exchangeRate}
-                    onValueChange={(val) => {
-                      setFormData((prev) => {
-                        const rate = val;
-                        const amount = prev.amount;
-                        const cop = prev.amountInCOP;
-
-                        let nextCOP = prev.amountInCOP;
-                        let nextAmount = prev.amount;
-
-                        if (gtZero(amount)) {
-                          nextCOP = multiply(amount, rate);
-                        } else if (gtZero(cop) && gtZero(rate)) {
-                          nextAmount = divide(cop, rate);
-                        }
-
-                        return {
-                          ...prev,
-                          exchangeRate: val,
-                          amountInCOP: nextCOP,
-                          amount: nextAmount,
-                        };
-                      });
-                    }}
-                    placeholder="Ej: 4 000"
-                  />
-                </>
-              )}
-            </div>
-          </div>
-
-          {formData.currency !== 'COP' && (
-            <div className="movement-form__grid movement-form__grid--3 mt-4">
-              <div className="movement-form__field-group">
-                <Label htmlFor="amountInCOP">Equivalente en COP</Label>
-                <NumericInput
-                  id="amountInCOP"
-                  name="amountInCOP"
-                  placeholder="0.00"
-                  value={formData.amountInCOP}
-                  onValueChange={(val) => {
-                    setFormData((prev) => {
-                      const cop = val;
-                      const amount = prev.amount;
-                      const rate = prev.exchangeRate;
-
-                      let nextAmount = prev.amount;
-                      let nextRate = prev.exchangeRate;
-
-                      if (gtZero(amount)) {
-                        nextRate = divide(cop, amount);
-                      } else if (gtZero(rate)) {
-                        nextAmount = divide(cop, rate);
-                      }
-
-                      return {
-                        ...prev,
-                        amountInCOP: val,
-                        exchangeRate: nextRate,
-                        amount: nextAmount,
-                      };
-                    });
-                  }}
-                />
-              </div>
-            </div>
-          )}
-        </div>
+        <AmountCurrencySection
+          formData={formData}
+          handleSelectChange={handleSelectChange}
+          setFormData={setFormData}
+        />
 
         <div className="movement-form__section">
           <div className="flex items-center justify-between mb-4">

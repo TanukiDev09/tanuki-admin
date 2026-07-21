@@ -32,7 +32,10 @@ const createInvoiceSchema = z.object({
   status: z
     .enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked'])
     .default('Unchecked'),
-  costCenters: z.array(z.string()).optional(), // Array of ObjectIds as strings
+  // Deprecated embedded repartition summary (legacy XML imports only)
+  costCenters: z
+    .array(z.object({ code: z.array(z.string()), amount: z.number() }))
+    .optional(),
   movements: z.array(z.string()).optional(), // Array of ObjectIds
   inventoryMovement: z.string().optional().nullable(), // ObjectId
   notes: z.string().optional(),
@@ -130,11 +133,12 @@ export async function GET(req: NextRequest) {
       sort.date = -1;
     }
 
+    // costCenters is an embedded repartition summary (legacy XML imports),
+    // not a reference to the CostCenter collection, so it needs no populate.
     const invoices = await Invoice.find(query)
       .sort(sort)
       .skip(skip)
       .limit(limit)
-      .populate('costCenters', 'name code')
       .populate('inventoryMovement', 'consecutive type');
 
     const total = await Invoice.countDocuments(query);

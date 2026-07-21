@@ -131,11 +131,18 @@ const MovementTableRow = ({
             Múltiple ({(movement.allocations?.length || 0) || (movement.items?.length || 0)})
           </Badge>
         ) : (
-          movement.costCenter ||
-          movement.allocations?.[0]?.costCenter ||
-          movement.items?.[0]?.costCenter || (
-            <span className="movements-list__no-category">Sin definir</span>
-          )
+          (() => {
+            const cc =
+              movement.costCenter ||
+              movement.allocations?.[0]?.costCenter ||
+              movement.items?.[0]?.costCenter;
+            const codes = Array.isArray(cc) ? cc : cc ? [cc] : [];
+            return codes.length > 0 ? (
+              codes.join(', ')
+            ) : (
+              <span className="movements-list__no-category">Sin definir</span>
+            );
+          })()
         )}
       </TableCell>
       <TableCell data-label="Monto">

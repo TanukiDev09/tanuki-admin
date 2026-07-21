@@ -25,7 +25,7 @@ export interface IInvoiceItem {
   unitPrice: number;
   total: number;
   bookId?: mongoose.Types.ObjectId;
-  costCenter: string; // The code of the cost center
+  costCenter: string[]; // One or more cost center codes
 }
 
 export interface IInvoice extends Document {
@@ -45,7 +45,10 @@ export interface IInvoice extends Document {
   status: 'Draft' | 'Sent' | 'Paid' | 'Partial' | 'Cancelled' | 'Unchecked';
 
   // Relations
-  costCenters?: mongoose.Types.ObjectId[]; // Deprecated in favor of per-item CC, but keeping for compatibility if needed
+  // Deprecated in favor of per-item CC (see items[].costCenter). Only
+  // populated on invoices imported from old XML batches, as an embedded
+  // repartition summary — not a reference to the CostCenter collection.
+  costCenters?: { code: string[]; amount: number }[];
   movements: mongoose.Types.ObjectId[]; // Associated Payments (Movements)
   inventoryMovement?: mongoose.Types.ObjectId; // Associated Settlement (Liquidacion)
 
@@ -110,7 +113,10 @@ const InvoiceSchema: Schema = new Schema(
         discount: { type: Number, default: 0 },
         total: { type: Number, required: true },
         bookId: { type: Schema.Types.ObjectId, ref: 'Book' },
-        costCenter: { type: String, required: true },
+        // Mongoose auto-wraps a scalar into a single-element array on cast,
+        // so callers that still submit a plain string (Zod schemas, the XML
+        // importer) keep working and land in the DB in the array shape.
+        costCenter: { type: [String], required: true },
       },
     ],
     subtotal: {
@@ -136,10 +142,13 @@ const InvoiceSchema: Schema = new Schema(
       enum: ['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked'],
       default: 'Unchecked',
     },
+    // Embedded repartition summary (legacy XML imports only), not a
+    // reference to the CostCenter collection.
     costCenters: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'CostCenter',
+        _id: false,
+        code: { type: [String] },
+        amount: { type: Number },
       },
     ],
     movements: [
@@ -200,7 +209,7 @@ const InvoiceSchema: Schema = new Schema(
 // Indexes
 InvoiceSchema.index({ date: -1 });
 InvoiceSchema.index({ status: 1 });
-InvoiceSchema.index({ costCenters: 1 });
+InvoiceSchema.index({ 'items.costCenter': 1 });
 InvoiceSchema.index({ inventoryMovement: 1 });
 InvoiceSchema.index({ newsletterSignup: 1 }); // For newsletter queries
 

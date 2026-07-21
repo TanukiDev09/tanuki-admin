@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export default function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   // Rutas protegidas
   if (request.nextUrl.pathname.startsWith('/dashboard')) {
     // Audit bypass (Development only)

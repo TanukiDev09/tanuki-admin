@@ -35,14 +35,16 @@ interface Invoice {
   customerName: string;
   customerTaxId?: string;
   status: string;
-  costCenters?: Array<{ _id: string; name: string; code: string }>;
+  // Embedded repartition summary (legacy XML imports only); code is an
+  // array because a portion can be split across several cost centers.
+  costCenters?: Array<{ code: string[]; amount: number }>;
   items: Array<{
     type: 'libro' | 'servicio';
     description: string;
     quantity: number;
     unitPrice: number;
     total: number;
-    costCenter: string;
+    costCenter: string[];
   }>;
   subtotal: number;
   tax: number;
@@ -254,13 +256,13 @@ export default function InvoiceDetailPage() {
                   </h4>
                   {invoice.costCenters && invoice.costCenters.length > 0 ? (
                     <div className="invoice-detail__cost-centers">
-                      {invoice.costCenters.map((cc) => (
+                      {invoice.costCenters.map((cc, idx) => (
                         <Badge
-                          key={cc._id}
+                          key={idx}
                           variant="secondary"
                           style={{ fontSize: '10px' }}
                         >
-                          {cc.code} - {cc.name}
+                          {cc.code.join(', ')} - {formatCurrency(cc.amount, 'COP')}
                         </Badge>
                       ))}
                     </div>
@@ -317,7 +319,7 @@ export default function InvoiceDetailPage() {
                             variant="outline"
                             className="text-[10px] font-mono"
                           >
-                            {item.costCenter}
+                            {item.costCenter.join(', ')}
                           </Badge>
                         </td>
                         <td className="invoice-detail__table-td--right">

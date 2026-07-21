@@ -12,6 +12,11 @@ export interface Movement {
   relevantAmount?: number | string;
   type: MovementType;
   category: string | { _id: string; name: string; color?: string };
+  // Note: the DB stores costCenter as string[] on every level (root,
+  // allocations, items). This frontend type stays string because the forms
+  // only support selecting a single cost center per row; API routes convert
+  // to/from the array shape at the boundary (see toCostCenterArray in
+  // src/app/api/finance/movements/route.ts and .../[id]/route.ts).
   costCenter: string;
   beneficiary: string;
   paymentChannel: string;

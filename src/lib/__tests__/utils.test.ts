@@ -4,7 +4,8 @@ describe('general utilities', () => {
   describe('cn (className merger)', () => {
     it('merges class names correctly', () => {
       expect(cn('class1', 'class2')).toBe('class1 class2');
-      expect(cn('class1', undefined && 'class2', 'class3')).toBe(
+      const showClass2: boolean = false;
+      expect(cn('class1', showClass2 && 'class2', 'class3')).toBe(
         'class1 class3'
       );
       expect(cn('class1', { class2: true, class3: false })).toBe(

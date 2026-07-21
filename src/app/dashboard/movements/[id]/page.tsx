@@ -161,7 +161,14 @@ function MovementDetailContent({
                 <Layers className="inline-block w-3 h-3 mr-1 mb-0.5" /> Centro de Costo
               </span>
               <span className="movement-detail__field-value">
-                {movement.costCenter || movement.allocations?.[0]?.costCenter || '-'}
+                {(() => {
+                  const cc =
+                    movement.costCenter?.length
+                      ? movement.costCenter
+                      : movement.allocations?.[0]?.costCenter;
+                  const codes = Array.isArray(cc) ? cc : cc ? [cc] : [];
+                  return codes.length > 0 ? codes.join(', ') : '-';
+                })()}
               </span>
             </div>
             {movement.invoiceRef && (

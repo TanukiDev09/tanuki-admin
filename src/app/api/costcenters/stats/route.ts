@@ -188,6 +188,21 @@ export async function GET(request: NextRequest) {
         },
       },
       { $unwind: '$portions' },
+      // portions.cc is an array of one or more codes (a movement/item/
+      // allocation can belong to several cost centers at once); unwind it
+      // too so each portion groups under its own individual code.
+      {
+        $addFields: {
+          'portions.cc': {
+            $cond: [
+              { $isArray: '$portions.cc' },
+              '$portions.cc',
+              ['$portions.cc'],
+            ],
+          },
+        },
+      },
+      { $unwind: '$portions.cc' },
       {
         $addFields: {
           finalAmount: { $toDouble: { $ifNull: ['$portions.val', 0] } },

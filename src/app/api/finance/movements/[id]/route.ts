@@ -98,7 +98,7 @@ interface MovementBody {
 }
 
 interface Allocation {
-  costCenter: string;
+  costCenter: string[];
   amount: { toString: () => string } | number | string;
 }
 
@@ -110,7 +110,7 @@ interface Item {
   catalogPrice?: { toString: () => string } | number;
   discount?: { toString: () => string } | number;
   total: { toString: () => string } | number;
-  costCenter: string;
+  costCenter: string[];
   bookId?: string | { toString: () => string } | null;
 }
 
@@ -249,7 +249,15 @@ function checkAllocations(
   return null;
 }
 
-// Helper to validate and normalize allocations for updates
+// costCenter is always stored as an array in the DB. The forms only ever
+// select a single cost center per allocation/item, so wrap that single value
+// here rather than pushing array-awareness into the UI.
+function toCostCenterArray(cc: unknown): string[] {
+  if (Array.isArray(cc)) return cc;
+  if (typeof cc === 'string' && cc) return [cc];
+  return [];
+}
+
 // Helper to validate and normalize allocations for updates
 function validateAndNormalizeAllocations(
   body: MovementBody,
@@ -275,6 +283,14 @@ function validateAndNormalizeAllocations(
     ];
   }
 
+  // Normalize every allocation's costCenter to the array shape the DB expects
+  body.allocations = (
+    body.allocations as { costCenter: unknown; amount: number | string }[]
+  ).map((alloc) => ({
+    ...alloc,
+    costCenter: toCostCenterArray(alloc.costCenter),
+  }));
+
   // Ensure costCenter is always the first allocation (redundancy for backwards compatibility)
   if (
     body.allocations &&
@@ -282,7 +298,7 @@ function validateAndNormalizeAllocations(
     body.allocations.length > 0
   ) {
     body.costCenter = (
-      body.allocations[0] as { costCenter: string }
+      body.allocations[0] as { costCenter: string[] }
     ).costCenter;
   }
 
@@ -411,6 +427,7 @@ function normalizePUTBody(body: MovementBody) {
         ? toNumber(item.catalogPrice).toString()
         : undefined,
       discount: toNumber(item.discount || 0).toString(),
+      costCenter: toCostCenterArray(item.costCenter),
       bookId:
         item.bookId && mongoose.isValidObjectId(item.bookId)
           ? item.bookId

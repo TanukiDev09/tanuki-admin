@@ -30,6 +30,11 @@ import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import './cost-center-detail.scss';
 
+// Un libro recién impreso arrastra el costo de producción completo antes de
+// vender el primer ejemplar, así que un margen muy negativo en sus primeros
+// meses es esperado, no un problema del centro de costo.
+const PROFITABILITY_RECOVERY_THRESHOLD = -100;
+
 const ScrollableIncomeExpenseChart = dynamic(
   () =>
     import('@/components/dashboard/ScrollableIncomeExpenseChart').then(
@@ -224,13 +229,26 @@ export default function CostCenterDetailPage() {
             variant="info"
             subtext="Saldo disponible"
           />
-          <StatCard
-            title="Rentabilidad"
-            value={`${(financialData.health?.profitMargin || 0).toFixed(1)}%`}
-            icon={Percent}
-            variant={financialData.health?.profitMargin >= 0 ? 'success' : 'danger'}
-            subtext="Margen sobre ingresos"
-          />
+          <div className="cost-center-detail__profitability-cell">
+            <StatCard
+              title="Rentabilidad"
+              value={`${(financialData.health?.profitMargin || 0).toFixed(1)}%`}
+              icon={Percent}
+              variant={financialData.health?.profitMargin >= 0 ? 'success' : 'danger'}
+              subtext="Margen sobre ingresos"
+            />
+            <p
+              className="cost-center-detail__profitability-note"
+              title="El cálculo (ingresos - egresos) / ingresos incluye la inversión inicial de producción (impresión, diseño, etc.), por lo que es normal que sea muy negativo en los primeros meses de un título recién publicado."
+            >
+              Incluye la inversión inicial de producción; es normal que sea muy negativa en los primeros meses.
+              {(financialData.health?.profitMargin ?? 0) < PROFITABILITY_RECOVERY_THRESHOLD && (
+                <span className="cost-center-detail__profitability-badge">
+                  En recuperación de inversión
+                </span>
+              )}
+            </p>
+          </div>
         </div>
       )}
 
