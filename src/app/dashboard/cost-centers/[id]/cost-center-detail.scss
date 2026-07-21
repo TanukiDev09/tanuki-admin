@@ -161,6 +161,17 @@
     }
   }
 
+  &__pie-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
+    min-width: 0;
+
+    @include sm {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
   &__movements-card {
     @extend %section-card;
 

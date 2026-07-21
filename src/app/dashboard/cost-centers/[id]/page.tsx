@@ -44,6 +44,19 @@ const ScrollableIncomeExpenseChart = dynamic(
   }
 );
 
+const CategoryPieChart = dynamic(
+  () =>
+    import('@/components/dashboard/CategoryPieChart').then(
+      (mod) => mod.CategoryPieChart
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[360px] w-full bg-muted/10 animate-pulse rounded-lg" />
+    ),
+  }
+);
+
 export default function CostCenterDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -287,6 +300,20 @@ export default function CostCenterDetailPage() {
               variant="monthly"
               scrollable={financialData.monthly.length > 8}
             />
+          )}
+
+          {/* Category Breakdown */}
+          {financialData && (
+            <div className="cost-center-detail__pie-grid">
+              <CategoryPieChart
+                data={financialData.categoriesIncome || []}
+                title="Ingresos por Categoría"
+              />
+              <CategoryPieChart
+                data={financialData.categoriesExpense || []}
+                title="Gastos por Categoría"
+              />
+            </div>
           )}
 
           {/* Recent Movements */}
