@@ -79,12 +79,44 @@ export async function getMovements(
       .populate('category')
       .sort({ date: -1 })
       .skip(skip)
-      .limit(limit),
+      .limit(limit)
+      // .lean() avoids Mongoose casting costCenter (schema type String)
+      // from the array shape actually stored in the DB, which otherwise
+      // silently drops the value during document hydration.
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .lean<any[]>(),
     Movement.countDocuments(query),
   ]);
 
   const formatted = movements.map((m) => {
-    const plain = m.toObject();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const plain: any = { ...m };
+
+    // DB stores costCenter as array (e.g. ["03"]); normalize to string
+    if (Array.isArray(plain.costCenter)) {
+      plain.costCenter = plain.costCenter[0] ?? '';
+    }
+    if (Array.isArray(plain.allocations)) {
+      plain.allocations = (
+        plain.allocations as { costCenter?: unknown; [key: string]: unknown }[]
+      ).map((al) => ({
+        ...al,
+        costCenter: Array.isArray(al.costCenter)
+          ? al.costCenter[0] ?? ''
+          : al.costCenter,
+      }));
+    }
+    if (Array.isArray(plain.items)) {
+      plain.items = (
+        plain.items as { costCenter?: unknown; [key: string]: unknown }[]
+      ).map((item) => ({
+        ...item,
+        costCenter: Array.isArray(item.costCenter)
+          ? item.costCenter[0] ?? ''
+          : item.costCenter,
+      }));
+    }
+
     let normalizedType = plain.type;
 
     if (
@@ -385,17 +417,13 @@ export async function getCostCenterBreakdown(
                   ],
                 },
                 then: {
+                  // NOTA: los allocations ya están en COP — sin exchangeRate.
                   $map: {
                     input: '$allocations',
                     as: 'alloc',
                     in: {
                       cc: '$$alloc.costCenter',
-                      val: {
-                        $multiply: [
-                          { $ifNull: ['$$alloc.amount', 0] },
-                          { $ifNull: ['$exchangeRate', 1] },
-                        ],
-                      },
+                      val: { $ifNull: ['$$alloc.amount', 0] },
                     },
                   },
                 },
@@ -412,9 +440,9 @@ export async function getCostCenterBreakdown(
       },
     },
     { $unwind: '$costCenters' },
-    // costCenters.cc is now itself an array of one or more codes (a
-    // movement/item/allocation can belong to several cost centers at once);
-    // unwind it too so grouping happens per individual code, not per array.
+    // costCenters.cc is an array of one or more codes (a movement/item/
+    // allocation can belong to several cost centers at once); unwind it
+    // too so grouping happens per individual code, not per array.
     {
       $addFields: {
         'costCenters.cc': {

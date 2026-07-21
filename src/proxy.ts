@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { verifyToken } from '@/lib/jwt';
 
 export default function proxy(request: NextRequest) {
   // Rutas protegidas
@@ -12,9 +13,10 @@ export default function proxy(request: NextRequest) {
       return NextResponse.next();
     }
 
-    const token = request.cookies.get('token');
+    const token = request.cookies.get('token')?.value;
+    const payload = token ? verifyToken(token) : null;
 
-    if (!token) {
+    if (!payload) {
       const loginUrl = new URL('/', request.url);
       loginUrl.searchParams.set('from', request.nextUrl.pathname);
       return NextResponse.redirect(loginUrl);

@@ -29,11 +29,13 @@ export function IncomeExpenseChart({ data, title }: IncomeExpenseChartProps) {
   const safeData = useMemo(() => data || [], [data]);
 
   // Detect key
-  const xAxisKey = useMemo(() =>
-    safeData.length > 0 && 'month' in safeData[0] ? 'month' : 'day'
-    , [safeData]);
+  const xAxisKey = useMemo(
+    () => (safeData.length > 0 && 'month' in safeData[0] ? 'month' : 'day'),
+    [safeData]
+  );
 
-  const defaultTitle = xAxisKey === 'month' ? 'Evolución Mensual' : 'Flujo de Caja del Mes';
+  const defaultTitle =
+    xAxisKey === 'month' ? 'Evolución Mensual' : 'Flujo de Caja del Mes';
 
   return (
     <Card className="income-expense-chart income-expense-chart--no-border">
@@ -70,7 +72,20 @@ export function IncomeExpenseChart({ data, title }: IncomeExpenseChartProps) {
                     }
                     // Handle Month: YYYY-MM -> Month YY
                     if (xAxisKey === 'month' && value.includes('-')) {
-                      const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                      const months = [
+                        'Ene',
+                        'Feb',
+                        'Mar',
+                        'Abr',
+                        'May',
+                        'Jun',
+                        'Jul',
+                        'Ago',
+                        'Sep',
+                        'Oct',
+                        'Nov',
+                        'Dic',
+                      ];
                       const [year, month] = value.split('-');
                       const monthIdx = parseInt(month) - 1;
                       return `${months[monthIdx]} ${year.slice(2)}`;

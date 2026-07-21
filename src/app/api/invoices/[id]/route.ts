@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Invoice from '@/models/Invoice';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import { z } from 'zod';
 import { syncInvoiceToDebt } from '@/lib/debtSync';
 import Debt from '@/models/Debt';
@@ -75,6 +77,13 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    req,
+    ModuleName.INVOICES,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { id } = await params;
@@ -106,6 +115,13 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    req,
+    ModuleName.INVOICES,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { id } = await params;
@@ -177,6 +193,13 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    req,
+    ModuleName.INVOICES,
+    PermissionAction.DELETE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { id } = await params;

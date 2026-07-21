@@ -27,7 +27,7 @@ export interface Movement {
   quantity?: number | string;
   unitValue?: number | string;
   status: MovementStatus;
-  salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'OTRO';
+  salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'WEB' | 'OTRO';
   pointOfSale?: string | { _id: string; name: string };
   inventoryMovementId?: string;
   debtId?: string;

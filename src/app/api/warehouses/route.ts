@@ -17,7 +17,9 @@ export async function GET(request: NextRequest) {
     await dbConnect();
     const { searchParams } = new URL(request.url);
     const buildQuery = (searchParams: URLSearchParams) => {
-      const query: Record<string, unknown> = {};
+      const query: Record<string, unknown> = {
+        isDeleted: { $ne: true }
+      };
 
       const status = searchParams.get('status');
       const type = searchParams.get('type');

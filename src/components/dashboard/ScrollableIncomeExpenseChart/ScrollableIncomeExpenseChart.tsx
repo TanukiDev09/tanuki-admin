@@ -71,8 +71,8 @@ export function ScrollableIncomeExpenseChart({
             style={
               scrollable
                 ? {
-                  width: `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px`,
-                }
+                    width: `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px`,
+                  }
                 : { width: '100%' }
             }
           >
@@ -119,7 +119,20 @@ export function ScrollableIncomeExpenseChart({
                       }
                       // YYYY-MM -> Month YY
                       if (!isDaily && value.includes('-')) {
-                        const months = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+                        const months = [
+                          'Ene',
+                          'Feb',
+                          'Mar',
+                          'Abr',
+                          'May',
+                          'Jun',
+                          'Jul',
+                          'Ago',
+                          'Sep',
+                          'Oct',
+                          'Nov',
+                          'Dic',
+                        ];
                         const [year, month] = value.split('-');
                         return `${months[parseInt(month) - 1]} ${year.slice(2)}`;
                       }

@@ -5,6 +5,7 @@
 La Dirección de Impuestos y Aduanas Nacionales (DIAN) de Colombia establece que las facturas electrónicas deben generarse en formato XML basado en el estándar **Universal Business Language (UBL) versión 2.1**.
 
 ### Fuentes Oficiales
+
 - Anexo Técnico de Factura Electrónica (DIAN)
 - Estándar UBL 2.1 (OASIS)
 - Política de firma: https://facturaelectronica.dian.gov.co/politicadefirma/v2/politicadefirmav2.pdf
@@ -18,6 +19,7 @@ El XML de la DIAN utiliza un contenedor `AttachedDocument` que envuelve la factu
 **Namespace**: `urn:oasis:names:specification:ubl:schema:xsd:AttachedDocument-2`
 
 #### Elementos Principales:
+
 - `ext:UBLExtensions` - Extensiones con firmas digitales
 - `cbc:UBLVersionID` - Versión UBL (2.1)
 - `cbc:CustomizationID` - "Documentos adjuntos"
@@ -58,20 +60,21 @@ Dentro del `AttachedDocument`, en la sección `cac:Attachment/cac:ExternalRefere
 
 #### 2.2 Información Básica de la Factura
 
-| Etiqueta | Descripción | Ejemplo |
-|----------|-------------|---------|
-| `cbc:ID` | Número de factura | FE1278 |
-| `cbc:UUID` | CUFE (Código Único de Factura Electrónica) SHA-384 | d589740deaa576f134a6915f... |
-| `cbc:IssueDate` | Fecha de emisión | 2025-01-02 |
-| `cbc:IssueTime` | Hora de emisión | 02:22:33-05:00 |
-| `cbc:DueDate` | Fecha de vencimiento | 2025-02-01 |
-| `cbc:InvoiceTypeCode` | Tipo de factura | 01 (Factura de venta) |
-| `cbc:DocumentCurrencyCode` | Moneda | COP |
-| `cbc:LineCountNumeric` | Número de líneas | 2 |
+| Etiqueta                   | Descripción                                        | Ejemplo                     |
+| -------------------------- | -------------------------------------------------- | --------------------------- |
+| `cbc:ID`                   | Número de factura                                  | FE1278                      |
+| `cbc:UUID`                 | CUFE (Código Único de Factura Electrónica) SHA-384 | d589740deaa576f134a6915f... |
+| `cbc:IssueDate`            | Fecha de emisión                                   | 2025-01-02                  |
+| `cbc:IssueTime`            | Hora de emisión                                    | 02:22:33-05:00              |
+| `cbc:DueDate`              | Fecha de vencimiento                               | 2025-02-01                  |
+| `cbc:InvoiceTypeCode`      | Tipo de factura                                    | 01 (Factura de venta)       |
+| `cbc:DocumentCurrencyCode` | Moneda                                             | COP                         |
+| `cbc:LineCountNumeric`     | Número de líneas                                   | 2                           |
 
 #### 2.3 Notas (`cbc:Note`)
 
 Las facturas pueden contener múltiples notas con información adicional:
+
 - Saldo pendiente
 - Información del establecimiento
 - Software utilizado
@@ -132,6 +135,7 @@ Las facturas pueden contener múltiples notas con información adicional:
 #### 2.6 Cliente (`cac:AccountingCustomerParty`)
 
 Estructura similar al proveedor, con los siguientes `schemeID` para identificación:
+
 - `schemeID="3"` - NIT (persona jurídica)
 - `schemeID="1"` - Cédula de ciudadanía (persona natural)
 - `schemeID="7"` - Otro tipo de documento
@@ -224,18 +228,22 @@ También embebida en el `AttachedDocument`, contiene la respuesta de validación
 ## Códigos y Valores Importantes
 
 ### Tipos de Documento de Identidad (schemeID)
+
 - `1` - Cédula de ciudadanía
 - `3` - NIT
 - `4` - NIT (alternativo)
 - `7` - Otro
 
 ### Códigos de Unidad (unitCode)
+
 - `94` - Unidades
 
 ### Códigos de Identificación de Producto (schemeID)
+
 - `999` - Estándar de adopción del contribuyente
 
 ### Régimen Tributario (TaxLevelCode)
+
 - `O-23` - No responsable de IVA
 - `O-13` - Gran contribuyente
 - Múltiples códigos separados por `;`
@@ -243,6 +251,7 @@ También embebida en el `AttachedDocument`, contiene la respuesta de validación
 ## Firmas Digitales
 
 Cada documento (AttachedDocument e Invoice) incluye firmas digitales XML (XMLDSig) con:
+
 - Certificado X.509
 - Algoritmo de firma: RSA-SHA256
 - Algoritmo de canonicalización: C14N

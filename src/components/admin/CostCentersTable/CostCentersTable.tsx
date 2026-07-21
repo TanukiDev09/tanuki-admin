@@ -9,7 +9,7 @@ import {
   TableRow,
 } from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
-import { Pencil, Trash2, Eye, TrendingUp, TrendingDown } from 'lucide-react';
+import { Pencil, Trash2, Eye, TrendingUp, TrendingDown, ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { CostCenter } from '@/types/cost-center';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
@@ -17,6 +17,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/utils';
 import { Sparkline } from '@/components/ui/Sparkline';
+import { useDataTable } from '@/hooks/useDataTable';
 import './CostCentersTable.scss';
 
 interface CostCenterStats extends CostCenter {
@@ -41,8 +42,44 @@ export default function CostCentersTable({
 }: CostCentersTableProps) {
   const router = useRouter();
   const { hasPermission } = usePermission();
-  const canUpdate = hasPermission(ModuleName.COST_CENTERS, PermissionAction.UPDATE);
-  const canDelete = hasPermission(ModuleName.COST_CENTERS, PermissionAction.DELETE);
+  const canUpdate = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.UPDATE
+  );
+  const canDelete = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.DELETE
+  );
+
+  const { data: sortedCostCenters, sortConfig, toggleSort } = useDataTable(costCenters);
+
+  const renderSortableHeader = (label: string, key: string, className?: string) => {
+    const isSorted = sortConfig.key === key;
+    const direction = isSorted ? sortConfig.direction : null;
+    const isRightAligned = className?.includes('text-right');
+
+    return (
+      <TableHead
+        className={`table__head--sortable group ${isSorted ? 'table__head--active' : ''} ${className || ''}`}
+        onClick={() => toggleSort(key)}
+      >
+        <div className={`table__head-content ${isRightAligned ? 'justify-end' : ''}`}>
+          {label}
+          <span
+            className={`table__head-sort-icon ${isSorted ? 'table__head-sort-icon--active' : ''}`}
+          >
+            {direction === 'asc' ? (
+              <ChevronUp className="w-3.5 h-3.5" />
+            ) : direction === 'desc' ? (
+              <ChevronDown className="w-3.5 h-3.5" />
+            ) : (
+              <ChevronsUpDown className="w-3.5 h-3.5" />
+            )}
+          </span>
+        </div>
+      </TableHead>
+    );
+  };
 
   if (loading) {
     return (
@@ -57,7 +94,11 @@ export default function CostCentersTable({
   }
 
   if (costCenters.length === 0) {
-    return <div className="cost-centers-table__empty">No hay centros de costo registrados.</div>;
+    return (
+      <div className="cost-centers-table__empty">
+        No hay centros de costo registrados.
+      </div>
+    );
   }
 
   return (
@@ -65,17 +106,19 @@ export default function CostCentersTable({
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Código</TableHead>
-            <TableHead>Nombre</TableHead>
-            <TableHead className="text-right">Ingresos</TableHead>
-            <TableHead className="text-right">Egresos</TableHead>
-            <TableHead className="text-right">Resultado</TableHead>
+            {renderSortableHeader('Código', 'code')}
+            {renderSortableHeader('Nombre', 'name')}
+            {renderSortableHeader('Ingresos', 'income', 'text-right')}
+            {renderSortableHeader('Egresos', 'expense', 'text-right')}
+            {renderSortableHeader('Resultado', 'balance', 'text-right')}
             <TableHead className="w-[120px]">Tendencia</TableHead>
-            <TableHead className="cost-centers-table__actions-head">Acciones</TableHead>
+            <TableHead className="cost-centers-table__actions-head">
+              Acciones
+            </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {costCenters.map((cc) => (
+          {sortedCostCenters.map((cc) => (
             <TableRow key={cc._id}>
               <TableCell className="p-0">
                 <Link
@@ -105,7 +148,13 @@ export default function CostCentersTable({
               </TableCell>
               <TableCell className="text-right">
                 <div className="flex items-center justify-end gap-1.5 tabular-nums">
-                  <span className={cc.balance >= 0 ? 'text-success font-bold' : 'text-danger font-bold'}>
+                  <span
+                    className={
+                      cc.balance >= 0
+                        ? 'text-success font-bold'
+                        : 'text-danger font-bold'
+                    }
+                  >
                     {formatCurrency(cc.balance)}
                   </span>
                   {cc.balance >= 0 ? (
@@ -119,7 +168,11 @@ export default function CostCentersTable({
                 <div className="h-8 w-full min-w-[100px] flex items-center">
                   <Sparkline
                     data={cc.history}
-                    color={cc.balance >= 0 ? 'hsl(142, 76%, 36%)' : 'hsl(0, 72%, 51%)'}
+                    color={
+                      cc.balance >= 0
+                        ? 'hsl(142, 76%, 36%)'
+                        : 'hsl(0, 72%, 51%)'
+                    }
                     height={24}
                   />
                 </div>
@@ -129,7 +182,9 @@ export default function CostCentersTable({
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => router.push(`/dashboard/cost-centers/${cc._id}`)}
+                    onClick={() =>
+                      router.push(`/dashboard/cost-centers/${cc._id}`)
+                    }
                     title="Ver Detalle"
                     className="h-8 w-8 hover:bg-muted"
                   >

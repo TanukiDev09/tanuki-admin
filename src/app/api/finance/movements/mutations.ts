@@ -2,7 +2,7 @@ import * as mongoose from 'mongoose';
 import InventoryMovement from '@/models/InventoryMovement';
 import Debt from '@/models/Debt';
 import { add, subtract, multiply, divide, toNumber, gtZero, isMatchedFinancial } from '@/lib/math';
-import { CreateMovementBody, toCostCenterArray } from './types';
+import { CreateMovementBody } from './types';
 
 // Helper to validate allocations
 function validateAllocations(
@@ -111,11 +111,6 @@ export function buildMovementDoc(
       },
     ];
   }
-  // costCenter is always stored as an array in the DB
-  allocations = allocations.map((alloc) => ({
-    ...alloc,
-    costCenter: toCostCenterArray(alloc.costCenter),
-  }));
 
   const metadata = {
     source: 'manual',
@@ -134,7 +129,6 @@ export function buildMovementDoc(
         ? toNumber(item.catalogPrice).toString()
         : undefined,
       discount: toNumber(item.discount || 0).toString(),
-      costCenter: toCostCenterArray(item.costCenter),
       bookId:
         item.bookId && mongoose.isValidObjectId(item.bookId)
           ? item.bookId
@@ -150,7 +144,6 @@ export function buildMovementDoc(
     quantity, // Use numeric quantity
     flowDirection,
     movementType,
-    costCenter: toCostCenterArray(body.costCenter ?? allocations[0]?.costCenter),
     allocations,
     items, // Set normalized items
     metadata,

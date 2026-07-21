@@ -210,6 +210,7 @@ const InvoiceSchema: Schema = new Schema(
 InvoiceSchema.index({ date: -1 });
 InvoiceSchema.index({ status: 1 });
 InvoiceSchema.index({ 'items.costCenter': 1 });
+InvoiceSchema.index({ 'costCenters.code': 1 });
 InvoiceSchema.index({ inventoryMovement: 1 });
 InvoiceSchema.index({ newsletterSignup: 1 }); // For newsletter queries
 

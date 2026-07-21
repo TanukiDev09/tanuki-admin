@@ -207,7 +207,7 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
 ### 🎨 Rediseño UX/UI de Inventario
 
 - **Detalle de Movimiento Premium**: Transformación total de la vista de detalle (`/dashboard/inventory/[id]`) con un diseño basado en tarjetas y grids.
-  - **Diagrama de Flujo Logístico**: Visualización gráfica de la ruta *Origen -> Destino* con indicadores de tipo de bodega.
+  - **Diagrama de Flujo Logístico**: Visualización gráfica de la ruta _Origen -> Destino_ con indicadores de tipo de bodega.
   - **Tabla de Items Limpia**: Diseño simplificado para fácil lectura, con metadatos (ISBN, Precios) jerarquizados.
   - **Panel de Metadatos**: Barra lateral dedicada para información clave (ID, Factura, Estado) y Observaciones destacados.
   - **Iconografía Unificada**: Implementación consistente de iconos `lucide-react` para mejorar la escaneabilidad.
@@ -220,3 +220,22 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
   - Corrección de tipado en componentes y rutas de API.
   - Escape correcto de caracteres especiales en JSX.
   - Verificación exitosa de `eslint` y `tsc`.
+
+---
+
+## [1.0.1] - 2026-07-21 (Sesión 10)
+
+### 🐛 Corrección Crítica: Egresos Inflados por Centro de Costo (recurrencia)
+
+- **Recurrencia del bug de la Sesión 9**: el bug de egresos inflados por centro de costo (`allocations[].amount` multiplicado indebidamente por `exchangeRate`) volvió a manifestarse. Investigado y confirmado que **no fue un revert**: la corrección de la Sesión 9 se hizo directamente en un directorio de trabajo de Git (`feature/create-cost-center`) pero **nunca se llegó a comitear**, así que quedó como cambios locales sin versionar. Cualquier sesión, rama o *worktree* nuevo partía de una copia del código sin el fix, por lo que el bug reaparecía como si se hubiera revertido.
+- **Duplicado adicional no detectado en la Sesión 9**: además de reaplicar el fix original, se encontró una **cuarta instancia** del mismo error que nunca había sido tocada: `formatMovements()` en `src/app/api/finance/movements/route.ts`, que alimenta el listado de movimientos filtrado por centro de costo y también multiplicaba el monto de `allocations` por `exchangeRate`.
+- **Verificación contra la base de datos**: se confirmó en la colección `movements` que, para el único movimiento histórico en moneda extranjera con `allocations` (pago a ilustrador en JPY, 2018), `allocations[0].amount` (1.637.580,2) es idéntico a `amountInCOP` — es decir, los `allocations` siempre están en COP y no deben volver a convertirse.
+- **Archivos corregidos (4 ubicaciones en 3 archivos)**:
+  - `src/app/api/finance/summary/route.ts`: `GET_CC_PORTION_EXPR`, `calculateRelevantAmount` y `getCostCenterBreakdown`.
+  - `src/app/api/costcenters/stats/route.ts`: `basePortionsPipeline`.
+  - `src/app/api/finance/movements/route.ts`: `formatMovements` (nuevo, no cubierto en la Sesión 9).
+- **Validación**: `eslint` y `tsc --noEmit` ejecutados sin errores nuevos (los únicos errores de `tsc` preexistentes provienen de caché de build `.next` no versionada y de un test no relacionado con este cambio).
+
+### 💡 Recomendación para evitar una tercera recurrencia
+
+La misma regla de negocio ("`allocations[].amount` ya está en COP, no se multiplica por `exchangeRate`; `items[].total` sí requiere esa conversión") está duplicada en al menos 4 lugares independientes (pipelines de agregación de Mongo y funciones JS). Se sugiere extraer esta lógica a una única función/expresión compartida (p. ej. `src/lib/costCenterAmount.ts`) reutilizada por todos los endpoints de finanzas y centros de costo, para que una futura corrección solo deba aplicarse una vez. No se implementó en esta sesión para no exceder el alcance solicitado (solo corrección + changelog).

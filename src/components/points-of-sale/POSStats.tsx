@@ -28,7 +28,7 @@ import {
   AlertCircle,
   ExternalLink,
   DollarSign,
-  Percent
+  Percent,
 } from 'lucide-react';
 import { formatCurrency, formatNumber } from '@/lib/utils';
 import { DataTable, Column } from '@/components/ui/DataTable';
@@ -118,7 +118,13 @@ export function POSStats({ posId, posName }: POSStatsProps) {
     );
   }
 
-  const { billingHistory, inventoryMetrics, topProducts, catalogContribution, globalRevenueSummary } = data;
+  const {
+    billingHistory,
+    inventoryMetrics,
+    topProducts,
+    catalogContribution,
+    globalRevenueSummary,
+  } = data;
 
   const invoicesLink = `/dashboard/invoices?search=${encodeURIComponent(posName.replace(/\s+(Librerías|Librería|S\.?A\.?S\.?|S\.?A\.?|Libros)\s*$/i, '').trim())}`;
   const stockLink = `/dashboard/points-of-sale/${posId}?tab=stock`;
@@ -130,7 +136,9 @@ export function POSStats({ posId, posName }: POSStatsProps) {
         <div className="pos-stats__metric-card pos-stats__metric-card--primary stats-interactive-card">
           <div className="pos-stats__metric-card-content">
             <div className="pos-stats__metric-card-header">
-              <span className="pos-stats__metric-card-title">Total Facturado</span>
+              <span className="pos-stats__metric-card-title">
+                Total Facturado
+              </span>
               <DollarSign className="pos-stats__metric-card-icon" />
             </div>
             <div className="pos-stats__metric-card-body">
@@ -148,7 +156,9 @@ export function POSStats({ posId, posName }: POSStatsProps) {
         <div className="pos-stats__metric-card pos-stats__metric-card--accent stats-interactive-card">
           <div className="pos-stats__metric-card-content">
             <div className="pos-stats__metric-card-header">
-              <span className="pos-stats__metric-card-title">Aporte a la facturación total</span>
+              <span className="pos-stats__metric-card-title">
+                Aporte a la facturación total
+              </span>
               <Percent className="pos-stats__metric-card-icon" />
             </div>
             <div className="pos-stats__metric-card-body">
@@ -165,15 +175,22 @@ export function POSStats({ posId, posName }: POSStatsProps) {
 
       <div className="pos-stats__grid">
         {/* Billing Chart */}
-        <Link href={invoicesLink} className="pos-stats__link-wrapper pos-stats__link-wrapper--chart">
+        <Link
+          href={invoicesLink}
+          className="pos-stats__link-wrapper pos-stats__link-wrapper--chart"
+        >
           <Card className="pos-stats__chart-card stats-interactive-card">
             <div className="pos-stats__card-header">
               <div className="pos-stats__card-title-group">
                 <div className="pos-stats__card-title-row">
-                  <span className="pos-stats__card-title">Histórico de Ventas</span>
+                  <span className="pos-stats__card-title">
+                    Histórico de Ventas
+                  </span>
                   <ExternalLink className="pos-stats__card-icon-external" />
                 </div>
-                <CardDescription>Perfil de facturación histórica (Clic para ver facturas)</CardDescription>
+                <CardDescription>
+                  Perfil de facturación histórica (Clic para ver facturas)
+                </CardDescription>
               </div>
               <TrendingUp className="pos-stats__card-trend-icon" />
             </div>
@@ -181,17 +198,38 @@ export function POSStats({ posId, posName }: POSStatsProps) {
               <div className="pos-stats__chart-scroll-container">
                 <div
                   className="pos-stats__chart-container"
-                  style={{ width: `${Math.max(100, billingHistory.length * 60)}px`, minWidth: '100%' }}
+                  style={{
+                    width: `${Math.max(100, billingHistory.length * 60)}px`,
+                    minWidth: '100%',
+                  }}
                 >
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={billingHistory}>
                       <defs>
-                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                          <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                        <linearGradient
+                          id="colorRevenue"
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="5%"
+                            stopColor="#3b82f6"
+                            stopOpacity={0.3}
+                          />
+                          <stop
+                            offset="95%"
+                            stopColor="#3b82f6"
+                            stopOpacity={0}
+                          />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        vertical={false}
+                        stroke="#f1f5f9"
+                      />
                       <XAxis
                         dataKey="month"
                         axisLine={false}
@@ -208,11 +246,13 @@ export function POSStats({ posId, posName }: POSStatsProps) {
                         contentStyle={{
                           borderRadius: '12px',
                           border: 'none',
-                          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)'
+                          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                         }}
                         formatter={(value: number | string | undefined) => [
-                          formatCurrency(value === undefined ? 0 : Number(value)),
-                          'Ventas'
+                          formatCurrency(
+                            value === undefined ? 0 : Number(value)
+                          ),
+                          'Ventas',
                         ]}
                       />
                       <Area
@@ -235,12 +275,17 @@ export function POSStats({ posId, posName }: POSStatsProps) {
         <Link href={stockLink} className="pos-stats__link-wrapper">
           <div className="pos-stats__stat-card pos-stats__stat-card--success stats-interactive-card">
             <div className="pos-stats__stat-card-header">
-              <span className="pos-stats__stat-card-title">Rotación de Inventario</span>
+              <span className="pos-stats__stat-card-title">
+                Rotación de Inventario
+              </span>
               <RotateCw className="pos-stats__stat-card-icon" />
             </div>
             <div>
               <div className="pos-stats__stat-card-value">
-                {inventoryMetrics.turnoverRatio > 0 ? inventoryMetrics.turnoverRatio.toFixed(2) : '0.00'}x
+                {inventoryMetrics.turnoverRatio > 0
+                  ? inventoryMetrics.turnoverRatio.toFixed(2)
+                  : '0.00'}
+                x
               </div>
               <div className="pos-stats__stat-card-footer">
                 Ventas 1Y / Stock actual (Clic para ver inventario)
@@ -271,7 +316,9 @@ export function POSStats({ posId, posName }: POSStatsProps) {
         <Link href={invoicesLink} className="pos-stats__link-wrapper">
           <div className="pos-stats__stat-card pos-stats__stat-card--warning stats-interactive-card">
             <div className="pos-stats__stat-card-header">
-              <span className="pos-stats__stat-card-title">Ventas (12 Meses)</span>
+              <span className="pos-stats__stat-card-title">
+                Ventas (12 Meses)
+              </span>
               <ShoppingBag className="pos-stats__stat-card-icon" />
             </div>
             <div>
@@ -289,15 +336,18 @@ export function POSStats({ posId, posName }: POSStatsProps) {
         <Card className="pos-stats__product-card">
           <div className="pos-stats__card-header">
             <BarChart3 className="pos-stats__card-icon-list" />
-            <span className="pos-stats__card-title--small">Más Vendidos (Histórico)</span>
+            <span className="pos-stats__card-title--small">
+              Más Vendidos (Histórico)
+            </span>
           </div>
           <CardContent>
             <div className="pos-stats__top-products">
               {topProducts.length > 0 ? (
                 topProducts.map((product) => {
-                  const contribution = product.globalRevenue > 0
-                    ? (product.totalRevenue / product.globalRevenue) * 100
-                    : 100;
+                  const contribution =
+                    product.globalRevenue > 0
+                      ? (product.totalRevenue / product.globalRevenue) * 100
+                      : 100;
 
                   return (
                     <Link
@@ -307,7 +357,10 @@ export function POSStats({ posId, posName }: POSStatsProps) {
                     >
                       <div className="pos-stats__product-item">
                         <div className="pos-stats__product-item-info">
-                          <span className="pos-stats__product-item-title" title={product.title}>
+                          <span
+                            className="pos-stats__product-item-title"
+                            title={product.title}
+                          >
                             {product.title}
                           </span>
                           <div className="pos-stats__product-item-row">
@@ -330,7 +383,9 @@ export function POSStats({ posId, posName }: POSStatsProps) {
                   );
                 })
               ) : (
-                <p className="text-center text-slate-400 py-4">No hay datos de ventas</p>
+                <p className="text-center text-slate-400 py-4">
+                  No hay datos de ventas
+                </p>
               )}
             </div>
           </CardContent>

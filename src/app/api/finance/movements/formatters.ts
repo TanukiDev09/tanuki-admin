@@ -4,7 +4,8 @@ import {
   Item,
   MovementDoc,
   FormattedMovement,
-  ccArrayIncludes,
+  matchesCC,
+  normalizeCC,
 } from './types';
 
 export function formatMovements(
@@ -23,7 +24,7 @@ export function formatMovements(
       if (m.items && m.items.length > 0) {
         const matchingTotal = m.items.reduce((sum, item) => {
           const itemCC = item.costCenter || m.costCenter;
-          if (ccArrayIncludes(itemCC, costCenterCode)) {
+          if (matchesCC(itemCC, costCenterCode)) {
             return add(sum, item.total?.toString() || '0');
           }
           return sum;
@@ -32,16 +33,16 @@ export function formatMovements(
           multiply(matchingTotal, m.exchangeRate?.toString() || '1')
         );
       } else if (m.allocations && m.allocations.length > 0) {
+        // NOTA: los allocations se guardan en COP (su suma = amountInCOP),
+        // por eso NO deben multiplicarse por exchangeRate.
         const matchingTotal = m.allocations.reduce((sum, alloc) => {
-          if (ccArrayIncludes(alloc.costCenter, costCenterCode)) {
+          if (matchesCC(alloc.costCenter, costCenterCode)) {
             return add(sum, alloc.amount?.toString() || '0');
           }
           return sum;
         }, '0');
-        relevantAmount = toNumber(
-          multiply(matchingTotal, m.exchangeRate?.toString() || '1')
-        );
-      } else if (!ccArrayIncludes(m.costCenter, costCenterCode)) {
+        relevantAmount = toNumber(matchingTotal);
+      } else if (!matchesCC(m.costCenter, costCenterCode)) {
         relevantAmount = 0;
       }
     }
@@ -58,10 +59,13 @@ export function formatMovements(
       unitValue: m.unitValue ? toNumber(m.unitValue) : undefined,
       allocations: m.allocations?.map((a) => ({
         ...a,
+        costCenter: normalizeCC(a.costCenter),
         amount: a.amount ? toNumber(a.amount) : 0,
       })),
+      costCenter: normalizeCC(m.costCenter),
       items: m.items?.map((item) => ({
         ...item,
+        costCenter: normalizeCC(item.costCenter),
         quantity: item.quantity ? toNumber(item.quantity) : 0,
         unitValue: item.unitValue ? toNumber(item.unitValue) : 0,
         total: item.total ? toNumber(item.total) : 0,

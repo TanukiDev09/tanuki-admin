@@ -1,5 +1,5 @@
 export interface Allocation {
-  costCenter: string[];
+  costCenter: string | string[];
   amount: { toString: () => string } | number;
 }
 
@@ -11,7 +11,7 @@ export interface Item {
   catalogPrice?: { toString: () => string } | number;
   discount?: { toString: () => string } | number;
   total: { toString: () => string } | number;
-  costCenter: string[];
+  costCenter: string | string[];
   bookId?: string | { toString: () => string };
 }
 
@@ -26,7 +26,7 @@ export interface MovementDoc {
   unitValue?: { toString: () => string };
   allocations?: Allocation[];
   items?: Item[];
-  costCenter?: string[];
+  costCenter?: string | string[];
   [key: string]: unknown;
 }
 
@@ -69,21 +69,19 @@ export interface CreateMovementBody {
   [key: string]: unknown;
 }
 
-// costCenter fields are always arrays in the DB; this tolerates a stray
-// legacy string value too.
-export function ccArrayIncludes(
-  cc: string | string[] | undefined,
-  code: string
-): boolean {
+// costCenter is always stored as an array in the DB, but a movement/item/
+// allocation only ever belongs to that array's codes — most call sites just
+// need to know if a given code is among them.
+export function matchesCC(cc: string | string[] | undefined, code: string): boolean {
   if (!cc) return false;
-  return Array.isArray(cc) ? cc.includes(code) : cc === code;
+  if (Array.isArray(cc)) return cc.includes(code);
+  return cc === code;
 }
 
-// costCenter is always stored as an array in the DB. The forms only ever
-// select a single cost center per allocation/item, so wrap that single value
-// here rather than pushing array-awareness into the UI.
-export function toCostCenterArray(cc: unknown): string[] {
-  if (Array.isArray(cc)) return cc;
-  if (typeof cc === 'string' && cc) return [cc];
-  return [];
+// The UI only ever lets a user pick a single cost center per allocation/item
+// row, so for display purposes we collapse the array down to its first code.
+export function normalizeCC(cc: string | string[] | undefined): string {
+  if (!cc) return '';
+  if (Array.isArray(cc)) return cc[0] ?? '';
+  return cc;
 }

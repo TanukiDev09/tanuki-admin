@@ -7,6 +7,11 @@
   padding: 0;
   overflow: hidden;
 
+  .table-wrapper {
+    max-height: 500px;
+    overflow-y: auto;
+  }
+
   &__loading,
   &__empty {
     padding: $spacing-xl;

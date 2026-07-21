@@ -6,7 +6,14 @@ import CostCenterSelect from '@/components/admin/CostCenterSelect/CostCenterSele
 import { BookSelect } from '@/components/finance/BookSelect';
 import { Trash2, Plus, Book, Settings } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
-import { add, multiply, toNumber, compare, subtract, isMatchedFinancial } from '@/lib/math';
+import {
+  add,
+  multiply,
+  toNumber,
+  compare,
+  subtract,
+  isMatchedFinancial,
+} from '@/lib/math';
 import { cn } from '@/lib/utils';
 
 interface MovementItem {
@@ -25,7 +32,11 @@ interface MovementItemsTableProps {
   items: MovementItem[];
   currency: string;
   targetAmount?: number | string;
-  onItemChange: (index: number, field: keyof MovementItem, value: string | number | undefined | null) => void;
+  onItemChange: (
+    index: number,
+    field: keyof MovementItem,
+    value: string | number | undefined | null
+  ) => void;
   onAddItem: () => void;
   onRemoveItem: (index: number) => void;
 }
@@ -38,7 +49,10 @@ export function MovementItemsTable({
   onAddItem,
   onRemoveItem,
 }: MovementItemsTableProps) {
-  const sumItems = items.reduce((sum, item) => add(sum, item.total || '0'), '0');
+  const sumItems = items.reduce(
+    (sum, item) => add(sum, item.total || '0'),
+    '0'
+  );
   const target = targetAmount || '0';
   const isMatched = isMatchedFinancial(sumItems, target);
   const difference = subtract(target, sumItems);
@@ -54,7 +68,8 @@ export function MovementItemsTable({
                 onClick={() => onItemChange(idx, 'type', 'libro')}
                 className={cn(
                   'movement-form__item-type-btn',
-                  item.type === 'libro' && 'movement-form__item-type-btn--active'
+                  item.type === 'libro' &&
+                    'movement-form__item-type-btn--active'
                 )}
                 title="Libro"
               >
@@ -65,7 +80,8 @@ export function MovementItemsTable({
                 onClick={() => onItemChange(idx, 'type', 'servicio')}
                 className={cn(
                   'movement-form__item-type-btn',
-                  item.type === 'servicio' && 'movement-form__item-type-btn--active'
+                  item.type === 'servicio' &&
+                    'movement-form__item-type-btn--active'
                 )}
                 title="Servicio"
               >
@@ -92,7 +108,9 @@ export function MovementItemsTable({
               ) : (
                 <Input
                   value={item.description}
-                  onChange={(e) => onItemChange(idx, 'description', e.target.value)}
+                  onChange={(e) =>
+                    onItemChange(idx, 'description', e.target.value)
+                  }
                   placeholder="Descripción del item..."
                   className="movement-form__description-input"
                 />
@@ -125,7 +143,11 @@ export function MovementItemsTable({
                 onValueChange={(val) => {
                   const qty = val || 0;
                   onItemChange(idx, 'quantity', qty);
-                  onItemChange(idx, 'total', multiply(qty, item.unitValue || 0));
+                  onItemChange(
+                    idx,
+                    'total',
+                    multiply(qty, item.unitValue || 0)
+                  );
                 }}
                 className="text-right"
               />
@@ -138,14 +160,20 @@ export function MovementItemsTable({
                 onValueChange={(val) => {
                   const unitPrice = val || 0;
                   onItemChange(idx, 'unitValue', unitPrice);
-                  onItemChange(idx, 'total', multiply(item.quantity || 0, unitPrice));
+                  onItemChange(
+                    idx,
+                    'total',
+                    multiply(item.quantity || 0, unitPrice)
+                  );
                 }}
                 className="text-right font-semibold"
               />
             </div>
 
             <div className="movement-form__item-total-col">
-              <span className="movement-form__item-total-label">Subtotal Neto</span>
+              <span className="movement-form__item-total-label">
+                Subtotal Neto
+              </span>
               <span className="movement-form__item-total-value">
                 {formatCurrency(toNumber(item.total), currency)}
               </span>

@@ -164,7 +164,7 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       });
     }
 
-    await Warehouse.findByIdAndDelete(id);
+    await Warehouse.findByIdAndUpdate(id, { isDeleted: true });
 
     return NextResponse.json({ message: 'Bodega eliminada correctamente' });
   } catch {

@@ -9,13 +9,6 @@ export const GET_AMOUNT_COP_EXPR = {
   ],
 };
 
-// Normalizes a costCenter field (string or string[]) to an array, then checks
-// whether ccCode is a member. Movements always store costCenter as an array,
-// but we normalize defensively in case of stray legacy values.
-export const CC_ARRAY_INCLUDES = (fieldExpr: unknown, ccCode: string) => ({
-  $in: [ccCode, { $cond: [{ $isArray: fieldExpr }, fieldExpr, [fieldExpr]] }],
-});
-
 export const GET_CC_PORTION_EXPR = (ccCode: string) => ({
   $multiply: [
     {
@@ -32,10 +25,18 @@ export const GET_CC_PORTION_EXPR = (ccCode: string) => ({
                 '$$value',
                 {
                   $cond: [
-                    CC_ARRAY_INCLUDES(
-                      { $ifNull: ['$$this.costCenter', '$costCenter'] },
-                      ccCode
-                    ),
+                    {
+                      $let: {
+                        vars: { cc: { $ifNull: ['$$this.costCenter', '$costCenter'] } },
+                        in: {
+                          $cond: [
+                            { $isArray: '$$cc' },
+                            { $in: [ccCode, '$$cc'] },
+                            { $eq: ['$$cc', ccCode] },
+                          ],
+                        },
+                      },
+                    },
                     { $ifNull: ['$$this.total', 0] },
                     0,
                   ],
@@ -53,6 +54,8 @@ export const GET_CC_PORTION_EXPR = (ccCode: string) => ({
               ],
             },
             then: {
+              // NOTA: los allocations se guardan en COP (su suma = amountInCOP),
+              // por eso NO deben multiplicarse por exchangeRate.
               $reduce: {
                 input: '$allocations',
                 initialValue: 0,
@@ -61,7 +64,13 @@ export const GET_CC_PORTION_EXPR = (ccCode: string) => ({
                     '$$value',
                     {
                       $cond: [
-                        CC_ARRAY_INCLUDES('$$this.costCenter', ccCode),
+                        {
+                          $cond: [
+                            { $isArray: '$$this.costCenter' },
+                            { $in: [ccCode, '$$this.costCenter'] },
+                            { $eq: ['$$this.costCenter', ccCode] },
+                          ],
+                        },
                         { $ifNull: ['$$this.amount', 0] },
                         0,
                       ],
@@ -72,7 +81,13 @@ export const GET_CC_PORTION_EXPR = (ccCode: string) => ({
             },
             else: {
               $cond: [
-                CC_ARRAY_INCLUDES('$costCenter', ccCode),
+                {
+                  $cond: [
+                    { $isArray: '$costCenter' },
+                    { $in: [ccCode, '$costCenter'] },
+                    { $eq: ['$costCenter', ccCode] },
+                  ],
+                },
                 GET_AMOUNT_COP_EXPR,
                 0,
               ],
@@ -84,17 +99,7 @@ export const GET_CC_PORTION_EXPR = (ccCode: string) => ({
     {
       $cond: [
         {
-          $or: [
-            {
-              $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }],
-            },
-            {
-              $and: [
-                { $isArray: '$allocations' },
-                { $gt: [{ $size: '$allocations' }, 0] },
-              ],
-            },
-          ],
+          $and: [{ $isArray: '$items' }, { $gt: [{ $size: '$items' }, 0] }],
         },
         { $ifNull: ['$exchangeRate', 1] },
         1,
@@ -113,14 +118,10 @@ interface MovementAllocation {
   amount?: { toString(): string } | string | number;
 }
 
-// costCenter fields are always arrays in the DB; this tolerates a stray
-// legacy string value too.
-export function ccArrayIncludes(
-  cc: string | string[] | undefined,
-  code: string
-): boolean {
+export function matchesCC(cc: string | string[] | undefined, code: string): boolean {
   if (!cc) return false;
-  return Array.isArray(cc) ? cc.includes(code) : cc === code;
+  if (Array.isArray(cc)) return cc.includes(code);
+  return cc === code;
 }
 
 export function calculateRelevantAmount(
@@ -139,7 +140,7 @@ export function calculateRelevantAmount(
     const matchingItemsTotal = plain.items.reduce(
       (sum: string, item: MovementItem) => {
         const itemCC = item.costCenter || plain.costCenter;
-        if (ccArrayIncludes(itemCC, costCenterCode)) {
+        if (matchesCC(itemCC, costCenterCode)) {
           return add(sum, item.total?.toString() || '0');
         }
         return sum;
@@ -152,21 +153,21 @@ export function calculateRelevantAmount(
   }
 
   if (plain.allocations && plain.allocations.length > 0) {
+    // NOTA: los allocations se guardan en COP (su suma = amountInCOP),
+    // por eso NO deben multiplicarse por exchangeRate.
     const matchingAllocTotal = plain.allocations.reduce(
       (sum: string, alloc: MovementAllocation) => {
-        if (ccArrayIncludes(alloc.costCenter, costCenterCode)) {
+        if (matchesCC(alloc.costCenter, costCenterCode)) {
           return add(sum, alloc.amount?.toString() || '0');
         }
         return sum;
       },
       '0'
     );
-    return toNumber(
-      multiply(matchingAllocTotal, plain.exchangeRate?.toString() || '1')
-    );
+    return toNumber(matchingAllocTotal);
   }
 
-  if (!ccArrayIncludes(plain.costCenter, costCenterCode)) {
+  if (!matchesCC(plain.costCenter, costCenterCode)) {
     return 0;
   }
 

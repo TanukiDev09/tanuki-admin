@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Invoice from '@/models/Invoice';
-// import { verifyAuth } from '@/lib/auth'; // Assuming auth is handled like this or similar
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import { z } from 'zod';
 import { syncInvoiceToDebt } from '@/lib/debtSync';
 
@@ -111,6 +112,13 @@ function buildInvoiceQuery(searchParams: URLSearchParams) {
 }
 
 export async function GET(req: NextRequest) {
+  const permissionError = await requirePermission(
+    req,
+    ModuleName.INVOICES,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
 
@@ -162,12 +170,15 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const permissionError = await requirePermission(
+    req,
+    ModuleName.INVOICES,
+    PermissionAction.CREATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
-
-    // Auth Check
-    // const auth = await verifyAuth(req);
-    // if (!auth.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const body = await req.json();
 
