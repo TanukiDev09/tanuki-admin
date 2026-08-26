@@ -220,3 +220,21 @@ Esta versión se centra en una mejora significativa de la experiencia de usuario
   - Corrección de tipado en componentes y rutas de API.
   - Escape correcto de caracteres especiales en JSX.
   - Verificación exitosa de `eslint` y `tsc`.
+
+---
+
+## [1.0.1] - 2026-07-17 (Sesión 9)
+
+### 🐛 Corrección Crítica: Egresos Inflados por Centro de Costo
+
+- **Bug de Cálculo (`allocations` × `exchangeRate`)**: Se identificó y corrigió un error crítico en el cálculo de egresos por centro de costo: los repartos (`allocations`) de un movimiento se multiplicaban indebidamente por la tasa de cambio (`exchangeRate`) del movimiento original.
+  - Los `allocations` se almacenan siempre en COP (su suma equivale a `amountInCOP`), a diferencia de los `items` de facturas, que sí requieren la conversión.
+  - El bug solo se manifestaba en movimientos en moneda extranjera con reparto multi-centro de costo (caso detectado: pago a ilustrador en JPY, tasa ×27.52), inflando el egreso reportado del centro de costo en decenas de millones de pesos.
+- **Archivos corregidos**:
+  - `src/app/api/finance/summary/route.ts`: `GET_CC_PORTION_EXPR`, `calculateRelevantAmount` y `getCostCenterBreakdown`.
+  - `src/app/api/costcenters/stats/route.ts`: `basePortionsPipeline`.
+- **Validación**: Verificado contra la base de datos que solo existe un movimiento histórico en moneda extranjera con `allocations` (JPY, 2018); se recalculó el P&L del centro de costo afectado (01T001) confirmando que el egreso pasó de un valor inflado a la cifra correcta ($8.237.955 COP) y el balance del título pasó de negativo a positivo.
+
+### ⚠️ Pendiente de verificación
+
+- No fue posible correr `npm run lint` / `tsc --noEmit` desde el entorno remoto (timeout en carpeta montada por red). Se recomienda correr el lint/typecheck local antes de desplegar.
