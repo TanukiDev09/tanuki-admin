@@ -29,7 +29,11 @@ export const invoiceSchema = z.object({
     'Cancelled',
     'Unchecked',
   ]),
-  costCenters: z.array(z.string()).optional(),
+  // Deprecated embedded repartition summary (legacy XML imports only); not
+  // editable here, just carried through untouched so it isn't lost on save.
+  costCenters: z
+    .array(z.object({ code: z.array(z.string()), amount: z.number() }))
+    .optional(),
   inventoryMovement: z.string().optional(),
   notes: z.string().optional(),
   subtotal: z.number(),
@@ -100,7 +104,11 @@ export const getInvoiceDefaultValues = (
       discount: item.discount || 0,
       total: item.total || 0,
       bookId: item.bookId || undefined,
-      costCenter: item.costCenter || '',
+      // costCenter is always an array in the DB; this form only supports a
+      // single cost center per item, so take the first code.
+      costCenter: (Array.isArray(item.costCenter)
+        ? item.costCenter[0]
+        : item.costCenter) || '',
     })) || [
       {
         type: 'servicio',

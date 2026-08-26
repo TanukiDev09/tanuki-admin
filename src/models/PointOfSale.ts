@@ -114,4 +114,4 @@ PointOfSaleSchema.index({ status: 1 });
 PointOfSaleSchema.index({ identificationNumber: 1 });
 
 export default mongoose.models.PointOfSale ||
-  mongoose.model<IPointOfSale>('PointOfSale', PointOfSaleSchema);
+  mongoose.model<IPointOfSale>('PointOfSale', PointOfSaleSchema, 'pointofsales');

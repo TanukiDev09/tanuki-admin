@@ -1,11 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { InventoryStats } from '@/components/inventory/InventoryStats';
 import { InventoryMatrixTable } from '@/components/inventory/InventoryMatrixTable';
 import { InventoryMovementsList } from '@/components/inventory/InventoryMovementsList';
 import { Button } from '@/components/ui/Button';
-import { RefreshCw, Plus } from 'lucide-react';
+import { RefreshCw, Plus, History } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import './inventory-page.scss';
 
@@ -92,7 +93,15 @@ export default function InventoryPage() {
         <InventoryMatrixTable />
 
         <div className="inventory-page__section">
-          <h2 className="inventory-page__section-title">Últimos Movimientos</h2>
+          <div className="inventory-page__section-header">
+            <h2 className="inventory-page__section-title"> Últimos Movimientos</h2>
+            <Link href="/dashboard/inventory/movements" passHref>
+              <Button variant="ghost" size="sm" className="inventory-page__history-btn">
+                <History className="h-4 w-4 mr-2" />
+                Ver histórico completo de movimientos
+              </Button>
+            </Link>
+          </div>
           <InventoryMovementsList
             movements={movements}
             isLoading={loading}

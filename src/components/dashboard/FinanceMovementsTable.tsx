@@ -106,14 +106,20 @@ export function FinanceMovementsTable({
                 <TableCell>
                   <div className="flex flex-wrap gap-1">
                     {(() => {
+                      // costCenter is always an array in the DB (a
+                      // movement/item/allocation can span several cost
+                      // centers); normalize defensively before deduping.
+                      const addCC = (ccs: Set<string>, cc: unknown) => {
+                        if (!cc) return;
+                        (Array.isArray(cc) ? cc : [cc]).forEach(
+                          (code) => code && ccs.add(code)
+                        );
+                      };
+
                       const ccs = new Set<string>();
-                      if (m.costCenter) ccs.add(m.costCenter);
-                      m.items?.forEach((it) => {
-                        if (it.costCenter) ccs.add(it.costCenter);
-                      });
-                      m.allocations?.forEach((al) => {
-                        if (al.costCenter) ccs.add(al.costCenter);
-                      });
+                      addCC(ccs, m.costCenter);
+                      m.items?.forEach((it) => addCC(ccs, it.costCenter));
+                      m.allocations?.forEach((al) => addCC(ccs, al.costCenter));
 
                       const ccList = Array.from(ccs);
                       if (ccList.length === 0)

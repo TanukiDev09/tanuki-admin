@@ -11,7 +11,7 @@ export interface IMovement extends Document {
   amountInCOP: mongoose.Types.Decimal128;
   type: string; // 'Ingreso' or 'Egreso' (presumably)
   category: mongoose.Types.ObjectId | ICategory; // Populated Category or ObjectId string
-  costCenter: string;
+  costCenter: string[]; // One or more cost center codes
   beneficiary: string;
   paymentChannel: string;
   invoiceRef?: string;
@@ -20,14 +20,14 @@ export interface IMovement extends Document {
   unit?: string;
   quantity?: mongoose.Types.Decimal128;
   unitValue?: mongoose.Types.Decimal128;
-  salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'OTRO';
+  salesChannel?: 'LIBRERIA' | 'FERIA' | 'DIRECTA' | 'WEB' | 'OTRO';
   pointOfSale?: mongoose.Types.ObjectId | string;
 
   // Validation fields
   flowDirection: string;
   movementType: string;
   allocations: {
-    costCenter: string;
+    costCenter: string[];
     amount: number | mongoose.Types.Decimal128;
   }[];
   metadata: { source: string; createdAt: Date };
@@ -46,7 +46,7 @@ export interface IMovement extends Document {
     catalogPrice?: mongoose.Types.Decimal128;
     discount?: mongoose.Types.Decimal128;
     total: mongoose.Types.Decimal128;
-    costCenter: string;
+    costCenter: string[];
     bookId?: mongoose.Types.ObjectId | string;
   }[];
 }
@@ -61,7 +61,7 @@ const MovementSchema: Schema = new Schema(
     amountInCOP: { type: Schema.Types.Decimal128, default: 0 },
     type: { type: String, required: true },
     category: { type: Schema.Types.ObjectId, ref: 'Category' },
-    costCenter: { type: String },
+    costCenter: { type: [String], default: undefined },
     beneficiary: { type: String },
     paymentChannel: { type: String },
     invoiceRef: { type: String },
@@ -72,7 +72,7 @@ const MovementSchema: Schema = new Schema(
     unitValue: { type: Schema.Types.Decimal128 },
     salesChannel: {
       type: String,
-      enum: ['LIBRERIA', 'FERIA', 'DIRECTA', 'OTRO'],
+      enum: ['LIBRERIA', 'FERIA', 'DIRECTA', 'WEB', 'OTRO'],
     },
     pointOfSale: { type: Schema.Types.ObjectId, ref: 'PointOfSale' },
 
@@ -82,7 +82,7 @@ const MovementSchema: Schema = new Schema(
     allocations: [
       {
         _id: false, // Added _id: false here
-        costCenter: { type: String },
+        costCenter: { type: [String] },
         amount: { type: Schema.Types.Decimal128 },
       },
     ],
@@ -90,6 +90,15 @@ const MovementSchema: Schema = new Schema(
       source: { type: String },
       createdAt: { type: Date, default: Date.now },
     },
+    status: {
+      type: String,
+      enum: ['COMPLETED', 'PENDING', 'CANCELLED'],
+      default: 'COMPLETED',
+    },
+    issuerId: { type: String },
+    issuerName: { type: String },
+    receiverId: { type: String },
+    receiverName: { type: String },
     inventoryMovementId: {
       type: Schema.Types.ObjectId,
       ref: 'InventoryMovement',
@@ -108,7 +117,7 @@ const MovementSchema: Schema = new Schema(
         catalogPrice: { type: Schema.Types.Decimal128 },
         discount: { type: Schema.Types.Decimal128, default: 0 },
         total: { type: Schema.Types.Decimal128 },
-        costCenter: { type: String },
+        costCenter: { type: [String] },
         bookId: { type: Schema.Types.ObjectId, ref: 'Book' },
       },
     ],

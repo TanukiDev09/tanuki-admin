@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Invoice from '@/models/Invoice';
+import { requirePermission } from '@/lib/apiPermissions';
+import { ModuleName, PermissionAction } from '@/types/permission';
 import { z } from 'zod';
 import { syncInvoiceToDebt } from '@/lib/debtSync';
 import Debt from '@/models/Debt';
@@ -33,7 +35,10 @@ const updateInvoiceSchema = z.object({
   status: z
     .enum(['Draft', 'Sent', 'Paid', 'Partial', 'Cancelled', 'Unchecked'])
     .optional(),
-  costCenters: z.array(z.string()).optional(),
+  // Deprecated embedded repartition summary (legacy XML imports only)
+  costCenters: z
+    .array(z.object({ code: z.array(z.string()), amount: z.number() }))
+    .optional(),
   movements: z.array(z.string()).optional(),
   inventoryMovement: z.string().optional().nullable(),
   notes: z.string().optional(),
@@ -72,12 +77,20 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    req,
+    ModuleName.INVOICES,
+    PermissionAction.READ
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { id } = await params;
 
+    // costCenters is an embedded repartition summary (legacy XML imports),
+    // not a reference to the CostCenter collection, so it needs no populate.
     const invoice = await Invoice.findById(id)
-      .populate('costCenters', 'name code')
       .populate('movements')
       .populate('inventoryMovement');
 
@@ -102,6 +115,13 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    req,
+    ModuleName.INVOICES,
+    PermissionAction.UPDATE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { id } = await params;
@@ -173,6 +193,13 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const permissionError = await requirePermission(
+    req,
+    ModuleName.INVOICES,
+    PermissionAction.DELETE
+  );
+  if (permissionError) return permissionError;
+
   try {
     await dbConnect();
     const { id } = await params;

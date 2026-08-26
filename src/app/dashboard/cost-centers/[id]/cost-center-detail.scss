@@ -139,6 +139,32 @@
     margin-bottom: $spacing-xl;
   }
 
+  &__profitability-cell {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__profitability-note {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    line-height: $line-height-relaxed;
+    padding: 0 $spacing-xs;
+    cursor: help;
+  }
+
+  &__profitability-badge {
+    display: inline-block;
+    margin-left: $spacing-2xs;
+    padding: $spacing-2xs $spacing-xs;
+    background: rgba($warning, 0.12);
+    color: $warning;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    border-radius: $radius-full;
+    white-space: nowrap;
+  }
+
   &__chart-card {
     @extend %section-card;
 
@@ -158,6 +184,17 @@
       font-size: $font-size-lg;
       font-weight: $font-weight-bold;
       color: $foreground;
+    }
+  }
+
+  &__pie-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: $spacing-xl;
+    min-width: 0;
+
+    @include sm {
+      grid-template-columns: 1fr 1fr;
     }
   }
 

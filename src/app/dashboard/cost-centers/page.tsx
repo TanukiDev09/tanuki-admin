@@ -301,7 +301,7 @@ export default function CostCentersPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                           
                           data={incomeParticipation as any}
                           cx="50%"
                           cy="50%"
@@ -320,7 +320,7 @@ export default function CostCentersPage() {
                           ))}
                         </Pie>
                         <Tooltip
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                           
                           formatter={
                             ((val: number) => formatCurrency(val)) as any
                           }
@@ -365,7 +365,7 @@ export default function CostCentersPage() {
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                         <Pie
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                           
                           data={expenseParticipation as any}
                           cx="50%"
                           cy="50%"
@@ -384,7 +384,7 @@ export default function CostCentersPage() {
                           ))}
                         </Pie>
                         <Tooltip
-                          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                           
                           formatter={
                             ((val: number) => formatCurrency(val)) as any
                           }
@@ -494,7 +494,7 @@ export default function CostCentersPage() {
                         borderColor: 'hsl(var(--border))',
                         borderRadius: '8px',
                       }}
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                       
                       formatter={
                         ((val: number) =>
                           val !== undefined ? formatCurrency(val) : '') as any
@@ -564,7 +564,7 @@ export default function CostCentersPage() {
                         borderColor: 'hsl(var(--border))',
                         borderRadius: '8px',
                       }}
-                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                       
                       formatter={
                         ((val: number) =>
                           val !== undefined ? formatCurrency(val) : '') as any

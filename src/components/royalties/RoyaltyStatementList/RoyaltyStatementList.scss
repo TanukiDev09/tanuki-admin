@@ -1,0 +1,17 @@
+.royalty-list {
+  &__amount {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  &__actions {
+    text-align: right;
+  }
+
+  &__action-icon {
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.35rem;
+  }
+}
