@@ -1,0 +1,45 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+// Contenedor con scroll horizontal para tablas anchas de operaciones.
+@mixin ops-table-scroll {
+  overflow-x: auto;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  background: $card;
+
+  @include custom-scrollbar;
+}
+
+// Tabla de operaciones: encabezado discreto y filas con aire.
+@mixin ops-table($min-width: 46rem) {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: $min-width;
+  font-size: $font-size-sm;
+
+  th {
+    border-bottom: 1px solid $border;
+    padding: $spacing-md;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  td {
+    border-top: 1px solid $border;
+    padding: $spacing-md;
+    color: $foreground;
+    vertical-align: middle;
+  }
+
+  tbody tr:first-child td {
+    border-top: 0;
+  }
+
+  tbody tr:hover {
+    background: rgba($muted, 0.4);
+  }
+}

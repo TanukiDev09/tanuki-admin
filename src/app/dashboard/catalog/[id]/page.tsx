@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use, useCallback } from 'react';
+import { useState, useEffect, use, useCallback, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { ArrowLeft, Edit } from 'lucide-react';
@@ -13,8 +13,20 @@ import AgreementList from '@/components/agreements/AgreementList';
 import { Separator } from '@/components/ui/Separator';
 import { CreatorResponse } from '@/types/creator';
 import BookFinancials from '@/components/books/BookFinancials';
-import BookInventorySummary from '@/components/books/BookInventorySummary';
+import BookPointsOfSale from '@/components/books/BookPointsOfSale';
 import BookSalesStats from '@/components/books/BookSalesStats';
+import BookAttention from '@/components/books/BookAttention';
+import BookKpiStrip from '@/components/books/BookKpiStrip';
+import BookReprint from '@/components/books/BookReprint';
+import BookPosRotation from '@/components/books/BookPosRotation';
+import BookDemandChart from '@/components/books/BookDemandChart';
+import BookUnitFlow from '@/components/books/BookUnitFlow';
+import BookConsignment from '@/components/books/BookConsignment';
+import BookKardex from '@/components/books/BookKardex';
+import BookVolumes from '@/components/books/BookVolumes';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
+import { useBookOperations } from '@/hooks/useBookOperations';
+import type { BookOperations } from '@/lib/inventory/bookOperations';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { formatCurrency, formatNumber } from '@/lib/utils';
@@ -48,6 +60,39 @@ const CreatorBadgeList = ({
   );
 };
 
+// Estados de carga, error y obra completa de los datos de operaciones.
+function OperationsGate({
+  state,
+  bundle,
+  children,
+}: {
+  state: ReturnType<typeof useBookOperations>;
+  /** Contenido alterno para obras completas (sin inventario propio). */
+  bundle?: ReactNode;
+  children: (operations: BookOperations) => ReactNode;
+}) {
+  if (state.loading) {
+    return <p className="book-detail__tab-message">Cargando...</p>;
+  }
+  if (state.isBundle && bundle) return <>{bundle}</>;
+  if (state.isBundle) {
+    return (
+      <p className="book-detail__tab-message">
+        Esta obra completa no tiene inventario propio: sus movimientos se
+        registran en cada volumen.
+      </p>
+    );
+  }
+  if (state.error || !state.operations) {
+    return (
+      <p className="book-detail__tab-message">
+        No se pudieron cargar los datos de inventario.
+      </p>
+    );
+  }
+  return <>{children(state.operations)}</>;
+}
+
 export default function BookDetailPage(props: {
   params: Promise<{ id: string }>;
 }) {
@@ -57,6 +102,7 @@ export default function BookDetailPage(props: {
   const [book, setBook] = useState<BookResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const operations = useBookOperations(params.id);
 
   const { hasPermission } = usePermission();
   const canUpdate = hasPermission(ModuleName.BOOKS, PermissionAction.UPDATE);
@@ -301,44 +347,86 @@ export default function BookDetailPage(props: {
             </div>
           </div>
 
-          {/* Single Column Section - Financials, Inventory, Credits, and Agreements */}
+          {/* Operations: key figures + tabs */}
           <div className="book-detail__extra-section">
             <Separator />
 
-            {/* Sales Stats and Historical Chart */}
-            <BookSalesStats bookId={book._id} />
-            <Separator />
+            <BookAttention operations={operations.operations} />
+            <BookKpiStrip
+              operations={operations.operations}
+              loading={operations.loading}
+              unitCost={operations.unitCost}
+            />
 
-            {/* Cost Center Financials */}
-            {book.costCenter && (
-              <>
-                <BookFinancials costCenterName={book.costCenter} />
-                <Separator />
-              </>
-            )}
+            <Tabs defaultValue="summary" className="book-detail__tabs">
+              <TabsList>
+                <TabsTrigger value="summary">Resumen</TabsTrigger>
+                <TabsTrigger value="reprint">Reimpresión</TabsTrigger>
+                <TabsTrigger value="points-of-sale">
+                  Puntos de venta
+                </TabsTrigger>
+                <TabsTrigger value="movements">Movimientos</TabsTrigger>
+              </TabsList>
 
-            {/* Inventory Summary */}
-            <div>
-              <BookInventorySummary
-                totalStock={book.totalStock}
-                inventoryDetails={book.inventoryDetails}
-                bookId={book._id}
-                onUpdate={fetchBook}
-              />
-            </div>
+              <TabsContent value="summary" className="book-detail__tab">
+                <BookSalesStats bookId={book._id} />
 
-            <Separator />
+                {book.costCenter && (
+                  <BookFinancials costCenterName={book.costCenter} />
+                )}
 
-            <div>
-              <h2 className="book-detail__section-title">
-                Contratos y Acuerdos
-              </h2>
-              <AgreementList
-                bookId={book._id}
-                requiredCreators={[]}
-                onUpdate={fetchBook}
-              />
-            </div>
+                <div>
+                  <h2 className="book-detail__section-title">
+                    Contratos y Acuerdos
+                  </h2>
+                  <AgreementList
+                    bookId={book._id}
+                    requiredCreators={[]}
+                    onUpdate={fetchBook}
+                  />
+                </div>
+              </TabsContent>
+
+              <TabsContent value="reprint" className="book-detail__tab">
+                <OperationsGate
+                  state={operations}
+                  bundle={
+                    <BookVolumes
+                      volumes={(book.bundleBooks ?? []) as BookResponse[]}
+                    />
+                  }
+                >
+                  {(ops) => (
+                    <>
+                      <BookReprint operations={ops} />
+                      <BookDemandChart data={ops.monthlyDemand} />
+                    </>
+                  )}
+                </OperationsGate>
+              </TabsContent>
+
+              <TabsContent value="points-of-sale" className="book-detail__tab">
+                <OperationsGate state={operations}>
+                  {(ops) => <BookPosRotation operations={ops} />}
+                </OperationsGate>
+                <BookPointsOfSale bookId={book._id} />
+              </TabsContent>
+
+              <TabsContent value="movements" className="book-detail__tab">
+                <OperationsGate state={operations}>
+                  {(ops) => (
+                    <>
+                      <BookUnitFlow operations={ops} />
+                      <BookConsignment operations={ops} />
+                      <BookKardex
+                        bookId={book._id}
+                        movements={operations.recentMovements}
+                      />
+                    </>
+                  )}
+                </OperationsGate>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </div>

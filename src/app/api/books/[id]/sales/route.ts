@@ -59,8 +59,9 @@ export async function GET(
       {
         $group: {
           _id: null,
-          totalQuantity: { $sum: '$items.quantity' },
-          totalRevenue: { $sum: '$items.total' },
+          // $toDouble normaliza Decimal128/strings guardados en facturas antiguas
+          totalQuantity: { $sum: { $toDouble: '$items.quantity' } },
+          totalRevenue: { $sum: { $toDouble: '$items.total' } },
         },
       },
     ]);
@@ -87,8 +88,8 @@ export async function GET(
             year: { $year: '$date' },
             month: { $month: '$date' },
           },
-          quantity: { $sum: '$items.quantity' },
-          revenue: { $sum: '$items.total' },
+          quantity: { $sum: { $toDouble: '$items.quantity' } },
+          revenue: { $sum: { $toDouble: '$items.total' } },
         },
       },
       { $sort: { '_id.year': 1, '_id.month': 1 } },

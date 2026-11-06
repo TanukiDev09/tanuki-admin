@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { InventoryMovementsList } from '@/components/inventory/InventoryMovementsList';
 import { InventoryMovementFilters } from './components/InventoryMovementFilters';
@@ -16,7 +16,19 @@ import { useToast } from '@/components/ui/Toast';
 import './movements-history.scss';
 
 export default function InventoryMovementsHistoryPage() {
+  return (
+    <Suspense
+      fallback={<div className="p-8 text-center">Cargando historial...</div>}
+    >
+      <InventoryMovementsHistory />
+    </Suspense>
+  );
+}
+
+function InventoryMovementsHistory() {
   const router = useRouter();
+  // Filtro opcional por libro (enlace desde el detalle del libro).
+  const bookId = useSearchParams().get('bookId');
   const { toast } = useToast();
   
   // State for movements and pagination
@@ -44,6 +56,7 @@ export default function InventoryMovementsHistoryPage() {
       if (warehouseFilter !== 'ALL') params.append('warehouseId', warehouseFilter);
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
+      if (bookId) params.append('bookId', bookId);
 
       const res = await fetch(`/api/inventory/movements?${params.toString()}`);
       const data = await res.json();
@@ -65,7 +78,7 @@ export default function InventoryMovementsHistoryPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, typeFilter, warehouseFilter, startDate, endDate, toast]);
+  }, [page, typeFilter, warehouseFilter, startDate, endDate, bookId, toast]);
 
   useEffect(() => {
     fetchMovements();
@@ -82,7 +95,7 @@ export default function InventoryMovementsHistoryPage() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setPage(1);
-  }, [typeFilter, warehouseFilter, startDate, endDate]);
+  }, [typeFilter, warehouseFilter, startDate, endDate, bookId]);
 
   return (
     <div className="movements-history">
@@ -104,6 +117,19 @@ export default function InventoryMovementsHistoryPage() {
           </p>
         </div>
       </div>
+
+      {bookId && (
+        <p className="movements-history__description">
+          Mostrando solo los movimientos de un libro.{' '}
+          <Button
+            variant="link"
+            size="sm"
+            onClick={() => router.replace('/dashboard/inventory/movements')}
+          >
+            Ver todos
+          </Button>
+        </p>
+      )}
 
       <InventoryMovementFilters
         typeFilter={typeFilter}

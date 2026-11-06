@@ -20,9 +20,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - **Historia de caja completa**: la gráfica "Historia Financiera" (vista global) cubre desde el primer movimiento (mayo 2018) hasta hoy. Antes del primer cierre documentado el saldo se reconstruye hacia atrás restando el flujo de los movimientos cargados (`basis: 'calculado'`), por lo que esos meses son aproximados.
   - **Resumen Anual para años anteriores**: los años sin cierre de diciembre/enero documentado ya usan la gráfica de caja (antes caían a la gráfica vieja de ingresos y egresos). La serie anual se recorta de la historia completa con `sliceCashYear`, y las tarjetas de caja, saldos e indicadores de sostenibilidad usan esa misma serie.
 
+- **Dashboard operativo por libro** (`/dashboard/catalog/[id]`): el detalle pasa de una columna larga a una franja de cifras y cuatro pestañas, pensado para decidir reimpresiones y reposiciones. Solo operación y logística, sin finanzas.
+  - **Franja de cifras** (`BookKpiStrip`): stock total, cobertura de bodega propia, cobertura combinada, rotación, tasa de devolución y costo unitario estimado.
+  - **Alertas** (`BookAttention`): solo aparece cuando hay algo que decidir (reimprimir ya, puntos agotados o sobre-abastecidos).
+  - **Pestaña Resumen**: ventas históricas, finanzas del centro de costo y contratos (lo que antes estaba en la página).
+  - **Pestaña Reimpresión**: semáforo de reimpresión (`Reimprimir ya` / `Planear`) según la cobertura de la bodega propia frente al tiempo de reimpresión elegido en pantalla (`BookReprint`), y gráfica de demanda mensual por canal de los últimos 12 meses (`BookDemandChart`).
+  - **Pestaña Puntos de venta**: rotación y estado de cada punto (`Dormido`, `Agotado`, `Reponer`, `Sobre-stock`, `Estable`) en `BookPosRotation`, y ventas por canal (puntos de venta vs. venta directa) con la participación de cada punto y su stock en consignación en `BookPointsOfSale`.
+  - **Pestaña Movimientos**: ciclo de vida de los ejemplares (`BookUnitFlow`), control de consignación con remitido, devuelto, liquidado y última liquidación por punto (`BookConsignment`) y kardex corto con enlace al historial filtrado por libro (`BookKardex`).
+  - **Obras completas**: no tienen inventario propio; la pestaña Reimpresión muestra una tabla por volumen y marca el que limita la obra (`BookVolumes`).
+  - **Costo unitario estimado**: último precio unitario pagado a la imprenta, tomado del egreso que incluye el libro (por línea, por total o por egresos de impresión del centro de costo). No es un costo de producción desglosado.
+- **Nuevos endpoints**:
+  - `GET /api/books/[id]/operations`: cobertura, rotación, estado por punto de venta, ciclo de vida, demanda mensual, últimos movimientos y costo unitario.
+  - `GET /api/books/[id]/points-of-sale`: ventas por canal y participación de cada punto de venta con su stock actual.
+  - `GET /api/inventory/movements?bookId=`: historial de movimientos filtrado por libro. La página `/dashboard/inventory/movements` lo usa desde el enlace del detalle y muestra un aviso con "Ver todos".
+- **Lógica pura y probada**: `src/lib/inventory/bookOperations.ts`, `unitCost.ts`, `unitCostQuery.ts` y `src/lib/finance/salesChannels.ts` (`buildBookPointsOfSaleStats`), con pruebas unitarias; el hook `useBookOperations` carga los datos una sola vez para todas las pestañas.
+
 ### 🚀 Mejoras & UX (1.1.0)
 
 - **Gráficas con scroll horizontal**: "Historia Financiera" (`CashBalanceChart`, prop `scrollable`) y "Evolución del Resultado" (`RunwayProjectionChart`) tienen ancho fijo por mes y scroll horizontal dentro de su contenedor; abren posicionadas en el mes más reciente.
+
+- **Listado del catálogo en tarjetas** (`BookManagementTable`): cada libro es una tarjeta con portada, título, autor, precio, stock (con etiqueta "sin stock" o "bajo" y, en obras completas, stock calculado de sus volúmenes), ejemplares vendidos y facturado. Reemplaza la tabla con encabezados ordenables por un selector de orden (nombre A→Z / Z→A, más / menos vendidos, mayor / menor facturación).
+- **Estilo de navegación**: `Sidebar`, `NavLinks` y `AppHeader` usan los tokens de `_variables.scss` (bordes, pesos de fuente y espaciado) en lugar de valores sueltos, con un aspecto más plano; `dashboard.scss` se ajusta en consecuencia.
+
+### 🐛 Correcciones (1.1.0)
+
+- **Ventas del libro con facturas antiguas**: `/api/books` y `/api/books/[id]/sales` suman cantidades e ingresos con `$toDouble`, de modo que las facturas con `Decimal128` o texto ya no dejan en cero o descuadran los ejemplares vendidos y lo facturado.
+- **Historial de movimientos**: se tolera la ausencia de bodega en un movimiento (`warehouseId` nulo) sin romper el filtro por bodega.
+
+### 🛠️ Calidad Técnica (1.1.0)
+
+- **Pruebas nuevas**: `bookOperations.test.ts`, `unitCost.test.ts`, `salesChannels.test.ts`, `BookOperations.test.tsx` y `BookMovementsTab.test.tsx`.
+- **Documentación**: `docs/modules/catalog.md` reescrito con el listado, las pestañas del detalle, los endpoints nuevos y las definiciones (venta directa desde la bodega propia, cobertura, rotación, señal de reimpresión, estados de punto de venta).
 
 ## [1.0.5] - 2026-05-08
 

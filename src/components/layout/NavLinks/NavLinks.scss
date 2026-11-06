@@ -40,7 +40,7 @@
 
     &--active {
       color: $primary;
-      font-weight: 900;
+      font-weight: $font-weight-semibold;
 
       .nav-links__mobile-icon-wrapper {
         background-color: $primary;
@@ -78,18 +78,16 @@
   &__footer-text {
     color: #64748b; // slate-500 (Contrast 4.5:1)
     font-size: 10px;
-    font-weight: 900;
-    letter-spacing: 0.1em;
+    font-weight: $font-weight-semibold;
+    letter-spacing: 0.05em;
     text-align: center;
     text-transform: uppercase;
   }
 
   &__mobile-label {
     display: block;
-    font-size: 9px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: 10px;
+    font-weight: $font-weight-medium;
     color: #111827; // gray-900
     opacity: 1;
     white-space: nowrap;
@@ -105,17 +103,17 @@
   &--vertical {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 2px;
   }
 
   &__item {
     display: flex;
     align-items: center;
-    gap: $spacing-md;
-    padding: $spacing-md;
+    gap: $spacing-sm + $spacing-xs;
+    padding: $spacing-sm $spacing-md;
     color: #374151; // gray-700
     text-decoration: none;
-    border-radius: $radius-xl;
+    border-radius: $radius-md;
     position: relative;
     overflow: hidden;
 
@@ -141,32 +139,19 @@
       }
 
       .nav-links__icon {
-        transform: scale(1.1);
         color: $primary;
       }
     }
 
     &--active {
-      background-color: rgba($primary, 0.05);
+      background-color: rgba($primary, 0.08);
       color: $primary;
-      font-weight: 900;
-      border: 1px solid rgba($primary, 0.08);
+      font-weight: $font-weight-semibold;
 
       .nav-links__icon {
         color: $primary;
-        filter: drop-shadow(0 0 5px rgba($primary, 0.2));
       }
 
-      &::after {
-        content: '';
-        position: absolute;
-        right: $spacing-md;
-        width: 6px;
-        height: 6px;
-        background: $primary;
-        border-radius: $radius-full;
-        box-shadow: 0 0 8px rgba($primary, 0.4);
-      }
     }
 
     // Sidebar collapsed styles
@@ -236,7 +221,7 @@
     color: #374151; // gray-700
     cursor: pointer;
     font-size: $font-size-sm;
-    font-weight: 900;
+    font-weight: $font-weight-medium;
 
     @include transition(all);
 

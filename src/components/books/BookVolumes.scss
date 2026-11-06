@@ -1,0 +1,118 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.book-volumes {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__title {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__message {
+    margin: 0;
+    border: 1px dashed $border;
+    border-radius: $radius-lg;
+    padding: $spacing-xl;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    background: $card;
+    list-style: none;
+  }
+
+  &__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $spacing-md $spacing-xl;
+    border-top: 1px solid $border;
+    padding: $spacing-md $spacing-lg;
+
+    &:first-child {
+      border-top: 0;
+    }
+  }
+
+  &__name {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: $spacing-2xs;
+    min-width: 12rem;
+  }
+
+  &__link {
+    color: $foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+
+  &__limit {
+    color: $warning;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+  }
+
+  &__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-md $spacing-xl;
+    margin: 0;
+
+    div {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-2xs;
+      min-width: 5.5rem;
+    }
+
+    dt {
+      color: $muted-foreground;
+      font-size: $font-size-xs;
+    }
+
+    dd {
+      margin: 0;
+      color: $foreground;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      font-variant-numeric: tabular-nums;
+    }
+  }
+
+  &__unavailable {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+}

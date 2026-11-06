@@ -262,6 +262,30 @@
     margin-top: $spacing-2xl;
   }
 
+  &__tabs {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xl;
+  }
+
+  // Cada pestaña apila sus secciones con aire entre ellas.
+  &__tab {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xl;
+    margin-top: 0;
+  }
+
+  &__tab-message {
+    margin: 0;
+    border: 1px dashed $border;
+    border-radius: $radius-lg;
+    padding: $spacing-xl;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
   &__section-title {
     margin-bottom: $spacing-md;
     font-size: $font-size-xl;

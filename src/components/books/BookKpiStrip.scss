@@ -1,0 +1,57 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.book-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: $spacing-lg;
+  margin: 0;
+  border: 1px solid $border;
+  border-radius: $radius-lg;
+  background: $card;
+  padding: $spacing-lg;
+
+  &--loading {
+    min-height: 6.5rem;
+    background: $muted;
+    animation: book-kpis-pulse 1.4s ease-in-out infinite;
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xs;
+    min-width: 0;
+  }
+
+  &__label {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__value {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+  }
+
+  &__hint {
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+}
+
+@keyframes book-kpis-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}

@@ -13,7 +13,7 @@
     flex-direction: column;
     gap: $spacing-xl; // Reduced from 3xl for mobile
     width: 100%;
-    max-width: 1600px;
+    max-width: 1440px;
     min-height: 100vh;
     margin: 0 auto;
     padding: $spacing-md; // Reduced for mobile
@@ -35,15 +35,46 @@
     display: flex;
     flex-direction: column;
     gap: $spacing-md;
-    padding-bottom: $spacing-lg;
-    border-bottom: 1px solid rgba($border, 0.4);
 
     @include md {
       flex-direction: row;
       justify-content: space-between;
       align-items: flex-end;
       gap: $spacing-lg;
-      padding-bottom: $spacing-xl;
+    }
+  }
+
+  &__title-group {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__title {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__icon {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  &__text-hidden-sm {
+    display: none;
+
+    @include sm {
+      display: inline;
     }
   }
 
