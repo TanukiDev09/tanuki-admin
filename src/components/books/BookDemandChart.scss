@@ -1,0 +1,130 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.book-demand {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__title {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: $spacing-lg;
+    margin: 0;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xs;
+
+    dt {
+      color: $muted-foreground;
+      font-size: $font-size-sm;
+    }
+
+    dd {
+      margin: 0;
+      color: $foreground;
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-semibold;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  &__hint {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-normal;
+    letter-spacing: 0;
+  }
+
+  &__trend-icon {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  // Solo para lectores de pantalla: los datos de la gráfica en texto.
+  &__table {
+    position: absolute;
+    margin: -1px;
+    border: 0;
+    padding: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  &__empty {
+    margin: 0;
+    border: 1px dashed $border;
+    border-radius: $radius-lg;
+    padding: $spacing-xl;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs $spacing-xl;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__legend-total {
+    color: $muted-foreground;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__swatch {
+    display: inline-block;
+    border-radius: $radius-sm;
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  &__chart {
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    background: $card;
+    padding: $spacing-lg;
+  }
+}

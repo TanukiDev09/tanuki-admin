@@ -140,11 +140,12 @@ export default function BookInventorySummary({
               // 2. Try to find in fresh inventory fetch (for specific InventoryItem ID)
               const fetchedInventory = (
                 fetchedInventoryItems as {
-                  warehouseId: string | { _id: string };
+                  warehouseId: string | { _id: string } | null;
                   quantity: number;
                   _id: string;
                 }[]
               ).find((item) => {
+                if (!item.warehouseId) return false;
                 const itemWarehouseId =
                   typeof item.warehouseId === 'object'
                     ? item.warehouseId._id

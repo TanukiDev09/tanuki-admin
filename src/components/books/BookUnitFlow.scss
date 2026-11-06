@@ -1,0 +1,108 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.book-flow {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__title {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__empty {
+    margin: 0;
+    border: 1px dashed $border;
+    border-radius: $radius-lg;
+    padding: $spacing-xl;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  &__bar {
+    display: flex;
+    overflow: hidden;
+    border-radius: $radius-full;
+    background: $muted;
+    height: 0.75rem;
+  }
+
+  &__segment {
+    height: 100%;
+    transition: width 0.4s ease;
+
+    &--sold-direct {
+      background: rgba($primary, 0.35);
+    }
+
+    &--sold-pos {
+      background: rgba($primary, 0.65);
+    }
+
+    &--own {
+      background: $primary;
+    }
+
+    &--pos {
+      background: $info;
+    }
+  }
+
+  &__legend {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: $spacing-sm $spacing-xl;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__legend-item {
+    display: flex;
+    align-items: baseline;
+    gap: $spacing-sm;
+    font-size: $font-size-sm;
+  }
+
+  &__dot {
+    flex-shrink: 0;
+    border-radius: $radius-full;
+    width: 0.5rem;
+    height: 0.5rem;
+  }
+
+  &__legend-label {
+    flex: 1;
+    color: $muted-foreground;
+  }
+
+  &__legend-value {
+    color: $foreground;
+    font-weight: $font-weight-semibold;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__legend-pct {
+    margin-left: $spacing-sm;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+  }
+}

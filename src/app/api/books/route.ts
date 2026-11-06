@@ -184,8 +184,9 @@ export async function GET(request: NextRequest) {
               {
                 $group: {
                   _id: null,
-                  totalSold: { $sum: '$items.quantity' },
-                  totalRevenue: { $sum: '$items.total' }
+                  // $toDouble normaliza Decimal128/strings guardados en facturas antiguas
+                  totalSold: { $sum: { $toDouble: '$items.quantity' } },
+                  totalRevenue: { $sum: { $toDouble: '$items.total' } }
                 }
               }
             ],

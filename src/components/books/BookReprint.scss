@@ -1,0 +1,233 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.book-reprint {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: $spacing-md;
+  }
+
+  &__heading {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__title {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__control {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    min-width: 12rem;
+  }
+
+  &__control-label {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  // --- Semáforo de reimpresión ---
+  &__banner {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    border-left: 4px solid $border;
+    border-radius: $radius-md;
+    background: $muted;
+    padding: $spacing-md $spacing-lg;
+
+    &--now {
+      border-left-color: $danger;
+      background: rgba($danger, 0.06);
+    }
+
+    &--plan {
+      border-left-color: $warning;
+      background: rgba($warning, 0.08);
+    }
+
+    &--ok {
+      border-left-color: $success;
+      background: rgba($success, 0.06);
+    }
+  }
+
+  &__banner-title {
+    color: $foreground;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__banner-dates {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__banner-text {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-sm;
+    line-height: 1.5;
+  }
+
+  // --- Dónde está el inventario ---
+  &__stock {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &__bar {
+    display: flex;
+    overflow: hidden;
+    border-radius: $radius-full;
+    background: $muted;
+    height: 0.75rem;
+  }
+
+  &__bar-segment {
+    height: 100%;
+    transition: width 0.4s ease;
+
+    &--own {
+      background: $primary;
+    }
+
+    &--active {
+      background: rgba($primary, 0.45);
+    }
+
+    &--dormant {
+      background: $warning;
+    }
+  }
+
+  &__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs $spacing-lg;
+    margin: 0;
+    padding: 0;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-variant-numeric: tabular-nums;
+    list-style: none;
+  }
+
+  &__dot {
+    display: inline-block;
+    margin-right: $spacing-xs;
+    border-radius: $radius-full;
+    width: 0.5rem;
+    height: 0.5rem;
+
+    &--own {
+      background: $primary;
+    }
+
+    &--active {
+      background: rgba($primary, 0.45);
+    }
+
+    &--dormant {
+      background: $warning;
+    }
+  }
+
+  // --- Dos frentes ---
+  &__columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: $spacing-lg;
+  }
+
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    background: $card;
+    padding: $spacing-lg;
+  }
+
+  &__card-title {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  &__list-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: $spacing-md;
+    border-top: 1px solid $border;
+    padding: $spacing-sm 0;
+
+    &:first-child {
+      border-top: 0;
+      padding-top: 0;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+  }
+
+  &__list-label {
+    display: flex;
+    flex-direction: column;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__list-hint {
+    font-size: $font-size-xs;
+  }
+
+  &__list-value {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  &__note {
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    line-height: 1.5;
+  }
+}

@@ -147,3 +147,83 @@ export function buildTopPointsOfSale(
     .sort((a, b) => b.revenue - a.revenue || b.units - a.units)
     .slice(0, limit);
 }
+
+export interface BookPointOfSaleStat extends TopPointOfSale {
+  /** % de los ejemplares totales del libro vendidos a este punto de venta. */
+  unitsShare: number;
+  /** % de los ingresos totales del libro aportados por este punto de venta. */
+  revenueShare: number;
+  /** % de los ejemplares del canal "puntos de venta" que aporta este punto. */
+  channelShare: number;
+}
+
+export interface BookChannelSummary {
+  totalUnits: number;
+  posUnits: number;
+  directUnits: number;
+  totalRevenue: number;
+  posRevenue: number;
+  directRevenue: number;
+  /** % de ejemplares vendidos vía puntos de venta (el resto es venta directa). */
+  posUnitsPct: number;
+  /** % de ingresos facturados vía puntos de venta. */
+  posRevenuePct: number;
+  /** Puntos de venta que registran al menos una venta del libro. */
+  pointsOfSaleWithSales: number;
+  /** Promedio de ejemplares por punto de venta con ventas. */
+  avgUnitsPerPointOfSale: number;
+}
+
+export interface BookPointsOfSaleStats {
+  summary: BookChannelSummary;
+  pointsOfSale: BookPointOfSaleStat[];
+}
+
+const pct = (part: number, total: number): number =>
+  total > 0 ? (part / total) * 100 : 0;
+
+/**
+ * Estadísticas de un libro por canal: proporción puntos de venta vs. venta
+ * directa y participación de cada punto de venta (ordenados por ejemplares).
+ * Cada fila es una línea de factura del libro.
+ */
+export function buildBookPointsOfSaleStats(
+  rows: SalesRow[],
+  pointsOfSale: PosIdentity[]
+): BookPointsOfSaleStats {
+  let totalUnits = 0;
+  let totalRevenue = 0;
+  for (const row of rows) {
+    totalUnits += Number(row.quantity) || 0;
+    totalRevenue += Number(row.total) || 0;
+  }
+
+  const ranked = buildTopPointsOfSale(rows, pointsOfSale, Infinity);
+  const posUnits = ranked.reduce((sum, pos) => sum + pos.units, 0);
+  const posRevenue = ranked.reduce((sum, pos) => sum + pos.revenue, 0);
+
+  const stats = ranked
+    .map((pos) => ({
+      ...pos,
+      unitsShare: pct(pos.units, totalUnits),
+      revenueShare: pct(pos.revenue, totalRevenue),
+      channelShare: pct(pos.units, posUnits),
+    }))
+    .sort((a, b) => b.units - a.units || b.revenue - a.revenue);
+
+  return {
+    summary: {
+      totalUnits,
+      posUnits,
+      directUnits: totalUnits - posUnits,
+      totalRevenue,
+      posRevenue,
+      directRevenue: totalRevenue - posRevenue,
+      posUnitsPct: pct(posUnits, totalUnits),
+      posRevenuePct: pct(posRevenue, totalRevenue),
+      pointsOfSaleWithSales: stats.length,
+      avgUnitsPerPointOfSale: stats.length > 0 ? posUnits / stats.length : 0,
+    },
+    pointsOfSale: stats,
+  };
+}

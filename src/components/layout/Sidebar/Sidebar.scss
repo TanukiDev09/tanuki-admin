@@ -15,8 +15,7 @@
 
   // Solid Theme Base
   background-color: white;
-  border-right: 1px solid rgba($primary, 0.1);
-  box-shadow: 10px 0 30px rgb(0 0 0 / 3%);
+  border-right: 1px solid $border;
   z-index: 100;
   overflow: hidden;
 
@@ -33,6 +32,7 @@
   // --- ELEMENTOS DECORATIVOS ---
 
   &__glow {
+    display: none;
     position: absolute;
     top: -50px;
     left: -50px;
@@ -82,7 +82,7 @@
   }
 
   &__logo-container {
-    padding: $spacing-xl $spacing-lg;
+    padding: $spacing-lg;
     flex-shrink: 0;
     position: relative;
     z-index: 10;
@@ -119,8 +119,8 @@
   &__logo-title {
     color: $primary;
     font-size: $font-size-xl;
-    font-weight: 900;
-    letter-spacing: 0.1em;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.05em;
     line-height: 1;
   }
 
@@ -144,11 +144,10 @@
     display: flex;
     align-items: center;
     gap: $spacing-md;
-    padding: $spacing-md;
-    background: white;
-    border: 1px solid rgba($primary, 0.05);
-    border-radius: $radius-xl;
-    box-shadow: 0 4px 15px rgb(0 0 0 / 3%);
+    padding: $spacing-sm $spacing-md;
+    background: transparent;
+    border: 0;
+    border-radius: $radius-md;
 
     .sidebar--collapsed & {
       justify-content: center;
@@ -206,10 +205,8 @@
 
   &__user-role {
     color: $muted-foreground;
-    font-size: 10px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
   }
 
   &__nav {
@@ -217,7 +214,7 @@
     padding-inline: $spacing-sm;
     display: flex;
     flex-direction: column;
-    gap: $spacing-md;
+    gap: $spacing-lg;
     overflow-y: auto;
     position: relative;
     z-index: 10;
@@ -228,10 +225,10 @@
   &__nav-label {
     padding-left: $spacing-md;
     font-size: 10px;
-    font-weight: 900;
+    font-weight: $font-weight-semibold;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: #4b5563; // gray-600
+    letter-spacing: 0.08em;
+    color: $muted-foreground;
     margin-bottom: $spacing-xs;
 
     .sidebar--collapsed & {

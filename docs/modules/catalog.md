@@ -269,6 +269,50 @@ Modal para editar libros existentes:
 - Validaciones y manejo de errores
 - Mismo diseño que CreateBookModal
 
+## 📦 Listado y Dashboard por Libro
+
+### Listado (`/dashboard/catalog`)
+
+Cada libro es una tarjeta (`BookManagementTable`): portada, título, autor, precio, stock, ejemplares vendidos y facturado. Se puede buscar, filtrar por colección y estado, y ordenar por nombre, ejemplares vendidos o facturación (ascendente o descendente).
+
+### Detalle (`/dashboard/catalog/[id]`)
+
+Muestra una franja de cifras (stock total, cobertura de bodega propia, cobertura combinada, rotación y tasa de devolución) y cuatro pestañas:
+
+| Pestaña            | Contenido                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------------- |
+| **Resumen**        | Análisis de ventas, finanzas del centro de costo y contratos                                                  |
+| **Reimpresión**    | Semáforo de reimpresión, dónde está el inventario, bodega propia vs. librerías, demanda mensual por canal     |
+| **Puntos de venta**| Rotación por punto de venta y participación de cada punto en las ventas del libro                             |
+| **Movimientos**    | Ciclo de vida de los ejemplares, control de consignación y kardex corto                                       |
+
+En una **obra completa** no hay inventario propio (su stock se calcula de los volúmenes): la pestaña Reimpresión muestra una tabla por volumen y marca el que limita la obra.
+
+### Endpoints
+
+| Endpoint                              | Descripción                                                                                       |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `GET /api/books/[id]/operations`      | Cobertura, rotación, estado por punto de venta, ciclo de vida, demanda mensual y últimos movimientos |
+| `GET /api/books/[id]/points-of-sale`  | Ventas por canal (puntos de venta vs. directa) y participación de cada punto                      |
+| `GET /api/inventory/movements?bookId` | Historial de movimientos de inventario filtrado por libro                                         |
+
+La lógica vive en funciones puras con tests: `src/lib/inventory/bookOperations.ts` y `src/lib/finance/salesChannels.ts`.
+
+### Definiciones y supuestos
+
+- **Venta directa**: sale de la bodega propia de la editorial. Las facturas no guardan punto de venta ni bodega: la venta a un punto se atribuye por NIT o nombre del cliente.
+- **Demanda mensual**: promedio de los últimos 90 días (ejemplares).
+- **Cobertura de bodega propia** = stock propio ÷ (venta directa + remisiones netas a librerías) por mes. Las remisiones netas son remisiones menos devoluciones.
+- **Cobertura combinada** = stock total ÷ (venta directa + ventas de las librerías) por mes.
+- **Rotación** = ejemplares vendidos en 12 meses ÷ stock actual.
+- **Señal de reimpresión**: compara la cobertura propia con el tiempo de una reimpresión (se elige en pantalla, no se guarda). `Reimprimir ya` si la cobertura es menor o igual a ese tiempo; `Planear` si la holgura es menor a 2 meses.
+- **Estado de un punto de venta**: `Dormido` (stock y sin ventas en 90 días), `Agotado` (vende y no tiene stock), `Reponer` (menos de 1 mes de cobertura), `Sobre-stock` (más de 12 meses) y `Estable`. Los umbrales están en `bookOperations.ts`.
+- **Control de consignación**: remitido, devuelto, liquidado y stock actual de cada punto, con la fecha de su última liquidación.
+
+### Componentes
+
+`BookKpiStrip`, `BookReprint`, `BookDemandChart`, `BookPosRotation`, `BookPointsOfSale`, `BookUnitFlow`, `BookConsignment`, `BookKardex` y `BookVolumes` en `src/components/books/`. Los datos de operaciones se cargan una sola vez con el hook `useBookOperations`.
+
 ## 💡 Ejemplos de Uso
 
 ### Con JavaScript/Fetch
@@ -453,6 +497,6 @@ function sanitizeBook(book: IBook): BookResponse;
 
 El módulo está completamente optimizado para:
 
-- **Desktop**: Tabla completa con todas las columnas
-- **Tablet**: Ajuste automático de columnas
-- **Móvil**: Vista optimizada con información esencial
+- **Desktop**: Cuadrícula de tarjetas, una por libro
+- **Tablet**: La cuadrícula ajusta el número de columnas
+- **Móvil**: Una tarjeta por fila

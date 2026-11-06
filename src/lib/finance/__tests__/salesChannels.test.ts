@@ -1,4 +1,5 @@
 import {
+  buildBookPointsOfSaleStats,
   buildSalesChannelSlices,
   buildTopPointsOfSale,
   isPointOfSaleCustomer,
@@ -98,5 +99,59 @@ describe('buildTopPointsOfSale', () => {
       'LER',
       'CAS',
     ]);
+  });
+});
+
+describe('buildBookPointsOfSaleStats', () => {
+  const rows = [
+    { customerTaxId: '8300123456', quantity: 30, total: 300000 },
+    { customerTaxId: '8300123456', quantity: 10, total: 100000 },
+    { customerName: 'Lerner Bogotá', quantity: 20, total: 200000 },
+    { customerName: 'Ana Pérez', quantity: 40, total: 400000 },
+  ];
+
+  it('calcula la proporción puntos de venta vs. venta directa', () => {
+    const { summary } = buildBookPointsOfSaleStats(rows, pos);
+    expect(summary.totalUnits).toBe(100);
+    expect(summary.posUnits).toBe(60);
+    expect(summary.directUnits).toBe(40);
+    expect(summary.posUnitsPct).toBe(60);
+    expect(summary.posRevenuePct).toBe(60);
+    expect(summary.pointsOfSaleWithSales).toBe(2);
+    expect(summary.avgUnitsPerPointOfSale).toBe(30);
+  });
+
+  it('calcula la participación de cada punto de venta, ordenada por ejemplares', () => {
+    const { pointsOfSale } = buildBookPointsOfSaleStats(rows, pos);
+    expect(pointsOfSale.map((p) => p.name)).toEqual([
+      'Librería Panamericana S.A.S.',
+      'Lerner Libros',
+    ]);
+    expect(pointsOfSale[0]).toMatchObject({
+      units: 40,
+      invoices: 2,
+      unitsShare: 40,
+      revenueShare: 40,
+    });
+    expect(pointsOfSale[0].channelShare).toBeCloseTo(66.67, 1);
+    expect(pointsOfSale[1].unitsShare).toBe(20);
+  });
+
+  it('devuelve ceros y sin NaN cuando no hay ventas', () => {
+    const { summary, pointsOfSale } = buildBookPointsOfSaleStats([], pos);
+    expect(pointsOfSale).toEqual([]);
+    expect(summary.totalUnits).toBe(0);
+    expect(summary.posUnitsPct).toBe(0);
+    expect(summary.avgUnitsPerPointOfSale).toBe(0);
+  });
+
+  it('todo es venta directa si ningún cliente es punto de venta', () => {
+    const { summary } = buildBookPointsOfSaleStats(
+      [{ customerName: 'Ana Pérez', quantity: 5, total: 50000 }],
+      pos
+    );
+    expect(summary.posUnits).toBe(0);
+    expect(summary.directUnits).toBe(5);
+    expect(summary.posUnitsPct).toBe(0);
   });
 });
