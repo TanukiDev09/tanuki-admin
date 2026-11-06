@@ -36,6 +36,11 @@
     font-size: $font-size-sm;
   }
 
+  &__scroll {
+    overflow-x: auto;
+    padding-bottom: $spacing-sm;
+  }
+
   &__chart-container {
     width: 100%;
     height: 280px;

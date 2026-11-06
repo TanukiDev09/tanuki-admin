@@ -1,63 +1,60 @@
 import { PipelineStage } from 'mongoose';
 import Movement from '@/models/Movement';
 import { getSemanticCategoryColor } from '@/styles/category-utils';
-import { add, subtract, toNumber } from '@/lib/math';
+import { subtract, toNumber } from '@/lib/math';
 import {
   GET_AMOUNT_COP_EXPR,
   GET_CC_PORTION_EXPR,
   calculateRelevantAmount,
 } from './aggregations';
 import { MonthlyData } from './health';
+import {
+  INCOME_TYPES,
+  TRANSFER_TYPES,
+  classifyMovementType,
+  flowExpressions,
+} from '@/lib/finance/cashflow';
+
+// Monto a sumar: la porción del centro de costo si hay filtro, o el monto en COP.
+function amountStages(costCenterCode?: string): {
+  stages: PipelineStage[];
+  amount: unknown;
+} {
+  if (!costCenterCode) return { stages: [], amount: GET_AMOUNT_COP_EXPR };
+  return {
+    stages: [
+      { $addFields: { finalAmount: GET_CC_PORTION_EXPR(costCenterCode) } },
+    ],
+    amount: '$finalAmount',
+  };
+}
 
 export async function getTotals(
   matchStage: Record<string, unknown>,
-  costCenterCode?: string
+  costCenterCode?: string,
+  accountId?: string | null
 ) {
-  const pipeline: PipelineStage[] = [{ $match: matchStage }];
+  const { stages, amount } = amountStages(costCenterCode);
+  const flow = flowExpressions(amount, accountId);
 
-  if (costCenterCode) {
-    // If a cost center filter is applied, we only want the portion of the amount that belongs to it.
-    pipeline.push({
-      $addFields: {
-        finalAmount: GET_CC_PORTION_EXPR(costCenterCode),
-      },
-    });
-
-    pipeline.push({
+  const [result] = await Movement.aggregate([
+    { $match: matchStage },
+    ...stages,
+    {
       $group: {
-        _id: '$type',
-        total: { $sum: '$finalAmount' },
-        quantity: { $sum: { $ifNull: ['$quantity', 0] } },
+        _id: null,
+        income: { $sum: flow.income },
+        expense: { $sum: flow.expense },
+        quantity: {
+          $sum: { $cond: [flow.isIncome, { $ifNull: ['$quantity', 0] }, 0] },
+        },
       },
-    });
-  } else {
-    pipeline.push({
-      $group: {
-        _id: '$type',
-        total: { $sum: GET_AMOUNT_COP_EXPR },
-        quantity: { $sum: { $ifNull: ['$quantity', 0] } },
-      },
-    });
-  }
+    },
+  ]);
 
-  const totalsResponse = await Movement.aggregate(pipeline);
-
-  let totalIncome = '0';
-  let totalExpenses = '0';
-  let totalQuantity = 0;
-
-  totalsResponse.forEach((t) => {
-    const val = t.total ? t.total.toString() : '0';
-    // Match both Spanish and English types
-    const isIncome =
-      t._id === 'Ingreso' || t._id === 'INCOME' || t._id === 'factura_emitida';
-    if (isIncome) {
-      totalIncome = add(totalIncome, val);
-      totalQuantity += toNumber(t.quantity || 0);
-    } else {
-      totalExpenses = add(totalExpenses, val);
-    }
-  });
+  const totalIncome = result?.income ? result.income.toString() : '0';
+  const totalExpenses = result?.expense ? result.expense.toString() : '0';
+  const totalQuantity = toNumber(result?.quantity || 0);
 
   return {
     totalIncome,
@@ -117,15 +114,9 @@ export async function getMovements(
       }));
     }
 
-    let normalizedType = plain.type;
-
-    if (
-      plain.type === 'Ingreso' ||
-      plain.type === 'INCOME' ||
-      plain.type === 'factura_emitida'
-    )
-      normalizedType = 'INCOME';
-    else normalizedType = 'EXPENSE';
+    const kind = classifyMovementType(plain.type);
+    const normalizedType =
+      kind === 'income' ? 'INCOME' : kind === 'transfer' ? 'TRANSFER' : 'EXPENSE';
 
     const amountInCOP = toNumber(plain.amountInCOP || 0);
     const relevantAmount = calculateRelevantAmount(
@@ -164,73 +155,22 @@ export async function getMovements(
 export async function getMonthlyData(
   matchStage: Record<string, unknown>,
   yearContext?: number,
-  costCenterCode?: string
+  costCenterCode?: string,
+  accountId?: string | null
 ) {
-  const pipeline: PipelineStage[] = [{ $match: matchStage }];
-
-  if (costCenterCode) {
-    pipeline.push({
-      $addFields: {
-        finalAmount: GET_CC_PORTION_EXPR(costCenterCode),
-      },
-    });
-
-    pipeline.push({
+  const { stages, amount } = amountStages(costCenterCode);
+  const flow = flowExpressions(amount, accountId);
+  const pipeline: PipelineStage[] = [
+    { $match: matchStage },
+    ...stages,
+    {
       $group: {
         _id: { year: { $year: '$date' }, month: { $month: '$date' } },
-        income: {
-          $sum: {
-            $cond: [
-              { $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']] },
-              '$finalAmount',
-              0,
-            ],
-          },
-        },
-        expense: {
-          $sum: {
-            $cond: [
-              {
-                $not: {
-                  $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']],
-                },
-              },
-              '$finalAmount',
-              0,
-            ],
-          },
-        },
+        income: { $sum: flow.income },
+        expense: { $sum: flow.expense },
       },
-    });
-  } else {
-    pipeline.push({
-      $group: {
-        _id: { year: { $year: '$date' }, month: { $month: '$date' } },
-        income: {
-          $sum: {
-            $cond: [
-              { $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']] },
-              GET_AMOUNT_COP_EXPR,
-              0,
-            ],
-          },
-        },
-        expense: {
-          $sum: {
-            $cond: [
-              {
-                $not: {
-                  $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']],
-                },
-              },
-              GET_AMOUNT_COP_EXPR,
-              0,
-            ],
-          },
-        },
-      },
-    });
-  }
+    },
+  ];
 
   const monthlyData = await Movement.aggregate([
     ...pipeline,
@@ -275,8 +215,8 @@ export async function getCategoryBreakdown(
   const matchQuery: Record<string, unknown> = {
     ...matchStage,
     type: isIncome
-      ? { $in: ['Ingreso', 'INCOME'] }
-      : { $nin: ['Ingreso', 'INCOME'] },
+      ? { $in: INCOME_TYPES }
+      : { $nin: [...INCOME_TYPES, ...TRANSFER_TYPES] },
   };
 
   if (startDate && endDate) {
@@ -376,8 +316,8 @@ export async function getCostCenterBreakdown(
   const matchQuery: Record<string, unknown> = {
     ...matchStage,
     type: isIncome
-      ? { $in: ['Ingreso', 'INCOME', 'factura_emitida'] }
-      : { $nin: ['Ingreso', 'INCOME', 'factura_emitida'] },
+      ? { $in: INCOME_TYPES }
+      : { $nin: [...INCOME_TYPES, ...TRANSFER_TYPES] },
   };
 
   if (startDate && endDate) {
@@ -478,8 +418,11 @@ export async function getDailyData(
   startOfMonth: Date,
   endOfMonth: Date,
   referenceDate: Date,
-  costCenterCode?: string
+  costCenterCode?: string,
+  accountId?: string | null
 ) {
+  const { stages, amount } = amountStages(costCenterCode);
+  const flow = flowExpressions(amount, accountId);
   const pipeline: PipelineStage[] = [
     {
       $match: {
@@ -487,82 +430,23 @@ export async function getDailyData(
         date: { $gte: startOfMonth, $lte: endOfMonth },
       },
     },
+    ...stages,
+    {
+      $group: {
+        _id: { day: { $dayOfMonth: '$date' } },
+        income: { $sum: flow.income },
+        expense: { $sum: flow.expense },
+      },
+    },
   ];
-
-  if (costCenterCode) {
-    pipeline.push({
-      $addFields: {
-        finalAmount: GET_CC_PORTION_EXPR(costCenterCode),
-      },
-    });
-    pipeline.push({
-      $group: {
-        _id: {
-          day: { $dayOfMonth: '$date' },
-        },
-        income: {
-          $sum: {
-            $cond: [
-              { $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']] },
-              '$finalAmount',
-              0,
-            ],
-          },
-        },
-        expense: {
-          $sum: {
-            $cond: [
-              {
-                $not: {
-                  $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']],
-                },
-              },
-              '$finalAmount',
-              0,
-            ],
-          },
-        },
-      },
-    });
-  } else {
-    pipeline.push({
-      $group: {
-        _id: {
-          day: { $dayOfMonth: '$date' },
-        },
-        income: {
-          $sum: {
-            $cond: [
-              { $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']] },
-              GET_AMOUNT_COP_EXPR,
-              0,
-            ],
-          },
-        },
-        expense: {
-          $sum: {
-            $cond: [
-              {
-                $not: {
-                  $in: ['$type', ['Ingreso', 'INCOME', 'factura_emitida']],
-                },
-              },
-              GET_AMOUNT_COP_EXPR,
-              0,
-            ],
-          },
-        },
-      },
-    });
-  }
 
   pipeline.push({ $sort: { '_id.day': 1 } });
   const dailyData = await Movement.aggregate(pipeline);
 
   // Fill in missing days
-  const year = referenceDate.getFullYear();
-  const month = referenceDate.getMonth();
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const year = referenceDate.getUTCFullYear();
+  const month = referenceDate.getUTCMonth();
+  const daysInMonth = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
 
   const formattedDailyData = [];
   for (let i = 1; i <= daysInMonth; i++) {

@@ -9,7 +9,9 @@ export interface IMovement extends Document {
   currency: string;
   exchangeRate: mongoose.Types.Decimal128;
   amountInCOP: mongoose.Types.Decimal128;
-  type: string; // 'Ingreso' or 'Egreso' (presumably)
+  type: string; // 'Ingreso', 'Egreso' or 'Traslado'
+  account?: mongoose.Types.ObjectId | string; // cuenta propia de origen
+  destinationAccount?: mongoose.Types.ObjectId | string; // solo en Traslados
   category: mongoose.Types.ObjectId | ICategory; // Populated Category or ObjectId string
   costCenter: string[]; // One or more cost center codes
   beneficiary: string;
@@ -60,6 +62,8 @@ const MovementSchema: Schema = new Schema(
     exchangeRate: { type: Schema.Types.Decimal128, default: 1 },
     amountInCOP: { type: Schema.Types.Decimal128, default: 0 },
     type: { type: String, required: true },
+    account: { type: Schema.Types.ObjectId, ref: 'Account' },
+    destinationAccount: { type: Schema.Types.ObjectId, ref: 'Account' },
     category: { type: Schema.Types.ObjectId, ref: 'Category' },
     costCenter: { type: [String], default: undefined },
     beneficiary: { type: String },

@@ -5,8 +5,10 @@ import Book from '@/models/Book';
 import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { subtract, toNumber, gtZero } from '@/lib/math';
+import { accountMatchStage } from '@/lib/finance/cashflow';
 import { getUnitsSoldFromInvoices } from './aggregations';
 import { calculateHealthMetrics } from './health';
+import { resolveCash } from './cash';
 import {
   getTotals,
   getMovements,
@@ -74,6 +76,7 @@ export async function GET(request: NextRequest) {
     const now = new Date();
     const costCenterParam = searchParams.get('costCenter');
     const groupBy = searchParams.get('groupBy');
+    const accountParam = searchParams.get('account');
 
     if (groupBy === 'book' && searchParams.get('creatorId')) {
       return handleBookGroupBy(searchParams.get('creatorId')!);
@@ -139,7 +142,7 @@ export async function GET(request: NextRequest) {
           matchStage = { costCenter: '________' };
         }
       }
-      return matchStage;
+      return { ...matchStage, ...accountMatchStage(accountParam) };
     }
 
     async function getFinancialReport(
@@ -161,7 +164,7 @@ export async function GET(request: NextRequest) {
 
       // 1. Calculate Totals (for the filtered period)
       const { totalIncome, totalExpenses, totalQuantity, netBalance } =
-        await getTotals(matchStage, costCenterCode);
+        await getTotals(matchStage, costCenterCode, accountParam);
 
       // 1.1 Unidades vendidas: para un CC específico se calculan desde las
       // facturas (ver getUnitsSoldFromInvoices), no desde movements.quantity.
@@ -173,7 +176,8 @@ export async function GET(request: NextRequest) {
       const { formattedMonthlyData } = await getMonthlyData(
         matchStage,
         yearParam && !monthParam ? parseInt(yearParam) : undefined,
-        costCenterCode
+        costCenterCode,
+        accountParam
       );
 
       // 3. Category & Cost Center Breakdowns
@@ -215,7 +219,8 @@ export async function GET(request: NextRequest) {
           startDate,
           endDate,
           startDate,
-          costCenterCode
+          costCenterCode,
+          accountParam
         );
       }
 
@@ -232,8 +237,16 @@ export async function GET(request: NextRequest) {
         const prevPeriodEnd = new Date(startDate.getTime() - 1);
 
         const [previousTotals, currentTotals] = await Promise.all([
-          getTotals({ ...baseMatchStage, date: { $lte: prevPeriodEnd } }),
-          getTotals({ ...baseMatchStage, date: { $lte: endDate } }),
+          getTotals(
+            { ...baseMatchStage, date: { $lte: prevPeriodEnd } },
+            undefined,
+            accountParam
+          ),
+          getTotals(
+            { ...baseMatchStage, date: { $lte: endDate } },
+            undefined,
+            accountParam
+          ),
         ]);
 
         balanceData = {
@@ -242,6 +255,18 @@ export async function GET(request: NextRequest) {
         };
       }
 
+      // 6.1 Saldo de caja real (todas las cuentas) desde los cierres documentados.
+      const { cash, balances, health: healthOptions } = await resolveCash({
+        filters: {
+          costCenter: costCenterParam,
+          creatorId: searchParams.get('creatorId'),
+          account: accountParam,
+        },
+        yearParam,
+        monthParam,
+        legacyBalances: balanceData,
+      });
+
       // 7. Calculate Health Metrics
       const health = calculateHealthMetrics(
         totalIncome,
@@ -249,7 +274,8 @@ export async function GET(request: NextRequest) {
         netBalance,
         formattedMonthlyData,
         yearParam,
-        monthParam
+        monthParam,
+        healthOptions
       );
 
       return {
@@ -281,7 +307,8 @@ export async function GET(request: NextRequest) {
         costCentersIncome,
         movements,
         health,
-        balances: balanceData,
+        balances,
+        cash,
       };
     }
 

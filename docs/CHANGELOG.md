@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-11-06
+
+### ✨ Nuevas Características (1.1.0)
+
+- **Saldo de caja real (todas las cuentas)**:
+  - **Cierres documentados**: nueva colección `reconciliations` (modelo `Reconciliation`) con el cierre mensual de cada cuenta (extracto Davivienda y reportes de MercadoPago/ePayco).
+  - **Gráfica "Plata en caja mes a mes"**: reemplaza la acumulación de ingresos menos egresos en la vista anual. La línea es el saldo de caja a fin de mes (nunca negativo) y las barras son lo que subió o bajó en el mes. Los traslados entre cuentas propias no cuentan como flujo.
+  - **Meses con saldo inicial no documentado**: el saldo de cierre se muestra; el flujo no se inventa (sin barra) y se informa el rango estimado.
+  - **Saldos de apertura/cierre**: `/api/finance/summary` devuelve `cash` y reemplaza `balances` en la vista consolidada (sin filtros). Con filtros de centro de costo, autor o cuenta se conserva el cálculo anterior.
+  - **Lógica pura y probada**: `src/lib/finance/cashBalance.ts` con pruebas unitarias.
+  - **Tres vistas, cada una con lo suyo**: la vista global muestra la historia completa de caja (todos los años con cierres documentados), la anual el año y la mensual el mes. En la vista mensual, un mes con flujo no determinable muestra las entradas y salidas del día en vez del saldo acumulado.
+  - **Indicadores de Sostenibilidad**: usan la caja real como base y dejan fuera de los promedios los meses con flujo no determinable y el mes en curso (`calculateHealthMetrics` recibe `cashBase` y `excludeMonths`).
+  - **Historia de caja completa**: la gráfica "Historia Financiera" (vista global) cubre desde el primer movimiento (mayo 2018) hasta hoy. Antes del primer cierre documentado el saldo se reconstruye hacia atrás restando el flujo de los movimientos cargados (`basis: 'calculado'`), por lo que esos meses son aproximados.
+  - **Resumen Anual para años anteriores**: los años sin cierre de diciembre/enero documentado ya usan la gráfica de caja (antes caían a la gráfica vieja de ingresos y egresos). La serie anual se recorta de la historia completa con `sliceCashYear`, y las tarjetas de caja, saldos e indicadores de sostenibilidad usan esa misma serie.
+
+### 🚀 Mejoras & UX (1.1.0)
+
+- **Gráficas con scroll horizontal**: "Historia Financiera" (`CashBalanceChart`, prop `scrollable`) y "Evolución del Resultado" (`RunwayProjectionChart`) tienen ancho fijo por mes y scroll horizontal dentro de su contenedor; abren posicionadas en el mes más reciente.
+
 ## [1.0.5] - 2026-05-08
 
 ### ✨ Nuevas Características (1.0.5)
