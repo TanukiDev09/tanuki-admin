@@ -6,6 +6,11 @@ import CostCenter from '@/models/CostCenter';
 import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { add, subtract, toNumber } from '@/lib/math';
+import {
+  INCOME_TYPES,
+  TRANSFER_TYPES,
+  classifyMovementType,
+} from '@/lib/finance/cashflow';
 import { subMonths, startOfMonth, format } from 'date-fns';
 
 /**
@@ -53,13 +58,10 @@ export async function GET(request: NextRequest) {
 
     globalTotals.forEach((t) => {
       const val = t.total ? t.total.toString() : '0';
-      const isIncome =
-        t._id === 'Ingreso' ||
-        t._id === 'INCOME' ||
-        t._id === 'factura_emitida';
-      if (isIncome) {
+      const kind = classifyMovementType(t._id);
+      if (kind === 'income') {
         totalIncome = add(totalIncome, val);
-      } else {
+      } else if (kind === 'expense') {
         totalExpenses = add(totalExpenses, val);
       }
     });
@@ -111,9 +113,10 @@ export async function GET(request: NextRequest) {
       const key = `${item._id.year}-${String(item._id.month).padStart(2, '0')}`;
       if (chartData[key]) {
         const val = toNumber(item.total);
-        if (item._id.type === 'Ingreso' || item._id.type === 'INCOME') {
+        const kind = classifyMovementType(item._id.type);
+        if (kind === 'income') {
           chartData[key].income += val;
-        } else {
+        } else if (kind === 'expense') {
           chartData[key].expenses += val;
         }
         chartData[key].balance =
@@ -122,7 +125,7 @@ export async function GET(request: NextRequest) {
     });
 
     // 4. Per Cost Center Stats
-    const incomeTypes = ['Ingreso', 'INCOME', 'factura_emitida'];
+    const incomeTypes = INCOME_TYPES;
 
     const basePortionsPipeline: PipelineStage[] = [
       {
@@ -209,6 +212,7 @@ export async function GET(request: NextRequest) {
 
     const ccStats = await Movement.aggregate([
       ...basePortionsPipeline,
+      { $match: { type: { $nin: TRANSFER_TYPES } } },
       {
         $group: {
           _id: {
@@ -228,6 +232,9 @@ export async function GET(request: NextRequest) {
         },
       },
       ...basePortionsPipeline,
+      {
+        $match: { type: { $nin: TRANSFER_TYPES } },
+      },
       {
         $group: {
           _id: {
@@ -260,9 +267,10 @@ export async function GET(request: NextRequest) {
 
       stats.forEach((s) => {
         const val = toNumber(s.total);
-        if (s._id.type === 'Ingreso' || s._id.type === 'INCOME') {
+        const kind = classifyMovementType(s._id.type);
+        if (kind === 'income') {
           income += val;
-        } else {
+        } else if (kind === 'expense') {
           expense += val;
         }
       });

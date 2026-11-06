@@ -1,0 +1,79 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.cash-balance-chart {
+  width: 100%;
+
+  &__header {
+    margin-bottom: $spacing-md;
+  }
+
+  &__title {
+    color: $foreground;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__subtitle {
+    margin-top: $spacing-xs;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__empty {
+    @include flex-center;
+
+    height: 280px;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__scroll--active {
+    overflow-x: auto;
+    padding-bottom: $spacing-sm;
+  }
+
+  &__chart {
+    width: 100%;
+    height: 340px;
+  }
+
+  &__line {
+    .recharts-line-curve {
+      stroke: $info;
+    }
+
+    .recharts-dot {
+      fill: $info;
+      stroke: $info;
+    }
+  }
+
+  &__bar {
+    &--up {
+      fill: $success;
+    }
+
+    &--down {
+      fill: $danger;
+    }
+  }
+
+  &__tooltip {
+    padding: $spacing-sm $spacing-md;
+    border: 1px solid $border;
+    border-radius: $radius-sm;
+    background: $popover;
+    color: $popover-foreground;
+    font-size: $font-size-xs;
+    box-shadow: $shadow-md;
+
+    p + p {
+      margin-top: $spacing-xs;
+    }
+  }
+
+  &__tooltip-title {
+    font-weight: $font-weight-semibold;
+  }
+}

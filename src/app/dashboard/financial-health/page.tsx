@@ -19,7 +19,7 @@ import { PeriodSelector } from '@/components/dashboard/PeriodSelector';
 import { FinanceMovementsTable } from '@/components/dashboard/FinanceMovementsTable';
 import { CostCenterChart } from '@/components/dashboard/CostCenterChart';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { Movement } from '@/types/movement';
+import type { FinancialHealthData } from './types';
 import './financial-health.scss';
 
 function buildSummaryQueryParams(
@@ -90,50 +90,18 @@ const CategoryBarChart = dynamic(
   }
 );
 
-interface FinancialHealthData {
-  totals: {
-    income: number;
-    expenses: number;
-    balance: number;
-  };
-  monthly: Array<{ month: string; income: number; expenses: number }>;
-  daily?: Array<{
-    month: string;
-    day: string;
-    date: string;
-    income: number;
-    expenses: number;
-  }>;
-  categories?: Array<{ name: string; value: number; color?: string }>;
-  categoriesIncome?: Array<{ name: string; value: number; color?: string }>;
-  categoriesExpense?: Array<{ name: string; value: number; color?: string }>;
-  costCenters?: Array<{ name: string; value: number }>;
-  costCentersIncome?: Array<{ name: string; value: number }>;
-  costCentersExpense?: Array<{ name: string; value: number }>;
-  movements?: Movement[];
-  pagination?: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  };
-  health: {
-    runway: number;
-    burnRate: {
-      gross: number;
-      net: number;
-    };
-    profitMargin: number;
-    avgMonthlyIncome: number;
-    avgMonthlyExpense: number;
-    healthScore?: number;
-    runwayProjection?: Array<{ month: string; balance: number }>;
-  };
-  balances?: {
-    previousMonth: number;
-    currentMonth: number;
-  };
-}
+const CashBalanceChart = dynamic(
+  () =>
+    import('@/components/dashboard/CashBalanceChart').then(
+      (mod) => mod.CashBalanceChart
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="chart-loading-placeholder" style={{ height: '340px' }} />
+    ),
+  }
+);
 
 interface ViewProps {
   data: FinancialHealthData;
@@ -173,7 +141,7 @@ function GlobalView({ data }: ViewProps) {
           />
           <StatCard
             title="Caja Total Actual"
-            value={formatCurrency(data.totals.balance)}
+            value={formatCurrency(data.cash?.current ?? data.totals.balance)}
             icon={Scale}
             variant="info"
             subtext="Disponible real en cuentas hoy"
@@ -205,7 +173,14 @@ function GlobalView({ data }: ViewProps) {
       <section className="financial-health__section">
         <SectionHeader title="Historia Financiera" />
         <div className="financial-health__chart-card">
-          <ScrollableIncomeExpenseChart data={data.monthly} scrollable={true} />
+          {data.cash ? (
+            <CashBalanceChart months={data.cash.months} showYear scrollable />
+          ) : (
+            <ScrollableIncomeExpenseChart
+              data={data.monthly}
+              scrollable={true}
+            />
+          )}
         </div>
       </section>
 
@@ -255,6 +230,9 @@ function MonthlyView({
           </div>
         </div>
       </section>
+      {data.balances?.note && (
+        <p className="financial-health__balance-note">{data.balances.note}</p>
+      )}
 
       {/* Main Statistics */}
       <section className="financial-health__section">
@@ -270,6 +248,11 @@ function MonthlyView({
             value={formatCurrency(data.totals.balance)}
             icon={TrendingUp}
             variant={data.totals.balance >= 0 ? 'info' : 'danger'}
+            subtext={
+              data.balances?.note
+                ? 'Incompleto: faltan ventas de billeteras'
+                : undefined
+            }
           />
           <StatCard
             title="Gastos del Mes"
@@ -288,6 +271,7 @@ function MonthlyView({
               data={data.daily || []}
               variant="daily"
               initialBalance={data.balances?.previousMonth || 0}
+              showBalance={!data.balances?.note}
             />
           </div>
         </div>
@@ -408,10 +392,14 @@ function AnnualView({
       <section className="financial-health__section">
         <SectionHeader title="Desempeño Mensual" />
         <div className="financial-health__chart-card">
-          <ScrollableIncomeExpenseChart
-            data={data.monthly}
-            initialBalance={data.balances?.previousMonth || 0}
-          />
+          {data.cash ? (
+            <CashBalanceChart months={data.cash.months} />
+          ) : (
+            <ScrollableIncomeExpenseChart
+              data={data.monthly}
+              initialBalance={data.balances?.previousMonth || 0}
+            />
+          )}
         </div>
       </section>
 

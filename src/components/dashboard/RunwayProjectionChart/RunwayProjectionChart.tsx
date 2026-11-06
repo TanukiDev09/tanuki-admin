@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import {
   Area,
   AreaChart,
@@ -18,6 +19,8 @@ interface NetIncomeChartProps {
   className?: string;
 }
 
+const MONTH_WIDTH = 56;
+
 export function RunwayProjectionChart({
   data = [],
   className,
@@ -27,6 +30,15 @@ export function RunwayProjectionChart({
     ...d,
     netIncome: d.income - d.expenses,
   }));
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const monthCount = chartData.length;
+
+  // Al abrir, muestra lo más reciente (el final de la serie).
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [monthCount]);
 
   return (
     <Card className={`runway-projection-chart ${className || ''}`}>
@@ -44,66 +56,73 @@ export function RunwayProjectionChart({
             <p>No hay datos históricos disponibles</p>
           </div>
         ) : (
-          <div className="runway-projection-chart__chart-container">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={chartData}
-                margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-              >
-                <defs>
-                  <linearGradient
-                    id="netIncomeGradient"
-                    x1="0"
-                    y1="0"
-                    x2="0"
-                    y2="1"
-                  >
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis
-                  dataKey="month"
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  stroke="hsl(var(--muted-foreground))"
-                  fontSize={10}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(value) => `$${(value / 1000000).toFixed(1)}M`}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'hsl(var(--popover))',
-                    borderColor: 'hsl(var(--border))',
-                    color: 'hsl(var(--popover-foreground))',
-                    fontFamily: 'var(--font-sans)',
-                    borderRadius: 'var(--radius)',
-                  }}
-                  formatter={(value: number | undefined) =>
-                    value !== undefined ? formatCurrency(value) : ''
-                  }
-                  labelFormatter={(label) => `Mes: ${label}`}
-                />
-                <ReferenceLine
-                  y={0}
-                  stroke="hsl(var(--muted-foreground))"
-                  strokeDasharray="3 3"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="netIncome"
-                  name="Resultado Neto"
-                  stroke="#10b981"
-                  strokeWidth={2}
-                  fill="url(#netIncomeGradient)"
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          <div className="runway-projection-chart__scroll" ref={scrollRef}>
+            <div
+              className="runway-projection-chart__chart-container"
+              style={{ minWidth: `${monthCount * MONTH_WIDTH}px` }}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={chartData}
+                  margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
+                >
+                  <defs>
+                    <linearGradient
+                      id="netIncomeGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.1} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis
+                    dataKey="month"
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={10}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={10}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(value) =>
+                      `$${(value / 1000000).toFixed(1)}M`
+                    }
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'hsl(var(--popover))',
+                      borderColor: 'hsl(var(--border))',
+                      color: 'hsl(var(--popover-foreground))',
+                      fontFamily: 'var(--font-sans)',
+                      borderRadius: 'var(--radius)',
+                    }}
+                    formatter={(value: number | undefined) =>
+                      value !== undefined ? formatCurrency(value) : ''
+                    }
+                    labelFormatter={(label) => `Mes: ${label}`}
+                  />
+                  <ReferenceLine
+                    y={0}
+                    stroke="hsl(var(--muted-foreground))"
+                    strokeDasharray="3 3"
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="netIncome"
+                    name="Resultado Neto"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    fill="url(#netIncomeGradient)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         )}
       </CardContent>
