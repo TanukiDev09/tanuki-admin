@@ -3,6 +3,8 @@ import { PipelineStage } from 'mongoose';
 import dbConnect from '@/lib/mongodb';
 import Movement from '@/models/Movement';
 import CostCenter from '@/models/CostCenter';
+import Book from '@/models/Book';
+import Invoice from '@/models/Invoice';
 import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { add, subtract, toNumber } from '@/lib/math';
@@ -260,6 +262,36 @@ export async function GET(request: NextRequest) {
       },
     ]);
 
+    // 6. Libros vinculados y ejemplares vendidos por centro de costo
+    // (mismo criterio que "Unidades Vendidas" del detalle).
+    const [books, unitsByCenter] = await Promise.all([
+      Book.find({ costCenter: { $in: costCenters.map((cc) => cc.code) } })
+        .select('title costCenter')
+        .sort({ title: 1 })
+        .lean<Array<{ title: string; costCenter: string }>>(),
+      Invoice.aggregate([
+        { $match: { status: { $ne: 'Cancelled' } } },
+        { $unwind: '$items' },
+        { $match: { 'items.type': 'libro' } },
+        { $unwind: '$items.costCenter' },
+        {
+          $group: {
+            _id: '$items.costCenter',
+            units: { $sum: { $ifNull: ['$items.quantity', 0] } },
+          },
+        },
+      ]),
+    ]);
+    const firstBookTitle = new Map<string, string>();
+    for (const book of books) {
+      if (!firstBookTitle.has(book.costCenter)) {
+        firstBookTitle.set(book.costCenter, book.title);
+      }
+    }
+    const unitsMap = new Map<string, number>(
+      unitsByCenter.map((u: { _id: string; units: number }) => [u._id, u.units])
+    );
+
     const formattedCCStats = costCenters.map((cc) => {
       const stats = ccStats.filter((s) => s._id.costCenter === cc.code);
       let income = 0;
@@ -300,6 +332,9 @@ export async function GET(request: NextRequest) {
         expense,
         balance: income - expense,
         history,
+        isBook: firstBookTitle.has(cc.code),
+        bookTitle: firstBookTitle.get(cc.code),
+        units: unitsMap.get(cc.code) ?? 0,
       };
     });
 

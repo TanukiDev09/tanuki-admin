@@ -1,0 +1,177 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.cc-card {
+  position: relative; // ancla el enlace que cubre toda la ficha
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+  border: 1px solid $border;
+  border-radius: $radius-xl;
+  background: $card;
+  padding: $spacing-lg;
+  min-width: 0;
+  box-shadow: $shadow-sm;
+  transition: $transition-base;
+
+  &:hover,
+  &:focus-within {
+    border-color: rgba($primary, 0.3);
+    box-shadow: $shadow-md;
+  }
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    min-width: 0;
+  }
+
+  &__badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $spacing-xs;
+  }
+
+  &__code {
+    border: 1px solid rgba($primary, 0.2);
+    border-radius: $radius-full;
+    background: rgba($primary, 0.1);
+    padding: $spacing-2xs $spacing-sm;
+    color: $primary;
+    font-family: $font-family-mono;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+  }
+
+  &__book-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-2xs;
+    border-radius: $radius-full;
+    background: $muted;
+    padding: $spacing-2xs $spacing-sm;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+  }
+
+  &__name {
+    margin: 0;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  // Toda la ficha es clicable; los botones de acción quedan por encima.
+  &__link {
+    color: $foreground;
+
+    &::after {
+      position: absolute;
+      inset: 0;
+      content: '';
+    }
+
+    &:hover {
+      color: $primary;
+    }
+
+    &:focus-visible {
+      outline: none;
+
+      &::after {
+        border-radius: $radius-xl;
+        box-shadow: 0 0 0 2px $primary;
+      }
+    }
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__result {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xs;
+  }
+
+  &__result-value {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+  }
+
+  &__spark {
+    margin-top: $spacing-xs;
+    height: 36px;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $spacing-md;
+    margin: 0;
+    border-top: 1px solid $border;
+    padding-top: $spacing-md;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xs;
+    min-width: 0;
+  }
+
+  &__stat-label {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  &__stat-value {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    font-variant-numeric: tabular-nums;
+
+    &--success {
+      color: $success;
+    }
+
+    &--danger {
+      color: $danger;
+    }
+  }
+
+  &__actions {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-xs;
+    margin-top: auto;
+  }
+
+  &__delete {
+    color: $danger;
+
+    &:hover {
+      background: rgba($danger, 0.1);
+      color: $danger;
+    }
+  }
+}

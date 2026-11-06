@@ -1,0 +1,103 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.cc-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: $spacing-md;
+
+  &__search {
+    position: relative;
+    flex: 1 1 260px;
+    max-width: 420px;
+  }
+
+  &__search-icon {
+    position: absolute;
+    top: 50%;
+    left: $spacing-md;
+    z-index: 1;
+    width: 16px;
+    height: 16px;
+    transform: translateY(-50%);
+    color: $muted-foreground;
+    pointer-events: none;
+  }
+
+  &__search-input {
+    transition: $transition-fast;
+    border-color: transparent;
+    background-color: $muted;
+    padding-left: 2.5rem;
+
+    &:focus {
+      border-color: $primary;
+      background-color: $card;
+    }
+  }
+
+  &__group {
+    display: inline-flex;
+    gap: $spacing-2xs;
+    border-radius: $radius-md;
+    background: $muted;
+    padding: $spacing-2xs;
+  }
+
+  &__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-xs;
+    cursor: pointer;
+    border: none;
+    border-radius: $radius-sm;
+    background: transparent;
+    padding: $spacing-xs $spacing-md;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    transition: $transition-fast;
+
+    &:hover {
+      color: $foreground;
+    }
+
+    &:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px $primary;
+    }
+
+    &--active {
+      background: $card;
+      color: $foreground;
+      box-shadow: $shadow-sm;
+    }
+  }
+
+  &__chip-count {
+    border-radius: $radius-full;
+    background: rgba($primary, 0.1);
+    padding: 0 $spacing-xs;
+    color: $primary;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+  }
+
+  &__sort {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-left: auto;
+  }
+
+  &__sort-label {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    white-space: nowrap;
+  }
+
+  &__sort-select {
+    min-width: 220px;
+  }
+}

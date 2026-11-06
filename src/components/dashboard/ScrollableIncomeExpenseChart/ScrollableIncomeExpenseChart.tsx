@@ -24,6 +24,8 @@ interface ScrollableIncomeExpenseChartProps {
   initialBalance?: number;
   /** false: sin línea de saldo acumulado; se dibujan las entradas y salidas del periodo. */
   showBalance?: boolean;
+  /** Alto de la gráfica en px (por defecto 400). */
+  height?: number;
 }
 
 function balanceSeries() {
@@ -84,6 +86,7 @@ export function ScrollableIncomeExpenseChart({
   variant = 'monthly',
   initialBalance = 0,
   showBalance = true,
+  height = 400,
 }: ScrollableIncomeExpenseChartProps) {
   const isDaily = variant === 'daily';
 
@@ -123,15 +126,14 @@ export function ScrollableIncomeExpenseChart({
         <div className="scrollable-income-expense-chart__scroll-container">
           <div
             className="scrollable-income-expense-chart__chart-wrapper"
-            style={
-              scrollable
-                ? {
-                    width: `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px`,
-                  }
-                : { width: '100%' }
-            }
+            style={{
+              minHeight: height,
+              width: scrollable
+                ? `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px`
+                : '100%',
+            }}
           >
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={height}>
               <ComposedChart
                 data={dataWithBalance}
                 margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
