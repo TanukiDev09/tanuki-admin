@@ -6,16 +6,14 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/Button';
 import {
   Plus,
-  Search,
   TrendingUp,
   DollarSign,
   PieChart as PieChartIcon,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
-import CostCentersTable from '@/components/admin/CostCentersTable/CostCentersTable';
+import CostCenterListing from '@/components/admin/CostCenterListing/CostCenterListing';
 import CostCenterModal from '@/components/admin/CostCenterModal';
-import { CostCenter } from '@/types/cost-center';
-import { Input } from '@/components/ui/Input';
+import type { CostCenter, CostCenterStats } from '@/types/cost-center';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { StatCard } from '@/components/dashboard/StatCard';
@@ -35,14 +33,8 @@ import {
   Pie,
 } from 'recharts';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card';
+import { renderPiePercentLabel } from '@/components/dashboard/PiePercentLabel';
 import './page.scss';
-
-interface CostCenterStats extends CostCenter {
-  income: number;
-  expense: number;
-  balance: number;
-  history: number[];
-}
 
 interface StatsData {
   summary: {
@@ -104,10 +96,17 @@ export default function CostCentersPage() {
     ModuleName.COST_CENTERS,
     PermissionAction.CREATE
   );
+  const canUpdate = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.UPDATE
+  );
+  const canDelete = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.DELETE
+  );
 
   const [data, setData] = useState<StatsData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
 
   // Estados para controlar el modal de creación/edición
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -161,12 +160,14 @@ export default function CostCentersPage() {
     }
   };
 
-  const filteredCostCenters =
-    data?.costCenters.filter(
-      (cc) =>
-        cc.name.toLowerCase().includes(search.toLowerCase()) ||
-        cc.code.toLowerCase().includes(search.toLowerCase())
-    ) || [];
+  // Copia ordenada: no debe mutar data.costCenters (el listado depende de él).
+  const topByBalance = useMemo(
+    () =>
+      [...(data?.costCenters ?? [])]
+        .sort((a, b) => b.balance - a.balance)
+        .slice(0, 8),
+    [data]
+  );
 
   const COLORS = [
     '#3b82f6', // blue-500
@@ -299,7 +300,7 @@ export default function CostCentersPage() {
                 <div className="cost-centers-page__pie-wrapper">
                   <div className="cost-centers-page__pie-main">
                     <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
+                      <PieChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
                         <Pie
                            
                           data={incomeParticipation as any}
@@ -311,6 +312,8 @@ export default function CostCentersPage() {
                           dataKey="value"
                           nameKey="fullName"
                           stroke="none"
+                          label={renderPiePercentLabel}
+                          labelLine={false}
                         >
                           {incomeParticipation.map((entry, index) => (
                             <Cell
@@ -363,7 +366,7 @@ export default function CostCentersPage() {
                 <div className="cost-centers-page__pie-wrapper">
                   <div className="cost-centers-page__pie-main">
                     <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
+                      <PieChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
                         <Pie
                            
                           data={expenseParticipation as any}
@@ -375,6 +378,8 @@ export default function CostCentersPage() {
                           dataKey="value"
                           nameKey="fullName"
                           stroke="none"
+                          label={renderPiePercentLabel}
+                          labelLine={false}
                         >
                           {expenseParticipation.map((entry, index) => (
                             <Cell
@@ -529,11 +534,7 @@ export default function CostCentersPage() {
               </CardHeader>
               <CardContent className="cost-centers-page__chart-container">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={data.costCenters
-                      .sort((a, b) => b.balance - a.balance)
-                      .slice(0, 8)}
-                  >
+                  <BarChart data={topByBalance}>
                     <CartesianGrid
                       strokeDasharray="3 3"
                       vertical={false}
@@ -575,7 +576,7 @@ export default function CostCentersPage() {
                       name="Resultado"
                       radius={[4, 4, 0, 0]}
                     >
-                      {data.costCenters.map((entry, index) => (
+                      {topByBalance.map((entry, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={
@@ -594,36 +595,17 @@ export default function CostCentersPage() {
         </>
       )}
 
-      {/* Table Section */}
-      <div className="cost-centers-page__table-section">
-        <div className="cost-centers-page__table-header">
-          <div className="cost-centers-page__table-title">
-            <h2 className="text-xl font-semibold">Listado de Centros</h2>
-            <p className="text-sm text-muted-foreground">
-              {filteredCostCenters.length} centros encontrados
-            </p>
-          </div>
-          <div className="cost-centers-page__search-container">
-            <Search className="cost-centers-page__search-icon" />
-            <Input
-              placeholder="Buscar por código o nombre..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="cost-centers-page__search"
-            />
-          </div>
-        </div>
-
-        <CostCentersTable
-          costCenters={filteredCostCenters}
-          loading={loading}
-          onEdit={(cc) => {
-            setSelectedCostCenter(cc);
-            setIsModalOpen(true);
-          }}
-          onDelete={handleDelete}
-        />
-      </div>
+      <CostCenterListing
+        costCenters={data?.costCenters ?? []}
+        loading={loading}
+        canUpdate={canUpdate}
+        canDelete={canDelete}
+        onEdit={(cc: CostCenter) => {
+          setSelectedCostCenter(cc);
+          setIsModalOpen(true);
+        }}
+        onDelete={handleDelete}
+      />
 
       <CostCenterModal
         isOpen={isModalOpen}

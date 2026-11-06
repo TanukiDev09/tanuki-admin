@@ -182,58 +182,10 @@
     font-variant-numeric: tabular-nums;
   }
 
-  &__table-section {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-lg;
-    background-color: $card;
-    border-radius: $radius-lg;
-    border: 1px solid $border;
-    padding: $spacing-lg;
-    box-shadow: $shadow-sm;
-  }
 
-  &__table-header {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-md;
 
-    @include md {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-    }
-  }
 
-  &__search-container {
-    position: relative;
-    width: 100%;
-    max-width: 400px;
-  }
 
-  &__search-icon {
-    position: absolute;
-    left: $spacing-md;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 16px;
-    height: 16px;
-    color: $muted-foreground;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  &__search {
-    padding-left: 2.5rem;
-    background-color: $muted;
-    border-color: transparent;
-    transition: $transition-fast;
-
-    &:focus {
-      background-color: $card;
-      border-color: $primary;
-    }
-  }
 
   &__new-btn {
     box-shadow: $shadow-sm;

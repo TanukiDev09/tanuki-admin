@@ -1,0 +1,161 @@
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.cc-insights {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+
+  &__header {
+    padding-bottom: $spacing-sm;
+  }
+
+  &__title {
+    color: $foreground;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+  }
+
+  &__subtitle {
+    margin-top: $spacing-2xs;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+
+  &__headline {
+    color: $foreground;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+  }
+
+  &__note {
+    color: $foreground;
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
+  }
+
+  &__footnote {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    line-height: $line-height-relaxed;
+  }
+
+  &__empty {
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__progress {
+    border-radius: $radius-full;
+    background: $muted;
+    height: 8px;
+    overflow: hidden;
+  }
+
+  &__progress-fill {
+    border-radius: $radius-full;
+    height: 100%;
+    transition: width 0.4s ease-out;
+
+    &--primary {
+      background: $primary;
+    }
+
+    &--success {
+      background: $success;
+    }
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: $spacing-md;
+    margin: 0;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2xs;
+    min-width: 0;
+  }
+
+  &__stat-label {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  &__stat-value {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+
+    &--success {
+      color: $success;
+    }
+
+    &--danger {
+      color: $danger;
+    }
+
+    &--warning {
+      color: $warning;
+    }
+  }
+
+  &__stat-hint {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
+  &--hero &__headline {
+    font-size: $font-size-3xl;
+    letter-spacing: -0.02em;
+  }
+
+  &__kpi {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: $spacing-2xs;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    background: $card;
+    padding: $spacing-md $spacing-lg;
+    min-width: 0;
+  }
+
+  &__kpi-value {
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    line-height: 1.2;
+  }
+
+  &__aging {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    border-top: 1px solid $border;
+    padding: $spacing-sm 0 0;
+    list-style: none;
+  }
+
+  &__aging-row {
+    display: flex;
+    justify-content: space-between;
+    padding: $spacing-2xs 0;
+    font-size: $font-size-sm;
+  }
+}
