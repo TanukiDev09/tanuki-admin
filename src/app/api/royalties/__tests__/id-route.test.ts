@@ -33,7 +33,12 @@ jest.mock('mongoose', () => {
   }
   return {
     __esModule: true,
-    default: { Types: { ObjectId }, models: {}, model: () => ({}), Schema: class {} },
+    default: {
+      Types: { ObjectId },
+      models: {},
+      model: () => ({}),
+      Schema: class {},
+    },
   };
 });
 
@@ -163,11 +168,17 @@ describe('GET /api/royalties/[id]', () => {
 
 describe('PATCH approve', () => {
   it('aprueba un borrador a favor del autor y crea una Cuenta por Pagar', async () => {
-    const stmt = makeStatement({ balanceInFavorOf: 'author', netSettlement: 4400 });
+    const stmt = makeStatement({
+      balanceInFavorOf: 'author',
+      netSettlement: 4400,
+    });
     findByIdMock.mockReturnValue(stmt);
     debtCreate.mockResolvedValue({ _id: 'debt1' });
 
-    const res = (await PATCH(reqWith({ action: 'approve' }), ctx())) as unknown as {
+    const res = (await PATCH(
+      reqWith({ action: 'approve' }),
+      ctx()
+    )) as unknown as {
       status: number;
     };
 
@@ -201,7 +212,10 @@ describe('PATCH approve', () => {
 
   it('no permite aprobar si no es borrador', async () => {
     findByIdMock.mockReturnValue(makeStatement({ status: 'approved' }));
-    const res = (await PATCH(reqWith({ action: 'approve' }), ctx())) as unknown as {
+    const res = (await PATCH(
+      reqWith({ action: 'approve' }),
+      ctx()
+    )) as unknown as {
       status: number;
     };
     expect(res.status).toBe(400);
@@ -300,7 +314,10 @@ describe('PATCH revert', () => {
       debtId: 'debt1',
     });
     findByIdMock.mockReturnValue(stmt);
-    const res = (await PATCH(reqWith({ action: 'revert' }), ctx())) as unknown as {
+    const res = (await PATCH(
+      reqWith({ action: 'revert' }),
+      ctx()
+    )) as unknown as {
       status: number;
     };
     expect(res.status).toBe(400);

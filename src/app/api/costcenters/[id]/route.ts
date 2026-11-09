@@ -70,7 +70,10 @@ export async function PUT(
       const trimmedName = body.name.trim();
       if (!trimmedName || trimmedName.length < 2) {
         return NextResponse.json(
-          { success: false, error: 'El nombre debe tener al menos 2 caracteres' },
+          {
+            success: false,
+            error: 'El nombre debe tener al menos 2 caracteres',
+          },
           { status: 400 }
         );
       }
@@ -83,7 +86,10 @@ export async function PUT(
 
       if (existingName) {
         return NextResponse.json(
-          { success: false, error: 'Ya existe otro centro de costo con este nombre' },
+          {
+            success: false,
+            error: 'Ya existe otro centro de costo con este nombre',
+          },
           { status: 409 }
         );
       }
@@ -159,7 +165,8 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'Centro de costo desactivado (eliminado lógicamente) exitosamente',
+      message:
+        'Centro de costo desactivado (eliminado lógicamente) exitosamente',
     });
   } catch (error) {
     console.error('Delete Cost Center Error:', error);

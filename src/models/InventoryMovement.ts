@@ -1,5 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { InventoryMovementType, InventoryMovementSubType } from '@/types/inventory-movement';
+import {
+  InventoryMovementType,
+  InventoryMovementSubType,
+} from '@/types/inventory-movement';
 
 export { InventoryMovementType, InventoryMovementSubType };
 

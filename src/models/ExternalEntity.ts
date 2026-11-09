@@ -15,7 +15,14 @@ const ExternalEntitySchema: Schema = new Schema(
     },
     type: {
       type: String,
-      enum: ['Socio', 'Banco', 'Persona Natural', 'Empresa SAS', 'Proveedor', 'Otro'],
+      enum: [
+        'Socio',
+        'Banco',
+        'Persona Natural',
+        'Empresa SAS',
+        'Proveedor',
+        'Otro',
+      ],
       default: 'Otro',
     },
     contactInfo: {

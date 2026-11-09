@@ -23,17 +23,14 @@ export interface SalesChannelSlice {
   value: number;
 }
 
-const POS_NAME_SUFFIX = /\s+(Librerías|Librería|S\.?A\.?S\.?|S\.?A\.?|Libros)\s*$/i;
+const POS_NAME_SUFFIX =
+  /\s+(Librerías|Librería|S\.?A\.?S\.?|S\.?A\.?|Libros)\s*$/i;
 
 export const normalizeTaxId = (value?: string): string =>
   (value ?? '').replace(/[^0-9a-z]/gi, '').toLowerCase();
 
 const normalizeName = (value?: string): string =>
-  (value ?? '')
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .trim()
-    .toLowerCase();
+  (value ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
 
 /** Nombre base del PdV sin sufijos societarios; vacío si es muy corto. */
 const baseName = (name: string): string => {

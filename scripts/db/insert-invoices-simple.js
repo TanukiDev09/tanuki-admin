@@ -12,49 +12,58 @@ require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 const mongoose = require('mongoose');
 
 // Invoice schema
-const invoiceSchema = new mongoose.Schema({
-  number: String,
-  date: Date,
-  dueDate: Date,
-  customerName: String,
-  customerTaxId: String,
-  customerDocumentType: String,
-  customerAddress: String,
-  customerCity: String,
-  customerEmail: String,
-  customerPhone: String,
-  items: [{
-    type: { type: String },
-    description: String,
-    quantity: Number,
-    unitPrice: Number,
+const invoiceSchema = new mongoose.Schema(
+  {
+    number: String,
+    date: Date,
+    dueDate: Date,
+    customerName: String,
+    customerTaxId: String,
+    customerDocumentType: String,
+    customerAddress: String,
+    customerCity: String,
+    customerEmail: String,
+    customerPhone: String,
+    items: [
+      {
+        type: { type: String },
+        description: String,
+        quantity: Number,
+        unitPrice: Number,
+        discount: Number,
+        total: Number,
+        bookId: String,
+        costCenter: String,
+      },
+    ],
+    subtotal: Number,
+    tax: Number,
     discount: Number,
     total: Number,
-    bookId: String,
-    costCenter: String,
-  }],
-  subtotal: Number,
-  tax: Number,
-  discount: Number,
-  total: Number,
-  status: String,
-  salesChannel: String,
-  costCenters: [{
-    code: String,
-    amount: Number,
-  }],
-  movements: [mongoose.Schema.Types.ObjectId],
-  fiscalYear: Number,
-  notes: String,
-  newsletterSignup: Boolean,
-  orderReference: String,
-}, { collection: 'invoices', timestamps: false });
+    status: String,
+    salesChannel: String,
+    costCenters: [
+      {
+        code: String,
+        amount: Number,
+      },
+    ],
+    movements: [mongoose.Schema.Types.ObjectId],
+    fiscalYear: Number,
+    notes: String,
+    newsletterSignup: Boolean,
+    orderReference: String,
+  },
+  { collection: 'invoices', timestamps: false }
+);
 
 async function insertInvoices() {
   const jsonlPath = process.argv[2];
 
   if (!jsonlPath) {
-    console.error('❌ Uso: node insert-invoices-simple.js <ruta-a-archivo.jsonl>');
+    console.error(
+      '❌ Uso: node insert-invoices-simple.js <ruta-a-archivo.jsonl>'
+    );
     process.exit(1);
   }
 
@@ -103,7 +112,7 @@ async function insertInvoices() {
 
     if (errors.length > 0) {
       console.log(`\n⚠️  Primeros 5 errores:`);
-      errors.slice(0, 5).forEach(e => {
+      errors.slice(0, 5).forEach((e) => {
         console.log(`   Línea ${e.line}: ${e.error}`);
       });
     }

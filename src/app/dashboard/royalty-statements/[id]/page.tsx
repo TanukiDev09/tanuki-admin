@@ -138,9 +138,7 @@ export default function RoyaltyStatementDetailPage(props: {
   };
 
   if (loading) {
-    return (
-      <div className="p-6 animate-pulse text-gray-400">Cargando...</div>
-    );
+    return <div className="p-6 animate-pulse text-gray-400">Cargando...</div>;
   }
 
   if (!statement) return null;
@@ -195,8 +193,14 @@ export default function RoyaltyStatementDetailPage(props: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Copias totales', value: statement.totalCopies.toString() },
-          { label: 'Total facturado', value: formatCOP(statement.totalInvoiced) },
-          { label: 'Total regalías', value: formatCOP(statement.totalRoyalties) },
+          {
+            label: 'Total facturado',
+            value: formatCOP(statement.totalInvoiced),
+          },
+          {
+            label: 'Total regalías',
+            value: formatCOP(statement.totalRoyalties),
+          },
           {
             label: 'Liquidación neta',
             value: formatCOP(statement.netSettlement),
@@ -229,7 +233,9 @@ export default function RoyaltyStatementDetailPage(props: {
                 {formatCOP(statement.previousBalance)}
               </span>{' '}
               a favor del{' '}
-              {statement.balanceInFavorOf === 'author' ? 'autor' : 'la editorial'}
+              {statement.balanceInFavorOf === 'author'
+                ? 'autor'
+                : 'la editorial'}
             </p>
           )}
           {statement.advancePayment !== 0 && (
@@ -253,7 +259,10 @@ export default function RoyaltyStatementDetailPage(props: {
 
       {/* Detalle por libro */}
       {statement.books.map((bookEntry, i) => (
-        <div key={i} className="rounded-lg border border-gray-200 overflow-hidden">
+        <div
+          key={i}
+          className="rounded-lg border border-gray-200 overflow-hidden"
+        >
           <div className="bg-gray-50 px-4 py-3 flex items-center justify-between">
             <div>
               <p className="font-semibold">{bookEntry.bookTitle}</p>

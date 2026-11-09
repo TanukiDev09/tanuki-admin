@@ -27,6 +27,10 @@
   --color-muted-foreground: hsl(var(--muted-foreground));
   --color-muted-rgb: var(--muted-rgb);
 
+  /* Aliases de texto atenuado: apuntan al gris AAA (slate-700) */
+  --color-text-muted: var(--color-muted-foreground);
+  --text-muted: var(--color-muted-foreground);
+
   --color-accent: hsl(var(--accent));
   --color-accent-foreground: hsl(var(--accent-foreground));
 

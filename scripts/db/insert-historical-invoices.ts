@@ -76,8 +76,8 @@ const invoiceSchema = new mongoose.Schema<Invoice>(
         discount: Number,
         total: Number,
         bookId: String,
-        costCenter: String
-      }
+        costCenter: String,
+      },
     ],
     subtotal: { type: Number, required: true },
     tax: { type: Number, default: 0 },
@@ -88,8 +88,8 @@ const invoiceSchema = new mongoose.Schema<Invoice>(
     costCenters: [
       {
         code: String,
-        amount: Number
-      }
+        amount: Number,
+      },
     ],
     movements: [mongoose.Schema.Types.Mixed],
     dianData: mongoose.Schema.Types.Mixed,
@@ -97,11 +97,11 @@ const invoiceSchema = new mongoose.Schema<Invoice>(
     fiscalYear: { type: Number, required: true },
     notes: String,
     newsletterSignup: { type: Boolean, default: false },
-    orderReference: String
+    orderReference: String,
   },
   {
     collection: 'invoices',
-    timestamps: true
+    timestamps: true,
   }
 );
 
@@ -130,7 +130,9 @@ async function processLine(line: string, index: number, total: number) {
       errorMsg = 'Error al parsear JSON';
     }
 
-    console.log(`[${idx}/${total}] ❌ ${number} - ${errorMsg.substring(0, 50)}`);
+    console.log(
+      `[${idx}/${total}] ❌ ${number} - ${errorMsg.substring(0, 50)}`
+    );
     return { success: false, number, error: errorMsg };
   }
 }
@@ -140,7 +142,9 @@ async function insertHistoricalInvoices() {
     const jsonlPath = process.argv[2];
 
     if (!jsonlPath) {
-      console.error('❌ Uso: npx ts-node scripts/db/insert-historical-invoices.ts <ruta-a-jsonl>');
+      console.error(
+        '❌ Uso: npx ts-node scripts/db/insert-historical-invoices.ts <ruta-a-jsonl>'
+      );
       console.error(
         '   Ejemplo: npx ts-node scripts/db/insert-historical-invoices.ts ../../../TANUKI/00-TANUKI-SAS/09-Finanzas/Finanzas\\ Tanuki/facturas_s7_extract.jsonl'
       );
@@ -151,14 +155,18 @@ async function insertHistoricalInvoices() {
       throw new Error(`Archivo no encontrado: ${jsonlPath}`);
     }
 
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/tanuki-admin';
+    const mongoUri =
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/tanuki-admin';
     console.log(`📡 Conectando a MongoDB: ${mongoUri}\n`);
 
     await mongoose.connect(mongoUri);
     console.log('✅ Conectado a MongoDB\n');
 
     const jsonlContent = fs.readFileSync(jsonlPath, 'utf-8');
-    const lines = jsonlContent.trim().split('\n').filter(line => line.trim());
+    const lines = jsonlContent
+      .trim()
+      .split('\n')
+      .filter((line) => line.trim());
 
     console.log(`📋 Insertando ${lines.length} facturas históricas...\n`);
 
@@ -170,7 +178,10 @@ async function insertHistoricalInvoices() {
       if (result.success) {
         insertedCount++;
       } else {
-        errors.push({ number: result.number, error: result.error || 'Unknown error' });
+        errors.push({
+          number: result.number,
+          error: result.error || 'Unknown error',
+        });
       }
     }
 
@@ -182,7 +193,9 @@ async function insertHistoricalInvoices() {
 
     if (errors.length > 0) {
       console.log('⚠️ Errores detallados:');
-      errors.forEach(e => console.log(`   - ${e.number}: ${e.error.substring(0, 80)}`));
+      errors.forEach((e) =>
+        console.log(`   - ${e.number}: ${e.error.substring(0, 80)}`)
+      );
       console.log();
     }
 
@@ -198,5 +211,3 @@ async function insertHistoricalInvoices() {
 }
 
 insertHistoricalInvoices();
-
-

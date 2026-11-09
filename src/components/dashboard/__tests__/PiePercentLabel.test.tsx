@@ -17,7 +17,9 @@ describe('renderPiePercentLabel', () => {
 
   it('ancla a la izquierda las porciones del lado izquierdo', () => {
     const { container } = render(
-      <svg>{renderPiePercentLabel({ ...base, midAngle: 180, percent: 0.5 })}</svg>
+      <svg>
+        {renderPiePercentLabel({ ...base, midAngle: 180, percent: 0.5 })}
+      </svg>
     );
     expect(container.querySelector('text')?.getAttribute('text-anchor')).toBe(
       'end'

@@ -94,9 +94,16 @@ export default function InventoryPage() {
 
         <div className="inventory-page__section">
           <div className="inventory-page__section-header">
-            <h2 className="inventory-page__section-title"> Últimos Movimientos</h2>
+            <h2 className="inventory-page__section-title">
+              {' '}
+              Últimos Movimientos
+            </h2>
             <Link href="/dashboard/inventory/movements" passHref>
-              <Button variant="ghost" size="sm" className="inventory-page__history-btn">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="inventory-page__history-btn"
+              >
                 <History className="h-4 w-4 mr-2" />
                 Ver histórico completo de movimientos
               </Button>

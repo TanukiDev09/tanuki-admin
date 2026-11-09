@@ -141,7 +141,10 @@ export default function RoyaltyStatementDetail({ id }: { id: string }) {
 
   const handlePay = async () => {
     await patch(
-      { action: 'pay', amount: payAmount === '' ? undefined : Number(payAmount) },
+      {
+        action: 'pay',
+        amount: payAmount === '' ? undefined : Number(payAmount),
+      },
       'Pago registrado'
     );
     setPayOpen(false);

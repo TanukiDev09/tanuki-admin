@@ -72,7 +72,10 @@ export interface CreateMovementBody {
 // costCenter is always stored as an array in the DB, but a movement/item/
 // allocation only ever belongs to that array's codes — most call sites just
 // need to know if a given code is among them.
-export function matchesCC(cc: string | string[] | undefined, code: string): boolean {
+export function matchesCC(
+  cc: string | string[] | undefined,
+  code: string
+): boolean {
   if (!cc) return false;
   if (Array.isArray(cc)) return cc.includes(code);
   return cc === code;

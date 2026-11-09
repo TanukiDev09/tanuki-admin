@@ -256,7 +256,11 @@ export async function GET(request: NextRequest) {
       }
 
       // 6.1 Saldo de caja real (todas las cuentas) desde los cierres documentados.
-      const { cash, balances, health: healthOptions } = await resolveCash({
+      const {
+        cash,
+        balances,
+        health: healthOptions,
+      } = await resolveCash({
         filters: {
           costCenter: costCenterParam,
           creatorId: searchParams.get('creatorId'),

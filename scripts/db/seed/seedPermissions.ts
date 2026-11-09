@@ -10,7 +10,8 @@ async function seedPermissions() {
     console.log('Cargando dependencias...');
     const dbConnect = (await import('../../../src/lib/mongodb')).default;
     const User = (await import('../../../src/models/User')).default;
-    const { createDefaultPermissions } = await import('../../../src/lib/permissions');
+    const { createDefaultPermissions } =
+      await import('../../../src/lib/permissions');
 
     console.log('Conectando a MongoDB...');
     await dbConnect();
@@ -50,4 +51,3 @@ async function seedPermissions() {
 }
 
 seedPermissions();
-

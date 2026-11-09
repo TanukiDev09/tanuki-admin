@@ -29,18 +29,40 @@ interface BenchmarkResult {
   usesIndex: boolean;
 }
 
+interface PlanStage {
+  stage?: string;
+  indexName?: string;
+  inputStage?: PlanStage;
+  inputStages?: PlanStage[];
+}
+
 interface ExplainResult {
   executionStats?: {
     totalDocsExamined?: number;
     nReturned?: number;
   };
   queryPlanner?: {
-    winningPlan?: {
-      inputStage?: {
-        indexName?: string;
-      };
-    };
+    winningPlan?: PlanStage;
   };
+}
+
+// Umbral del estándar de release: un COLLSCAN solo es showstopper
+// cuando la colección supera los 10.000 documentos examinados.
+const COLLSCAN_SHOWSTOPPER_DOCS = 10_000;
+
+// Recorre el árbol de plan (LIMIT → FETCH → IXSCAN, OR, SORT_MERGE, etc.)
+function findIndexName(stage?: PlanStage): string | null {
+  if (!stage) return null;
+  if (stage.indexName) return stage.indexName;
+  if (stage.inputStage) {
+    const nested = findIndexName(stage.inputStage);
+    if (nested) return nested;
+  }
+  for (const child of stage.inputStages || []) {
+    const nested = findIndexName(child);
+    if (nested) return nested;
+  }
+  return null;
 }
 
 async function runBenchmark(
@@ -62,6 +84,7 @@ async function runBenchmark(
     .explain('executionStats')) as unknown as ExplainResult;
 
   const executionStats = explain.executionStats;
+  const indexUsed = findIndexName(explain.queryPlanner?.winningPlan);
 
   return {
     query: queryName,
@@ -69,8 +92,8 @@ async function runBenchmark(
     executionTime,
     docsExamined: executionStats?.totalDocsExamined || 0,
     docsReturned: executionStats?.nReturned || 0,
-    indexUsed: explain.queryPlanner?.winningPlan?.inputStage?.indexName || null,
-    usesIndex: !!explain.queryPlanner?.winningPlan?.inputStage?.indexName,
+    indexUsed,
+    usesIndex: !!indexUsed,
   };
 }
 
@@ -205,7 +228,15 @@ async function benchmark() {
     console.log('='.repeat(80));
 
     results.forEach((result) => {
-      const indexIndicator = result.usesIndex ? '✅' : '❌';
+      // Un COLLSCAN solo es showstopper cuando la colección es grande.
+      // En colecciones pequeñas el optimizador prefiere el scan completo.
+      const isShowstopper =
+        !result.usesIndex && result.docsExamined > COLLSCAN_SHOWSTOPPER_DOCS;
+      const indexIndicator = result.usesIndex
+        ? '✅'
+        : isShowstopper
+          ? '❌'
+          : '⚠️ ';
       console.log(`\n${indexIndicator} ${result.collection} - ${result.query}`);
       console.log(`   ⏱️  Tiempo: ${result.executionTime}ms`);
       console.log(
@@ -217,11 +248,21 @@ async function benchmark() {
       console.log(
         `   🔍 Índice usado: ${result.indexUsed || 'NINGUNO (Collection Scan)'}`
       );
+      if (!result.usesIndex && !isShowstopper) {
+        console.log(
+          `   ℹ️  Colección pequeña (≤ ${COLLSCAN_SHOWSTOPPER_DOCS.toLocaleString()} docs): aceptable`
+        );
+      }
     });
 
     // Resumen
     const withIndex = results.filter((r) => r.usesIndex).length;
-    const withoutIndex = results.filter((r) => !r.usesIndex).length;
+    const showstoppers = results.filter(
+      (r) => !r.usesIndex && r.docsExamined > COLLSCAN_SHOWSTOPPER_DOCS
+    );
+    const acceptableScans = results.filter(
+      (r) => !r.usesIndex && r.docsExamined <= COLLSCAN_SHOWSTOPPER_DOCS
+    );
     const avgTimeWithIndex =
       results
         .filter((r) => r.usesIndex)
@@ -229,12 +270,18 @@ async function benchmark() {
     const avgTimeWithoutIndex =
       results
         .filter((r) => !r.usesIndex)
-        .reduce((sum, r) => sum + r.executionTime, 0) / (withoutIndex || 1);
+        .reduce((sum, r) => sum + r.executionTime, 0) /
+      (acceptableScans.length + showstoppers.length || 1);
 
     console.log('\n' + '='.repeat(80));
     console.log('📈 RESUMEN:');
     console.log(`  ✅ Consultas usando índice: ${withIndex}`);
-    console.log(`  ❌ Consultas sin índice: ${withoutIndex}`);
+    console.log(
+      `  ⚠️  COLLSCAN en colecciones pequeñas (aceptable): ${acceptableScans.length}`
+    );
+    console.log(
+      `  ❌ COLLSCAN showstopper (>10.000 docs): ${showstoppers.length}`
+    );
     console.log(
       `  ⏱️  Tiempo promedio con índice: ${avgTimeWithIndex.toFixed(2)}ms`
     );
@@ -242,6 +289,17 @@ async function benchmark() {
       `  ⏱️  Tiempo promedio sin índice: ${avgTimeWithoutIndex.toFixed(2)}ms`
     );
     console.log('='.repeat(80));
+
+    if (showstoppers.length > 0) {
+      console.error(
+        `\n❌ ${showstoppers.length} consulta(s) requieren índice antes del release.`
+      );
+      process.exitCode = 1;
+    } else {
+      console.log(
+        '\n✅ Ninguna consulta requiere índice: todos los COLLSCAN están en colecciones pequeñas.'
+      );
+    }
   } catch (error) {
     console.error('❌ Error fatal:', error);
     process.exit(1);

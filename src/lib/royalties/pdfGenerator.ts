@@ -120,7 +120,10 @@ export const generateRoyaltyPDF = (
       foot: [
         [
           { content: 'Subtotal', styles: { halign: 'right' } },
-          { content: formatNumber(book.totalCopies), styles: { halign: 'center' } },
+          {
+            content: formatNumber(book.totalCopies),
+            styles: { halign: 'center' },
+          },
           '',
           '',
           '',
@@ -131,7 +134,12 @@ export const generateRoyaltyPDF = (
         ],
       ],
       theme: 'striped',
-      headStyles: { fillColor: dark, textColor: 255, fontSize: 8, halign: 'center' },
+      headStyles: {
+        fillColor: dark,
+        textColor: 255,
+        fontSize: 8,
+        halign: 'center',
+      },
       bodyStyles: { fontSize: 8 },
       columnStyles: {
         0: { cellWidth: 30 },

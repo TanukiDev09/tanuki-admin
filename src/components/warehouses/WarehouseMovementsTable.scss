@@ -17,7 +17,7 @@
   .data-table-container {
     overflow-x: auto;
     width: 100%;
-    
+
     // Prohibit unnecessary horizontal scrolling but make sure it handles responsiveness cleanly
     -webkit-overflow-scrolling: touch;
   }
@@ -79,7 +79,7 @@
   // Hover animations for action buttons
   .btn-ghost {
     transition: all 0.2s ease;
-    
+
     &:hover {
       transform: translateY(-1px);
     }
