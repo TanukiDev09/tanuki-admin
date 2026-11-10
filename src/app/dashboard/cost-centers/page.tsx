@@ -110,7 +110,8 @@ export default function CostCentersPage() {
 
   // Estados para controlar el modal de creación/edición
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedCostCenter, setSelectedCostCenter] = useState<CostCenter | null>(null);
+  const [selectedCostCenter, setSelectedCostCenter] =
+    useState<CostCenter | null>(null);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -300,9 +301,10 @@ export default function CostCentersPage() {
                 <div className="cost-centers-page__pie-wrapper">
                   <div className="cost-centers-page__pie-main">
                     <ResponsiveContainer width="100%" height="100%">
-                      <PieChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
+                      <PieChart
+                        margin={{ top: 20, right: 30, bottom: 20, left: 30 }}
+                      >
                         <Pie
-                           
                           data={incomeParticipation as any}
                           cx="50%"
                           cy="50%"
@@ -323,7 +325,6 @@ export default function CostCentersPage() {
                           ))}
                         </Pie>
                         <Tooltip
-                           
                           formatter={
                             ((val: number) => formatCurrency(val)) as any
                           }
@@ -366,9 +367,10 @@ export default function CostCentersPage() {
                 <div className="cost-centers-page__pie-wrapper">
                   <div className="cost-centers-page__pie-main">
                     <ResponsiveContainer width="100%" height="100%">
-                      <PieChart margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
+                      <PieChart
+                        margin={{ top: 20, right: 30, bottom: 20, left: 30 }}
+                      >
                         <Pie
-                           
                           data={expenseParticipation as any}
                           cx="50%"
                           cy="50%"
@@ -389,7 +391,6 @@ export default function CostCentersPage() {
                           ))}
                         </Pie>
                         <Tooltip
-                           
                           formatter={
                             ((val: number) => formatCurrency(val)) as any
                           }
@@ -499,7 +500,6 @@ export default function CostCentersPage() {
                         borderColor: 'hsl(var(--border))',
                         borderRadius: '8px',
                       }}
-                       
                       formatter={
                         ((val: number) =>
                           val !== undefined ? formatCurrency(val) : '') as any
@@ -565,7 +565,6 @@ export default function CostCentersPage() {
                         borderColor: 'hsl(var(--border))',
                         borderRadius: '8px',
                       }}
-                       
                       formatter={
                         ((val: number) =>
                           val !== undefined ? formatCurrency(val) : '') as any

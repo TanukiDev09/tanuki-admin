@@ -99,7 +99,7 @@ export async function getMovements(
       ).map((al) => ({
         ...al,
         costCenter: Array.isArray(al.costCenter)
-          ? al.costCenter[0] ?? ''
+          ? (al.costCenter[0] ?? '')
           : al.costCenter,
       }));
     }
@@ -109,14 +109,18 @@ export async function getMovements(
       ).map((item) => ({
         ...item,
         costCenter: Array.isArray(item.costCenter)
-          ? item.costCenter[0] ?? ''
+          ? (item.costCenter[0] ?? '')
           : item.costCenter,
       }));
     }
 
     const kind = classifyMovementType(plain.type);
     const normalizedType =
-      kind === 'income' ? 'INCOME' : kind === 'transfer' ? 'TRANSFER' : 'EXPENSE';
+      kind === 'income'
+        ? 'INCOME'
+        : kind === 'transfer'
+          ? 'TRANSFER'
+          : 'EXPENSE';
 
     const amountInCOP = toNumber(plain.amountInCOP || 0);
     const relevantAmount = calculateRelevantAmount(

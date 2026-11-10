@@ -106,9 +106,10 @@ export const getInvoiceDefaultValues = (
       bookId: item.bookId || undefined,
       // costCenter is always an array in the DB; this form only supports a
       // single cost center per item, so take the first code.
-      costCenter: (Array.isArray(item.costCenter)
-        ? item.costCenter[0]
-        : item.costCenter) || '',
+      costCenter:
+        (Array.isArray(item.costCenter)
+          ? item.costCenter[0]
+          : item.costCenter) || '',
     })) || [
       {
         type: 'servicio',

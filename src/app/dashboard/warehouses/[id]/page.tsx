@@ -43,15 +43,15 @@ const InventoryAdjustModal = dynamic(
   { ssr: false }
 );
 
-import { 
-  Package, 
-  MapPin, 
-  Building2, 
-  ArrowLeft, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Loader2 
+import {
+  Package,
+  MapPin,
+  Building2,
+  ArrowLeft,
+  Plus,
+  Edit,
+  Trash2,
+  Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePermission } from '@/hooks/usePermissions';
@@ -199,11 +199,15 @@ export default function WarehouseDetailPage() {
 
   const handleDeleteWarehouse = async () => {
     // Calculate total quantity of items currently in inventory
-    const totalQty = inventory.reduce((acc, curr) => acc + (curr.quantity || 0), 0);
+    const totalQty = inventory.reduce(
+      (acc, curr) => acc + (curr.quantity || 0),
+      0
+    );
     if (totalQty > 0) {
       toast({
         title: 'Error',
-        description: 'No se puede eliminar una bodega con inventario activo (unidades > 0)',
+        description:
+          'No se puede eliminar una bodega con inventario activo (unidades > 0)',
         variant: 'destructive',
       });
       return;
@@ -231,14 +235,16 @@ export default function WarehouseDetailPage() {
 
       toast({
         title: 'Éxito',
-        description: 'La bodega ha sido eliminada correctamente (eliminación lógica)',
+        description:
+          'La bodega ha sido eliminada correctamente (eliminación lógica)',
       });
       router.push('/dashboard/warehouses');
     } catch (error) {
       console.error('Error deleting warehouse:', error);
       toast({
         title: 'Error',
-        description: (error as Error).message || 'No se pudo eliminar la bodega',
+        description:
+          (error as Error).message || 'No se pudo eliminar la bodega',
         variant: 'destructive',
       });
     } finally {
@@ -339,7 +345,11 @@ export default function WarehouseDetailPage() {
 
       <Separator />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="warehouse-detail__tabs">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="warehouse-detail__tabs"
+      >
         <TabsList>
           <TabsTrigger value="inventory">Inventario Actual</TabsTrigger>
           <TabsTrigger value="info">Información General</TabsTrigger>
@@ -393,7 +403,10 @@ export default function WarehouseDetailPage() {
             </CardContent>
           </Card>
 
-          <WarehouseMovementsTable key={refreshTrigger} warehouseId={id as string} />
+          <WarehouseMovementsTable
+            key={refreshTrigger}
+            warehouseId={id as string}
+          />
         </TabsContent>
 
         <TabsContent value="info" className="warehouse-detail__section">

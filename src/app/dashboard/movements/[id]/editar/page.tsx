@@ -24,7 +24,11 @@ import { formatCurrency } from '@/lib/utils';
 import { divide, gtZero, add, toNumber, isMatchedFinancial } from '@/lib/math';
 import { InventoryMovementSearchSelect } from '@/components/inventory/InventoryMovementSearchSelect';
 import { MovementItemsTable } from '@/components/finance/MovementItemsTable';
-import { GeneralInfoSection, AllocationSection, AmountCurrencySection } from '@/components/finance/MovementFormSections';
+import {
+  GeneralInfoSection,
+  AllocationSection,
+  AmountCurrencySection,
+} from '@/components/finance/MovementFormSections';
 import '../../movement-form.scss';
 
 export default function EditMovementPage() {
@@ -104,7 +108,10 @@ export default function EditMovementPage() {
             ) || [],
           items:
             m.items?.map(
-              (item: { costCenter: string | string[]; [key: string]: unknown }) => ({
+              (item: {
+                costCenter: string | string[];
+                [key: string]: unknown;
+              }) => ({
                 ...item,
                 costCenter: Array.isArray(item.costCenter)
                   ? item.costCenter[0] || ''

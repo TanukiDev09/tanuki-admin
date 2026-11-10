@@ -1,8 +1,5 @@
 import { BadgeProps } from '@/components/ui/Badge';
-import {
-  RoyaltyStatementStatus,
-  BalanceFavor,
-} from '@/types/royalty';
+import { RoyaltyStatementStatus, BalanceFavor } from '@/types/royalty';
 
 export const STATUS_META: Record<
   RoyaltyStatementStatus,

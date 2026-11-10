@@ -6,24 +6,27 @@ import {
 } from '../salesChannels';
 
 const pos = [
-  { name: 'Librería Panamericana S.A.S.', identificationNumber: '830.012.345-6' },
+  {
+    name: 'Librería Panamericana S.A.S.',
+    identificationNumber: '830.012.345-6',
+  },
   { name: 'Lerner Libros', identificationNumber: '' },
 ];
 
 describe('isPointOfSaleCustomer', () => {
   it('coincide por NIT ignorando puntuación', () => {
-    expect(
-      isPointOfSaleCustomer({ customerTaxId: '8300123456' }, pos)
-    ).toBe(true);
+    expect(isPointOfSaleCustomer({ customerTaxId: '8300123456' }, pos)).toBe(
+      true
+    );
   });
 
   it('coincide por nombre sin sufijo societario ni tildes', () => {
     expect(
       isPointOfSaleCustomer({ customerName: 'LIBRERIA PANAMERICANA SA' }, pos)
     ).toBe(true);
-    expect(
-      isPointOfSaleCustomer({ customerName: 'Lerner Bogotá' }, pos)
-    ).toBe(true);
+    expect(isPointOfSaleCustomer({ customerName: 'Lerner Bogotá' }, pos)).toBe(
+      true
+    );
   });
 
   it('un cliente final no es punto de venta', () => {
@@ -57,7 +60,9 @@ describe('buildSalesChannelSlices', () => {
   });
 
   it('devuelve ceros sin facturas', () => {
-    expect(buildSalesChannelSlices([], pos).map((s) => s.value)).toEqual([0, 0]);
+    expect(buildSalesChannelSlices([], pos).map((s) => s.value)).toEqual([
+      0, 0,
+    ]);
   });
 });
 
@@ -76,8 +81,18 @@ describe('buildTopPointsOfSale', () => {
   it('ordena por ingresos, ignora compradores directos y limita', () => {
     const top = buildTopPointsOfSale(
       [
-        { customerTaxId: '8300123456', quantity: 2, total: 100, date: '2026-01-10' },
-        { customerTaxId: '8300123456', quantity: 3, total: 150, date: '2026-03-05' },
+        {
+          customerTaxId: '8300123456',
+          quantity: 2,
+          total: 100,
+          date: '2026-01-10',
+        },
+        {
+          customerTaxId: '8300123456',
+          quantity: 3,
+          total: 150,
+          date: '2026-03-05',
+        },
         { customerName: 'Lerner Bogotá', quantity: 20, total: 1000 },
         { customerName: 'Ana Pérez', quantity: 99, total: 99999 },
       ],

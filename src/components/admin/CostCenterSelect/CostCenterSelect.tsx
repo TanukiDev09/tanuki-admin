@@ -51,7 +51,10 @@ export default function CostCenterSelect({
   hideLabel = false,
 }: CostCenterSelectProps) {
   const { hasPermission } = usePermission();
-  const canCreate = hasPermission(ModuleName.COST_CENTERS, PermissionAction.CREATE);
+  const canCreate = hasPermission(
+    ModuleName.COST_CENTERS,
+    PermissionAction.CREATE
+  );
 
   const [costCenters, setCostCenters] = useState<CostCenter[]>([]);
   const [loading, setLoading] = useState(true);

@@ -279,22 +279,22 @@ Cada libro es una tarjeta (`BookManagementTable`): portada, título, autor, prec
 
 Muestra una franja de cifras (stock total, cobertura de bodega propia, cobertura combinada, rotación y tasa de devolución) y cuatro pestañas:
 
-| Pestaña            | Contenido                                                                                                     |
-| ------------------ | ------------------------------------------------------------------------------------------------------------- |
-| **Resumen**        | Análisis de ventas, finanzas del centro de costo y contratos                                                  |
-| **Reimpresión**    | Semáforo de reimpresión, dónde está el inventario, bodega propia vs. librerías, demanda mensual por canal     |
-| **Puntos de venta**| Rotación por punto de venta y participación de cada punto en las ventas del libro                             |
-| **Movimientos**    | Ciclo de vida de los ejemplares, control de consignación y kardex corto                                       |
+| Pestaña             | Contenido                                                                                                 |
+| ------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Resumen**         | Análisis de ventas, finanzas del centro de costo y contratos                                              |
+| **Reimpresión**     | Semáforo de reimpresión, dónde está el inventario, bodega propia vs. librerías, demanda mensual por canal |
+| **Puntos de venta** | Rotación por punto de venta y participación de cada punto en las ventas del libro                         |
+| **Movimientos**     | Ciclo de vida de los ejemplares, control de consignación y kardex corto                                   |
 
 En una **obra completa** no hay inventario propio (su stock se calcula de los volúmenes): la pestaña Reimpresión muestra una tabla por volumen y marca el que limita la obra.
 
 ### Endpoints
 
-| Endpoint                              | Descripción                                                                                       |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Endpoint                              | Descripción                                                                                          |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `GET /api/books/[id]/operations`      | Cobertura, rotación, estado por punto de venta, ciclo de vida, demanda mensual y últimos movimientos |
-| `GET /api/books/[id]/points-of-sale`  | Ventas por canal (puntos de venta vs. directa) y participación de cada punto                      |
-| `GET /api/inventory/movements?bookId` | Historial de movimientos de inventario filtrado por libro                                         |
+| `GET /api/books/[id]/points-of-sale`  | Ventas por canal (puntos de venta vs. directa) y participación de cada punto                         |
+| `GET /api/inventory/movements?bookId` | Historial de movimientos de inventario filtrado por libro                                            |
 
 La lógica vive en funciones puras con tests: `src/lib/inventory/bookOperations.ts` y `src/lib/finance/salesChannels.ts`.
 

@@ -5,12 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { InventoryMovementsList } from '@/components/inventory/InventoryMovementsList';
 import { InventoryMovementFilters } from './components/InventoryMovementFilters';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  ArrowLeft, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  ArrowLeft,
   Loader2,
-  PackageSearch
+  PackageSearch,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import './movements-history.scss';
@@ -30,7 +30,7 @@ function InventoryMovementsHistory() {
   // Filtro opcional por libro (enlace desde el detalle del libro).
   const bookId = useSearchParams().get('bookId');
   const { toast } = useToast();
-  
+
   // State for movements and pagination
   const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,9 +51,10 @@ function InventoryMovementsHistory() {
       const params = new URLSearchParams();
       params.append('page', page.toString());
       params.append('limit', limit.toString());
-      
+
       if (typeFilter !== 'ALL') params.append('type', typeFilter);
-      if (warehouseFilter !== 'ALL') params.append('warehouseId', warehouseFilter);
+      if (warehouseFilter !== 'ALL')
+        params.append('warehouseId', warehouseFilter);
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
       if (bookId) params.append('bookId', bookId);
@@ -102,18 +103,21 @@ function InventoryMovementsHistory() {
       <div className="movements-history__header">
         <div className="movements-history__title-group">
           <div className="flex items-center gap-2 mb-1">
-             <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => router.back()}
-                className="h-8 w-8"
-             >
-                <ArrowLeft className="h-4 w-4" />
-             </Button>
-             <h1 className="movements-history__title">Historial de Movimientos</h1>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="h-8 w-8"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h1 className="movements-history__title">
+              Historial de Movimientos
+            </h1>
           </div>
           <p className="movements-history__description">
-            Consulta todos los registros de entrada, salida y ajustes de inventario.
+            Consulta todos los registros de entrada, salida y ajustes de
+            inventario.
           </p>
         </div>
       </div>
@@ -154,22 +158,23 @@ function InventoryMovementsHistory() {
             <PackageSearch className="movements-history__empty-icon" />
             <p>No se encontraron movimientos con los filtros aplicados</p>
             <Button variant="outline" size="sm" onClick={clearFilters}>
-                Limpiar filtros
+              Limpiar filtros
             </Button>
           </div>
         ) : (
           <>
             <div className="movements-history__table-wrapper">
-              <InventoryMovementsList 
-                movements={movements} 
-                isLoading={false} 
-                onRefresh={fetchMovements} 
+              <InventoryMovementsList
+                movements={movements}
+                isLoading={false}
+                onRefresh={fetchMovements}
               />
             </div>
 
             <div className="movements-history__pagination">
               <div className="movements-history__pagination-info">
-                Mostrando <strong>{movements.length}</strong> de <strong>{totalResults}</strong> movimientos
+                Mostrando <strong>{movements.length}</strong> de{' '}
+                <strong>{totalResults}</strong> movimientos
               </div>
               <div className="movements-history__pagination-controls">
                 <Button
@@ -183,7 +188,8 @@ function InventoryMovementsHistory() {
                   Anterior
                 </Button>
                 <div className="movements-history__pagination-current">
-                  Página <strong>{page}</strong> de <strong>{totalPages}</strong>
+                  Página <strong>{page}</strong> de{' '}
+                  <strong>{totalPages}</strong>
                 </div>
                 <Button
                   variant="outline"

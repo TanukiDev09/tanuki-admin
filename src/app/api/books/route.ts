@@ -186,22 +186,22 @@ export async function GET(request: NextRequest) {
                   _id: null,
                   // $toDouble normaliza Decimal128/strings guardados en facturas antiguas
                   totalSold: { $sum: { $toDouble: '$items.quantity' } },
-                  totalRevenue: { $sum: { $toDouble: '$items.total' } }
-                }
-              }
+                  totalRevenue: { $sum: { $toDouble: '$items.total' } },
+                },
+              },
             ],
-            as: 'salesData'
-          }
+            as: 'salesData',
+          },
         },
         {
           $addFields: {
             soldCopies: {
-              $ifNull: [{ $arrayElemAt: ['$salesData.totalSold', 0] }, 0]
+              $ifNull: [{ $arrayElemAt: ['$salesData.totalSold', 0] }, 0],
             },
             totalRevenue: {
-              $ifNull: [{ $arrayElemAt: ['$salesData.totalRevenue', 0] }, 0]
-            }
-          }
+              $ifNull: [{ $arrayElemAt: ['$salesData.totalRevenue', 0] }, 0],
+            },
+          },
         },
         // Remove inventory arrays from response
         {

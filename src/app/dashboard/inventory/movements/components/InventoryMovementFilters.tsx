@@ -79,23 +79,35 @@ export function InventoryMovementFilters({
 
       <div className="inventory-movement-filters__grid">
         <div className="inventory-movement-filters__field">
-          <Label className="mb-1.5 block text-xs font-medium">Tipo de Movimiento</Label>
+          <Label className="mb-1.5 block text-xs font-medium">
+            Tipo de Movimiento
+          </Label>
           <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="h-9">
               <SelectValue placeholder="Todos los tipos" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="ALL">Todos los tipos</SelectItem>
-              <SelectItem value={InventoryMovementType.INGRESO}>Ingreso</SelectItem>
-              <SelectItem value={InventoryMovementType.REMISION}>Remisión</SelectItem>
-              <SelectItem value={InventoryMovementType.DEVOLUCION}>Devolución</SelectItem>
-              <SelectItem value={InventoryMovementType.LIQUIDACION}>Liquidación</SelectItem>
+              <SelectItem value={InventoryMovementType.INGRESO}>
+                Ingreso
+              </SelectItem>
+              <SelectItem value={InventoryMovementType.REMISION}>
+                Remisión
+              </SelectItem>
+              <SelectItem value={InventoryMovementType.DEVOLUCION}>
+                Devolución
+              </SelectItem>
+              <SelectItem value={InventoryMovementType.LIQUIDACION}>
+                Liquidación
+              </SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="inventory-movement-filters__field">
-          <Label className="mb-1.5 block text-xs font-medium">Bodega (Origen o Destino)</Label>
+          <Label className="mb-1.5 block text-xs font-medium">
+            Bodega (Origen o Destino)
+          </Label>
           <Select value={warehouseFilter} onValueChange={setWarehouseFilter}>
             <SelectTrigger className="h-9">
               <SelectValue placeholder="Todas las bodegas" />
