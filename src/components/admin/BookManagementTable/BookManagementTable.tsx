@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { usePermission } from '@/hooks/usePermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import Image from 'next/image';
@@ -13,23 +13,10 @@ import {
   BookCheck,
   Search,
   Image as ImageIcon,
-  ChevronDown,
-  ChevronUp,
-  ChevronsUpDown,
 } from 'lucide-react';
-import { useDataTable } from '@/hooks/useDataTable';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { Badge } from '@/components/ui/Badge';
 import { formatCurrency, formatNumber } from '@/lib/utils';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from '@/components/ui/Table';
 import {
   Select,
   SelectContent,
@@ -39,10 +26,62 @@ import {
 } from '@/components/ui/Select';
 import './BookManagementTable.scss';
 
+type SortOption =
+  | 'title-asc'
+  | 'title-desc'
+  | 'sold-desc'
+  | 'sold-asc'
+  | 'revenue-desc'
+  | 'revenue-asc';
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: 'title-asc', label: 'Nombre (A → Z)' },
+  { value: 'title-desc', label: 'Nombre (Z → A)' },
+  { value: 'sold-desc', label: 'Más vendidos' },
+  { value: 'sold-asc', label: 'Menos vendidos' },
+  { value: 'revenue-desc', label: 'Mayor facturación' },
+  { value: 'revenue-asc', label: 'Menor facturación' },
+];
+
+// Algunos valores pueden llegar como Decimal128 ({ $numberDecimal }) en vez de number
+function toNumber(value: unknown): number {
+  if (typeof value === 'number') return value;
+  if (value && typeof value === 'object' && '$numberDecimal' in value) {
+    return Number((value as { $numberDecimal: string }).$numberDecimal) || 0;
+  }
+  return Number(value) || 0;
+}
+
 interface BookManagementTableProps {
   onEdit: (book: BookResponse) => void;
   onDelete: (bookId: string) => void;
   onToggleStatus: (bookId: string, currentStatus: boolean) => void;
+}
+
+function StockLabel({
+  stock,
+  isBundle,
+}: {
+  stock: number;
+  isBundle?: boolean;
+}) {
+  let tone = 'ok';
+  let text = `${formatNumber(stock)} en stock`;
+  if (stock === 0) {
+    tone = 'out';
+    text = 'Agotado';
+  } else if (stock < 10) {
+    tone = 'low';
+    text = `${formatNumber(stock)} en stock · bajo`;
+  }
+  return (
+    <span
+      className={`book-card__stock book-card__stock--${tone}`}
+      title={isBundle ? 'Stock calculado de sus volúmenes' : undefined}
+    >
+      {text}
+    </span>
+  );
 }
 
 export default function BookManagementTable({
@@ -60,6 +99,7 @@ export default function BookManagementTable({
   const [searchTerm, setSearchTerm] = useState('');
   const [collections, setCollections] = useState<string[]>([]);
   const [selectedCollection, setSelectedCollection] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('title-asc');
 
   const getNames = (items: (string | { name: string })[] | undefined) => {
     if (!items || !Array.isArray(items)) return '';
@@ -120,36 +160,17 @@ export default function BookManagementTable({
     return true;
   });
 
-  const { data: sortedBooks, sortConfig, toggleSort } = useDataTable(filteredBooks);
-
-  const renderSortableHeader = (label: string, key: string, className?: string) => {
-    const isSorted = sortConfig.key === key;
-    const direction = isSorted ? sortConfig.direction : null;
-
-    return (
-      <TableHead
-        className={`table__head--sortable group ${isSorted ? 'table__head--active' : ''} ${className || ''}`}
-        onClick={() => toggleSort(key)}
-      >
-        <div className="table__head-content">
-          {label}
-          <span 
-            className={`inline-flex items-center transition-opacity duration-200 ${
-              isSorted ? 'opacity-100 text-blue-600' : 'opacity-0 group-hover:opacity-40'
-            }`}
-          >
-            {direction === 'asc' ? (
-              <ChevronUp className="w-3.5 h-3.5" />
-            ) : direction === 'desc' ? (
-              <ChevronDown className="w-3.5 h-3.5" />
-            ) : (
-              <ChevronsUpDown className="w-3.5 h-3.5" />
-            )}
-          </span>
-        </div>
-      </TableHead>
+  const sortedBooks = useMemo(() => {
+    const [field, direction] = sortBy.split('-') as [string, 'asc' | 'desc'];
+    const factor = direction === 'asc' ? 1 : -1;
+    const value = (book: BookResponse) =>
+      toNumber(field === 'sold' ? book.soldCopies : book.totalRevenue);
+    return [...filteredBooks].sort((a, b) =>
+      field === 'title'
+        ? factor * a.title.localeCompare(b.title, 'es', { sensitivity: 'base' })
+        : factor * (value(a) - value(b))
     );
-  };
+  }, [filteredBooks, sortBy]);
 
   if (loading) {
     return (
@@ -196,6 +217,23 @@ export default function BookManagementTable({
             </SelectContent>
           </Select>
         </div>
+        <div className="book-management-table__collection-filter-wrapper">
+          <Select
+            value={sortBy}
+            onValueChange={(value) => setSortBy(value as SortOption)}
+          >
+            <SelectTrigger aria-label="Ordenar por">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              {SORT_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
         <div className="book-management-table__filter-group">
           <Button
             variant={filter === 'all' ? 'default' : 'outline'}
@@ -221,159 +259,87 @@ export default function BookManagementTable({
         </div>
       </div>
 
-      {/* Table */}
-      <div className="book-management-table__container">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Portada</TableHead>
-              {renderSortableHeader('Título', 'title')}
-              <TableHead>Autor</TableHead>
-              {renderSortableHeader('Colección', 'collectionName', 'book-management-table__hide-on-tablet')}
-              {renderSortableHeader('Precio', 'price')}
-              {renderSortableHeader('Stock', 'totalStock')}
-              {renderSortableHeader('Ventas', 'soldCopies', 'book-management-table__hide-on-mobile')}
-              {renderSortableHeader('Facturado', 'totalRevenue', 'book-management-table__hide-on-mobile')}
-              <TableHead className="book-management-table__actions-head">
-                Acciones
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedBooks.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={9}
-                  className="book-management-table__empty-cell"
-                >
-                  <p className="book-management-table__empty-text">
-                    No se encontraron libros
-                  </p>
-                </TableCell>
-              </TableRow>
-            ) : (
-              sortedBooks.map((book) => (
-                <TableRow key={book._id} className="book-management-table__row">
-                  <TableCell>
-                    {book.coverImage ? (
-                      <div className="book-management-table__cover-wrapper">
-                        <Image
-                          src={
-                            book.coverImage.startsWith('http')
-                              ? book.coverImage
-                              : `/uploads/covers/${book.coverImage}`
-                          }
-                          alt={getBookCoverAlt(book.title)}
-                          fill
-                          className="book-management-table__cover-image"
-                        />
-                      </div>
-                    ) : (
-                      <div className="book-management-table__no-cover">
-                        <ImageIcon className="book-management-table__icon-muted" />
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <div className="book-management-table__title-cell">
-                      <div className="book-management-table__title-wrapper">
-                        <a
-                          href={`/dashboard/catalog/${book._id}`}
-                          className="book-management-table__title-link"
-                        >
-                          {book.title}
-                        </a>
-                        {book.isBundle && (
-                          <Badge
-                            variant="secondary"
-                            className="book-management-table__bundle-badge"
-                          >
-                            Obra Completa
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="book-management-table__book-meta">
-                        {book.isbn} • {book.pages} págs • {book.language.toUpperCase()}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="book-management-table__author-info">
-                      <div className="book-management-table__author-name">
-                        {getNames(book.authors)}
-                      </div>
-                      {((book.translators?.length ?? 0) > 0 ||
-                        (book.illustrators?.length ?? 0) > 0) && (
-                        <div className="book-management-table__extra-credits">
-                          {(book.translators?.length ?? 0) > 0 && (
-                            <span>Trad: {book.translators!.length}</span>
-                          )}
-                          {(book.translators?.length ?? 0) > 0 &&
-                            (book.illustrators?.length ?? 0) > 0 &&
-                            ' • '}
-                          {(book.illustrators?.length ?? 0) > 0 && (
-                            <span>Ilust: {book.illustrators!.length}</span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="book-management-table__hide-on-tablet">
-                    <Badge
-                      variant="outline"
-                      className="book-management-table__collection-badge"
-                    >
-                      {book.collectionName || '-'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="book-management-table__price">
-                      {formatCurrency(book.price)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="book-management-table__stock-info">
-                      <span
-                        className={`book-management-table__stock-count ${
-                          (book.totalStock ?? book.stock) > 0
-                            ? 'book-management-table__stock-count--in-stock'
-                            : 'book-management-table__stock-count--out-of-stock'
-                        } ${book.isBundle ? 'book-management-table__stock-count--bundle' : ''}`}
-                        title={
-                          book.isBundle
-                            ? 'Stock calculado dinámicamente de sus volúmenes'
-                            : undefined
-                        }
+      {/* Cards */}
+      {sortedBooks.length === 0 ? (
+        <div className="book-management-table__empty">
+          <p className="book-management-table__empty-text">
+            No se encontraron libros
+          </p>
+        </div>
+      ) : (
+        <div className="book-management-table__grid">
+          {sortedBooks.map((book) => {
+            const stock = book.totalStock ?? book.stock;
+            const authors = getNames(book.authors);
+            const subtitle = [
+              book.collectionName,
+              book.isBundle ? 'Obra completa' : '',
+              book.isActive ? '' : 'Inactivo',
+            ]
+              .filter(Boolean)
+              .join(' · ');
+            return (
+              <article
+                key={book._id}
+                className={`book-card ${book.isActive ? '' : 'book-card--inactive'}`}
+              >
+                <div className="book-card__cover">
+                  {book.coverImage ? (
+                    <Image
+                      src={
+                        book.coverImage.startsWith('http')
+                          ? book.coverImage
+                          : `/uploads/covers/${book.coverImage}`
+                      }
+                      alt={getBookCoverAlt(book.title)}
+                      fill
+                      sizes="80px"
+                      className="book-card__cover-image"
+                    />
+                  ) : (
+                    <ImageIcon className="book-card__cover-placeholder" />
+                  )}
+                </div>
+
+                <div className="book-card__body">
+                  <div className="book-card__text">
+                    <h3 className="book-card__title">
+                      <a
+                        href={`/dashboard/catalog/${book._id}`}
+                        className="book-card__link"
                       >
-                        {formatNumber(book.totalStock ?? book.stock)}
-                        {book.isBundle && (
-                          <span className="book-management-table__virtual-indicator">
-                            V
-                          </span>
-                        )}
-                      </span>
-                      {(() => {
-                        const stock = book.totalStock ?? book.stock;
-                        if (stock === 0)
-                          return <Badge variant="destructive">Agotado</Badge>;
-                        if (stock < 10)
-                          return <Badge variant="warning">Bajo</Badge>;
-                        return null;
-                      })()}
+                        {book.title}
+                      </a>
+                    </h3>
+                    {authors && <p className="book-card__authors">{authors}</p>}
+                    {subtitle && (
+                      <p className="book-card__subtitle">{subtitle}</p>
+                    )}
+                  </div>
+
+                  <dl className="book-card__stats">
+                    <div className="book-card__stat">
+                      <dt className="book-card__stat-label">Vendidos</dt>
+                      <dd className="book-card__stat-value">
+                        {formatNumber(toNumber(book.soldCopies))}
+                      </dd>
                     </div>
-                  </TableCell>
-                  <TableCell className="book-management-table__hide-on-mobile">
-                    <span className="text-slate-600">
-                      {formatNumber(book.soldCopies ?? 0)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="book-management-table__hide-on-mobile">
-                    <span className="text-slate-600">
-                      {formatCurrency(book.totalRevenue ?? 0)}
-                    </span>
-                  </TableCell>
-                  <TableCell className="book-management-table__actions-cell">
-                    <div className="book-management-table__actions">
+                    <div className="book-card__stat">
+                      <dt className="book-card__stat-label">Facturado</dt>
+                      <dd className="book-card__stat-value">
+                        {formatCurrency(toNumber(book.totalRevenue))}
+                      </dd>
+                    </div>
+                  </dl>
+
+                  <div className="book-card__footer">
+                    <div className="book-card__figures">
+                      <span className="book-card__price">
+                        {formatCurrency(book.price)}
+                      </span>
+                      <StockLabel stock={stock} isBundle={book.isBundle} />
+                    </div>
+                    <div className="book-card__actions">
                       {canUpdate && (
                         <Button
                           variant="ghost"
@@ -418,13 +384,13 @@ export default function BookManagementTable({
                         </Button>
                       )}
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

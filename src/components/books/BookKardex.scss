@@ -1,0 +1,107 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.book-kardex {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  &__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: $spacing-md;
+  }
+
+  &__heading {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__title {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__all {
+    color: $primary;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__empty {
+    margin: 0;
+    border: 1px dashed $border;
+    border-radius: $radius-lg;
+    padding: $spacing-xl;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  &__list {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid $border;
+    border-radius: $radius-lg;
+    background: $card;
+    list-style: none;
+  }
+
+  &__row {
+    display: grid;
+    grid-template-columns: 7.5rem 6.5rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: $spacing-md;
+    border-top: 1px solid $border;
+    padding: $spacing-md $spacing-lg;
+    font-size: $font-size-sm;
+
+    &:first-child {
+      border-top: 0;
+    }
+
+    @media (max-width: $breakpoint-sm) {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+  }
+
+  &__date {
+    color: $muted-foreground;
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__route {
+    overflow: hidden;
+    color: $foreground;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    @media (max-width: $breakpoint-sm) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__quantity {
+    color: $foreground;
+    font-weight: $font-weight-semibold;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+}

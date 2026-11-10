@@ -1,24 +1,36 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
 import { InventoryMovementsList } from '@/components/inventory/InventoryMovementsList';
 import { InventoryMovementFilters } from './components/InventoryMovementFilters';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  ArrowLeft, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  ArrowLeft,
   Loader2,
-  PackageSearch
+  PackageSearch,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
 import './movements-history.scss';
 
 export default function InventoryMovementsHistoryPage() {
+  return (
+    <Suspense
+      fallback={<div className="p-8 text-center">Cargando historial...</div>}
+    >
+      <InventoryMovementsHistory />
+    </Suspense>
+  );
+}
+
+function InventoryMovementsHistory() {
   const router = useRouter();
+  // Filtro opcional por libro (enlace desde el detalle del libro).
+  const bookId = useSearchParams().get('bookId');
   const { toast } = useToast();
-  
+
   // State for movements and pagination
   const [movements, setMovements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -39,11 +51,13 @@ export default function InventoryMovementsHistoryPage() {
       const params = new URLSearchParams();
       params.append('page', page.toString());
       params.append('limit', limit.toString());
-      
+
       if (typeFilter !== 'ALL') params.append('type', typeFilter);
-      if (warehouseFilter !== 'ALL') params.append('warehouseId', warehouseFilter);
+      if (warehouseFilter !== 'ALL')
+        params.append('warehouseId', warehouseFilter);
       if (startDate) params.append('startDate', startDate);
       if (endDate) params.append('endDate', endDate);
+      if (bookId) params.append('bookId', bookId);
 
       const res = await fetch(`/api/inventory/movements?${params.toString()}`);
       const data = await res.json();
@@ -65,7 +79,7 @@ export default function InventoryMovementsHistoryPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, typeFilter, warehouseFilter, startDate, endDate, toast]);
+  }, [page, typeFilter, warehouseFilter, startDate, endDate, bookId, toast]);
 
   useEffect(() => {
     fetchMovements();
@@ -82,28 +96,44 @@ export default function InventoryMovementsHistoryPage() {
   // Reset to page 1 when filters change
   useEffect(() => {
     setPage(1);
-  }, [typeFilter, warehouseFilter, startDate, endDate]);
+  }, [typeFilter, warehouseFilter, startDate, endDate, bookId]);
 
   return (
     <div className="movements-history">
       <div className="movements-history__header">
         <div className="movements-history__title-group">
           <div className="flex items-center gap-2 mb-1">
-             <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => router.back()}
-                className="h-8 w-8"
-             >
-                <ArrowLeft className="h-4 w-4" />
-             </Button>
-             <h1 className="movements-history__title">Historial de Movimientos</h1>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => router.back()}
+              className="h-8 w-8"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <h1 className="movements-history__title">
+              Historial de Movimientos
+            </h1>
           </div>
           <p className="movements-history__description">
-            Consulta todos los registros de entrada, salida y ajustes de inventario.
+            Consulta todos los registros de entrada, salida y ajustes de
+            inventario.
           </p>
         </div>
       </div>
+
+      {bookId && (
+        <p className="movements-history__description">
+          Mostrando solo los movimientos de un libro.{' '}
+          <Button
+            variant="link"
+            size="sm"
+            onClick={() => router.replace('/dashboard/inventory/movements')}
+          >
+            Ver todos
+          </Button>
+        </p>
+      )}
 
       <InventoryMovementFilters
         typeFilter={typeFilter}
@@ -128,22 +158,23 @@ export default function InventoryMovementsHistoryPage() {
             <PackageSearch className="movements-history__empty-icon" />
             <p>No se encontraron movimientos con los filtros aplicados</p>
             <Button variant="outline" size="sm" onClick={clearFilters}>
-                Limpiar filtros
+              Limpiar filtros
             </Button>
           </div>
         ) : (
           <>
             <div className="movements-history__table-wrapper">
-              <InventoryMovementsList 
-                movements={movements} 
-                isLoading={false} 
-                onRefresh={fetchMovements} 
+              <InventoryMovementsList
+                movements={movements}
+                isLoading={false}
+                onRefresh={fetchMovements}
               />
             </div>
 
             <div className="movements-history__pagination">
               <div className="movements-history__pagination-info">
-                Mostrando <strong>{movements.length}</strong> de <strong>{totalResults}</strong> movimientos
+                Mostrando <strong>{movements.length}</strong> de{' '}
+                <strong>{totalResults}</strong> movimientos
               </div>
               <div className="movements-history__pagination-controls">
                 <Button
@@ -157,7 +188,8 @@ export default function InventoryMovementsHistoryPage() {
                   Anterior
                 </Button>
                 <div className="movements-history__pagination-current">
-                  Página <strong>{page}</strong> de <strong>{totalPages}</strong>
+                  Página <strong>{page}</strong> de{' '}
+                  <strong>{totalPages}</strong>
                 </div>
                 <Button
                   variant="outline"

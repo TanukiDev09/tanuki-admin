@@ -30,9 +30,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(statements);
   } catch (error: unknown) {
     const message =
-      error instanceof Error
-        ? error.message
-        : 'Error al obtener liquidaciones';
+      error instanceof Error ? error.message : 'Error al obtener liquidaciones';
     return NextResponse.json({ message }, { status: 500 });
   }
 }

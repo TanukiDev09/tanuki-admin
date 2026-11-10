@@ -158,9 +158,7 @@ describe('buildCreatorComputation', () => {
   it('agrega varias obras (suma regalías de todas)', async () => {
     aggregateMock
       .mockResolvedValueOnce([aggRow()]) // libro 1: 4400
-      .mockResolvedValueOnce([
-        aggRow({ quantity: 2, totalInvoiced: 110000 }),
-      ]); // libro 2: 8800
+      .mockResolvedValueOnce([aggRow({ quantity: 2, totalInvoiced: 110000 })]); // libro 2: 8800
 
     const c = await buildCreatorComputation({
       ...base,

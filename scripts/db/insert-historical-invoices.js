@@ -12,7 +12,9 @@ async function insertHistoricalInvoices() {
     const jsonlPath = process.argv[2];
 
     if (!jsonlPath) {
-      console.error('❌ Uso: node insert-historical-invoices.js <ruta-a-jsonl>');
+      console.error(
+        '❌ Uso: node insert-historical-invoices.js <ruta-a-jsonl>'
+      );
       process.exit(1);
     }
 
@@ -21,7 +23,8 @@ async function insertHistoricalInvoices() {
     }
 
     // Conectar a MongoDB
-    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/tanuki-admin';
+    const mongoUri =
+      process.env.MONGODB_URI || 'mongodb://localhost:27017/tanuki-admin';
     console.log(`📡 Conectando a MongoDB: ${mongoUri}\n`);
 
     await mongoose.connect(mongoUri);
@@ -33,7 +36,7 @@ async function insertHistoricalInvoices() {
       {
         strict: false,
         collection: 'invoices',
-        timestamps: true
+        timestamps: true,
       }
     );
 
@@ -41,7 +44,10 @@ async function insertHistoricalInvoices() {
 
     // Leer archivo JSONL
     const jsonlContent = fs.readFileSync(jsonlPath, 'utf-8');
-    const lines = jsonlContent.trim().split('\n').filter(line => line.trim());
+    const lines = jsonlContent
+      .trim()
+      .split('\n')
+      .filter((line) => line.trim());
 
     console.log(`📋 Insertando ${lines.length} facturas históricas...\n`);
 
@@ -59,17 +65,23 @@ async function insertHistoricalInvoices() {
 
         insertedCount++;
         const idx = String(i + 1).padStart(2, '0');
-        console.log(`[${idx}/${lines.length}] ✅ ${data.number} - ${data.customerName}`);
+        console.log(
+          `[${idx}/${lines.length}] ✅ ${data.number} - ${data.customerName}`
+        );
       } catch (error) {
         errorCount++;
         const idx = String(i + 1).padStart(2, '0');
         try {
           const data = JSON.parse(line);
-          const errorMsg = error.message ? error.message.substring(0, 50) : String(error);
-          console.log(`[${idx}/${lines.length}] ❌ ${data.number} - ${errorMsg}`);
+          const errorMsg = error.message
+            ? error.message.substring(0, 50)
+            : String(error);
+          console.log(
+            `[${idx}/${lines.length}] ❌ ${data.number} - ${errorMsg}`
+          );
           errors.push({
             number: data.number,
-            error: error.message || String(error)
+            error: error.message || String(error),
           });
         } catch {
           console.log(`[${idx}/${lines.length}] ❌ Error al parsear JSON`);
@@ -86,7 +98,7 @@ async function insertHistoricalInvoices() {
 
     if (errors.length > 0) {
       console.log('⚠️ Errores detallados:');
-      errors.forEach(e => {
+      errors.forEach((e) => {
         console.log(`   - ${e.number}: ${e.error.substring(0, 80)}`);
       });
       console.log();

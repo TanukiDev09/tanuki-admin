@@ -269,7 +269,8 @@ export default function InvoiceDetailPage() {
                           variant="secondary"
                           style={{ fontSize: '10px' }}
                         >
-                          {cc.code.join(', ')} - {formatCurrency(cc.amount, 'COP')}
+                          {cc.code.join(', ')} -{' '}
+                          {formatCurrency(cc.amount, 'COP')}
                         </Badge>
                       ))}
                     </div>

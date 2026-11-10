@@ -1,7 +1,15 @@
 import * as mongoose from 'mongoose';
 import InventoryMovement from '@/models/InventoryMovement';
 import Debt from '@/models/Debt';
-import { add, subtract, multiply, divide, toNumber, gtZero, isMatchedFinancial } from '@/lib/math';
+import {
+  add,
+  subtract,
+  multiply,
+  divide,
+  toNumber,
+  gtZero,
+  isMatchedFinancial,
+} from '@/lib/math';
 import { CreateMovementBody } from './types';
 
 // Helper to validate allocations
@@ -181,7 +189,10 @@ export async function linkInventoryMovement(
   }
 }
 
-export async function updateDebtProgress(debtId: string, movementAmount: number) {
+export async function updateDebtProgress(
+  debtId: string,
+  movementAmount: number
+) {
   const debt = await Debt.findById(debtId);
   if (!debt) return;
 

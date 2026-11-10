@@ -27,7 +27,9 @@ export const GET_CC_PORTION_EXPR = (ccCode: string) => ({
                   $cond: [
                     {
                       $let: {
-                        vars: { cc: { $ifNull: ['$$this.costCenter', '$costCenter'] } },
+                        vars: {
+                          cc: { $ifNull: ['$$this.costCenter', '$costCenter'] },
+                        },
                         in: {
                           $cond: [
                             { $isArray: '$$cc' },
@@ -118,7 +120,10 @@ interface MovementAllocation {
   amount?: { toString(): string } | string | number;
 }
 
-export function matchesCC(cc: string | string[] | undefined, code: string): boolean {
+export function matchesCC(
+  cc: string | string[] | undefined,
+  code: string
+): boolean {
   if (!cc) return false;
   if (Array.isArray(cc)) return cc.includes(code);
   return cc === code;

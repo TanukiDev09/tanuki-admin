@@ -309,7 +309,10 @@ function extractDianMetadata(invoice: any, attachedDoc: any) {
 
 const MAX_XML_SIZE = 5 * 1024 * 1024; // 5MB - las facturas XML de la DIAN son pequeñas
 
-function validateXmlFile(file: File | null, fileContent: string): string | null {
+function validateXmlFile(
+  file: File | null,
+  fileContent: string
+): string | null {
   if (!file) return 'No file provided';
   if (!file.name.endsWith('.xml')) {
     return 'Invalid file type. Only XML files are accepted.';

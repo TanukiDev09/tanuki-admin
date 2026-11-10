@@ -134,7 +134,10 @@ export default function CostCenterModal({
 
           <div className="cost-center-modal__grid">
             <div className="cost-center-modal__field">
-              <Label htmlFor="cc-code" className="flex items-center gap-2 mb-1.5">
+              <Label
+                htmlFor="cc-code"
+                className="flex items-center gap-2 mb-1.5"
+              >
                 <Type className="h-3.5 w-3.5 text-muted-foreground" />
                 Código de Identificación
               </Label>
@@ -154,7 +157,8 @@ export default function CostCenterModal({
                   <div className="mt-2 p-2.5 bg-muted/50 rounded-md border border-border flex gap-2">
                     <Info className="h-4 w-4 text-primary shrink-0 mt-0.5" />
                     <p className="text-[11px] text-muted-foreground leading-normal">
-                      El código es inmutable para preservar la integridad de los registros históricos.
+                      El código es inmutable para preservar la integridad de los
+                      registros históricos.
                     </p>
                   </div>
                 )}
@@ -162,7 +166,10 @@ export default function CostCenterModal({
             </div>
 
             <div className="cost-center-modal__field">
-              <Label htmlFor="cc-name" className="flex items-center gap-2 mb-1.5">
+              <Label
+                htmlFor="cc-name"
+                className="flex items-center gap-2 mb-1.5"
+              >
                 <Tag className="h-3.5 w-3.5 text-muted-foreground" />
                 Nombre del Centro
               </Label>
@@ -179,7 +186,10 @@ export default function CostCenterModal({
             </div>
 
             <div className="cost-center-modal__field">
-              <Label htmlFor="cc-description" className="flex items-center gap-2 mb-1.5">
+              <Label
+                htmlFor="cc-description"
+                className="flex items-center gap-2 mb-1.5"
+              >
                 <FileText className="h-3.5 w-3.5 text-muted-foreground" />
                 Descripción Detallada
               </Label>
@@ -216,7 +226,8 @@ export default function CostCenterModal({
                     )}
                   </Label>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Si se desactiva, el centro no podrá seleccionarse en nuevos registros pero mantendrá sus datos históricos.
+                    Si se desactiva, el centro no podrá seleccionarse en nuevos
+                    registros pero mantendrá sus datos históricos.
                   </p>
                 </div>
               </div>
@@ -256,4 +267,3 @@ export default function CostCenterModal({
     </Dialog>
   );
 }
-

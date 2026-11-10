@@ -1,0 +1,21 @@
+# Dependencias y artefactos de build
+node_modules
+.next
+out
+build
+dist
+coverage
+logs
+.swc
+*.tsbuildinfo
+
+# Copias de trabajo de agentes y skills
+.claude
+.agent
+.agents
+
+# Archivos generados o de terceros
+package-lock.json
+public/uploads
+cypress/screenshots
+cypress/videos

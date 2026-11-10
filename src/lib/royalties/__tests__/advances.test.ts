@@ -110,10 +110,7 @@ describe('findAdvanceMovements', () => {
     expect(query.category.$in).not.toContain('traducción');
     expect(query.date.$lte).toEqual(periodEnd);
     expect(query.$or).toEqual(
-      expect.arrayContaining([
-        { type: 'Egreso' },
-        { flowDirection: 'outflow' },
-      ])
+      expect.arrayContaining([{ type: 'Egreso' }, { flowDirection: 'outflow' }])
     );
   });
 

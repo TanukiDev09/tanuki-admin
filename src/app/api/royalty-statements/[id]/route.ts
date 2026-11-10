@@ -97,7 +97,9 @@ export async function DELETE(request: NextRequest, props: Props) {
       );
     }
 
-    return NextResponse.json({ message: 'Liquidación eliminada correctamente' });
+    return NextResponse.json({
+      message: 'Liquidación eliminada correctamente',
+    });
   } catch (error: unknown) {
     const message =
       error instanceof Error ? error.message : 'Error al eliminar liquidación';

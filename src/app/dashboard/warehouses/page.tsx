@@ -4,6 +4,9 @@ import Warehouse from '@/models/Warehouse';
 import { WarehouseList } from '@/components/warehouses/WarehouseList';
 import { CreateWarehouseButton } from '@/components/warehouses/CreateWarehouseButton';
 
+// Force dynamic rendering to ensure fresh data
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Bodegas - Admin',
   description: 'Gestión de bodegas e inventario',
@@ -11,8 +14,9 @@ export const metadata = {
 
 async function getWarehouses() {
   await dbConnect();
+  // Excluir bodegas con eliminación lógica (mismo criterio que /api/warehouses)
   // We need to populate pointOfSaleId to get the name
-  const warehouses = await Warehouse.find({})
+  const warehouses = await Warehouse.find({ isDeleted: { $ne: true } })
     .populate('pointOfSaleId', 'name code')
     .sort({ createdAt: -1 })
     .lean();

@@ -123,6 +123,13 @@
     border-radius: $radius-lg;
   }
 
+  &__balance-note {
+    margin-top: -$spacing-md;
+    margin-bottom: $spacing-xl;
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+
   &__metrics-grid {
     display: grid;
     grid-template-columns: 1fr;

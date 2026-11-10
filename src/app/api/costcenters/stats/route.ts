@@ -3,9 +3,16 @@ import { PipelineStage } from 'mongoose';
 import dbConnect from '@/lib/mongodb';
 import Movement from '@/models/Movement';
 import CostCenter from '@/models/CostCenter';
+import Book from '@/models/Book';
+import Invoice from '@/models/Invoice';
 import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import { add, subtract, toNumber } from '@/lib/math';
+import {
+  INCOME_TYPES,
+  TRANSFER_TYPES,
+  classifyMovementType,
+} from '@/lib/finance/cashflow';
 import { subMonths, startOfMonth, format } from 'date-fns';
 
 /**
@@ -53,13 +60,10 @@ export async function GET(request: NextRequest) {
 
     globalTotals.forEach((t) => {
       const val = t.total ? t.total.toString() : '0';
-      const isIncome =
-        t._id === 'Ingreso' ||
-        t._id === 'INCOME' ||
-        t._id === 'factura_emitida';
-      if (isIncome) {
+      const kind = classifyMovementType(t._id);
+      if (kind === 'income') {
         totalIncome = add(totalIncome, val);
-      } else {
+      } else if (kind === 'expense') {
         totalExpenses = add(totalExpenses, val);
       }
     });
@@ -111,9 +115,10 @@ export async function GET(request: NextRequest) {
       const key = `${item._id.year}-${String(item._id.month).padStart(2, '0')}`;
       if (chartData[key]) {
         const val = toNumber(item.total);
-        if (item._id.type === 'Ingreso' || item._id.type === 'INCOME') {
+        const kind = classifyMovementType(item._id.type);
+        if (kind === 'income') {
           chartData[key].income += val;
-        } else {
+        } else if (kind === 'expense') {
           chartData[key].expenses += val;
         }
         chartData[key].balance =
@@ -122,7 +127,7 @@ export async function GET(request: NextRequest) {
     });
 
     // 4. Per Cost Center Stats
-    const incomeTypes = ['Ingreso', 'INCOME', 'factura_emitida'];
+    const incomeTypes = INCOME_TYPES;
 
     const basePortionsPipeline: PipelineStage[] = [
       {
@@ -209,6 +214,7 @@ export async function GET(request: NextRequest) {
 
     const ccStats = await Movement.aggregate([
       ...basePortionsPipeline,
+      { $match: { type: { $nin: TRANSFER_TYPES } } },
       {
         $group: {
           _id: {
@@ -228,6 +234,9 @@ export async function GET(request: NextRequest) {
         },
       },
       ...basePortionsPipeline,
+      {
+        $match: { type: { $nin: TRANSFER_TYPES } },
+      },
       {
         $group: {
           _id: {
@@ -253,6 +262,36 @@ export async function GET(request: NextRequest) {
       },
     ]);
 
+    // 6. Libros vinculados y ejemplares vendidos por centro de costo
+    // (mismo criterio que "Unidades Vendidas" del detalle).
+    const [books, unitsByCenter] = await Promise.all([
+      Book.find({ costCenter: { $in: costCenters.map((cc) => cc.code) } })
+        .select('title costCenter')
+        .sort({ title: 1 })
+        .lean<Array<{ title: string; costCenter: string }>>(),
+      Invoice.aggregate([
+        { $match: { status: { $ne: 'Cancelled' } } },
+        { $unwind: '$items' },
+        { $match: { 'items.type': 'libro' } },
+        { $unwind: '$items.costCenter' },
+        {
+          $group: {
+            _id: '$items.costCenter',
+            units: { $sum: { $ifNull: ['$items.quantity', 0] } },
+          },
+        },
+      ]),
+    ]);
+    const firstBookTitle = new Map<string, string>();
+    for (const book of books) {
+      if (!firstBookTitle.has(book.costCenter)) {
+        firstBookTitle.set(book.costCenter, book.title);
+      }
+    }
+    const unitsMap = new Map<string, number>(
+      unitsByCenter.map((u: { _id: string; units: number }) => [u._id, u.units])
+    );
+
     const formattedCCStats = costCenters.map((cc) => {
       const stats = ccStats.filter((s) => s._id.costCenter === cc.code);
       let income = 0;
@@ -260,9 +299,10 @@ export async function GET(request: NextRequest) {
 
       stats.forEach((s) => {
         const val = toNumber(s.total);
-        if (s._id.type === 'Ingreso' || s._id.type === 'INCOME') {
+        const kind = classifyMovementType(s._id.type);
+        if (kind === 'income') {
           income += val;
-        } else {
+        } else if (kind === 'expense') {
           expense += val;
         }
       });
@@ -292,6 +332,9 @@ export async function GET(request: NextRequest) {
         expense,
         balance: income - expense,
         history,
+        isBook: firstBookTitle.has(cc.code),
+        bookTitle: firstBookTitle.get(cc.code),
+        units: unitsMap.get(cc.code) ?? 0,
       };
     });
 

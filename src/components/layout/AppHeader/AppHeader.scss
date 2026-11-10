@@ -11,13 +11,12 @@
   width: 100%;
   background-color: $card;
   border-bottom: 1px solid $border;
-  box-shadow: $shadow-sm;
 
   &__container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 64px; // h-16
+    height: 56px;
     padding: 0 $spacing-md;
 
     @include respond-to('md') {

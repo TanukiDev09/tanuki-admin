@@ -215,7 +215,6 @@ export default function InventoryMovementDetailPage() {
   return (
     <div className="inventory-detail">
       <div className="inventory-detail__container">
-        
         {/* Header - Compact, Refined & Clean */}
         <header className="inventory-detail__header">
           <div className="inventory-detail__header-left">
@@ -284,10 +283,8 @@ export default function InventoryMovementDetailPage() {
 
         {/* Layout Split */}
         <div className="inventory-detail__grid">
-          
           {/* Main Area: Logistics and Items Table */}
           <main className="inventory-detail__main">
-            
             {/* Route Section - Interactive Flow Layout */}
             <Card className="inventory-detail__route-card">
               <CardHeader className="inventory-detail__route-header">
@@ -297,11 +294,12 @@ export default function InventoryMovementDetailPage() {
               </CardHeader>
               <CardContent className="inventory-detail__route-content">
                 <div className="inventory-detail__route-flow">
-                  
                   {/* Origin Node */}
                   {movement.fromWarehouseId ? (
                     <div className="inventory-detail__route-node">
-                      <span className="inventory-detail__route-label">Origen</span>
+                      <span className="inventory-detail__route-label">
+                        Origen
+                      </span>
                       <div className="inventory-detail__route-info">
                         <div className="inventory-detail__route-icon-wrapper">
                           <Building2 className="h-5 w-5" />
@@ -333,7 +331,9 @@ export default function InventoryMovementDetailPage() {
                   {/* Destination Node */}
                   {movement.toWarehouseId ? (
                     <div className="inventory-detail__route-node">
-                      <span className="inventory-detail__route-label">Destino</span>
+                      <span className="inventory-detail__route-label">
+                        Destino
+                      </span>
                       <div className="inventory-detail__route-info">
                         <div className="inventory-detail__route-icon-wrapper">
                           <MapPin className="h-5 w-5" />
@@ -356,7 +356,6 @@ export default function InventoryMovementDetailPage() {
                       Cliente Externo
                     </div>
                   )}
-
                 </div>
               </CardContent>
             </Card>
@@ -427,7 +426,6 @@ export default function InventoryMovementDetailPage() {
 
           {/* Sidebar Area: General Information and Observations */}
           <aside className="inventory-detail__sidebar">
-            
             {/* General Info Card */}
             <Card className="inventory-detail__info-card">
               <CardHeader className="inventory-detail__info-header">
@@ -436,9 +434,10 @@ export default function InventoryMovementDetailPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="inventory-detail__info-content p-0">
-                
                 <div className="inventory-detail__info-item">
-                  <span className="inventory-detail__info-label">ID Interno</span>
+                  <span className="inventory-detail__info-label">
+                    ID Interno
+                  </span>
                   <span className="inventory-detail__info-value inventory-detail__info-value--mono">
                     {movement._id}
                   </span>
@@ -446,9 +445,14 @@ export default function InventoryMovementDetailPage() {
 
                 {movement.subType && (
                   <div className="inventory-detail__info-item">
-                    <span className="inventory-detail__info-label">Subtipo de Movimiento</span>
+                    <span className="inventory-detail__info-label">
+                      Subtipo de Movimiento
+                    </span>
                     <span className="inventory-detail__info-value">
-                      <Badge variant="secondary" className="bg-slate-100 text-slate-600 font-normal">
+                      <Badge
+                        variant="secondary"
+                        className="bg-slate-100 text-slate-600 font-normal"
+                      >
                         {movement.subType}
                       </Badge>
                     </span>
@@ -457,9 +461,14 @@ export default function InventoryMovementDetailPage() {
 
                 {movement.invoiceRef && (
                   <div className="inventory-detail__info-item">
-                    <span className="inventory-detail__info-label">Referencia / Factura</span>
+                    <span className="inventory-detail__info-label">
+                      Referencia / Factura
+                    </span>
                     <span className="inventory-detail__info-value">
-                      <Badge variant="outline" className="font-mono bg-slate-50 text-slate-700">
+                      <Badge
+                        variant="outline"
+                        className="font-mono bg-slate-50 text-slate-700"
+                      >
                         {movement.invoiceRef}
                       </Badge>
                     </span>
@@ -468,7 +477,9 @@ export default function InventoryMovementDetailPage() {
 
                 {movement.consecutive && (
                   <div className="inventory-detail__info-item">
-                    <span className="inventory-detail__info-label">Consecutivo</span>
+                    <span className="inventory-detail__info-label">
+                      Consecutivo
+                    </span>
                     <span className="inventory-detail__info-value font-mono font-semibold">
                       #{movement.consecutive}
                     </span>
@@ -482,22 +493,21 @@ export default function InventoryMovementDetailPage() {
                     <span>Completado</span>
                   </div>
                 </div>
-
               </CardContent>
             </Card>
 
             {/* Observations Card */}
             {movement.observations && (
               <div className="inventory-detail__observations-card">
-                <span className="inventory-detail__observations-title">Observaciones</span>
+                <span className="inventory-detail__observations-title">
+                  Observaciones
+                </span>
                 <p className="inventory-detail__observations-text">
                   &quot;{movement.observations}&quot;
                 </p>
               </div>
             )}
-
           </aside>
-
         </div>
       </div>
     </div>

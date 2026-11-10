@@ -7,16 +7,22 @@ import { es } from 'date-fns/locale';
 import { DataTable, Column } from '@/components/ui/DataTable';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
-import { 
-  Eye, 
-  FileText, 
-  ExternalLink, 
-  ArrowUpRight, 
-  ArrowDownLeft, 
-  Loader2, 
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '@/components/ui/Card';
+import {
+  Eye,
+  FileText,
+  ExternalLink,
+  ArrowUpRight,
+  ArrowDownLeft,
+  Loader2,
   Calendar,
-  DollarSign
+  DollarSign,
 } from 'lucide-react';
 import { generateMovementPDF } from '@/lib/inventory/pdfGenerator';
 import { EditorialSettings } from '@/types/settings';
@@ -68,16 +74,22 @@ interface WarehouseMovementsTableProps {
   warehouseId: string;
 }
 
-export function WarehouseMovementsTable({ warehouseId }: WarehouseMovementsTableProps) {
+export function WarehouseMovementsTable({
+  warehouseId,
+}: WarehouseMovementsTableProps) {
   const router = useRouter();
   const [movements, setMovements] = useState<ProcessedMovement[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editorialSettings, setEditorialSettings] = useState<EditorialSettings | undefined>(undefined);
+  const [editorialSettings, setEditorialSettings] = useState<
+    EditorialSettings | undefined
+  >(undefined);
 
   const fetchMovements = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/inventory/movements?warehouseId=${warehouseId}&limit=100`);
+      const res = await fetch(
+        `/api/inventory/movements?warehouseId=${warehouseId}&limit=100`
+      );
       if (res.ok) {
         const result = await res.json();
         const rawMovements: ApiMovement[] = result.data || [];
@@ -88,10 +100,14 @@ export function WarehouseMovementsTable({ warehouseId }: WarehouseMovementsTable
             (acc, item) => acc + (item.bookId?.price || 0) * item.quantity,
             0
           );
-          const totalQuantity = mov.items.reduce((acc, item) => acc + item.quantity, 0);
-          
+          const totalQuantity = mov.items.reduce(
+            (acc, item) => acc + item.quantity,
+            0
+          );
+
           // Determine flow relative to current warehouse
-          const flowType = mov.fromWarehouseId?._id === warehouseId ? 'salida' : 'entrada';
+          const flowType =
+            mov.fromWarehouseId?._id === warehouseId ? 'salida' : 'entrada';
 
           return {
             ...mov,
@@ -168,7 +184,10 @@ export function WarehouseMovementsTable({ warehouseId }: WarehouseMovementsTable
       className: 'warehouse-movements-table__col-type',
       cell: (mov) => (
         <div className="flex flex-col gap-1 items-start">
-          <Badge variant="outline" className={`${getMovementColor(mov.type)} font-semibold`}>
+          <Badge
+            variant="outline"
+            className={`${getMovementColor(mov.type)} font-semibold`}
+          >
             {mov.type}
           </Badge>
           {mov.consecutive && (
@@ -200,10 +219,9 @@ export function WarehouseMovementsTable({ warehouseId }: WarehouseMovementsTable
               {mov.flowType === 'entrada' ? 'Entrada' : 'Salida'}
             </span>
             <span className="text-sm font-medium text-slate-700 max-w-[200px] truncate">
-              {mov.flowType === 'entrada' 
-                ? (mov.fromWarehouseId?.name || 'Proveedor Externo') 
-                : (mov.toWarehouseId?.name || 'Cliente Externo')
-              }
+              {mov.flowType === 'entrada'
+                ? mov.fromWarehouseId?.name || 'Proveedor Externo'
+                : mov.toWarehouseId?.name || 'Cliente Externo'}
             </span>
           </div>
         </div>
@@ -223,7 +241,10 @@ export function WarehouseMovementsTable({ warehouseId }: WarehouseMovementsTable
           <div className="flex flex-col gap-1 max-w-[250px]">
             {displayItems.map((item, idx) => (
               <div key={idx} className="text-xs text-slate-600 truncate">
-                <span className="font-semibold text-slate-700">{formatNumber(item.quantity)}</span> x {item.bookId?.title || 'Libro desconocido'}
+                <span className="font-semibold text-slate-700">
+                  {formatNumber(item.quantity)}
+                </span>{' '}
+                x {item.bookId?.title || 'Libro desconocido'}
               </div>
             ))}
             {extraCount > 0 && (
@@ -241,7 +262,10 @@ export function WarehouseMovementsTable({ warehouseId }: WarehouseMovementsTable
       sortable: true,
       className: 'warehouse-movements-table__col-units text-right',
       cell: (mov) => (
-        <Badge variant="outline" className="font-mono font-medium text-slate-700">
+        <Badge
+          variant="outline"
+          className="font-mono font-medium text-slate-700"
+        >
           {formatNumber(mov.totalQuantity)}
         </Badge>
       ),
@@ -267,15 +291,17 @@ export function WarehouseMovementsTable({ warehouseId }: WarehouseMovementsTable
       accessorKey: 'invoiceRef',
       sortable: true,
       className: 'warehouse-movements-table__col-invoice',
-      cell: (mov) => (
+      cell: (mov) =>
         mov.invoiceRef ? (
-          <Badge variant="secondary" className="font-mono text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 uppercase">
+          <Badge
+            variant="secondary"
+            className="font-mono text-xs bg-slate-100 text-slate-600 hover:bg-slate-200 uppercase"
+          >
             {mov.invoiceRef}
           </Badge>
         ) : (
           <span className="text-xs text-slate-400 italic">Sin Ref.</span>
-        )
-      ),
+        ),
     },
     {
       header: 'Acciones',
@@ -321,7 +347,8 @@ export function WarehouseMovementsTable({ warehouseId }: WarehouseMovementsTable
                   typeof mov.financialMovementId === 'object'
                     ? mov.financialMovementId?._id
                     : mov.financialMovementId;
-                if (finId) window.open(`/dashboard/movements/${finId}`, '_blank');
+                if (finId)
+                  window.open(`/dashboard/movements/${finId}`, '_blank');
               }}
               title="Ver Movimiento Financiero"
               className="w-8 h-8 rounded-full hover:bg-primary/5 hover:text-primary"
@@ -356,7 +383,9 @@ export function WarehouseMovementsTable({ warehouseId }: WarehouseMovementsTable
             Historial de Movimientos de Inventario
           </CardTitle>
           <CardDescription className="text-xs text-slate-500">
-            Registro de todos los ingresos, remisiones, devoluciones o liquidaciones asociados a esta bodega. Haz clic en las cabeceras para ordenar.
+            Registro de todos los ingresos, remisiones, devoluciones o
+            liquidaciones asociados a esta bodega. Haz clic en las cabeceras
+            para ordenar.
           </CardDescription>
         </div>
       </CardHeader>

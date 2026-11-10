@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose from 'mongoose';
 import { requirePermission } from '@/lib/apiPermissions';
 import { ModuleName, PermissionAction } from '@/types/permission';
 import dbConnect from '@/lib/mongodb';
@@ -359,6 +360,22 @@ export async function POST(request: NextRequest) {
   }
 }
 
+// Rango de fechas del filtro; el fin incluye todo el día.
+function buildDateRange(
+  startDate: string | null,
+  endDate: string | null
+): { $gte?: Date; $lte?: Date } | null {
+  if (!startDate && !endDate) return null;
+  const range: { $gte?: Date; $lte?: Date } = {};
+  if (startDate) range.$gte = new Date(startDate);
+  if (endDate) {
+    const end = new Date(endDate);
+    end.setHours(23, 59, 59, 999);
+    range.$lte = end;
+  }
+  return range;
+}
+
 export async function GET(request: NextRequest) {
   const permissionError = await requirePermission(
     request,
@@ -376,6 +393,7 @@ export async function GET(request: NextRequest) {
 
     const type = searchParams.get('type');
     const warehouseId = searchParams.get('warehouseId');
+    const bookId = searchParams.get('bookId');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
 
@@ -383,8 +401,13 @@ export async function GET(request: NextRequest) {
       type?: string;
       $or?: Array<Record<string, string>>;
       date?: { $gte?: Date; $lte?: Date };
+      'items.bookId'?: string;
     }
     const query: MovementQuery = {};
+
+    if (bookId && mongoose.Types.ObjectId.isValid(bookId)) {
+      query['items.bookId'] = bookId;
+    }
 
     if (type && type !== 'ALL') {
       query.type = type;
@@ -397,17 +420,8 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-    if (startDate || endDate) {
-      query.date = {};
-      if (startDate) {
-        query.date.$gte = new Date(startDate);
-      }
-      if (endDate) {
-        const end = new Date(endDate);
-        end.setHours(23, 59, 59, 999);
-        query.date.$lte = end;
-      }
-    }
+    const dateRange = buildDateRange(startDate, endDate);
+    if (dateRange) query.date = dateRange;
 
     const [movements, total] = await Promise.all([
       InventoryMovement.find(query)

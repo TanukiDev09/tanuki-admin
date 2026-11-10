@@ -64,23 +64,48 @@ function generateRunwayProjection(netBalance: string, netBurnRate: string) {
   return projection;
 }
 
+export interface HealthOptions {
+  /** Saldo de caja real (todas las cuentas). Si viene, reemplaza al saldo de los libros. */
+  cashBase?: number | null;
+  /** Meses (AAAA-MM) que no entran en los promedios: incompletos o todavía en curso. */
+  excludeMonths?: string[];
+}
+
+function selectRelevantMonths(
+  data: MonthlyData[],
+  upToMonth: number | null,
+  exclude: string[]
+) {
+  const upToNow = upToMonth === null ? data : data.slice(0, upToMonth);
+  const complete = upToNow.filter((m) => !exclude.includes(m.month));
+  // Si no queda ningún mes completo se usan todos (mejor eso que nada).
+  return complete.length > 0 ? complete : upToNow;
+}
+
 export function calculateHealthMetrics(
   totalIncome: string,
   totalExpenses: string,
   netBalance: string,
   formattedMonthlyData: MonthlyData[],
   yearParam: string | null,
-  monthParam: string | null
+  monthParam: string | null,
+  options: HealthOptions = {}
 ) {
-  const isAnnual = yearParam && !monthParam;
   const currentYear = new Date().getUTCFullYear();
   const currentMonth = new Date().getUTCMonth() + 1;
+  const isAnnualCurrentYear =
+    !!yearParam && !monthParam && parseInt(yearParam) === currentYear;
 
-  // For annual view of current year, only use months up to now for average
-  let relevantMonths = formattedMonthlyData;
-  if (isAnnual && parseInt(yearParam) === currentYear) {
-    relevantMonths = formattedMonthlyData.slice(0, currentMonth);
-  }
+  // Vista anual del año en curso: solo los meses hasta hoy, sin los incompletos.
+  const relevantMonths = selectRelevantMonths(
+    formattedMonthlyData,
+    isAnnualCurrentYear ? currentMonth : null,
+    options.excludeMonths ?? []
+  );
+  const cashBalance =
+    typeof options.cashBase === 'number'
+      ? String(options.cashBase)
+      : netBalance;
 
   // Filter out months with no activity to avoid dragging down average?
   // Actually, standard burn rate usually counts all months.
@@ -106,7 +131,7 @@ export function calculateHealthMetrics(
   const netBurnRate = subtract(avgMonthlyExpenses, avgMonthlyIncome);
 
   const cashRunway = gtZero(netBurnRate)
-    ? toNumber(divide(netBalance, netBurnRate))
+    ? toNumber(divide(cashBalance, netBurnRate))
     : Infinity;
 
   const grossProfitMargin = gtZero(totalIncome)
@@ -121,7 +146,7 @@ export function calculateHealthMetrics(
     relevantMonths
   );
 
-  const runwayProjection = generateRunwayProjection(netBalance, netBurnRate);
+  const runwayProjection = generateRunwayProjection(cashBalance, netBurnRate);
 
   return {
     runway: cashRunway,

@@ -52,7 +52,11 @@ async function createS6CostCenters() {
     // Define CostCenter model
     const CostCenter =
       mongoose.models.CostCenter ||
-      mongoose.model<ICostCenter>('CostCenter', CostCenterSchema, 'costcenters');
+      mongoose.model<ICostCenter>(
+        'CostCenter',
+        CostCenterSchema,
+        'costcenters'
+      );
 
     // Data to insert
     const newCostCenters: ICostCenter[] = [

@@ -5,6 +5,79 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+El detalle sesión por sesión de las versiones 1.0.1–1.0.4 se conserva en [`changelog-archive/`](../changelog-archive/).
+
+## [1.1.0] - 2026-11-10
+
+### ✨ Nuevas Características (1.1.0)
+
+- **Módulo de regalías a autores**:
+  - **Liquidación por creador**: el documento agrupa todas las obras del creador con ventas en el período en secciones separadas, pero anticipo, saldo anterior, total a liquidar, deuda y arrastre se calculan a nivel de la persona.
+  - **Anticipos automáticos**: en la primera liquidación el anticipo se detecta sumando los egresos cuyo centro de costo coincide con el del libro y cuya categoría corresponde al rol del contrato (autor, traductor, ilustrador); las liquidaciones posteriores arrastran el saldo.
+  - **Elegibilidad**: solo entran contratos con `royaltyPercentage > 0`; las obras sin ventas en el período se omiten.
+  - **Flujo completo**: listado, detalle con historial, PDF y estados de aprobación sobre la colección `royalty_statements`, más el selector de creadores elegibles.
+- **Saldo de caja real (todas las cuentas)**:
+  - **Cierres documentados**: nueva colección `reconciliations` (modelo `Reconciliation`) con el cierre mensual de cada cuenta (extracto Davivienda y reportes de MercadoPago/ePayco).
+  - **Gráfica "Plata en caja mes a mes"**: reemplaza la acumulación de ingresos menos egresos en la vista anual. La línea es el saldo de caja a fin de mes (nunca negativo) y las barras son lo que subió o bajó en el mes. Los traslados entre cuentas propias no cuentan como flujo.
+  - **Meses con saldo inicial no documentado**: el saldo de cierre se muestra; el flujo no se inventa (sin barra) y se informa el rango estimado.
+  - **Saldos de apertura/cierre**: `/api/finance/summary` devuelve `cash` y reemplaza `balances` en la vista consolidada (sin filtros). Con filtros de centro de costo, autor o cuenta se conserva el cálculo anterior.
+  - **Lógica pura y probada**: `src/lib/finance/cashBalance.ts` con pruebas unitarias.
+  - **Tres vistas, cada una con lo suyo**: la vista global muestra la historia completa de caja (todos los años con cierres documentados), la anual el año y la mensual el mes. En la vista mensual, un mes con flujo no determinable muestra las entradas y salidas del día en vez del saldo acumulado.
+  - **Indicadores de Sostenibilidad**: usan la caja real como base y dejan fuera de los promedios los meses con flujo no determinable y el mes en curso (`calculateHealthMetrics` recibe `cashBase` y `excludeMonths`).
+  - **Historia de caja completa**: la gráfica "Historia Financiera" (vista global) cubre desde el primer movimiento (mayo 2018) hasta hoy. Antes del primer cierre documentado el saldo se reconstruye hacia atrás restando el flujo de los movimientos cargados (`basis: 'calculado'`), por lo que esos meses son aproximados.
+  - **Resumen Anual para años anteriores**: los años sin cierre de diciembre/enero documentado ya usan la gráfica de caja (antes caían a la gráfica vieja de ingresos y egresos). La serie anual se recorta de la historia completa con `sliceCashYear`, y las tarjetas de caja, saldos e indicadores de sostenibilidad usan esa misma serie.
+
+- **Dashboard operativo por libro** (`/dashboard/catalog/[id]`): el detalle pasa de una columna larga a una franja de cifras y cuatro pestañas, pensado para decidir reimpresiones y reposiciones. Solo operación y logística, sin finanzas.
+  - **Franja de cifras** (`BookKpiStrip`): stock total, cobertura de bodega propia, cobertura combinada, rotación, tasa de devolución y costo unitario estimado.
+  - **Alertas** (`BookAttention`): solo aparece cuando hay algo que decidir (reimprimir ya, puntos agotados o sobre-abastecidos).
+  - **Pestaña Resumen**: ventas históricas, finanzas del centro de costo y contratos (lo que antes estaba en la página).
+  - **Pestaña Reimpresión**: semáforo de reimpresión (`Reimprimir ya` / `Planear`) según la cobertura de la bodega propia frente al tiempo de reimpresión elegido en pantalla (`BookReprint`), y gráfica de demanda mensual por canal de los últimos 12 meses (`BookDemandChart`).
+  - **Pestaña Puntos de venta**: rotación y estado de cada punto (`Dormido`, `Agotado`, `Reponer`, `Sobre-stock`, `Estable`) en `BookPosRotation`, y ventas por canal (puntos de venta vs. venta directa) con la participación de cada punto y su stock en consignación en `BookPointsOfSale`.
+  - **Pestaña Movimientos**: ciclo de vida de los ejemplares (`BookUnitFlow`), control de consignación con remitido, devuelto, liquidado y última liquidación por punto (`BookConsignment`) y kardex corto con enlace al historial filtrado por libro (`BookKardex`).
+  - **Obras completas**: no tienen inventario propio; la pestaña Reimpresión muestra una tabla por volumen y marca el que limita la obra (`BookVolumes`).
+  - **Costo unitario estimado**: último precio unitario pagado a la imprenta, tomado del egreso que incluye el libro (por línea, por total o por egresos de impresión del centro de costo). No es un costo de producción desglosado.
+- **Nuevos endpoints**:
+  - `GET /api/books/[id]/operations`: cobertura, rotación, estado por punto de venta, ciclo de vida, demanda mensual, últimos movimientos y costo unitario.
+  - `GET /api/books/[id]/points-of-sale`: ventas por canal y participación de cada punto de venta con su stock actual.
+  - `GET /api/inventory/movements?bookId=`: historial de movimientos filtrado por libro. La página `/dashboard/inventory/movements` lo usa desde el enlace del detalle y muestra un aviso con "Ver todos".
+  - `GET /api/royalties/creators`, `POST /api/royalties/preview` y `POST /api/royalties`: creadores elegibles, previsualización y guardado de liquidaciones.
+  - `/api/royalty-statements`: CRUD completo del documento de liquidación.
+- **Lógica pura y probada**: `src/lib/inventory/bookOperations.ts`, `unitCost.ts`, `unitCostQuery.ts` y `src/lib/finance/salesChannels.ts` (`buildBookPointsOfSaleStats`), con pruebas unitarias; el hook `useBookOperations` carga los datos una sola vez para todas las pestañas.
+
+### 🚀 Mejoras & UX (1.1.0)
+
+- **Gráficas con scroll horizontal**: "Historia Financiera" (`CashBalanceChart`, prop `scrollable`) y "Evolución del Resultado" (`RunwayProjectionChart`) tienen ancho fijo por mes y scroll horizontal dentro de su contenedor; abren posicionadas en el mes más reciente.
+
+- **Listado del catálogo en tarjetas** (`BookManagementTable`): cada libro es una tarjeta con portada, título, autor, precio, stock (con etiqueta "sin stock" o "bajo" y, en obras completas, stock calculado de sus volúmenes), ejemplares vendidos y facturado. Reemplaza la tabla con encabezados ordenables por un selector de orden (nombre A→Z / Z→A, más / menos vendidos, mayor / menor facturación).
+- **Centros de costo**: donuts de ingresos y egresos por categoría en el detalle (con la leyenda debajo del donut para mantener legibles las categorías) y nota de rentabilidad para explicar márgenes negativos en la etapa temprana de un centro de costo.
+- **Estilo de navegación**: `Sidebar`, `NavLinks` y `AppHeader` usan los tokens de `_variables.scss` (bordes, pesos de fuente y espaciado) en lugar de valores sueltos, con un aspecto más plano; `dashboard.scss` se ajusta en consecuencia.
+
+### 🛡️ Seguridad (1.1.0)
+
+- **Endpoints de facturas protegidos**: `requirePermission(INVOICES, ...)` en GET/POST/PATCH/DELETE, carga de XML y `mail-list`, que estaban expuestos sin autenticación porque el middleware solo cubría `/dashboard/*`.
+- **Validación de JWT en el proxy**: el middleware dejó de aceptar cualquier cookie `token` no vacía y ahora verifica firma y expiración con `verifyToken()`, ejecutándose en runtime Node.
+- **`JWT_SECRET` obligatorio**: se elimina el fallback público de desarrollo; un entorno mal configurado ya no puede firmar tokens predecibles.
+- **Endurecimiento adicional**: límite de 5 MB en la carga de XML y `.gitignore` ampliado a todos los `.env*` excepto `.env.example`.
+- **Dependencias**: Next.js 16.2.10 y actualización de `jspdf`, `undici`, `lodash` e `immutable`; las vulnerabilidades de producción bajan de 9 a 2.
+
+### 🐛 Correcciones (1.1.0)
+
+- **Listado de bodegas incompleto** (`/dashboard/warehouses`): la página se prerenderizaba en build y servía un HTML estático, por lo que las bodegas recién creadas no aparecían hasta el siguiente despliegue. Ahora se renderiza dinámicamente (`export const dynamic = 'force-dynamic'`) y cada visita consulta la base de datos. Además, el listado excluye las bodegas con eliminación lógica (`isDeleted: true`), igual que `/api/warehouses`.
+- **Egresos por centro de costo inflados**: `allocations[].amount` ya está almacenado en COP y no debe multiplicarse otra vez por `exchangeRate`; se corrigieron las cuatro ocurrencias (resumen financiero, estadísticas de centros de costo y `formatMovements`), incluida una que nunca se había detectado.
+- **Datos de la editorial en PDFs**: remisiones y devoluciones mostraban datos distintos según el usuario porque el GET de settings exigía `USERS/READ`; ahora solo requiere autenticación y la escritura sigue restringida a ADMIN.
+- **NaN en el detalle de una liquidación guardada**: se convierten los `Decimal128` anidados de `books[]` y `lines[]` al serializar.
+- **Ventas del libro con facturas antiguas**: `/api/books` y `/api/books/[id]/sales` suman cantidades e ingresos con `$toDouble`, de modo que las facturas con `Decimal128` o texto ya no dejan en cero o descuadran los ejemplares vendidos y lo facturado.
+- **Historial de movimientos**: se tolera la ausencia de bodega en un movimiento (`warehouseId` nulo) sin romper el filtro por bodega.
+- **Contraste AAA en texto atenuado**: los encabezados de la tabla compartida y los textos secundarios de regalías usaban `#64748b` y `#6b7280` (≈4,5:1). Ahora usan el token `muted-foreground` (`#334155`), que cumple 7:1, y se definieron los alias `--color-text-muted` / `--text-muted` que los componentes referenciaban sin existir. Corrige las violaciones de accesibilidad en acuerdos, creadores, facturas, usuarios y regalías.
+
+### 🛠️ Calidad Técnica (1.1.0)
+
+- **Alineación con la base de datos**: `costCenter` pasa a `string[]` en modelos, lecturas y formularios; se agrega el canal `WEB`; `Invoice.costCenters` se tipa como `{ code, amount }[]`; `middleware.ts` se renombra a `proxy.ts` (convención de Next.js 16).
+- **Refactor por límite de líneas**: `finance/summary/route.ts` y `finance/movements/route.ts` se dividen en módulos y se extrae la sección de monto/moneda del editor de movimientos.
+- **Pruebas nuevas**: royalties (`advances`, `agreements`, `calculate`, `statement`, `handlers` y lista), `bookOperations.test.ts`, `unitCost.test.ts`, `salesChannels.test.ts`, `BookOperations.test.tsx` y `BookMovementsTab.test.tsx`.
+- **Documentación**: `docs/modules/catalog.md` reescrito con el listado, las pestañas del detalle, los endpoints nuevos y las definiciones (venta directa desde la bodega propia, cobertura, rotación, señal de reimpresión, estados de punto de venta).
+- **Pipeline de calidad**: `.prettierignore` excluye dependencias, artefactos y copias de trabajo de agentes (`.claude`, `.agent`, `.agents`), y `endOfLine: "auto"` evita que Prettier reescriba los archivos por CRLF en Windows; ESLint ignora esas mismas copias y se retiró el `.eslintignore` obsoleto. El benchmark de consultas ahora recorre planes anidados y solo trata un `COLLSCAN` como bloqueante por encima de 10.000 documentos.
+
 ## [1.0.5] - 2026-05-08
 
 ### ✨ Nuevas Características (1.0.5)
@@ -211,5 +284,10 @@ Lanzamiento oficial de la plataforma **Tanuki Admin**, un sistema integral de ge
 
 ---
 
-[1.0.5]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v1.0.5
-[1.0.0]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v1.0.0
+[1.1.0]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v.1.1.0
+[1.0.5]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v.1.0.5
+[1.0.4]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v.1.0.4
+[1.0.3]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v.1.0.3
+[1.0.2]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v.1.0.2
+[1.0.1]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v.1.0.1
+[1.0.0]: https://github.com/TanukiDev09/tanuki-admin/releases/tag/v.1.0.0

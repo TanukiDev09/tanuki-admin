@@ -27,10 +27,7 @@ const STATUS_LABEL: Record<string, string> = {
   paid: 'Pagada',
 };
 
-const STATUS_VARIANT: Record<
-  string,
-  'secondary' | 'success' | 'outline'
-> = {
+const STATUS_VARIANT: Record<string, 'secondary' | 'success' | 'outline'> = {
   draft: 'secondary',
   approved: 'outline',
   paid: 'success',
@@ -91,7 +88,9 @@ export default function RoyaltyStatementsPage() {
           </p>
         </div>
         {canCreate && (
-          <Button onClick={() => router.push('/dashboard/royalty-statements/new')}>
+          <Button
+            onClick={() => router.push('/dashboard/royalty-statements/new')}
+          >
             <Plus className="w-4 h-4 mr-2" />
             Nueva liquidación
           </Button>

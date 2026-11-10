@@ -58,3 +58,7 @@ next-env.d.ts
 
 /.swc/*
 /.agent/*
+
+# cypress artifacts
+/cypress/screenshots/
+/cypress/videos/

@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Bar,
   Line,
   XAxis,
   YAxis,
@@ -21,6 +22,61 @@ interface ScrollableIncomeExpenseChartProps {
   scrollable?: boolean;
   variant?: 'daily' | 'monthly';
   initialBalance?: number;
+  /** false: sin línea de saldo acumulado; se dibujan las entradas y salidas del periodo. */
+  showBalance?: boolean;
+  /** Alto de la gráfica en px (por defecto 400). */
+  height?: number;
+}
+
+function balanceSeries() {
+  return [
+    <Area
+      key="balance-area"
+      type="monotone"
+      dataKey="balance"
+      fill="url(#balanceGradient)"
+      stroke="none"
+    />,
+    <Line
+      key="balance-line"
+      type="monotone"
+      dataKey="balance"
+      name="balance"
+      stroke="#06b6d4"
+      strokeWidth={3}
+      dot={{
+        fill: '#06b6d4',
+        stroke: 'hsl(var(--background))',
+        strokeWidth: 2,
+        r: 5,
+      }}
+      activeDot={{
+        r: 8,
+        fill: '#06b6d4',
+        stroke: 'hsl(var(--background))',
+        strokeWidth: 3,
+      }}
+    />,
+  ];
+}
+
+function flowBars() {
+  return [
+    <Bar
+      key="income-bar"
+      dataKey="income"
+      name="Entradas"
+      fill="#10b981"
+      maxBarSize={24}
+    />,
+    <Bar
+      key="expenses-bar"
+      dataKey="expenses"
+      name="Salidas"
+      fill="#ef4444"
+      maxBarSize={24}
+    />,
+  ];
 }
 
 export function ScrollableIncomeExpenseChart({
@@ -29,6 +85,8 @@ export function ScrollableIncomeExpenseChart({
   scrollable = false,
   variant = 'monthly',
   initialBalance = 0,
+  showBalance = true,
+  height = 400,
 }: ScrollableIncomeExpenseChartProps) {
   const isDaily = variant === 'daily';
 
@@ -68,15 +126,14 @@ export function ScrollableIncomeExpenseChart({
         <div className="scrollable-income-expense-chart__scroll-container">
           <div
             className="scrollable-income-expense-chart__chart-wrapper"
-            style={
-              scrollable
-                ? {
-                    width: `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px`,
-                  }
-                : { width: '100%' }
-            }
+            style={{
+              minHeight: height,
+              width: scrollable
+                ? `${Math.max(data.length * (isDaily ? 40 : 80), 800)}px`
+                : '100%',
+            }}
           >
-            <ResponsiveContainer width="100%" height={400}>
+            <ResponsiveContainer width="100%" height={height}>
               <ComposedChart
                 data={dataWithBalance}
                 margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
@@ -194,31 +251,7 @@ export function ScrollableIncomeExpenseChart({
                   strokeDasharray="5 5"
                   opacity={0.5}
                 />
-                <Area
-                  type="monotone"
-                  dataKey="balance"
-                  fill="url(#balanceGradient)"
-                  stroke="none"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="balance"
-                  name="balance"
-                  stroke="#06b6d4"
-                  strokeWidth={3}
-                  dot={{
-                    fill: '#06b6d4',
-                    stroke: 'hsl(var(--background))',
-                    strokeWidth: 2,
-                    r: 5,
-                  }}
-                  activeDot={{
-                    r: 8,
-                    fill: '#06b6d4',
-                    stroke: 'hsl(var(--background))',
-                    strokeWidth: 3,
-                  }}
-                />
+                {showBalance ? balanceSeries() : flowBars()}
               </ComposedChart>
             </ResponsiveContainer>
           </div>

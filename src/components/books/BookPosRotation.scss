@@ -1,0 +1,68 @@
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+@use './opsTable' as *;
+
+.book-pos-rotation {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+  }
+
+  &__title {
+    margin: 0;
+    color: $foreground;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    margin: 0;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+  }
+
+  &__empty {
+    margin: 0;
+    border: 1px dashed $border;
+    border-radius: $radius-lg;
+    padding: $spacing-xl;
+    color: $muted-foreground;
+    font-size: $font-size-sm;
+    text-align: center;
+  }
+
+  &__scroll {
+    @include ops-table-scroll;
+  }
+
+  &__table {
+    @include ops-table;
+  }
+
+  &__num {
+    font-variant-numeric: tabular-nums;
+    text-align: right !important;
+    white-space: nowrap;
+  }
+
+  &__name {
+    display: block;
+    color: $foreground;
+    font-weight: $font-weight-semibold;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+
+  &__city {
+    color: $muted-foreground;
+    font-size: $font-size-xs;
+  }
+}

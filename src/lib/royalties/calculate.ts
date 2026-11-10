@@ -133,8 +133,13 @@ export async function buildCreatorComputation(params: {
   /** true en la primera liquidación del creador (se detecta el anticipo). */
   detectAdvances: boolean;
 }): Promise<RoyaltyComputation> {
-  const { agreements, periodStart, periodEnd, previousBalance, detectAdvances } =
-    params;
+  const {
+    agreements,
+    periodStart,
+    periodEnd,
+    previousBalance,
+    detectAdvances,
+  } = params;
 
   const books: RoyaltyBookComputation[] = [];
   const advanceBreakdown: IAdvanceBreakdownLine[] = [];
@@ -146,13 +151,17 @@ export async function buildCreatorComputation(params: {
 
   for (const agreement of agreements) {
     const book = agreement.book;
-    const { lines, totalCopies: copies, totalInvoiced, totalRoyalties } =
-      await computeRoyaltyLines(
-        book._id,
-        periodStart,
-        periodEnd,
-        agreement.royaltyPercentage
-      );
+    const {
+      lines,
+      totalCopies: copies,
+      totalInvoiced,
+      totalRoyalties,
+    } = await computeRoyaltyLines(
+      book._id,
+      periodStart,
+      periodEnd,
+      agreement.royaltyPercentage
+    );
 
     // Omitir obras sin ventas en el período.
     if (lines.length === 0) continue;
